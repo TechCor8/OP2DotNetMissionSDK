@@ -26,8 +26,9 @@ namespace DotNetInterop
 	// Called every update cycle.
 	EXPORT_SPEC void Update();
 
-	// Used to return a buffer description to OP2 for storing data to saved game files
-	EXPORT_SPEC void GetSaveRegions(void* bufferStart, int length);
+	// Used to get a buffer for storing data for saved game files
+	EXPORT_SPEC void* GetSaveBuffer();
+	EXPORT_SPEC int GetSaveBufferLength();
 
 	//EXPORT_SPEC std::string GetDisplayString(const char * pName, int iValue);
 }

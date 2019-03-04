@@ -41,11 +41,18 @@ namespace DotNetInterop
 		lib->Update();
 	}
 
-	void GetSaveRegions(void* bufferStart, int length)
+	void* GetSaveBuffer()
 	{
 		DotNetMissionEntry^ lib = gcnew DotNetMissionEntry();
 
-		lib->GetSaveRegions((IntPtr)bufferStart, length);
+		return (void*)lib->GetSaveBuffer();
+	}
+
+	int GetSaveBufferLength()
+	{
+		DotNetMissionEntry^ lib = gcnew DotNetMissionEntry();
+
+		return lib->GetSaveBufferLength();
 	}
 }
 

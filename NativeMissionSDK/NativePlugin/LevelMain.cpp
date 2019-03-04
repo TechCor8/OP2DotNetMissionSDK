@@ -5,6 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>						// Required for DLLMain
 
+
 // Note: These exports are required by Outpost2.exe from every level
 //		 DLL. They give values for the map and tech trees used by the
 //		 level and a description to place in the level listbox. The
@@ -17,16 +18,11 @@ ExportLevelDetails("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", Colony
 // Required data exports  (Description, Map, TechTree, GameType, NumPlayers, maxTechLevel, bUnitOnlyMission)
 //ExportLevelDetailsEx("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", MultiLastOneStanding, 6, 12, false)
 
-// Statically sized save buffer for global game variables.
-// This buffer is passed to managed code where a stream can fill it up to the maximum size specified.
-char saveBuffer[1024];
 
 Export void __cdecl GetSaveRegions(struct BufferDesc &bufDesc)
 {
-	bufDesc.bufferStart = saveBuffer;
-	bufDesc.length = 1024;
-
-	DotNetInterop::GetSaveRegions(bufDesc.bufferStart, bufDesc.length);
+	bufDesc.bufferStart = DotNetInterop::GetSaveBuffer();
+	bufDesc.length = DotNetInterop::GetSaveBufferLength();
 }
 
 
