@@ -1,0 +1,9 @@
+Debug
+Release
+x64
+*.suo
+*.db
+*.opendb
+*.user
+.vs
+*.aps

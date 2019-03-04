@@ -1,0 +1,10 @@
+#[submodule "OP2Helper"]
+#	path = OP2Helper
+#	url = https://github.com/OutpostUniverse/OP2Helper.git
+[submodule "HFL"]
+	path = HFL
+	url = https://github.com/OutpostUniverse/HFL.git
+
+[submodule "Outpost2DLL"]
+	path = Outpost2DLL
+	url = https://github.com/OutpostUniverse/Outpost2DLL.git

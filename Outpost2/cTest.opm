@@ -1,0 +1,127 @@
+{
+	"LevelDetails":
+	{
+		"LevelDescription":"Colony Game, Eden",
+		"MapName":"on6_01.map",
+		"TechTreeName":"MULTITEK.TXT",
+		"MissionType":-1,
+		"NumPlayers":2,
+		"MaxTechLevel":12,
+		"UnitOnlyMission":false
+	},
+	
+	"TethysGame":
+	{
+		"DaylightEverywhere":true,
+		"DaylightMoves":true,
+		"InitialLightLevel":0,
+		"MusicPlayList":
+		{
+			"RepeatStartIndex":0,
+			"SongIDs":[0,1,2]
+		},
+		"Beacons":
+		[
+			{
+				"MapID":81,
+				"CommonRareType":0,
+				"BarYield":-1,
+				"BarVariant":-1,
+				"SpawnRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 }
+			}
+		],
+		"Markers":
+		[
+			{
+				"MarkerType":0,
+				"SpawnRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 }
+			}
+		],
+		"Wreckage":
+		[
+			{
+				"TechID":8000,
+				"IsVisible":true,
+				"SpawnRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 }
+			}
+		],
+		"WallTubes":
+		[
+			{
+				"TypeID":17,
+				"Location": { "X":19, "Y":14 }
+			},
+			{
+				"TypeID":17,
+				"Location": { "X":20, "Y":14 }
+			}
+		]
+	},
+	
+	"Players":
+	[
+		{
+			"ID":0,
+			"MoraleLevel":2,
+			"FreeMorale":true,
+			"IsEden":true,
+			"IsHuman":true,
+			"ColorID":0,
+			"Allies":[1],
+			"CenterView": { "X":15, "Y":14 },
+			
+			"Kids":10,
+			"Workers":25,
+			"Scientists":12,
+			"CommonOre":2000,
+			"RareOre":0,
+			"Food":2000,
+			
+			"Units":
+			[
+				{
+					"TypeID":28,
+					"CargoType":0,
+					"Rotation":0,
+					"Location": { "X":15, "Y":13 }
+				},
+				{
+					"TypeID":2,
+					"CargoType":28,
+					"Rotation":0,
+					"Location": { "X":15, "Y":13 }
+				}
+			]
+		}
+	],
+	
+	"Disasters":
+	[
+		{
+			"ID":0,
+			"Type":"Meteor",
+			"SrcRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 },
+			"DestRect":{ "MinX":60, "MinY":60, "MaxX":90, "MaxY":90 },
+			"Size":1,
+			"Duration":80,
+			"StartTime":10,
+			"EndTime":1500,
+			"MinDelay":5,
+			"MaxDelay":10
+		}
+	],
+	
+	"Triggers":
+	[
+		{
+			"ID":0,
+			"Type":"OnePlayerLeft",
+			"Enabled":true,
+			"OneShot":true,
+			"Actions":
+			[
+			1
+			]
+		}
+	]
+}
