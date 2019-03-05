@@ -6,6 +6,7 @@ namespace DotNetMissionSDK.Json
 	public class PlayerData
 	{
 		[DataMember(Name = "ID")]				public int id						{ get; private set; }
+		[DataMember(Name = "TechLevel")]		public int techLevel				{ get; private set; }
 		[DataMember(Name = "MoraleLevel")]		public int moraleLevel				{ get; private set; }
 		[DataMember(Name = "FreeMorale")]		public bool freeMorale				{ get; private set; }
 		[DataMember(Name = "IsEden")]			public bool isEden					{ get; private set; }
@@ -20,6 +21,9 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "CommonOre")]		public int commonOre				{ get; private set; }
 		[DataMember(Name = "RareOre")]			public int rareOre					{ get; private set; }
 		[DataMember(Name = "Food")]				public int food						{ get; private set; }
+		[DataMember(Name = "SolarSatellites")]	public int solarSatellites			{ get; private set; }
+
+		[DataMember(Name = "CompletedResearch")]public int[] completedResearch		{ get; private set; }
 
 		[DataMember(Name = "Units")]			public UnitData[] units				{ get; private set; }
 

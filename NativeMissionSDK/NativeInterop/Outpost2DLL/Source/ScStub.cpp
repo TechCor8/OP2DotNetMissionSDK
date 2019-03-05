@@ -37,6 +37,11 @@ public:	// Why not? ;)
 
 extern "C"
 {
+	extern EXPORT int __stdcall ScStub_GetIndex(ScStub* handle)
+	{
+		return handle->Id();
+	}
+
 	extern EXPORT void __stdcall ScStub_Release(ScStub* handle)
 	{
 		delete handle;

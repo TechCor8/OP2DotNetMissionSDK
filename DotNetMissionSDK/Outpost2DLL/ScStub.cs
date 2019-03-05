@@ -26,11 +26,16 @@ namespace DotNetMissionSDK
 		//void Disable();
 		//void Enable();
 		// [Get]
-		//int Id() const;
+		public int GetStubIndex()
+		{
+			return ScStub_GetIndex(m_Handle);
+		}
 		//int IsEnabled();
 		//int IsInitialized();
 		// [Set]
 		//void SetId(int stubIndex);
+
+		[DllImport("NativeInterop.dll")] private static extern int ScStub_GetIndex(IntPtr handle);
 
 		// --- Release ---
 		public void Dispose()

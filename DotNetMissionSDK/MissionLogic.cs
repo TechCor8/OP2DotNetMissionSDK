@@ -1,17 +1,44 @@
 ﻿using DotNetMissionSDK.Json;
+using DotNetMissionSDK.Triggers;
+using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK
 {
 	public class MissionLogic
 	{
-		private List<Unit> m_Markers = new List<Unit>();
+		private MissionRoot m_Root;
+		private SaveData m_SaveData;
+		
+		private TriggerManager m_TriggerManager;
 
 		private List<DisasterData> m_Disasters = new List<DisasterData>();
+		private Dictionary<int, TriggerData> m_TriggerData = new Dictionary<int, TriggerData>();
 
 
-		public bool Initialize(MissionRoot root)
+		/// <summary>
+		/// Prepares mission logic for use.
+		/// </summary>
+		/// <param name="root">The filled JSON data root.</param>
+		/// <param name="saveData">The save data class.</param>
+		/// <param name="triggerManager">The trigger manager used for the mission.</param>
+		public MissionLogic(MissionRoot root, SaveData saveData, TriggerManager triggerManager)
 		{
+			m_Root = root;
+			m_SaveData = saveData;
+			m_TriggerManager = triggerManager;
+
+			m_TriggerManager.onTriggerFired += OnTriggerExecuted;
+		}
+
+		/// <summary>
+		/// Called when a new mission should start. Performs initial setup.
+		/// </summary>
+		/// <returns>True on success.</returns>
+		public bool InitializeNewMission()
+		{
+			MissionRoot root = m_Root;
+
 			// Setup Game
 			TethysGame.SetDaylightEverywhere(root.tethysGame.daylightEverywhere);
 			TethysGame.SetDaylightMoves(root.tethysGame.daylightMoves);
@@ -35,7 +62,7 @@ namespace DotNetMissionSDK
 
 				Unit unit;
 				TethysGame.PlaceMarker(out unit, spawnPt.x, spawnPt.y, marker.markerType);
-				m_Markers.Add(unit);
+				unit.Dispose();
 			}
 
 			// Wreckage
@@ -58,6 +85,8 @@ namespace DotNetMissionSDK
 			foreach (PlayerData data in root.players)
 			{
 				Player player = TethysGame.GetPlayer(data.id);
+
+				player.SetTechLevel(data.techLevel);
 
 				switch ((MoraleLevels)data.moraleLevel)
 				{
@@ -91,6 +120,10 @@ namespace DotNetMissionSDK
 				player.SetOre(data.commonOre);
 				player.SetRareOre(data.rareOre);
 				player.SetFoodStored(data.food);
+				player.SetSolarSat(data.solarSatellites);
+
+				foreach (int techID in data.completedResearch)
+					player.MarkResearchComplete(techID);
 
 				// Units
 				foreach (UnitData unitData in data.units)
@@ -103,6 +136,186 @@ namespace DotNetMissionSDK
 				}
 			}
 
+			InitializeDisasters();
+
+			// Setup Triggers
+			List<TriggerData> triggers = new List<TriggerData>(root.triggers);
+			Dictionary<int, TriggerStub> triggerLookup = new Dictionary<int, TriggerStub>();
+			int previousCount = 0;
+
+			// Keep performing passes until all triggers have been processed
+			while (triggers.Count > 0)
+			{
+				// Prevent infinite loop. If parent triggers are not found, they will stay in the trigger queue.
+				if (triggers.Count == previousCount)
+				{
+					Console.WriteLine("Warning: " + triggers.Count + " triggers not processed.");
+					break;
+				}
+
+				previousCount = triggers.Count;
+
+				// Perform a processing pass on the triggers
+				for (int i=0; i < triggers.Count; ++i)
+				{
+					TriggerData data = triggers[i];
+
+					// Get parent trigger if there is one
+					TriggerStub parentTrigger = null;
+					if (data.triggerID > 0)
+						triggerLookup.TryGetValue(data.triggerID, out parentTrigger);
+
+					bool wasProcessed = true;
+
+					TriggerStub trigger = null;
+
+					switch (data.type)
+					{
+						case TriggerType.None:
+							Console.WriteLine("Warning: Trigger Type None");
+							break;
+
+						case TriggerType.Victory:
+							if (parentTrigger == null)
+							{
+								wasProcessed = false;
+								break;
+							}
+							
+							trigger = TriggerStub.CreateVictoryCondition(data.enabled, parentTrigger, data.message);
+							break;
+
+						case TriggerType.Failure:
+							if (parentTrigger == null)
+							{
+								wasProcessed = false;
+								break;
+							}
+
+							trigger = TriggerStub.CreateFailureCondition(data.enabled, parentTrigger);
+							break;
+
+						case TriggerType.OnePlayerLeft:
+							trigger = TriggerStub.CreateOnePlayerLeftTrigger(data.enabled, data.oneShot);
+							break;
+
+						case TriggerType.Evac:
+							trigger = TriggerStub.CreateEvacTrigger(data.enabled, data.oneShot, data.playerID);
+							break;
+
+						case TriggerType.Midas:
+							trigger = TriggerStub.CreateMidasTrigger(data.enabled, data.oneShot, data.time);
+							break;
+
+						case TriggerType.Operational:
+							trigger = TriggerStub.CreateOperationalTrigger(data.enabled, data.oneShot, data.playerID, data.unitType, data.count, data.compareType);
+							break;
+
+						case TriggerType.Research:
+							trigger = TriggerStub.CreateResearchTrigger(data.enabled, data.oneShot, data.techID, data.playerID);
+							break;
+
+						case TriggerType.Resource:
+							trigger = TriggerStub.CreateResourceTrigger(data.enabled, data.oneShot, data.resourceType, data.count, data.playerID, data.compareType);
+							break;
+
+						case TriggerType.Kit:
+							trigger = TriggerStub.CreateKitTrigger(data.enabled, data.oneShot, data.playerID, data.unitType, data.count);
+							break;
+
+						case TriggerType.Escape:
+							trigger = TriggerStub.CreateEscapeTrigger(data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height, data.count, data.unitType, data.cargoType, data.cargoAmount);
+							break;
+
+						case TriggerType.Count:
+							trigger = TriggerStub.CreateCountTrigger(data.enabled, data.oneShot, data.playerID, data.unitType, data.cargoOrWeaponType, data.count, data.compareType);
+							break;
+
+						case TriggerType.VehicleCount:
+							trigger = TriggerStub.CreateVehicleCountTrigger(data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
+							break;
+
+						case TriggerType.BuildingCount:
+							trigger = TriggerStub.CreateBuildingCountTrigger(data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
+							break;
+
+						case TriggerType.Attacked:
+							wasProcessed = false;
+							Console.WriteLine("Attacked trigger not implemented!");
+							break;
+
+						case TriggerType.Damaged:
+							wasProcessed = false;
+							Console.WriteLine("Damaged trigger not implemented!!");
+							break;
+
+						case TriggerType.Time:
+							trigger = TriggerStub.CreateTimeTrigger(data.enabled, data.oneShot, data.time);
+							break;
+
+						case TriggerType.TimeRange:
+							trigger = TriggerStub.CreateTimeTrigger(data.enabled, data.oneShot, data.minTime, data.maxTime);
+							break;
+
+						case TriggerType.Point:
+							trigger = TriggerStub.CreatePointTrigger(data.enabled, data.oneShot, data.playerID, data.x, data.y);
+							break;
+
+						case TriggerType.Rect:
+							trigger = TriggerStub.CreateRectTrigger(data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height);
+							break;
+
+						case TriggerType.SpecialTarget:
+							Console.WriteLine("SpecialTarget not implemented!");
+							break;
+
+						default:
+							wasProcessed = false;
+							Console.WriteLine("Invalid Trigger Type: " + data.type);
+							break;
+					}
+
+					if (wasProcessed)
+					{
+						trigger.id = data.id;
+						
+						try
+						{
+							triggerLookup.Add(data.id, trigger);
+						}
+						catch (ArgumentException e)
+						{
+							// More than one trigger has the same ID
+							Console.WriteLine(e);
+						}
+
+						m_TriggerManager.AddTrigger(trigger);
+
+						triggers.RemoveAt(i--);
+					}
+				}
+			}
+
+			CreateTriggerDataLookupTable();
+
+			return true;
+		}
+
+		/// <summary>
+		/// Called when a mission is loaded from a saved game. Performs reinitialization of data lost during quit.
+		/// </summary>
+		public void LoadMission()
+		{
+			InitializeDisasters();
+			CreateTriggerDataLookupTable();
+		}
+
+		private void InitializeDisasters()
+		{
+			MissionRoot root = m_Root;
+
+			m_Disasters.Clear();
+
 			// Setup Disasters
 			if (TethysGame.CanHaveDisasters() || root.levelDetails.missionType == MissionTypes.Colony)
 			{
@@ -112,12 +325,41 @@ namespace DotNetMissionSDK
 					m_Disasters.Add(disaster);
 				}
 			}
+		}
 
-			// Setup Triggers
-			//Trigger trig = Trigger.CreateOperationalTrigger(true, true, TethysGame.LocalPlayer(), map_id.mapCommandCenter, 0, compare_mode.cmpEqual, Trigger.EmptyFunction);
-			//Trigger.CreateFailureCondition(true, trig);
+		/// <summary>
+		/// Creates a table used for looking up trigger actions
+		/// </summary>
+		private void CreateTriggerDataLookupTable()
+		{
+			m_TriggerData.Clear();
 
-			return true;
+			foreach (TriggerData data in m_Root.triggers)
+				m_TriggerData.Add(data.id, data);
+		}
+
+		private void OnTriggerExecuted(TriggerStub stub)
+		{
+			TriggerData data;
+			if (!m_TriggerData.TryGetValue(stub.id, out data))
+			{
+				Console.WriteLine("Could not find trigger data for ID: " + stub.id);
+				return;
+			}
+
+			// Execute trigger actions
+			foreach (ActionData action in data.actions)
+				ExecuteAction(action);
+		}
+
+		private void ExecuteAction(ActionData action)
+		{
+			switch (action.type)
+			{
+				case "AddMessage":
+					TethysGame.AddMessage(0, 0, action.message, action.playerID, action.soundID);
+					break;
+			}
 		}
 
 		public void Update()
@@ -145,16 +387,6 @@ namespace DotNetMissionSDK
 			LOCATION spawnPt = TethysGame.GetMapCoordinates(TethysGame.GetRandomLocation(new MAP_RECT(disaster.srcRect)));
 			LOCATION destPt = TethysGame.GetMapCoordinates(TethysGame.GetRandomLocation(new MAP_RECT(disaster.destRect)));
 
-			/*using (System.IO.FileStream fs = new System.IO.FileStream("DotNetLog.txt", System.IO.FileMode.Append))
-			using (System.IO.StreamWriter writer = new System.IO.StreamWriter(fs))
-			{
-				writer.WriteLine();
-				writer.WriteLine("Disaster: " + disaster.type);
-				writer.WriteLine("Current Time: " + TethysGame.Time());
-				writer.WriteLine("Disaster Time: " + disaster.timeUntilNextDisaster);
-				writer.WriteLine("End Time: " + disaster.endTime);
-			}*/
-			
 			switch (disaster.type)
 			{
 				case "Meteor":			TethysGame.SetMeteor(spawnPt.x, spawnPt.y, disaster.size);								break;
@@ -169,14 +401,17 @@ namespace DotNetMissionSDK
 			}
 		}
 
+		/// <summary>
+		/// Called when the mission restarts.
+		/// </summary>
+		public void Restart()
+		{
+			m_TriggerManager.onTriggerFired -= OnTriggerExecuted;
+		}
+
 		// Unused: Releases all mission resources
 		private void Dispose()
 		{
-			// Dispose markers
-			foreach (Unit marker in m_Markers)
-				marker.Dispose();
-
-			m_Markers.Clear();
 		}
 	}
 }

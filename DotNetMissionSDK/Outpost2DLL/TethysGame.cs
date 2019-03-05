@@ -69,7 +69,7 @@ namespace DotNetMissionSDK
 		[DllImport("NativeInterop.dll")] public static extern void AddMapSound(int soundIndex, int tileX, int tileY);
 		// Message log
 		[DllImport("NativeInterop.dll")] public static extern void AddMessage(int pixelX, int pixelY, string message, int toPlayerNum, int soundIndex); // Note: toPlayerNum: -1 = PlayerAll
-																																						//[DllImport("NativeInterop.dll")] public static extern void AddMessage(Unit owner, string message, int toPlayerNum, int soundIndex);				// Note: toPlayerNum: -1 = PlayerAll
+		//[DllImport("NativeInterop.dll")] public static extern void AddMessage(Unit owner, string message, int toPlayerNum, int soundIndex);				// Note: toPlayerNum: -1 = PlayerAll
 
 		// Debug/Cheat flags
 		[DllImport("NativeInterop.dll")] private static extern void TethysGame_SetDaylightEverywhere(int bOn);
@@ -86,7 +86,7 @@ namespace DotNetMissionSDK
 		[DllImport("NativeInterop.dll")] private static extern int TethysGame_CreateWreck(int tileX, int tileY, map_id techID, int bInitiallyVisible);      // Note: techID must be >= 8000 but < (8000+4096) = 12096
 		[DllImport("NativeInterop.dll")] private static extern int TethysGame_PlaceMarker(IntPtr returnedUnit, int tileX, int tileY, int markerType);       // Note: See enum MarkerTypes
 		[DllImport("NativeInterop.dll")] public static extern int CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType);      // Returns: 1 [true] always
-																																				//[DllImport("NativeInterop.dll")] public static extern int CreateUnitBlock(_Player& ownerPlayer, string exportName, int bLightsOn);		// Returns: numUnitsCreated,  Note: see class UnitBlock
+		//[DllImport("NativeInterop.dll")] public static extern int CreateUnitBlock(_Player& ownerPlayer, string exportName, int bLightsOn);		// Returns: numUnitsCreated,  Note: see class UnitBlock
 
 		// Morale Level
 		//  Note: playerNum: -1 = PlayerAll

@@ -45,15 +45,18 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="MissionLogic.cs" />
+    <Compile Include="MissionReader\Json\ActionData.cs" />
     <Compile Include="MissionReader\Json\DataLocation.cs" />
     <Compile Include="MissionReader\Json\DataRect.cs" />
     <Compile Include="MissionReader\Json\DisasterData.cs" />
+    <Compile Include="MissionReader\Json\TriggerData.cs" />
     <Compile Include="MissionReader\Json\UnitData.cs" />
     <Compile Include="MissionReader\Json\GameData.cs" />
     <Compile Include="MissionReader\Json\LevelDetails.cs" />
     <Compile Include="MissionReader\Json\MissionRoot.cs" />
     <Compile Include="MissionReader\Json\PlayerData.cs" />
     <Compile Include="MissionReader\MissionReader.cs" />
+    <Compile Include="MissionSDK\TriggerManager.cs" />
     <Compile Include="Outpost2DLL\Enumerators.cs" />
     <Compile Include="Outpost2DLL\Enums.cs" />
     <Compile Include="Outpost2DLL\GameMap.cs" />
@@ -64,11 +67,12 @@
     <Compile Include="Outpost2DLL\ScStub.cs" />
     <Compile Include="Outpost2DLL\Structs.cs" />
     <Compile Include="Outpost2DLL\TethysGame.cs" />
-    <Compile Include="Outpost2DLL\Trigger.cs" />
+    <Compile Include="Outpost2DLL\TriggerStub.cs" />
     <Compile Include="Outpost2DLL\Unit.cs" />
     <Compile Include="Outpost2DLL\UnitBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SaveBuffer.cs" />
+    <Compile Include="SaveData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

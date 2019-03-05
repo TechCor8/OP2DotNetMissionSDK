@@ -1,36 +1,12 @@
 ﻿using DotNetMissionSDK.Json;
+using DotNetMissionSDK.Triggers;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 
-/*
- * TODO:
- * 
- * Create mission Format Serializer/Deserializer
- * Create OP2Script API wrapper (Maybe try to link directly to Outpost2DLL instead)
- * Create OP2DotNetLib API wrapper
- * Create objects based on mission format
-*/
 
 namespace DotNetMissionSDK
 {
-	/// <summary>
-	/// The save data class for storing values that must persist when loading the mission from a save file.
-	/// Make sure this class does not contain any reference types.
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Pack=1)]
-	public class SaveData
-	{
-		public int test;
-		public int test2;
-
-		[MarshalAs(UnmanagedType.LPStr, SizeConst = 50)]
-		public string testStr;
-
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-		public int[] testArr;
-	}
-
 	/// <summary>
 	/// The class containing entry points from Outpost 2.
 	/// </summary>
@@ -43,12 +19,16 @@ namespace DotNetMissionSDK
 		private FileStream m_LogFileStream;
 		private StreamWriter m_LogWriter;
 
-		// Native DLL name and Save Buffer
+		// Mission Data
 		private string m_MissionDLLName;
+		MissionRoot m_MissionData;
 		private SaveBuffer<SaveData> m_SaveBuffer = new SaveBuffer<SaveData>();
 
+		// Essential Systems
+		TriggerManager m_Triggers;
+
 		// Mission logic
-		private MissionLogic m_MissionLogic = new MissionLogic();
+		private MissionLogic m_MissionLogic;
 
 
 		/// <summary>
@@ -67,8 +47,22 @@ namespace DotNetMissionSDK
 		// DO NOT PUT MISSION CODE HERE. THE GAME IS NOT GUARANTEED TO BE READY.
 		private bool _Attach(string dllPath)
 		{
+			InitializeLog();
+
 			m_MissionDLLName = Path.GetFileNameWithoutExtension(dllPath);
 
+			// Read JSON data
+			if (!File.Exists(m_MissionDLLName + ".opm"))
+				return false;
+
+			// Load JSON data
+			m_MissionData = MissionReader.GetMissionData(m_MissionDLLName + ".opm");
+
+			return true;
+		}
+
+		private void InitializeLog()
+		{
 			// Initialize debug log
 			try
 			{
@@ -81,8 +75,6 @@ namespace DotNetMissionSDK
 			{
 				Console.WriteLine(e);
 			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -99,28 +91,16 @@ namespace DotNetMissionSDK
 		// ** Put mission init code here. **
 		private bool _Initialize()
 		{
-			// Prepare save buffer
-			m_SaveBuffer.Load();
-
-			// Read JSON data
-			if (!File.Exists(m_MissionDLLName + ".opm"))
-				return false;
-
-			MissionRoot missionData = MissionReader.GetMissionData(m_MissionDLLName + ".opm");
-
+			InitializeSystems();
+			
 			// Initialize mission with JSON data
-			m_MissionLogic.Initialize(missionData);
+			m_MissionLogic.InitializeNewMission();
 
 			// TODO: Remove Me
 			Console.WriteLine("Initialized!");
 			Console.WriteLine("Mission DLL: " + m_MissionDLLName);
-			Console.WriteLine("Mission Desc: " + missionData.levelDetails.description);
-			Console.WriteLine("Tube: " + missionData.tethysGame.wallTubes[0].typeID);
-			Console.WriteLine("Tube: " + missionData.tethysGame.wallTubes[0].location.x);
-			Console.WriteLine("Tube: " + missionData.tethysGame.wallTubes[0].location.y);
-			Console.WriteLine("m_SaveBuffer" + m_SaveBuffer);
-			// **End TODO**
-
+			Console.WriteLine("Mission Desc: " + m_MissionData.levelDetails.description);
+			
 			Console.WriteLine("PreSet");
 			Console.WriteLine("Test = " + m_SaveBuffer.saveData.test);
 			Console.WriteLine("Test2 = " + m_SaveBuffer.saveData.test2);
@@ -131,8 +111,28 @@ namespace DotNetMissionSDK
 			Console.WriteLine("PostSet");
 			Console.WriteLine("Test = " + m_SaveBuffer.saveData.test);
 			Console.WriteLine("Test2 = " + m_SaveBuffer.saveData.test2);
+			m_Triggers.AddTrigger(TriggerStub.CreateVehicleCountTrigger(true, true, TethysGame.LocalPlayer(), 3, compare_mode.cmpGreaterEqual));
+			// **End TODO**
 
 			return true;
+		}
+
+		private void InitializeSystems()
+		{
+			// Prepare save buffer
+			m_SaveBuffer.Load();
+
+			// Init essential systems
+			m_Triggers = new TriggerManager(m_SaveBuffer.saveData);
+			m_Triggers.onTriggerFired += OnTriggerFired;
+
+			m_MissionLogic = new MissionLogic(m_MissionData, m_SaveBuffer.saveData, m_Triggers);
+		}
+
+		private void OnTriggerFired(TriggerStub trigger)
+		{
+			TethysGame.AddMessage(0, 0, "Trigger Fired!", TethysGame.LocalPlayer(), 0);
+			Console.WriteLine("Trigger Fired!");
 		}
 
 		/// <summary>
@@ -148,14 +148,13 @@ namespace DotNetMissionSDK
 		{
 			// Load the save buffer if it isn't loaded
 			if (!m_SaveBuffer.isLoaded)
-				m_SaveBuffer.Load();
+				InitializeSystems();
+
+			// Update essential systems
+			m_Triggers.Update();
 
 			// Update mission logic
 			m_MissionLogic.Update();
-
-			/*Console.WriteLine("Update");
-			Console.WriteLine("Test = " + m_SaveBuffer.saveData.test);
-			Console.WriteLine("Test2 = " + m_SaveBuffer.saveData.test2);*/
 
 			// Update save buffer
 			m_SaveBuffer.Save();
@@ -179,13 +178,27 @@ namespace DotNetMissionSDK
 			return m_Instance.m_SaveBuffer.GetSaveBufferLength();
 		}
 
-		public void Dispose()
+		/// <summary>
+		/// Must be called when the mission restarts.
+		/// </summary>
+		public void Restart()
+		{
+			m_MissionLogic.Restart();
+
+			m_Triggers.onTriggerFired -= OnTriggerFired;
+		}
+		
+		private void Dispose()
 		{
 			if (m_LogFileStream != null)
 			{
 				m_LogFileStream.Close();
 				m_LogWriter.Close();
 			}
+
+			m_SaveBuffer.Dispose();
+
+			m_Triggers.onTriggerFired -= OnTriggerFired;
 		}
 	}
 }

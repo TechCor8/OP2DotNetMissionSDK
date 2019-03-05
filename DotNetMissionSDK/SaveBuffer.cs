@@ -41,7 +41,6 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public void Load()
 		{
-			Console.WriteLine("Load");
 			Marshal.PtrToStructure(m_Handle, saveData);
 
 			isLoaded = true;
@@ -52,7 +51,6 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public void Save()
 		{
-			Console.WriteLine("Save");
 			Marshal.StructureToPtr(saveData, m_Handle, true);
 		}
 

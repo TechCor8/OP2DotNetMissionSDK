@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <Outpost2DLL/Outpost2DLL.h>	// Main Outpost 2 header to interface with the game
+#include <fstream>
 
 #ifndef EXPORT
 #define EXPORT __declspec(dllexport)
@@ -13,113 +14,137 @@
 //		 this class to control a trigger and it is usually destroyed
 //		 shortly after it is returned from the trigger creation function.
 
-/*class OP2 Trigger : public ScStub
-{
-public:
-	Trigger();
-	~Trigger();	// {};
-	Trigger& operator = (const Trigger& trigger);
-
-	void Disable();
-	void Enable();
-	int HasFired(int playerNum);	// Note: Do not pass -1 = PlayerAll
-};*/
-
 extern "C"
 {
+	extern EXPORT void __stdcall Trigger_Disable(int stubIndex)
+	{
+		Trigger trigger;
+		trigger.stubIndex = stubIndex;
+
+		trigger.Disable();
+	}
+
+	extern EXPORT void __stdcall Trigger_Enable(int stubIndex)
+	{
+		Trigger trigger;
+		trigger.stubIndex = stubIndex;
+
+		trigger.Enable();
+	}
+
+	extern EXPORT int __stdcall Trigger_HasFired(int stubIndex, int playerNum)	// Note: Do not pass -1 = PlayerAll
+	{
+		Trigger trigger;
+		trigger.stubIndex = stubIndex;
+
+		return trigger.HasFired(playerNum);
+	}
+
+
 	// Trigger creation functions
 	// **************************
 
 	// Victory/Failure condition triggers
-	extern EXPORT Trigger* __stdcall Trigger_CreateVictoryCondition(int bEnabled, int bOneShot /*not used, set to 0*/, Trigger* victoryTrigger, const char* missionObjective)
+	extern EXPORT int __stdcall Trigger_CreateVictoryCondition(int bEnabled, int bOneShot /*not used, set to 0*/, int victoryTrigger, const char* missionObjective)
 	{
-		return new Trigger(CreateVictoryCondition(bEnabled, bOneShot, *victoryTrigger, missionObjective));
+		// CreateVictoryCondition does not make a copy, and missionObjective gets released. Make a copy now.
+		size_t len = strlen(missionObjective)+1;
+		char* copy = new char[len];
+		strcpy_s(copy, len, missionObjective);
+
+		Trigger t;
+		t.stubIndex = victoryTrigger;
+
+		return CreateVictoryCondition(bEnabled, bOneShot, t, copy).stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateFailureCondition(int bEnabled, int bOneShot /*not used, set to 0*/, Trigger* failureTrigger, const char* failureCondition /*not used, set to ""*/)
+	extern EXPORT int __stdcall Trigger_CreateFailureCondition(int bEnabled, int bOneShot /*not used, set to 0*/, int failureTrigger)
 	{
-		return new Trigger(CreateFailureCondition(bEnabled, bOneShot, *failureTrigger, failureCondition));
+		Trigger t;
+		t.stubIndex = failureTrigger;
+
+		return CreateFailureCondition(bEnabled, bOneShot, t, "").stubIndex;
 	}
 
 	// Typical Victory Triggers
-	extern EXPORT Trigger* __stdcall Trigger_CreateOnePlayerLeftTrigger(int bEnabled, int bOneShot, const char* triggerFunction)			// Last One Standing (and later part of Land Rush)
+	extern EXPORT int __stdcall Trigger_CreateOnePlayerLeftTrigger(int bEnabled, int bOneShot)			// Last One Standing (and later part of Land Rush)
 	{
-		return new Trigger(CreateOnePlayerLeftTrigger(bEnabled, bOneShot, triggerFunction));
+		return CreateOnePlayerLeftTrigger(bEnabled, bOneShot, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateEvacTrigger(int bEnabled, int bOneShot, int playerNum, const char* triggerFunction)	// Spacerace
+	extern EXPORT int __stdcall Trigger_CreateEvacTrigger(int bEnabled, int bOneShot, int playerNum)	// Spacerace
 	{
-		return new Trigger(CreateEvacTrigger(bEnabled, bOneShot, playerNum, triggerFunction));
+		return CreateEvacTrigger(bEnabled, bOneShot, playerNum, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateMidasTrigger(int bEnabled, int bOneShot, int time, const char* triggerFunction)		// Midas
+	extern EXPORT int __stdcall Trigger_CreateMidasTrigger(int bEnabled, int bOneShot, int time)		// Midas
 	{
-		return new Trigger(CreateMidasTrigger(bEnabled, bOneShot, time, triggerFunction));
+		return CreateMidasTrigger(bEnabled, bOneShot, time, "NoResponseToTrigger").stubIndex;
 	}
 	// Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
-	extern EXPORT Trigger* __stdcall Trigger_CreateOperationalTrigger(int bEnabled, int bOneShot, int playerNum, map_id buildingType, int refValue, compare_mode compareType, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateOperationalTrigger(int bEnabled, int bOneShot, int playerNum, map_id buildingType, int refValue, compare_mode compareType)
 	{
-		return new Trigger(CreateOperationalTrigger(bEnabled, bOneShot, playerNum, buildingType, refValue, compareType, triggerFunction));
+		return CreateOperationalTrigger(bEnabled, bOneShot, playerNum, buildingType, refValue, compareType, "NoResponseToTrigger").stubIndex;
 	}
 	
 	// Research and Resource Count Triggers  [Note: Typically used to set what needs to be done by the end of a campaign mission]
-	extern EXPORT Trigger* __stdcall Trigger_CreateResearchTrigger(int bEnabled, int bOneShot, int techID, int playerNum, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateResearchTrigger(int bEnabled, int bOneShot, int techID, int playerNum)
 	{
-		return new Trigger(CreateResearchTrigger(bEnabled, bOneShot, techID, playerNum, triggerFunction));
+		return CreateResearchTrigger(bEnabled, bOneShot, techID, playerNum, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateResourceTrigger(int bEnabled, int bOneShot, trig_res resourceType, int refAmount, int playerNum, compare_mode compareType, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateResourceTrigger(int bEnabled, int bOneShot, trig_res resourceType, int refAmount, int playerNum, compare_mode compareType)
 	{
-		return new Trigger(CreateResourceTrigger(bEnabled, bOneShot, resourceType, refAmount, playerNum, compareType, triggerFunction));
+		return CreateResourceTrigger(bEnabled, bOneShot, resourceType, refAmount, playerNum, compareType, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateKitTrigger(int bEnabled, int bOneShot, int playerNum, map_id id, int refCount, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateKitTrigger(int bEnabled, int bOneShot, int playerNum, map_id id, int refCount)
 	{
-		return new Trigger(CreateKitTrigger(bEnabled, bOneShot, playerNum, id, refCount, triggerFunction));
+		return CreateKitTrigger(bEnabled, bOneShot, playerNum, id, refCount, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateEscapeTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height, int refValue, map_id unitType, int cargoType, int cargoAmount, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateEscapeTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height, int refValue, map_id unitType, int cargoType, int cargoAmount)
 	{
-		return new Trigger(CreateEscapeTrigger(bEnabled, bOneShot, playerNum, x, y, width, height, refValue, unitType, cargoType, cargoAmount, triggerFunction));
+		return CreateEscapeTrigger(bEnabled, bOneShot, playerNum, x, y, width, height, refValue, unitType, cargoType, cargoAmount, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateCountTrigger(int bEnabled, int bOneShot, int playerNum, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateCountTrigger(int bEnabled, int bOneShot, int playerNum, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType)
 	{
-		return new Trigger(CreateCountTrigger(bEnabled, bOneShot, playerNum, unitType, cargoOrWeapon, refCount, compareType, triggerFunction));
+		return CreateCountTrigger(bEnabled, bOneShot, playerNum, unitType, cargoOrWeapon, refCount, compareType, "NoResponseToTrigger").stubIndex;
 	}
 	// Unit Count Triggers  [Note: See also CreateCountTrigger]
-	extern EXPORT Trigger* __stdcall Trigger_CreateVehicleCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateVehicleCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType)
 	{
-		return new Trigger(CreateVehicleCountTrigger(bEnabled, bOneShot, playerNum, refCount, compareType, triggerFunction));
+		return CreateVehicleCountTrigger(bEnabled, bOneShot, playerNum, refCount, compareType, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateBuildingCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateBuildingCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType)
 	{
-		return new Trigger(CreateBuildingCountTrigger(bEnabled, bOneShot, playerNum, refCount, compareType, triggerFunction));
+		return CreateBuildingCountTrigger(bEnabled, bOneShot, playerNum, refCount, compareType, "NoResponseToTrigger").stubIndex;
 	}
 	// Attack/Damage Triggers
-	extern EXPORT Trigger* __stdcall Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, ScGroup* group, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, ScGroup* group)
 	{
-		return new Trigger(CreateAttackedTrigger(bEnabled, bOneShot, *group, triggerFunction));
+		return CreateAttackedTrigger(bEnabled, bOneShot, *group, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, ScGroup* group, int damage, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, ScGroup* group, int damage)
 	{
-		return new Trigger(CreateDamagedTrigger(bEnabled, bOneShot, *group, damage, triggerFunction));
+		return CreateDamagedTrigger(bEnabled, bOneShot, *group, damage, "NoResponseToTrigger").stubIndex;
 	}
 	// Time Triggers
-	extern EXPORT Trigger* __stdcall Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int timeMin, int timeMax, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int timeMin, int timeMax)
 	{
-		return new Trigger(CreateTimeTrigger(bEnabled, bOneShot, timeMin, timeMax, triggerFunction));
+		return CreateTimeTrigger(bEnabled, bOneShot, timeMin, timeMax, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateTimeTrigger2(int bEnabled, int bOneShot, int time, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateTimeTrigger2(int bEnabled, int bOneShot, int time)
 	{
-		return new Trigger(CreateTimeTrigger(bEnabled, bOneShot, time, triggerFunction));
+		return CreateTimeTrigger(bEnabled, bOneShot, time, "NoResponseToTrigger").stubIndex;
 	}
 	// Positional Triggers
-	extern EXPORT Trigger* __stdcall Trigger_CreatePointTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreatePointTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y)
 	{
-		return new Trigger(CreatePointTrigger(bEnabled, bOneShot, playerNum, x, y, triggerFunction));
+		return CreatePointTrigger(bEnabled, bOneShot, playerNum, x, y, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT Trigger* __stdcall Trigger_CreateRectTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateRectTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height)
 	{
-		return new Trigger(CreateRectTrigger(bEnabled, bOneShot, playerNum, x, y, width, height, triggerFunction));
+		return CreateRectTrigger(bEnabled, bOneShot, playerNum, x, y, width, height, "NoResponseToTrigger").stubIndex;
 	}
 	// Special Target Trigger/Data
-	extern EXPORT Trigger* __stdcall Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, Unit* targetUnit /* Lab */, map_id sourceUnitType /* mapScout */, const char* triggerFunction)
+	extern EXPORT int __stdcall Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, Unit* targetUnit /* Lab */, map_id sourceUnitType /* mapScout */)
 	{
-		return new Trigger(CreateSpecialTarget(bEnabled, bOneShot, *targetUnit, sourceUnitType, triggerFunction));
+		return CreateSpecialTarget(bEnabled, bOneShot, *targetUnit, sourceUnitType, "NoResponseToTrigger").stubIndex;
 	}
 	extern EXPORT void __stdcall Trigger_GetSpecialTargetData(Trigger* specialTargetTrigger, Unit* sourceUnit /* Scout */)
 	{

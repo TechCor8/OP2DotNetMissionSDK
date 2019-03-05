@@ -62,6 +62,7 @@
 	[
 		{
 			"ID":0,
+			"TechLevel":5,
 			"MoraleLevel":2,
 			"FreeMorale":true,
 			"IsEden":true,
@@ -73,9 +74,14 @@
 			"Kids":10,
 			"Workers":25,
 			"Scientists":12,
-			"CommonOre":2000,
+			"CommonOre":5000,
 			"RareOre":0,
 			"Food":2000,
+			"SolarSatellites":1,
+			
+			"CompletedResearch":
+			[
+			],
 			
 			"Units":
 			[
@@ -84,6 +90,24 @@
 					"CargoType":0,
 					"Rotation":0,
 					"Location": { "X":15, "Y":13 }
+				},
+				{
+					"TypeID":54,
+					"CargoType":0,
+					"Rotation":0,
+					"Location": { "X":15, "Y":16 }
+				},
+				{
+					"TypeID":58,
+					"CargoType":0,
+					"Rotation":0,
+					"Location": { "X":21, "Y":18 }
+				},
+				{
+					"TypeID":48,
+					"CargoType":0,
+					"Rotation":0,
+					"Location": { "X":20, "Y":13 }
 				},
 				{
 					"TypeID":2,
@@ -114,14 +138,70 @@
 	"Triggers":
 	[
 		{
-			"ID":0,
-			"Type":"OnePlayerLeft",
+			"Comment":"Trigger for losing.",
+			"ID":1,
+			"Type":"Operational",
 			"Enabled":true,
 			"OneShot":true,
+			
+			"PlayerID":0,
+			"UnitType":"mapCommandCenter",
+			"Count":1,
+			"CompareType":"cmpLower",
+			
+			"Actions":[]
+		},
+		{
+			"Comment":"Random test trigger.",
+			"ID":2,
+			"Type":"VehicleCount",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"PlayerID":0,
+			"Count":2,
+			"CompareType":"cmpGreaterEqual",
+			
 			"Actions":
 			[
-			1
+				{ "Type":"AddMessage", "Message":"My Vehicle Message", "PlayerID":0, "SoundID":64 }
 			]
+		},
+		{
+			"Comment":"Trigger for winning.",
+			"ID":3,
+			"Type":"VehicleCount",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"PlayerID":0,
+			"Count":3,
+			"CompareType":"cmpGreaterEqual",
+			
+			"Actions":[]
+		},
+		{
+			"Comment":"Victory Condition",
+			"ID":4,
+			"Type":"Victory",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"TriggerID":3,
+			"Message":"Create 3 vehicles",
+			
+			"Actions":[]
+		},
+		{
+			"Comment":"Failure Condition",
+			"ID":5,
+			"Type":"Failure",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"TriggerID":1,
+			
+			"Actions":[]
 		}
 	]
 }
