@@ -101,16 +101,6 @@ namespace DotNetMissionSDK
 			Console.WriteLine("Mission DLL: " + m_MissionDLLName);
 			Console.WriteLine("Mission Desc: " + m_MissionData.levelDetails.description);
 			
-			Console.WriteLine("PreSet");
-			Console.WriteLine("Test = " + m_SaveBuffer.saveData.test);
-			Console.WriteLine("Test2 = " + m_SaveBuffer.saveData.test2);
-
-			m_SaveBuffer.saveData.test = TethysGame.GetRand(600);
-			m_SaveBuffer.saveData.test2 = TethysGame.GetRand(600);
-
-			Console.WriteLine("PostSet");
-			Console.WriteLine("Test = " + m_SaveBuffer.saveData.test);
-			Console.WriteLine("Test2 = " + m_SaveBuffer.saveData.test2);
 			m_Triggers.AddTrigger(TriggerStub.CreateVehicleCountTrigger(true, true, TethysGame.LocalPlayer(), 3, compare_mode.cmpGreaterEqual));
 			// **End TODO**
 

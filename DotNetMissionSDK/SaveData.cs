@@ -21,8 +21,5 @@ namespace DotNetMissionSDK
 
 		[MarshalAs(UnmanagedType.LPStr, SizeConst = 50)]
 		public string testStr;
-
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-		public int[] testArr;
 	}
 }
