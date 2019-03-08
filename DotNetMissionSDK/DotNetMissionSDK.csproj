@@ -65,6 +65,7 @@
     <Compile Include="Outpost2DLL\NonExportedEnums.cs" />
     <Compile Include="Outpost2DLL\Player.cs" />
     <Compile Include="Outpost2DLL\ScStub.cs" />
+    <Compile Include="Outpost2DLL\SDKDisposable.cs" />
     <Compile Include="Outpost2DLL\Structs.cs" />
     <Compile Include="Outpost2DLL\TethysGame.cs" />
     <Compile Include="Outpost2DLL\TriggerStub.cs" />

@@ -1,37 +1,26 @@
-#pragma once
-#ifndef OP2
-#define OP2 __declspec(dllimport)
+#include "stdafx.h"
+
+#include <Outpost2DLL/Outpost2DLL.h>	// Main Outpost 2 header to interface with the game
+
+#ifndef EXPORT
+#define EXPORT __declspec(dllexport)
 #endif
 
-// Note: This file is used to define all the group related classes exported
-//		 from Outpost2.exe. It also contains the Pinwheel class (which is
-//		 like a group class in many ways) and the Trigger class (which
-//		 derives from the same base class as all the others).
 
+extern "C"
+{
+	// Note: This file is used to define all the group related classes exported
+	//		 from Outpost2.exe. It also contains the Pinwheel class (which is
+	//		 like a group class in many ways) and the Trigger class (which
+	//		 derives from the same base class as all the others).
 
-#include "ScStub.h"
-
-
-// External type names
-enum map_id;
-enum UnitClassifactions;	// ** Typo **
-struct LOCATION;
-struct MAP_RECT;
-struct MrRec;
-struct PWDef;
-struct PatrolRoute;
-class UnitBlock;
-class Unit;
-class _Player;
-
-
-// Note: ScGroup is the main parent class of all other group classes.
-//		 Any functions defined here on this class are available to any
-//		 instance of the derived classes.
-// Note: Do not try to create an instance of this class. It was meant
-//		 simply as a base parent class from which other classes inherit
-//		 functions from. Creating an instance of this class serves little
-//		 (or no) purpose and may even crash the game.
+	// Note: ScGroup is the main parent class of all other group classes.
+	//		 Any functions defined here on this class are available to any
+	//		 instance of the derived classes.
+	// Note: Do not try to create an instance of this class. It was meant
+	//		 simply as a base parent class from which other classes inherit
+	//		 functions from. Creating an instance of this class serves little
+	//		 (or no) purpose and may even crash the game.
 
 class OP2 ScGroup : public ScStub
 {

@@ -10,15 +10,14 @@ using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK
 {
-	public class ScStub : IDisposable
+	public class ScStub
 	{
-		private IntPtr m_Handle;
+		public int stubIndex { get; private set; }
 
-		public IntPtr GetHandle() { return m_Handle; }
 
-		public ScStub(IntPtr handle)
+		public ScStub(int stubIndex)
 		{
-			m_Handle = handle;
+			this.stubIndex = stubIndex;
 		}
 
 		// Methods
@@ -26,41 +25,12 @@ namespace DotNetMissionSDK
 		//void Disable();
 		//void Enable();
 		// [Get]
-		public int GetStubIndex()
-		{
-			return ScStub_GetIndex(m_Handle);
-		}
+		
 		//int IsEnabled();
 		//int IsInitialized();
 		// [Set]
 		//void SetId(int stubIndex);
 
-		[DllImport("NativeInterop.dll")] private static extern int ScStub_GetIndex(IntPtr handle);
-
-		// --- Release ---
-		public void Dispose()
-		{
-			Dispose(true);
-
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if(disposing)
-			{
-				// Release managed objects
-			}
-
-			// Release unmanaged resources
-			ScStub_Release(m_Handle);
-		}
-
-		~ScStub()
-		{
-			Dispose(false);
-		}
-
-		[DllImport("NativeInterop.dll")] private static extern void ScStub_Release(IntPtr handle);
+		//[DllImport("NativeInterop.dll")] private static extern int ScStub_GetIndex(IntPtr handle);
 	}
 }

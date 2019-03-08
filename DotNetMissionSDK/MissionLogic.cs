@@ -132,6 +132,7 @@ namespace DotNetMissionSDK
 
 					Unit unit;
 					TethysGame.CreateUnit(out unit, unitData.typeID, spawnPt.x, spawnPt.y, data.id, unitData.cargoType, unitData.rotation);
+					unit.DoSetLights(true);
 					unit.Dispose();
 				}
 			}

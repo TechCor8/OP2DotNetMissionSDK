@@ -90,9 +90,9 @@ extern "C"
 	{
 		return handle->HasTechnology(techID);
 	}
-	extern EXPORT ScGroup* __stdcall Player_GetDefaultGroup(_Player* handle)
+	extern EXPORT int __stdcall Player_GetDefaultGroup(_Player* handle)
 	{
-		return new ScGroup(handle->GetDefaultGroup());
+		return handle->GetDefaultGroup().stubIndex;
 	}
 	// [Get] Player Strength  [Calculational]
 	// Note: Unit Strengths are as follows:

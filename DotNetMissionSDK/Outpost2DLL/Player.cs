@@ -17,28 +17,16 @@ using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK
 {
-	public class Player : IDisposable
+	public class Player
 	{
 		private IntPtr m_Handle;
-		private bool m_ShouldRelease;
 
-		public int playerNum { get; }
+		public int playerID { get; }
 
-		/// <summary>
-		/// Creates a Player object.
-		/// Player must be disposed when no longer needed.
-		/// </summary>
-		/*public Player(int playerNum)
-		{
-			this.playerNum = playerNum;
 
-			m_ShouldRelease = true;
-			m_Handle = Player_Create(playerNum);
-		}*/
-		public Player(IntPtr handle, bool shouldRelease)
+		public Player(IntPtr handle)
 		{
 			m_Handle = handle;
-			m_ShouldRelease = shouldRelease;
 		}
 
 		public IntPtr GetHandle()			{ return m_Handle;											}
@@ -62,7 +50,7 @@ namespace DotNetMissionSDK
 		public int GetRLVCount()			{ return Player_GetRLVCount(m_Handle);						}
 		// [Get] Indirect property lookups
 		public bool HasTechnology(int techID){ return Player_HasTechnology(m_Handle, techID) != 0;		}
-		//ScGroup GetDefaultGroup()			{ return new ScGroup(Player_GetDefaultGroup(m_Handle));		}
+		public ScGroup GetDefaultGroup()	{ return new ScGroup(Player_GetDefaultGroup(m_Handle));		}
 		// [Get] Player Strength  [Calculational]
 		// Note: Unit Strengths are as follows:
 		//	Spider/Scorpion	: 4
@@ -154,7 +142,7 @@ namespace DotNetMissionSDK
 		[DllImport("NativeInterop.dll")] private static extern int Player_GetRLVCount(IntPtr handle);
 		// [Get] Indirect property lookups
 		[DllImport("NativeInterop.dll")] private static extern int Player_HasTechnology(IntPtr handle, int techID);
-		[DllImport("NativeInterop.dll")] private static extern IntPtr Player_GetDefaultGroup(IntPtr handle); // Warning: This allocates on the heap!
+		[DllImport("NativeInterop.dll")] private static extern int Player_GetDefaultGroup(IntPtr handle);
 		// [Get] Player Strength  [Calculational]
 		// Note: Unit Strengths are as follows:
 		//	Spider/Scorpion	: 4
@@ -217,32 +205,5 @@ namespace DotNetMissionSDK
 			PlayerCheckIndexStandardLab			= 6,	// Has Structure, Kit loaded in Convec, or can build
 			PlayerCheckIndexAdvancedLab			= 7,	// Has Structure, Kit loaded in Convec, or can build
 		};*/
-
-		// --- Release ---
-		public void Dispose()
-		{
-			Dispose(true);
-
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if(disposing)
-			{
-				// Release managed objects
-			}
-
-			if (!m_ShouldRelease)
-				return;
-
-			// Release unmanaged resources
-			Player_Release(m_Handle);
-		}
-
-		~Player()
-		{
-			Dispose(false);
-		}
 	}
 }

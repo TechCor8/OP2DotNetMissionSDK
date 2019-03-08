@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK
 {
-	public class Unit : IDisposable
+	public class Unit : SDKDisposable
 	{
 		private IntPtr m_Handle;
 
@@ -145,28 +145,11 @@ namespace DotNetMissionSDK
 		[DllImport("NativeInterop.dll")] private static extern int Unit_IsDiscovered(IntPtr handle);															// Wreckage
 
 
-		// --- Release ---
-		public void Dispose()
+		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
+		protected override void Dispose(bool disposing)
 		{
-			Dispose(true);
-
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if(disposing)
-			{
-				// Release managed objects
-			}
-
 			// Release unmanaged resources
 			Unit_Release(m_Handle);
-		}
-
-		~Unit()
-		{
-			Dispose(false);
 		}
 	}
 }

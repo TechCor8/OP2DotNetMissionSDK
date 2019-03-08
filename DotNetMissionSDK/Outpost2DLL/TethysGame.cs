@@ -14,7 +14,7 @@ namespace DotNetMissionSDK
 {
 	public class TethysGame
 	{
-		public static Player GetPlayer(int playerNum)		{ return new Player(TethysGame_GetPlayer(playerNum), false);	}
+		public static Player GetPlayer(int playerNum)		{ return new Player(TethysGame_GetPlayer(playerNum));	}
 
 		// Multiplayer game options  [Get Property]
 		public static bool UsesDayNight()					{ return TethysGame_UsesDayNight() != 0;				}

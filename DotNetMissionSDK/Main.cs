@@ -123,6 +123,23 @@ namespace DotNetMissionSDK
 		{
 			TethysGame.AddMessage(0, 0, "Trigger Fired!", TethysGame.LocalPlayer(), 0);
 			Console.WriteLine("Trigger Fired!");
+
+			using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
+			using (Unit unit = new Unit())
+			{
+				while (myEnum.GetNext(unit))
+				{
+					unit.DoMove(30, 30);
+				}
+			}
+
+			//Console.WriteLine("PRE");
+			//Player p = TethysGame.GetPlayer(TethysGame.LocalPlayer());
+			//Console.WriteLine("P");
+			//ScGroup g = p.GetDefaultGroup();
+
+			//Console.WriteLine("G");
+			//Console.WriteLine("Stub: " + g.stubIndex);
 		}
 
 		/// <summary>

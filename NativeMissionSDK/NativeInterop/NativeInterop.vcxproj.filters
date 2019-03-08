@@ -59,5 +59,8 @@
     <ClCompile Include="Outpost2DLL\Source\ScStub.cpp">
       <Filter>Outpost2DLL\Source</Filter>
     </ClCompile>
+    <ClCompile Include="Outpost2DLL\Source\Enumerators.cpp">
+      <Filter>Outpost2DLL\Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

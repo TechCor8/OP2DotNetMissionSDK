@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="NativeInterop.cpp" />
+    <ClCompile Include="Outpost2DLL\Source\Enumerators.cpp" />
     <ClCompile Include="Outpost2DLL\Source\GameMap.cpp" />
     <ClCompile Include="Outpost2DLL\Source\Player.cpp" />
     <ClCompile Include="Outpost2DLL\Source\ScStub.cpp" />
