@@ -31,10 +31,10 @@ Forwards Outpost 2 DLL functions called from DotNetMissionSDK.
 ## CREATING A NEW SCENARIO IN JSON
 If you want to avoid coding all together, copy the following files from the DotNetMissionSDK/Outpost2 subdirectory to your Outpost 2 directory:
 
-cTest.dll
-DotNetInterop.dll
-DotNetMissionSDK.dll
-NativeInterop.dll
+cTest.dll\
+DotNetInterop.dll\
+DotNetMissionSDK.dll\
+NativeInterop.dll\
 cTest.opm
 
 You can change the cTest.opm JSON file in any text editor.
@@ -47,14 +47,14 @@ The name of the native plugin (cTest.dll) must match the name of the JSON file (
 
 
 ## CREATING A NEW SCENARIO IN C#
-If you are a programmer, you can dive right into the C# code. There are few things to  keep in mind:
-
-Triggers don't work the same. You could forward every trigger function from the native plugin, but that would be tedious. It is better to register the trigger with the MissionLogic update loop (Not Yet Implemented) and check if the trigger has fired.
+If you are a programmer, you can dive right into the C# code. There are few things to keep in mind.
 
 Mission details are set in the NativePlugin.
 
-You will need to change DotNetInterop.dll to dynamically load the MissionSDK and remove the static reference. Load the assembly using the name provided by Attach() and use reflection to grab the functions to call. Make sure your C# DLL is named the same as the native plugin with some suffix.
+To have the interop load your custom C# mission DLL, in NativePlugin.LevelMain.cpp, set USE_CUSTOM_DLL to true. This will make the interop load the C# DLL using the native plugin name as the base: {NativePluginName}\_DotNet.dll
 
 For example: cTest.DLL (native) > DotNetInterop.dll > cTest_DotNet.dll
 
-NOTE: The code to dynamically load C# DLLs is not available in the interop project yet. Eventually this code will be added and commented out for ease of use.
+
+## Native vs Managed SDK differences
+Triggers work differently compared to the native SDK. All triggers must be registered to the TriggerManager. TriggerManager will execute a C# event when a trigger has fired, passing in the TriggerStub that was returned when the trigger was created. This stub is how you identify the trigger that has fired.
