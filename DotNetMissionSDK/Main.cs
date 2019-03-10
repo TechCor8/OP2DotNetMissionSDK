@@ -12,9 +12,6 @@ namespace DotNetMissionSDK
 	/// </summary>
     public class DotNetMissionEntry
 	{
-		// Mission singleton instance
-		private static DotNetMissionEntry m_Instance = new DotNetMissionEntry();
-
 		// Debug log streams
 		private FileStream m_LogFileStream;
 		private StreamWriter m_LogWriter;
@@ -38,18 +35,15 @@ namespace DotNetMissionSDK
 		/// <returns>True on success.</returns>
 		public bool Attach(string dllPath)
 		{
-			// Call singleton
-			return m_Instance._Attach(dllPath);
-		}
+			// Put code that must be called from DLLMain.ProcessAttach here.
+			// There should not be much need to put code here in most cases.
+			// DO NOT PUT MISSION INIT CODE HERE.
 
-		// Put code that must be called from DLLMain.ProcessAttach here.
-		// There should not be much need to put code here in most cases.
-		// DO NOT PUT MISSION CODE HERE. THE GAME IS NOT GUARANTEED TO BE READY.
-		private bool _Attach(string dllPath)
-		{
 			InitializeLog();
 
 			m_MissionDLLName = Path.GetFileNameWithoutExtension(dllPath);
+
+			Console.WriteLine("DLLName = " + m_MissionDLLName);
 
 			// Read JSON data
 			if (!File.Exists(m_MissionDLLName + ".opm"))
@@ -84,17 +78,12 @@ namespace DotNetMissionSDK
 		/// <returns>True on success.</returns>
 		public bool Initialize()
 		{
-			// Call singleton
-			return m_Instance._Initialize();
-		}
-
-		// ** Put mission init code here. **
-		private bool _Initialize()
-		{
 			InitializeSystems();
 			
 			// Initialize mission with JSON data
 			m_MissionLogic.InitializeNewMission();
+
+			// ** Put mission init code here. **
 
 			// TODO: Remove Me
 			Console.WriteLine("Initialized!");
@@ -147,12 +136,6 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public void Update()
 		{
-			m_Instance._Update();
-		}
-
-		// ** Put mission update code here. **
-		private void _Update()
-		{
 			// Load the save buffer if it isn't loaded
 			if (!m_SaveBuffer.isLoaded)
 				InitializeSystems();
@@ -162,6 +145,8 @@ namespace DotNetMissionSDK
 
 			// Update mission logic
 			m_MissionLogic.Update();
+
+			// ** Put mission update code here. **
 
 			// Update save buffer
 			m_SaveBuffer.Save();
@@ -173,7 +158,7 @@ namespace DotNetMissionSDK
 		/// <returns>The save buffer.</returns>
 		public IntPtr GetSaveBuffer()
 		{
-			return m_Instance.m_SaveBuffer.GetSaveBuffer();
+			return m_SaveBuffer.GetSaveBuffer();
 		}
 
 		/// <summary>
@@ -182,7 +167,7 @@ namespace DotNetMissionSDK
 		/// <returns>The length of the save buffer.</returns>
 		public int GetSaveBufferLength()
 		{
-			return m_Instance.m_SaveBuffer.GetSaveBufferLength();
+			return m_SaveBuffer.GetSaveBufferLength();
 		}
 
 		/// <summary>

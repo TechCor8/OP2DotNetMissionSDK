@@ -2,57 +2,80 @@
 #include "CppInterface.h"
 #include "DotNetMissionSDK.h"
 
-// NOTE: Currently this is set up to use a static reference to DotNetMissionSDK.dll.
-// This is fine for the intended purpose of reading scenario data from a data file for use with an editor.
-// However, if you want to hardcode missions in C#, you will need to make the reference C# dll unique for reach mission and have DotNetInterop.dll point to it.
-// You can accomplish this by:
-// A. Duplicating DotNetInterop with the updated reference name for DotNetMissionSDK.dll and updating the reference name for NativePlugin.dll (cMissionName.dll) to DotNetInterop.dll.
-//    This creates unnecessary duplicates of DotNetInterop.
-//    For example: cMyMission.dll > cMyMission_Interop.dll > cMyMission_DotNet.dll
-//                 cMyMission2.dll > cMyMission2_Interop.dll > cMyMission2_DotNet.dll
-// B. Changing this file to load DotNetMissionSDK.dll dynamically, by looking at the name of the NativePlugin.dll (which already must be named according to Outpost2 requirements),
-//    and loading the C# dll using that name. The native plugin (cMyMission.dll), would not need to be recompiled for each mission, only renamed.
-//    For example: cMyMission.dll > DotNetInterop.dll > cMyMission_DotNet.dll
-//                 cMyMission2.dll > DotNetInterop.dll > cMyMission2_DotNet.dll
-// C. The real purpose is to use data files for mission scripting, and C# will contain common logic used by all missions. No libraries would need to be recompiled.
-//    For example: cMyMission.dll > DotNetInterop.dll > DotNetMissionSDK.dll > cMyMission.opm
-//                 cMyMission2.dll > DotNetInterop.dll > DotNetMissionSDK.dll > cMyMission2.opm
-
 namespace DotNetInterop
 {
-	bool Attach(const char* dllPath)
+	// Singleton class for accessing DotNetMissionEntry
+	public ref class DotNetMissionDLL
 	{
-		DotNetMissionEntry^ lib = gcnew DotNetMissionEntry();
+		static Assembly^ m_Assembly;
+		static DotNetMissionEntry^ m_Instance;
 
-		return lib->Attach(ToManagedString(dllPath));
+	public:
+		static property DotNetMissionEntry^ Instance { DotNetMissionEntry^ get() { return m_Instance; } }
+
+		// Attach creates the app domain, loads the assembly and creates the entry point
+		static void Load(String^ dotNetPath)
+		{
+			// Load app domain and assembly
+			m_Assembly = Assembly::LoadFile(dotNetPath);
+
+			// Create entry point
+			m_Instance = (DotNetMissionEntry^)m_Assembly->CreateInstance("DotNetMissionSDK.DotNetMissionEntry");
+		}
+	};
+
+
+	bool Attach(const char* dllPath, bool useCustomDLL)
+	{
+		String^ strDllPath = ToManagedString(dllPath);
+		String^ dotNetPath;
+
+		if (useCustomDLL)
+		{
+			// Custom mission DLL based on the native plugin name
+			dotNetPath = Path::Combine(Path::GetDirectoryName(strDllPath), Path::GetFileNameWithoutExtension(strDllPath));
+			dotNetPath += "_DotNet.dll";
+		}
+		else
+		{
+			// Common Interop DLL
+			dotNetPath = Path::Combine(Path::GetDirectoryName(strDllPath), "DotNetMissionSDK.dll");
+		}
+
+		FileStream^ fstream = gcnew FileStream("DotNetLogCpp.txt", FileMode::Create);
+		StreamWriter ^writer = gcnew StreamWriter(fstream);
+		writer->AutoFlush = true;
+		writer->WriteLine("dll path = " + dotNetPath);
+
+		// Load DLL and create mission entry instance
+		DotNetMissionDLL::Load(dotNetPath);
+		
+		// Call Attach() on DLL
+		return DotNetMissionDLL::Instance->Attach(strDllPath);
 	}
 
 	bool Initialize()
 	{
-		DotNetMissionEntry^ lib = gcnew DotNetMissionEntry();
-
-		return lib->Initialize();
+		return DotNetMissionDLL::Instance->Initialize();
 	}
 
 	void Update()
 	{
-		DotNetMissionEntry^ lib = gcnew DotNetMissionEntry();
-
-		lib->Update();
+		DotNetMissionDLL::Instance->Update();
 	}
 
 	void* GetSaveBuffer()
 	{
-		DotNetMissionEntry^ lib = gcnew DotNetMissionEntry();
-
-		return (void*)lib->GetSaveBuffer();
+		return (void*)DotNetMissionDLL::Instance->GetSaveBuffer();
 	}
 
 	int GetSaveBufferLength()
 	{
-		DotNetMissionEntry^ lib = gcnew DotNetMissionEntry();
+		return DotNetMissionDLL::Instance->GetSaveBufferLength();
+	}
 
-		return lib->GetSaveBufferLength();
+	void Detach()
+	{
 	}
 }
 

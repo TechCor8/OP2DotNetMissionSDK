@@ -18,6 +18,10 @@ ExportLevelDetails("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", Colony
 // Required data exports  (Description, Map, TechTree, GameType, NumPlayers, maxTechLevel, bUnitOnlyMission)
 //ExportLevelDetailsEx("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", MultiLastOneStanding, 6, 12, false)
 
+// Set to true to have the DotNetInterop call [NativePluginName]_DotNet.dll (for custom C# missions).
+// Set to false to have the DotNetInterop call DotNetMissionSDK.dll (for JSON missions).
+#define USE_CUSTOM_DLL false
+
 
 Export void __cdecl GetSaveRegions(struct BufferDesc &bufDesc)
 {
@@ -60,11 +64,15 @@ Export void NoResponseToTrigger()
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
+	int len;
+	LPSTR filePath;
+	bool result;
+
 	switch (fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		int len = MAX_PATH;
-		LPSTR filePath = new char[len];
+		len = MAX_PATH;
+		filePath = new char[len];
 
 		// Get DLL path
 		while (GetModuleFileName(hinstDLL, filePath, len) == len)
@@ -74,12 +82,16 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			filePath = new char[len];
 		}
 
-		bool result = DotNetInterop::Attach(filePath);
+		result = DotNetInterop::Attach(filePath, USE_CUSTOM_DLL);
 
 		delete[] filePath;
 
 		return result;
 
+		break;
+
+	case DLL_PROCESS_DETACH:
+		DotNetInterop::Detach();
 		break;
 	}
 

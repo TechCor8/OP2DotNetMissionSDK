@@ -15,7 +15,7 @@ namespace DotNetInterop
 	// Calls .NET library Attach.
 	// Called when DLL is loaded.
 	// Returns true on success.
-	EXPORT_SPEC bool Attach(const char* dllPath);
+	EXPORT_SPEC bool Attach(const char* dllPath, bool useCustomDLL);
 
 	// Calls .NET library Initialize.
 	// Called when the mission is first loaded.
@@ -29,6 +29,10 @@ namespace DotNetInterop
 	// Used to get a buffer for storing data for saved game files
 	EXPORT_SPEC void* GetSaveBuffer();
 	EXPORT_SPEC int GetSaveBufferLength();
+
+	// Calls CLR Detach.
+	// Called when DLL is unloaded.
+	EXPORT_SPEC void Detach();
 
 	//EXPORT_SPEC std::string GetDisplayString(const char * pName, int iValue);
 }
