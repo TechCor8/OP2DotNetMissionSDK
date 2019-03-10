@@ -90,7 +90,7 @@ namespace DotNetMissionSDK
 			Console.WriteLine("Mission DLL: " + m_MissionDLLName);
 			Console.WriteLine("Mission Desc: " + m_MissionData.levelDetails.description);
 			
-			m_Triggers.AddTrigger(TriggerStub.CreateVehicleCountTrigger(true, true, TethysGame.LocalPlayer(), 3, compare_mode.cmpGreaterEqual));
+			m_Triggers.AddTrigger(TriggerStub.CreateVehicleCountTrigger(999, true, true, TethysGame.LocalPlayer(), 3, compare_mode.cmpGreaterEqual));
 			// **End TODO**
 
 			return true;
@@ -110,15 +110,18 @@ namespace DotNetMissionSDK
 
 		private void OnTriggerFired(TriggerStub trigger)
 		{
-			TethysGame.AddMessage(0, 0, "Trigger Fired!", TethysGame.LocalPlayer(), 0);
-			Console.WriteLine("Trigger Fired!");
-
-			using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
-			using (Unit unit = new Unit())
+			if (trigger.id == 999)
 			{
-				while (myEnum.GetNext(unit))
+				TethysGame.AddMessage(0, 0, "Trigger Fired!", TethysGame.LocalPlayer(), 0);
+				Console.WriteLine("Trigger Fired!");
+
+				using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
+				using (Unit unit = new Unit())
 				{
-					unit.DoMove(30, 30);
+					while (myEnum.GetNext(unit))
+					{
+						unit.DoMove(30, 30);
+					}
 				}
 			}
 

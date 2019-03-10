@@ -48,12 +48,13 @@ namespace DotNetMissionSDK.Triggers
 		/// <summary>
 		/// Only call this from TriggerManager for loading existing triggers.
 		/// </summary>
-		internal TriggerStub(int stubIndex, bool enabled, bool oneShot, int playerID)
+		internal TriggerStub(int stubIndex, int triggerID, bool enabled, bool oneShot, int playerID)
 		{
 			m_StubData.isActive = true;
 
 			m_StubData.stubIndex = stubIndex;
 
+			m_StubData.id = triggerID;
 			m_StubData.enabled = enabled;
 			m_StubData.oneShot = oneShot;
 			m_StubData.hasFired = false;
@@ -123,110 +124,110 @@ namespace DotNetMissionSDK.Triggers
 		// **************************
 
 		// Victory/Failure condition triggers
-		public static TriggerStub CreateVictoryCondition(bool enabled, TriggerStub victoryTriggerStub, string missionObjective)
+		public static TriggerStub CreateVictoryCondition(int triggerID, bool enabled, TriggerStub victoryTriggerStub, string missionObjective)
 		{
 			int index = Trigger_CreateVictoryCondition(enabled ? 1 : 0, 0, victoryTriggerStub.m_StubData.stubIndex, missionObjective);
-			return new TriggerStub(index, enabled, true, victoryTriggerStub.m_StubData.playerID);
+			return new TriggerStub(index, triggerID, enabled, true, victoryTriggerStub.m_StubData.playerID);
 		}
 
-		public static TriggerStub CreateFailureCondition(bool enabled, TriggerStub failureTriggerStub)
+		public static TriggerStub CreateFailureCondition(int triggerID, bool enabled, TriggerStub failureTriggerStub)
 		{
 			int index = Trigger_CreateFailureCondition(enabled ? 1 : 0, 0, failureTriggerStub.m_StubData.stubIndex);
-			return new TriggerStub(index, enabled, true, failureTriggerStub.m_StubData.playerID);
+			return new TriggerStub(index, triggerID, enabled, true, failureTriggerStub.m_StubData.playerID);
 		}
 
 		// Typical Victory Triggers
-		public static TriggerStub CreateOnePlayerLeftTrigger(bool enabled, bool oneShot) // Last One Standing (and later part of Land Rush)
+		public static TriggerStub CreateOnePlayerLeftTrigger(int triggerID, bool enabled, bool oneShot) // Last One Standing (and later part of Land Rush)
 		{
 			int index = Trigger_CreateOnePlayerLeftTrigger(enabled ? 1 : 0, oneShot ? 1 : 0);
-			return new TriggerStub(index, enabled, oneShot, -1);
+			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 
-		public static TriggerStub CreateEvacTrigger(bool enabled, bool oneShot, int playerID)  // Spacerace
+		public static TriggerStub CreateEvacTrigger(int triggerID, bool enabled, bool oneShot, int playerID)  // Spacerace
 		{
 			int index = Trigger_CreateEvacTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 
-		public static TriggerStub CreateMidasTrigger(bool enabled, bool oneShot, int time)     // Midas
+		public static TriggerStub CreateMidasTrigger(int triggerID, bool enabled, bool oneShot, int time)     // Midas
 		{
 			int index = Trigger_CreateMidasTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, time);
-			return new TriggerStub(index, enabled, oneShot, -1);
+			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 
-		public static TriggerStub CreateOperationalTrigger(bool enabled, bool oneShot, int playerID, map_id buildingType, int refValue, compare_mode compareType)  // Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
+		public static TriggerStub CreateOperationalTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id buildingType, int refValue, compare_mode compareType)  // Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
 		{
 			int index = Trigger_CreateOperationalTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, buildingType, refValue, compareType);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 
 		// Research and Resource Count Triggers  [Note: Typically used to set what needs to be done by the end of a campaign mission]
-		public static TriggerStub CreateResearchTrigger(bool enabled, bool oneShot, int techID, int playerID)
+		public static TriggerStub CreateResearchTrigger(int triggerID, bool enabled, bool oneShot, int techID, int playerID)
 		{
 			int index = Trigger_CreateResearchTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, techID, playerID);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateResourceTrigger(bool enabled, bool oneShot, trig_res resourceType, int refAmount, int playerID, compare_mode compareType)
+		public static TriggerStub CreateResourceTrigger(int triggerID, bool enabled, bool oneShot, trig_res resourceType, int refAmount, int playerID, compare_mode compareType)
 		{
 			int index = Trigger_CreateResourceTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, resourceType, refAmount, playerID, compareType);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateKitTrigger(bool enabled, bool oneShot, int playerID, map_id id, int refCount)
+		public static TriggerStub CreateKitTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id id, int refCount)
 		{
 			int index = Trigger_CreateKitTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, id, refCount);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateEscapeTrigger(bool enabled, bool oneShot, int playerID, int x, int y, int width, int height, int refValue, map_id unitType, Truck_Cargo cargoType, int cargoAmount)
+		public static TriggerStub CreateEscapeTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y, int width, int height, int refValue, map_id unitType, Truck_Cargo cargoType, int cargoAmount)
 		{
 			int index = Trigger_CreateEscapeTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, x, y, width, height, refValue, unitType, cargoType, cargoAmount);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateCountTrigger(bool enabled, bool oneShot, int playerID, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType)
+		public static TriggerStub CreateCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType)
 		{
 			int index = Trigger_CreateCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, unitType, cargoOrWeapon, refCount, compareType);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 		// Unit Count Triggers  [Note: See also CreateCountTrigger]
-		public static TriggerStub CreateVehicleCountTrigger(bool enabled, bool oneShot, int playerID, int refCount, compare_mode compareType)
+		public static TriggerStub CreateVehicleCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, compare_mode compareType)
 		{
 			int index = Trigger_CreateVehicleCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, refCount, compareType);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateBuildingCountTrigger(bool enabled, bool oneShot, int playerID, int refCount, compare_mode compareType)
+		public static TriggerStub CreateBuildingCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, compare_mode compareType)
 		{
 			int index = Trigger_CreateBuildingCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, refCount, compareType);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 		// Attack/Damage Triggers
-		//public static TriggerStub CreateAttackedTrigger(bool enabled, bool oneShot, ScGroup& group);
-		//public static TriggerStub CreateDamagedTrigger(bool enabled, bool oneShot, ScGroup& group, int damage);
+		//public static TriggerStub CreateAttackedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup& group);
+		//public static TriggerStub CreateDamagedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup& group, int damage);
 		// Time Triggers
-		public static TriggerStub CreateTimeTrigger(bool enabled, bool oneShot, int timeMin, int timeMax)
+		public static TriggerStub CreateTimeTrigger(int triggerID, bool enabled, bool oneShot, int timeMin, int timeMax)
 		{
 			int index = Trigger_CreateTimeTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, timeMin, timeMax);
-			return new TriggerStub(index, enabled, oneShot, -1);
+			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
-		public static TriggerStub CreateTimeTrigger(bool enabled, bool oneShot, int time)
+		public static TriggerStub CreateTimeTrigger(int triggerID, bool enabled, bool oneShot, int time)
 		{
 			int index = Trigger_CreateTimeTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, time);
-			return new TriggerStub(index, enabled, oneShot, -1);
+			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 		// Positional Triggers
-		public static TriggerStub CreatePointTrigger(bool enabled, bool oneShot, int playerID, int x, int y)
+		public static TriggerStub CreatePointTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y)
 		{
 			int index = Trigger_CreatePointTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, x, y);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateRectTrigger(bool enabled, bool oneShot, int playerID, int x, int y, int width, int height)
+		public static TriggerStub CreateRectTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y, int width, int height)
 		{
 			int index = Trigger_CreateRectTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, x, y, width, height);
-			return new TriggerStub(index, enabled, oneShot, playerID);
+			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 		// Special Target Trigger/Data
-		public static TriggerStub CreateSpecialTarget(bool enabled, bool oneShot, Unit targetUnit /* Lab */, map_id sourceUnitType /* mapScout */)
+		public static TriggerStub CreateSpecialTarget(int triggerID, bool enabled, bool oneShot, Unit targetUnit /* Lab */, map_id sourceUnitType /* mapScout */)
 		{
 			int index = Trigger_CreateSpecialTarget(enabled ? 1 : 0, oneShot ? 1 : 0, targetUnit.GetHandle(), sourceUnitType);
-			return new TriggerStub(index, enabled, oneShot, -1);
+			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 		public void GetSpecialTargetData(Unit sourceUnit /* Scout */)
 		{

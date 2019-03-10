@@ -183,7 +183,7 @@ namespace DotNetMissionSDK
 								break;
 							}
 							
-							trigger = TriggerStub.CreateVictoryCondition(data.enabled, parentTrigger, data.message);
+							trigger = TriggerStub.CreateVictoryCondition(data.id, data.enabled, parentTrigger, data.message);
 							break;
 
 						case TriggerType.Failure:
@@ -193,51 +193,51 @@ namespace DotNetMissionSDK
 								break;
 							}
 
-							trigger = TriggerStub.CreateFailureCondition(data.enabled, parentTrigger);
+							trigger = TriggerStub.CreateFailureCondition(data.id, data.enabled, parentTrigger);
 							break;
 
 						case TriggerType.OnePlayerLeft:
-							trigger = TriggerStub.CreateOnePlayerLeftTrigger(data.enabled, data.oneShot);
+							trigger = TriggerStub.CreateOnePlayerLeftTrigger(data.id, data.enabled, data.oneShot);
 							break;
 
 						case TriggerType.Evac:
-							trigger = TriggerStub.CreateEvacTrigger(data.enabled, data.oneShot, data.playerID);
+							trigger = TriggerStub.CreateEvacTrigger(data.id, data.enabled, data.oneShot, data.playerID);
 							break;
 
 						case TriggerType.Midas:
-							trigger = TriggerStub.CreateMidasTrigger(data.enabled, data.oneShot, data.time);
+							trigger = TriggerStub.CreateMidasTrigger(data.id, data.enabled, data.oneShot, data.time);
 							break;
 
 						case TriggerType.Operational:
-							trigger = TriggerStub.CreateOperationalTrigger(data.enabled, data.oneShot, data.playerID, data.unitType, data.count, data.compareType);
+							trigger = TriggerStub.CreateOperationalTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.unitType, data.count, data.compareType);
 							break;
 
 						case TriggerType.Research:
-							trigger = TriggerStub.CreateResearchTrigger(data.enabled, data.oneShot, data.techID, data.playerID);
+							trigger = TriggerStub.CreateResearchTrigger(data.id, data.enabled, data.oneShot, data.techID, data.playerID);
 							break;
 
 						case TriggerType.Resource:
-							trigger = TriggerStub.CreateResourceTrigger(data.enabled, data.oneShot, data.resourceType, data.count, data.playerID, data.compareType);
+							trigger = TriggerStub.CreateResourceTrigger(data.id, data.enabled, data.oneShot, data.resourceType, data.count, data.playerID, data.compareType);
 							break;
 
 						case TriggerType.Kit:
-							trigger = TriggerStub.CreateKitTrigger(data.enabled, data.oneShot, data.playerID, data.unitType, data.count);
+							trigger = TriggerStub.CreateKitTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.unitType, data.count);
 							break;
 
 						case TriggerType.Escape:
-							trigger = TriggerStub.CreateEscapeTrigger(data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height, data.count, data.unitType, data.cargoType, data.cargoAmount);
+							trigger = TriggerStub.CreateEscapeTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height, data.count, data.unitType, data.cargoType, data.cargoAmount);
 							break;
 
 						case TriggerType.Count:
-							trigger = TriggerStub.CreateCountTrigger(data.enabled, data.oneShot, data.playerID, data.unitType, data.cargoOrWeaponType, data.count, data.compareType);
+							trigger = TriggerStub.CreateCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.unitType, data.cargoOrWeaponType, data.count, data.compareType);
 							break;
 
 						case TriggerType.VehicleCount:
-							trigger = TriggerStub.CreateVehicleCountTrigger(data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
+							trigger = TriggerStub.CreateVehicleCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
 							break;
 
 						case TriggerType.BuildingCount:
-							trigger = TriggerStub.CreateBuildingCountTrigger(data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
+							trigger = TriggerStub.CreateBuildingCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
 							break;
 
 						case TriggerType.Attacked:
@@ -251,19 +251,19 @@ namespace DotNetMissionSDK
 							break;
 
 						case TriggerType.Time:
-							trigger = TriggerStub.CreateTimeTrigger(data.enabled, data.oneShot, data.time);
+							trigger = TriggerStub.CreateTimeTrigger(data.id, data.enabled, data.oneShot, data.time);
 							break;
 
 						case TriggerType.TimeRange:
-							trigger = TriggerStub.CreateTimeTrigger(data.enabled, data.oneShot, data.minTime, data.maxTime);
+							trigger = TriggerStub.CreateTimeTrigger(data.id, data.enabled, data.oneShot, data.minTime, data.maxTime);
 							break;
 
 						case TriggerType.Point:
-							trigger = TriggerStub.CreatePointTrigger(data.enabled, data.oneShot, data.playerID, data.x, data.y);
+							trigger = TriggerStub.CreatePointTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y);
 							break;
 
 						case TriggerType.Rect:
-							trigger = TriggerStub.CreateRectTrigger(data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height);
+							trigger = TriggerStub.CreateRectTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height);
 							break;
 
 						case TriggerType.SpecialTarget:
@@ -278,8 +278,6 @@ namespace DotNetMissionSDK
 
 					if (wasProcessed)
 					{
-						trigger.id = data.id;
-						
 						try
 						{
 							triggerLookup.Add(data.id, trigger);
