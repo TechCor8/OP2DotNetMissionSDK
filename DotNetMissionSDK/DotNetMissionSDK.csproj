@@ -43,8 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomLogic.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="MissionLogic.cs" />
+    <Compile Include="MissionSDK\MissionLogic.cs" />
     <Compile Include="MissionReader\Json\ActionData.cs" />
     <Compile Include="MissionReader\Json\DataLocation.cs" />
     <Compile Include="MissionReader\Json\DataRect.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="Outpost2DLL\Unit.cs" />
     <Compile Include="Outpost2DLL\UnitBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SaveBuffer.cs" />
+    <Compile Include="MissionSDK\SaveBuffer.cs" />
     <Compile Include="SaveData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -35,7 +35,7 @@ namespace DotNetMissionSDK
 		/// Called when a new mission should start. Performs initial setup.
 		/// </summary>
 		/// <returns>True on success.</returns>
-		public bool InitializeNewMission()
+		public virtual bool InitializeNewMission()
 		{
 			MissionRoot root = m_Root;
 
@@ -303,7 +303,7 @@ namespace DotNetMissionSDK
 		/// <summary>
 		/// Called when a mission is loaded from a saved game. Performs reinitialization of data lost during quit.
 		/// </summary>
-		public void LoadMission()
+		public virtual void LoadMission()
 		{
 			InitializeDisasters();
 			CreateTriggerDataLookupTable();
@@ -337,12 +337,16 @@ namespace DotNetMissionSDK
 				m_TriggerData.Add(data.id, data);
 		}
 
-		private void OnTriggerExecuted(TriggerStub stub)
+		/// <summary>
+		/// Called when a trigger has been executed.
+		/// </summary>
+		/// <param name="trigger">The trigger that was executed.</param>
+		protected virtual void OnTriggerExecuted(TriggerStub trigger)
 		{
 			TriggerData data;
-			if (!m_TriggerData.TryGetValue(stub.id, out data))
+			if (!m_TriggerData.TryGetValue(trigger.id, out data))
 			{
-				Console.WriteLine("Could not find trigger data for ID: " + stub.id);
+				Console.WriteLine("Could not find trigger data for ID: " + trigger.id);
 				return;
 			}
 
@@ -361,7 +365,10 @@ namespace DotNetMissionSDK
 			}
 		}
 
-		public void Update()
+		/// <summary>
+		/// Called every game cycle.
+		/// </summary>
+		public virtual void Update()
 		{
 			int currentTime = TethysGame.Time();
 
@@ -403,9 +410,14 @@ namespace DotNetMissionSDK
 		/// <summary>
 		/// Called when the mission restarts.
 		/// </summary>
-		public void Restart()
+		public virtual void Restart()
 		{
 			m_TriggerManager.onTriggerFired -= OnTriggerExecuted;
+		}
+
+		protected bool AddTrigger(TriggerStub triggerStub)
+		{
+			return m_TriggerManager.AddTrigger(triggerStub);
 		}
 
 		// Unused: Releases all mission resources

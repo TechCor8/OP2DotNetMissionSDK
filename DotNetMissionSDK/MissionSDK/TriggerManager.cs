@@ -74,13 +74,13 @@ namespace DotNetMissionSDK.Triggers
 			{
 				TriggerStub trigger = m_Triggers[i];
 
+				// Check if trigger has fired, execute if it did
 				if (trigger.CheckTrigger())
-				{
 					onTriggerFired?.Invoke(trigger);
 
-					if (!trigger.isActive)
-						m_Triggers.RemoveAt(i--);
-				}
+				// Remove inactive trigger
+				if (!trigger.isActive)
+					m_Triggers.RemoveAt(i--);
 			}
 		}
 	}

@@ -43,14 +43,32 @@ namespace DotNetMissionSDK
 
 			m_MissionDLLName = Path.GetFileNameWithoutExtension(dllPath);
 
-			Console.WriteLine("DLLName = " + m_MissionDLLName);
+			Console.WriteLine("Initializing DotNet DLL...");
+			Console.WriteLine("Mission DLLName: " + m_MissionDLLName);
 
-			// Read JSON data
-			if (!File.Exists(m_MissionDLLName + ".opm"))
-				return false;
+			if (CustomLogic.useJson)
+			{
+				Console.WriteLine("Initializing JSON...");
 
-			// Load JSON data
-			m_MissionData = MissionReader.GetMissionData(m_MissionDLLName + ".opm");
+				// Read JSON data
+				if (!File.Exists(m_MissionDLLName + ".opm"))
+				{
+					Console.WriteLine("JSON data file '" + m_MissionDLLName + ".opm" + " not found!");
+					return false;
+				}
+
+				// Load JSON data
+				try
+				{
+					m_MissionData = MissionReader.GetMissionData(m_MissionDLLName + ".opm");
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.ToString());
+				}
+			}
+
+			Console.WriteLine("DLL Init complete.");
 
 			return true;
 		}
@@ -83,16 +101,6 @@ namespace DotNetMissionSDK
 			// Initialize mission with JSON data
 			m_MissionLogic.InitializeNewMission();
 
-			// ** Put mission init code here. **
-
-			// TODO: Remove Me
-			Console.WriteLine("Initialized!");
-			Console.WriteLine("Mission DLL: " + m_MissionDLLName);
-			Console.WriteLine("Mission Desc: " + m_MissionData.levelDetails.description);
-			
-			m_Triggers.AddTrigger(TriggerStub.CreateVehicleCountTrigger(999, true, true, TethysGame.LocalPlayer(), 3, compare_mode.cmpGreaterEqual));
-			// **End TODO**
-
 			return true;
 		}
 
@@ -103,35 +111,8 @@ namespace DotNetMissionSDK
 
 			// Init essential systems
 			m_Triggers = new TriggerManager(m_SaveBuffer.saveData);
-			m_Triggers.onTriggerFired += OnTriggerFired;
-
-			m_MissionLogic = new MissionLogic(m_MissionData, m_SaveBuffer.saveData, m_Triggers);
-		}
-
-		private void OnTriggerFired(TriggerStub trigger)
-		{
-			if (trigger.id == 999)
-			{
-				TethysGame.AddMessage(0, 0, "Trigger Fired!", TethysGame.LocalPlayer(), 0);
-				Console.WriteLine("Trigger Fired!");
-
-				using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
-				using (Unit unit = new Unit())
-				{
-					while (myEnum.GetNext(unit))
-					{
-						unit.DoMove(30, 30);
-					}
-				}
-			}
-
-			//Console.WriteLine("PRE");
-			//Player p = TethysGame.GetPlayer(TethysGame.LocalPlayer());
-			//Console.WriteLine("P");
-			//ScGroup g = p.GetDefaultGroup();
-
-			//Console.WriteLine("G");
-			//Console.WriteLine("Stub: " + g.stubIndex);
+			
+			m_MissionLogic = new CustomLogic(m_MissionData, m_SaveBuffer.saveData, m_Triggers);
 		}
 
 		/// <summary>
@@ -148,8 +129,6 @@ namespace DotNetMissionSDK
 
 			// Update mission logic
 			m_MissionLogic.Update();
-
-			// ** Put mission update code here. **
 
 			// Update save buffer
 			m_SaveBuffer.Save();
@@ -179,8 +158,6 @@ namespace DotNetMissionSDK
 		public void Restart()
 		{
 			m_MissionLogic.Restart();
-
-			m_Triggers.onTriggerFired -= OnTriggerFired;
 		}
 		
 		private void Dispose()
@@ -192,8 +169,6 @@ namespace DotNetMissionSDK
 			}
 
 			m_SaveBuffer.Dispose();
-
-			m_Triggers.onTriggerFired -= OnTriggerFired;
 		}
 	}
 }

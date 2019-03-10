@@ -16,6 +16,14 @@
 
 extern "C"
 {
+	extern EXPORT void __stdcall Trigger_Destroy(int stubIndex)
+	{
+		Trigger trigger;
+		trigger.stubIndex = stubIndex;
+
+		trigger.Destroy();
+	}
+
 	extern EXPORT void __stdcall Trigger_Disable(int stubIndex)
 	{
 		Trigger trigger;

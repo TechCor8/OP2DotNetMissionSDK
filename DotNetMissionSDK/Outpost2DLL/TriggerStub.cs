@@ -66,6 +66,13 @@ namespace DotNetMissionSDK.Triggers
 			m_StubData = triggerStub;
 		}
 
+		public void Destroy()
+		{
+			m_StubData.isActive = false;
+
+			Trigger_Destroy(m_StubData.stubIndex);
+		}
+
 		public void Disable()
 		{
 			m_StubData.enabled = false;
@@ -115,6 +122,7 @@ namespace DotNetMissionSDK.Triggers
 		}
 
 
+		[DllImport("NativeInterop.dll")] private static extern int Trigger_Destroy(int stubIndex);
 		[DllImport("NativeInterop.dll")] private static extern int Trigger_Disable(int stubIndex);
 		[DllImport("NativeInterop.dll")] private static extern int Trigger_Enable(int stubIndex);
 		[DllImport("NativeInterop.dll")] private static extern int Trigger_HasFired(int stubIndex, int playerNum);
