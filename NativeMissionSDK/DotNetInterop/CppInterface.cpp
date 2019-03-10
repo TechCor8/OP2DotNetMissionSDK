@@ -41,12 +41,7 @@ namespace DotNetInterop
 			// Common Interop DLL
 			dotNetPath = Path::Combine(Path::GetDirectoryName(strDllPath), "DotNetMissionSDK.dll");
 		}
-
-		FileStream^ fstream = gcnew FileStream("DotNetLogCpp.txt", FileMode::Create);
-		StreamWriter ^writer = gcnew StreamWriter(fstream);
-		writer->AutoFlush = true;
-		writer->WriteLine("dll path = " + dotNetPath);
-
+		
 		// Load DLL and create mission entry instance
 		DotNetMissionDLL::Load(dotNetPath);
 		
@@ -76,6 +71,7 @@ namespace DotNetInterop
 
 	void Detach()
 	{
+		DotNetMissionDLL::Instance->Detach();
 	}
 }
 

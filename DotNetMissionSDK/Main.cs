@@ -82,6 +82,7 @@ namespace DotNetMissionSDK
 				m_LogWriter = new StreamWriter(m_LogFileStream);
 				m_LogWriter.AutoFlush = true;
 				Console.SetOut(m_LogWriter);
+				Console.SetError(m_LogWriter);
 			}
 			catch (Exception e)
 			{
@@ -153,22 +154,28 @@ namespace DotNetMissionSDK
 		}
 
 		/// <summary>
-		/// Must be called when the mission restarts.
+		/// Called when the DLL is detached.
 		/// </summary>
-		public void Restart()
+		public void Detach()
 		{
-			m_MissionLogic.Restart();
-		}
-		
-		private void Dispose()
-		{
+			m_MissionLogic.Dispose();
+			
+			m_SaveBuffer.Dispose();
+			
+			// Dispose log file
 			if (m_LogFileStream != null)
 			{
-				m_LogFileStream.Close();
 				m_LogWriter.Close();
+				m_LogFileStream.Close();
 			}
 
-			m_SaveBuffer.Dispose();
+			// Restore console
+			StreamWriter sOut = new StreamWriter(Console.OpenStandardOutput());
+			StreamWriter sError = new StreamWriter(Console.OpenStandardError());
+			sOut.AutoFlush = true;
+			sError.AutoFlush = true;
+			Console.SetOut(sOut);
+			Console.SetError(sError);
 		}
 	}
 }

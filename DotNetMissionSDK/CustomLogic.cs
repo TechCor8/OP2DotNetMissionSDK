@@ -94,13 +94,13 @@ namespace DotNetMissionSDK
 		}
 
 		/// <summary>
-		/// Called when the mission restarts.
+		/// Releases all mission resources.
 		/// </summary>
-		public override void Restart()
+		public override void Dispose()
 		{
-			Console.WriteLine("Mission restarted.");
+			Console.WriteLine("Mission Ended.");
 
-			base.Restart();
+			base.Dispose();
 		}
 	}
 }

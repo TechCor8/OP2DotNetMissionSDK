@@ -407,22 +407,17 @@ namespace DotNetMissionSDK
 			}
 		}
 
-		/// <summary>
-		/// Called when the mission restarts.
-		/// </summary>
-		public virtual void Restart()
-		{
-			m_TriggerManager.onTriggerFired -= OnTriggerExecuted;
-		}
-
 		protected bool AddTrigger(TriggerStub triggerStub)
 		{
 			return m_TriggerManager.AddTrigger(triggerStub);
 		}
 
-		// Unused: Releases all mission resources
-		private void Dispose()
+		/// <summary>
+		/// Releases all mission resources.
+		/// </summary>
+		public virtual void Dispose()
 		{
+			m_TriggerManager.onTriggerFired -= OnTriggerExecuted;
 		}
 	}
 }
