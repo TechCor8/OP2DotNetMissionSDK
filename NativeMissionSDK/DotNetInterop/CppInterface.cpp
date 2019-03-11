@@ -4,26 +4,41 @@
 
 namespace DotNetInterop
 {
+	// Interface for Mission Entry in the C# mission DLL
+	public interface class IMissionEntry
+	{
+		bool Attach(String^ dllPath);
+		bool Initialize();
+		void Update();
+		IntPtr GetSaveBuffer();
+		int GetSaveBufferLength();
+		void Detach();
+	};
+
 	// Singleton class for accessing DotNetMissionEntry
 	public ref class DotNetMissionDLL
 	{
 		static Assembly^ m_Assembly;
-		static DotNetMissionEntry^ m_Instance;
+		static IMissionEntry^ m_Instance;
 
 	public:
-		static property DotNetMissionEntry^ Instance { DotNetMissionEntry^ get() { return m_Instance; } }
+		static property IMissionEntry^ Instance { IMissionEntry^ get() { return m_Instance; } }
 
 		// Attach creates the app domain, loads the assembly and creates the entry point
-		static void Load(String^ dotNetPath)
+		static bool Load(String^ dotNetPath)
 		{
 			// Load app domain and assembly
 			m_Assembly = Assembly::LoadFile(dotNetPath);
 
 			// Create entry point
-			m_Instance = (DotNetMissionEntry^)m_Assembly->CreateInstance("DotNetMissionSDK.DotNetMissionEntry");
+			m_Instance = (IMissionEntry^)m_Assembly->CreateInstance("DotNetMissionSDK.DotNetMissionEntry");
+
+			if (m_Instance == nullptr)
+				return false;
+
+			return true;
 		}
 	};
-
 
 	bool Attach(const char* dllPath, bool useCustomDLL)
 	{
@@ -43,7 +58,8 @@ namespace DotNetInterop
 		}
 		
 		// Load DLL and create mission entry instance
-		DotNetMissionDLL::Load(dotNetPath);
+		if (!DotNetMissionDLL::Load(dotNetPath))
+			return false;
 		
 		// Call Attach() on DLL
 		return DotNetMissionDLL::Instance->Attach(strDllPath);

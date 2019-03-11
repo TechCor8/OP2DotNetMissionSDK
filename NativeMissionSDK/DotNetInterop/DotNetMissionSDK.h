@@ -8,8 +8,6 @@ using namespace System::IO;
 using namespace System::Reflection;
 using namespace System::Runtime::InteropServices;
 
-using namespace DotNetMissionSDK;
-
 
 namespace DotNetInterop
 {

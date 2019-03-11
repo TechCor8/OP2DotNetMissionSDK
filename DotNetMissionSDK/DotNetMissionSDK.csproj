@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,6 +76,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MissionSDK\SaveBuffer.cs" />
     <Compile Include="SaveData.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NativeMissionSDK\DotNetInterop\DotNetInterop.vcxproj">
+      <Project>{3e632572-5532-4113-ac7e-8af9be92b350}</Project>
+      <Name>DotNetInterop</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

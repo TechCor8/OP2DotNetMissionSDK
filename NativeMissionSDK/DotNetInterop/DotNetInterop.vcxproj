@@ -216,9 +216,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DotNetMissionSDK\DotNetMissionSDK.csproj">
-      <Project>{a9e258bf-d6dc-4058-92d1-0728237ff346}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\NativeSDK\HFL\Source\HFL.vcxproj">
       <Project>{0fc43a25-fb89-4258-849b-cb3c0a061e0d}</Project>
     </ProjectReference>
