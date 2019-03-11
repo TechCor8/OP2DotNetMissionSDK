@@ -121,28 +121,28 @@ namespace DotNetMissionSDK
 		public void CenterViewOn(int tileX, int tileY)	{ Player_CenterViewOn(m_Handle, tileX, tileY);									}
 	
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr Player_Create(int playerNum);
-		[DllImport("NativeInterop.dll")] private static extern void Player_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr Player_Create(int playerNum);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_Release(IntPtr handle);
 
 		// [Get] Game Settings
-		[DllImport("NativeInterop.dll")] private static extern int Player_Difficulty(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Player_IsEden(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Player_IsHuman(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_Difficulty(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_IsEden(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_IsHuman(IntPtr handle);
 		// [Get] Population
-		[DllImport("NativeInterop.dll")] private static extern int Player_Kids(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Player_Workers(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Player_Scientists(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_Kids(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_Workers(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_Scientists(IntPtr handle);
 		// [Get] Resources
-		[DllImport("NativeInterop.dll")] private static extern int Player_Ore(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Player_RareOre(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Player_FoodStored(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern FoodStatus Player_FoodSupply(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_Ore(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_RareOre(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_FoodStored(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern FoodStatus Player_FoodSupply(IntPtr handle);
 		// [Get] Misc
-		[DllImport("NativeInterop.dll")] private static extern MoraleLevels Player_MoraleLevel(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Player_GetRLVCount(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern MoraleLevels Player_MoraleLevel(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_GetRLVCount(IntPtr handle);
 		// [Get] Indirect property lookups
-		[DllImport("NativeInterop.dll")] private static extern int Player_HasTechnology(IntPtr handle, int techID);
-		[DllImport("NativeInterop.dll")] private static extern int Player_GetDefaultGroup(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_HasTechnology(IntPtr handle, int techID);
+		[DllImport("DotNetInterop.dll")] private static extern int Player_GetDefaultGroup(IntPtr handle);
 		// [Get] Player Strength  [Calculational]
 		// Note: Unit Strengths are as follows:
 		//	Spider/Scorpion	: 4
@@ -151,45 +151,45 @@ namespace DotNetMissionSDK
 		//	Tiger			: Laser/Microwave: 8 Other: 9 ThorsHammer: 10
 		//	Guard Post		: Laser/Microwave: 4 Other: 5 ThorsHammer: 7
 		//	Other			: 0  [Including Units in a Garage]
-		[DllImport("NativeInterop.dll")] private static extern int Player_GetPlayerStrength(IntPtr handle, int x1,int y1,int x2,int y2);			// Returns (strength / 8), where strength is the sum of all units owned by the player in the given map rectangle
-		[DllImport("NativeInterop.dll")] private static extern int Player_GetTotalPlayerStrength(IntPtr handle);									// Returns (strength / 8), where strength is the sum of all units owned by the player
+		[DllImport("DotNetInterop.dll")] private static extern int Player_GetPlayerStrength(IntPtr handle, int x1,int y1,int x2,int y2);			// Returns (strength / 8), where strength is the sum of all units owned by the player in the given map rectangle
+		[DllImport("DotNetInterop.dll")] private static extern int Player_GetTotalPlayerStrength(IntPtr handle);									// Returns (strength / 8), where strength is the sum of all units owned by the player
 		// [Get] Checks  [Prerequisite searching]
-		[DllImport("NativeInterop.dll")] private static extern int Player_CanAccumulateOre(IntPtr handle);											// Checks for (CommonOreMine, or (hasVehicle(mapRoboMiner, mapAny), or canBuildVehicle(true))) + (hasVehicle(mapCargoTruck, mapAny), or canBuildVehicle(true)) + (CommonOreSmelter, or canBuildBuilding)
-		[DllImport("NativeInterop.dll")] private static extern int Player_CanAccumulateRareOre(IntPtr handle);										// Checks for (RareOreMine, or (hasVehicle(mapRoboMiner, mapAny), or canBuildVehicle(true))) + (hasVehicle(mapCargoTruck, mapAny), or canBuildVehicle(true)) + (RareOreSmelter, or canBuildBuilding)
-		[DllImport("NativeInterop.dll")] private static extern int Player_CanBuildSpace(IntPtr handle);												// Checks for Spaceport, or hasVehicle(mapConvec, mapSpaceport), or canBuildBuilding
-		[DllImport("NativeInterop.dll")] private static extern int Player_CanBuildBuilding(IntPtr handle);											// Checks for StructureFactory + (Convec, or (VehicleFactory, or (redundant) hasVehicle(mapConvec, mapVehicleFactory))), or hasVehicle(mapConvec, mapStructureFactory)
-		[DllImport("NativeInterop.dll")] private static extern int Player_CanBuildVehicle(IntPtr handle, int bCheckCanBuildBuilding);				// Checks for VehicleFactory, or hasVehicle(mapConvec, mapVehicleFactory), or [optional] canBuildBuilding  [Note: Uses last cached result if available, so optional parameter may not function as expected]
-		[DllImport("NativeInterop.dll")] private static extern int Player_CanDoResearch(IntPtr handle, int techID);									// Checks for <Tech.labType>Lab, or hasVehicle(mapConvec, map<Techc.labType>Lab), or canBuildBuilding
-		[DllImport("NativeInterop.dll")] private static extern int Player_HasVehicle(IntPtr handle, map_id vehicleType, map_id cargoOrWeaponType);	// [cargoOrWeaponType: -1 = mapAny]  Checks for free units, or units in Garages
-		[DllImport("NativeInterop.dll")] private static extern int Player_HasActiveCommand(IntPtr handle);											// Returns (numActiveCommandCenters > 0)
+		[DllImport("DotNetInterop.dll")] private static extern int Player_CanAccumulateOre(IntPtr handle);											// Checks for (CommonOreMine, or (hasVehicle(mapRoboMiner, mapAny), or canBuildVehicle(true))) + (hasVehicle(mapCargoTruck, mapAny), or canBuildVehicle(true)) + (CommonOreSmelter, or canBuildBuilding)
+		[DllImport("DotNetInterop.dll")] private static extern int Player_CanAccumulateRareOre(IntPtr handle);										// Checks for (RareOreMine, or (hasVehicle(mapRoboMiner, mapAny), or canBuildVehicle(true))) + (hasVehicle(mapCargoTruck, mapAny), or canBuildVehicle(true)) + (RareOreSmelter, or canBuildBuilding)
+		[DllImport("DotNetInterop.dll")] private static extern int Player_CanBuildSpace(IntPtr handle);												// Checks for Spaceport, or hasVehicle(mapConvec, mapSpaceport), or canBuildBuilding
+		[DllImport("DotNetInterop.dll")] private static extern int Player_CanBuildBuilding(IntPtr handle);											// Checks for StructureFactory + (Convec, or (VehicleFactory, or (redundant) hasVehicle(mapConvec, mapVehicleFactory))), or hasVehicle(mapConvec, mapStructureFactory)
+		[DllImport("DotNetInterop.dll")] private static extern int Player_CanBuildVehicle(IntPtr handle, int bCheckCanBuildBuilding);				// Checks for VehicleFactory, or hasVehicle(mapConvec, mapVehicleFactory), or [optional] canBuildBuilding  [Note: Uses last cached result if available, so optional parameter may not function as expected]
+		[DllImport("DotNetInterop.dll")] private static extern int Player_CanDoResearch(IntPtr handle, int techID);									// Checks for <Tech.labType>Lab, or hasVehicle(mapConvec, map<Techc.labType>Lab), or canBuildBuilding
+		[DllImport("DotNetInterop.dll")] private static extern int Player_HasVehicle(IntPtr handle, map_id vehicleType, map_id cargoOrWeaponType);	// [cargoOrWeaponType: -1 = mapAny]  Checks for free units, or units in Garages
+		[DllImport("DotNetInterop.dll")] private static extern int Player_HasActiveCommand(IntPtr handle);											// Returns (numActiveCommandCenters > 0)
 		// Reset cached check values
-		[DllImport("NativeInterop.dll")] private static extern void Player_ResetChecks(IntPtr handle);												// Clears checkValue array to -1  [Not Set]
+		[DllImport("DotNetInterop.dll")] private static extern void Player_ResetChecks(IntPtr handle);												// Clears checkValue array to -1  [Not Set]
 
 		// [Set] Game Settings
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetColorNumber(IntPtr handle, int colorIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetColorNumber(IntPtr handle, int colorIndex);
 		// [Set] Population
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetKids(IntPtr handle, int numKids);
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetWorkers(IntPtr handle, int numWorkers);
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetScientists(IntPtr handle, int numScientists);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetKids(IntPtr handle, int numKids);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetWorkers(IntPtr handle, int numWorkers);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetScientists(IntPtr handle, int numScientists);
 		// [Set] Resources
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetOre(IntPtr handle, int newCommonOre);
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetRareOre(IntPtr handle, int newRareOre);
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetFoodStored(IntPtr handle, int newFoodStored);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetOre(IntPtr handle, int newCommonOre);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetRareOre(IntPtr handle, int newRareOre);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetFoodStored(IntPtr handle, int newFoodStored);
 		// [Set] Misc
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetSolarSat(IntPtr handle, int numSolarSatellites);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetSolarSat(IntPtr handle, int numSolarSatellites);
 		// [Set] Indirect property setting
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetTechLevel(IntPtr handle, int techLevel);								// Gives all techs with techID <= (techLevel * 1000), and all free subsequent techs
-		[DllImport("NativeInterop.dll")] private static extern void Player_MarkResearchComplete(IntPtr handle, int techID);							// Gives the tech with the given tech ID, and all free subsequent techs
-		[DllImport("NativeInterop.dll")] private static extern void Player_SetDefaultGroup(IntPtr handle, IntPtr newDefaultGroup);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetTechLevel(IntPtr handle, int techLevel);								// Gives all techs with techID <= (techLevel * 1000), and all free subsequent techs
+		[DllImport("DotNetInterop.dll")] private static extern void Player_MarkResearchComplete(IntPtr handle, int techID);							// Gives the tech with the given tech ID, and all free subsequent techs
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetDefaultGroup(IntPtr handle, IntPtr newDefaultGroup);
 
 		// [Method]
-		[DllImport("NativeInterop.dll")] private static extern void Player_GoEden(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Player_GoPlymouth(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Player_GoAI(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Player_GoHuman(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Player_AllyWith(IntPtr handle, int playerNum);
-		[DllImport("NativeInterop.dll")] private static extern void Player_CaptureRLV(IntPtr handle, int sourcePlayerNum);							// Steals an RLV from the source Player, provided they have one
-		[DllImport("NativeInterop.dll")] private static extern void Player_CenterViewOn(IntPtr handle, int tileX, int tileY);						// Sets the view for this Player (does nothing if player is not the local player)
+		[DllImport("DotNetInterop.dll")] private static extern void Player_GoEden(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_GoPlymouth(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_GoAI(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_GoHuman(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_AllyWith(IntPtr handle, int playerNum);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_CaptureRLV(IntPtr handle, int sourcePlayerNum);							// Steals an RLV from the source Player, provided they have one
+		[DllImport("DotNetInterop.dll")] private static extern void Player_CenterViewOn(IntPtr handle, int tileX, int tileY);						// Sets the view for this Player (does nothing if player is not the local player)
 
 	//public:	// Why not? :)
 	//	char checkValue[8];		// 0 = False, 1 = True, -1 = Not Set

@@ -30,8 +30,6 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "Outpost2", "Outpost2exe\Out
 		AttachLaunchAction = No
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeInterop", "NativeMissionSDK\NativeInterop\NativeInterop.vcxproj", "{BFF04679-892F-4195-82F3-331EA9EB46F7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,18 +100,6 @@ Global
 		{CFC740A2-54ED-4BB8-88FA-B8B21FBEAD17}.Release|Any CPU.ActiveCfg = Release|x86
 		{CFC740A2-54ED-4BB8-88FA-B8B21FBEAD17}.Release|x64.ActiveCfg = Release|x86
 		{CFC740A2-54ED-4BB8-88FA-B8B21FBEAD17}.Release|x86.ActiveCfg = Release|x86
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Debug|Any CPU.Build.0 = Debug|Win32
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Debug|x64.ActiveCfg = Debug|x64
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Debug|x64.Build.0 = Debug|x64
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Debug|x86.ActiveCfg = Debug|Win32
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Debug|x86.Build.0 = Debug|Win32
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Release|Any CPU.ActiveCfg = Release|Win32
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Release|Any CPU.Build.0 = Release|Win32
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Release|x64.ActiveCfg = Release|x64
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Release|x64.Build.0 = Release|x64
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Release|x86.ActiveCfg = Release|Win32
-		{BFF04679-892F-4195-82F3-331EA9EB46F7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,7 +110,6 @@ Global
 		{43E987C2-8355-4186-91C9-69FE643F7C7D} = {28E63BAF-B78B-4D73-864E-290EC08AB010}
 		{B3F40368-F3CC-4EC5-A758-F5DAD08FEDDC} = {43E987C2-8355-4186-91C9-69FE643F7C7D}
 		{0FC43A25-FB89-4258-849B-CB3C0A061E0D} = {43E987C2-8355-4186-91C9-69FE643F7C7D}
-		{BFF04679-892F-4195-82F3-331EA9EB46F7} = {28E63BAF-B78B-4D73-864E-290EC08AB010}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F8E804A3-CE0D-48B6-BDEE-AC4BD02B7233}

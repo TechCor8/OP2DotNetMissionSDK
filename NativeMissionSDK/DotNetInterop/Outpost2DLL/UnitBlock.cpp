@@ -1,4 +1,5 @@
-#pragma once
+#include "stdafx_unmanaged.h"
+/*#pragma once
 #ifndef OP2
 #define OP2 __declspec(dllimport)
 #endif
@@ -31,3 +32,4 @@ public:
 	Range classRange[16];			// 0x4  Range of unit indexes in the unitRecordTable for each class
 	UnitRecord* unitRecordTable;	// 0x84
 };
+*/

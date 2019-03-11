@@ -88,61 +88,61 @@ namespace DotNetMissionSDK
 
 
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr Unit_Create();
-		[DllImport("NativeInterop.dll")] private static extern void Unit_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr Unit_Create();
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_Release(IntPtr handle);
 
 		// Common
 		// [Get]
-		[DllImport("NativeInterop.dll")] private static extern map_id Unit_GetType(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_OwnerID(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_IsBuilding(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_IsVehicle(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_IsBusy(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_IsLive(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_IsEMPed(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_GetTileX(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int Unit_GetTileY(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern map_id Unit_GetType(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_OwnerID(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsBuilding(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsVehicle(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsBusy(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsLive(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsEMPed(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_GetTileX(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_GetTileY(IntPtr handle);
 
 		// [Set]
-		[DllImport("NativeInterop.dll")] private static extern int Unit_SetDamage(IntPtr handle, int damage);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_SetDamage(IntPtr handle, int damage);
 		//void SetId(int newUnitId);													// Change referenced unit of this Proxy/Stub
-		[DllImport("NativeInterop.dll")] private static extern int Unit_SetOppFiredUpon(IntPtr handle, int bTrue);
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_SetOppFiredUpon(IntPtr handle, int bTrue);
 
 		// [Method]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoDeath(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoSelfDestruct(IntPtr handle);					// Order Unit to SelfDestruct
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoTransfer(IntPtr handle, int destPlayerNum);  // Order Unit to Transfer to another Player (Vehicle or Building)
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoDeath(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoSelfDestruct(IntPtr handle);					// Order Unit to SelfDestruct
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoTransfer(IntPtr handle, int destPlayerNum);  // Order Unit to Transfer to another Player (Vehicle or Building)
 
 		// Combat Units
-		[DllImport("NativeInterop.dll")] private static extern map_id Unit_GetWeapon(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Unit_SetWeapon(IntPtr handle, map_id weaponType);
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoAttack(IntPtr handle, IntPtr targetUnit);		// Order Unit to Attack target Unit
+		[DllImport("DotNetInterop.dll")] private static extern map_id Unit_GetWeapon(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_SetWeapon(IntPtr handle, map_id weaponType);
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoAttack(IntPtr handle, IntPtr targetUnit);		// Order Unit to Attack target Unit
 
 		// Vehicles
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoSetLights(IntPtr handle, int boolOn);												// Order Unit to SetLights
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoMove(IntPtr handle, int tileX, int tileY);											// Order Unit to Move
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoSetLights(IntPtr handle, int boolOn);												// Order Unit to SetLights
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoMove(IntPtr handle, int tileX, int tileY);											// Order Unit to Move
 		// Specific Vehicle
-		[DllImport("NativeInterop.dll")] private static extern map_id Unit_GetCargo(IntPtr handle);																// [Convec]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoBuild(IntPtr handle, map_id buildingType, int tileX, int tileY);						// [Convec]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_SetCargo(IntPtr handle, map_id cargoType, map_id weaponType);							// [Convec]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_SetTruckCargo(IntPtr handle, Truck_Cargo cargoType, int amount);						// [Cargo Truck]
+		[DllImport("DotNetInterop.dll")] private static extern map_id Unit_GetCargo(IntPtr handle);																// [Convec]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoBuild(IntPtr handle, map_id buildingType, int tileX, int tileY);						// [Convec]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_SetCargo(IntPtr handle, map_id cargoType, map_id weaponType);							// [Convec]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_SetTruckCargo(IntPtr handle, Truck_Cargo cargoType, int amount);						// [Cargo Truck]
 
 		// Buildings
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoIdle(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoUnIdle(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoStop(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoInfect(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoIdle(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoUnIdle(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoStop(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoInfect(IntPtr handle);
 		// Specific Building
-		[DllImport("NativeInterop.dll")] private static extern map_id Unit_GetObjectOnPad(IntPtr handle);														// [Spaceport]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoLaunch(IntPtr handle, int destPixelX, int destPixelY, int bForceEnable);				// [Spaceport]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_PutInGarage(IntPtr handle, int bayIndex, int tileX, int tileY);						// [Garage]
-		[DllImport("NativeInterop.dll")] private static extern int Unit_HasOccupiedBay(IntPtr handle);															// [Garage, StructureFactory, Spaceport]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_SetFactoryCargo(IntPtr handle, int bay, map_id unitType, map_id cargoOrWeaponType);	// [StructureFactory, Spaceport]  [Note: If items is an SULV, RLV, or EMP Missile, it is placed on the launch pad instead of in the bay]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_DoDevelop(IntPtr handle, map_id itemToProduce);										// [Factory]  [Note: Sets weapon/cargo to mapNone, can't build Lynx/Panther/Tiger/GuardPostKits]
-		[DllImport("NativeInterop.dll")] private static extern void Unit_ClearSpecialTarget(IntPtr handle);														// [Lab]
+		[DllImport("DotNetInterop.dll")] private static extern map_id Unit_GetObjectOnPad(IntPtr handle);														// [Spaceport]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoLaunch(IntPtr handle, int destPixelX, int destPixelY, int bForceEnable);				// [Spaceport]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_PutInGarage(IntPtr handle, int bayIndex, int tileX, int tileY);						// [Garage]
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_HasOccupiedBay(IntPtr handle);															// [Garage, StructureFactory, Spaceport]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_SetFactoryCargo(IntPtr handle, int bay, map_id unitType, map_id cargoOrWeaponType);	// [StructureFactory, Spaceport]  [Note: If items is an SULV, RLV, or EMP Missile, it is placed on the launch pad instead of in the bay]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoDevelop(IntPtr handle, map_id itemToProduce);										// [Factory]  [Note: Sets weapon/cargo to mapNone, can't build Lynx/Panther/Tiger/GuardPostKits]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_ClearSpecialTarget(IntPtr handle);														// [Lab]
 
 		// Wreckage
-		[DllImport("NativeInterop.dll")] private static extern int Unit_IsDiscovered(IntPtr handle);															// Wreckage
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsDiscovered(IntPtr handle);															// Wreckage
 
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.

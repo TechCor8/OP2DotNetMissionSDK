@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "stdafx_unmanaged.h"
 
 #include <Outpost2DLL/Outpost2DLL.h>	// Main Outpost 2 header to interface with the game
 #include <fstream>

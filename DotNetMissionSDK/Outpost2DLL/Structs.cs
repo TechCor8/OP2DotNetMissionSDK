@@ -49,7 +49,7 @@ namespace DotNetMissionSDK
 			y = (int)(result >> 32);
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern long LOCATION_Clip(int x, int y);
+		[DllImport("DotNetInterop.dll")] private static extern long LOCATION_Clip(int x, int y);
 		
 		//int Norm(); WTF is Norm? The magnitude? The developer's name?
 	};
@@ -136,9 +136,9 @@ namespace DotNetMissionSDK
 			maxY = (int)(max >> 32);
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern int MAP_RECT_Check(int minX, int minY, int maxX, int maxY, int x, int y);		
-		[DllImport("NativeInterop.dll")] private static extern long MAP_RECT_ClipToMapMin(int minX, int minY, int maxX, int maxY);
-		[DllImport("NativeInterop.dll")] private static extern long MAP_RECT_ClipToMapMax(int minX, int minY, int maxX, int maxY);
+		[DllImport("DotNetInterop.dll")] private static extern int MAP_RECT_Check(int minX, int minY, int maxX, int maxY, int x, int y);		
+		[DllImport("DotNetInterop.dll")] private static extern long MAP_RECT_ClipToMapMin(int minX, int minY, int maxX, int maxY);
+		[DllImport("DotNetInterop.dll")] private static extern long MAP_RECT_ClipToMapMax(int minX, int minY, int maxX, int maxY);
 	};
 
 

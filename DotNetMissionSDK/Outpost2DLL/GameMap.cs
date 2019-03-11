@@ -23,15 +23,15 @@ namespace DotNetMissionSDK
 		public static void SetInitialLightLevel(int lightPosition)				{ GameMap_SetInitialLightLevel(lightPosition);				}
 
 		// [Get]
-		[DllImport("NativeInterop.dll")] private static extern int GameMap_GetCellType(int x, int y);
-		[DllImport("NativeInterop.dll")] private static extern int GameMap_GetTile(int x, int y);
+		[DllImport("DotNetInterop.dll")] private static extern int GameMap_GetCellType(int x, int y);
+		[DllImport("DotNetInterop.dll")] private static extern int GameMap_GetTile(int x, int y);
 
 		// [Set]
-		[DllImport("NativeInterop.dll")] private static extern void GameMap_InitialSetTile(int x, int y, int tileIndex);
-		[DllImport("NativeInterop.dll")] private static extern void GameMap_SetTile(int x, int y, int tileIndex);
-		[DllImport("NativeInterop.dll")] private static extern void GameMap_SetCellType(int x, int y, int cellIndex);
-		[DllImport("NativeInterop.dll")] private static extern void GameMap_SetLavaPossible(int x, int y, int bLavaPossible);
-		[DllImport("NativeInterop.dll")] private static extern void GameMap_SetVirusUL(int x, int y, int bBlightPresent);
-		[DllImport("NativeInterop.dll")] private static extern void GameMap_SetInitialLightLevel(int lightPosition);
+		[DllImport("DotNetInterop.dll")] private static extern void GameMap_InitialSetTile(int x, int y, int tileIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void GameMap_SetTile(int x, int y, int tileIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void GameMap_SetCellType(int x, int y, int cellIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void GameMap_SetLavaPossible(int x, int y, int bLavaPossible);
+		[DllImport("DotNetInterop.dll")] private static extern void GameMap_SetVirusUL(int x, int y, int bBlightPresent);
+		[DllImport("DotNetInterop.dll")] private static extern void GameMap_SetInitialLightLevel(int lightPosition);
 	}
 }

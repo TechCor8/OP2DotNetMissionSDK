@@ -31,6 +31,6 @@ namespace DotNetMissionSDK
 		// [Set]
 		//void SetId(int stubIndex);
 
-		//[DllImport("NativeInterop.dll")] private static extern int ScStub_GetIndex(IntPtr handle);
+		//[DllImport("DotNetInterop.dll")] private static extern int ScStub_GetIndex(IntPtr handle);
 	}
 }

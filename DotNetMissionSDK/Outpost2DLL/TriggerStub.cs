@@ -122,10 +122,10 @@ namespace DotNetMissionSDK.Triggers
 		}
 
 
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_Destroy(int stubIndex);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_Disable(int stubIndex);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_Enable(int stubIndex);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_HasFired(int stubIndex, int playerNum);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_Destroy(int stubIndex);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_Disable(int stubIndex);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_Enable(int stubIndex);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_HasFired(int stubIndex, int playerNum);
 
 
 		// Trigger creation functions
@@ -253,37 +253,37 @@ namespace DotNetMissionSDK.Triggers
 		}*/
 
 		// Victory/Failure condition triggers
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateVictoryCondition(int bEnabled, int bOneShot /*not used, set to 0*/, int victoryTrigger, string missionObjective);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateFailureCondition(int bEnabled, int bOneShot /*not used, set to 0*/, int failureTrigger);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateVictoryCondition(int bEnabled, int bOneShot /*not used, set to 0*/, int victoryTrigger, string missionObjective);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateFailureCondition(int bEnabled, int bOneShot /*not used, set to 0*/, int failureTrigger);
 
 		// Typical Victory Triggers
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateOnePlayerLeftTrigger(int bEnabled, int bOneShot);			// Last One Standing (and later part of Land Rush)
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateEvacTrigger(int bEnabled, int bOneShot, int playerNum);	// Spacerace
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateMidasTrigger(int bEnabled, int bOneShot, int time);		// Midas
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateOperationalTrigger(int bEnabled, int bOneShot, int playerNum, map_id buildingType, int refValue, compare_mode compareType);	// Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateOnePlayerLeftTrigger(int bEnabled, int bOneShot);			// Last One Standing (and later part of Land Rush)
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateEvacTrigger(int bEnabled, int bOneShot, int playerNum);	// Spacerace
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateMidasTrigger(int bEnabled, int bOneShot, int time);		// Midas
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateOperationalTrigger(int bEnabled, int bOneShot, int playerNum, map_id buildingType, int refValue, compare_mode compareType);	// Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
 		// Research and Resource Count Triggers  [Note: Typically used to set what needs to be done by the end of a campaign mission]
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateResearchTrigger(int bEnabled, int bOneShot, int techID, int playerNum);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateResourceTrigger(int bEnabled, int bOneShot, trig_res resourceType, int refAmount, int playerNum, compare_mode compareType);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateKitTrigger(int bEnabled, int bOneShot, int playerNum, map_id id, int refCount);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateEscapeTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height, int refValue, map_id unitType, Truck_Cargo cargoType, int cargoAmount);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateCountTrigger(int bEnabled, int bOneShot, int playerNum, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateResearchTrigger(int bEnabled, int bOneShot, int techID, int playerNum);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateResourceTrigger(int bEnabled, int bOneShot, trig_res resourceType, int refAmount, int playerNum, compare_mode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateKitTrigger(int bEnabled, int bOneShot, int playerNum, map_id id, int refCount);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateEscapeTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height, int refValue, map_id unitType, Truck_Cargo cargoType, int cargoAmount);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateCountTrigger(int bEnabled, int bOneShot, int playerNum, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType);
 		// Unit Count Triggers  [Note: See also CreateCountTrigger]
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateVehicleCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateBuildingCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateVehicleCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateBuildingCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
 		// Attack/Damage Triggers
-		//[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, ScGroup& group);
-		//[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, ScGroup& group, int damage);
+		//[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, ScGroup& group);
+		//[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, ScGroup& group, int damage);
 		// Time Triggers
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int timeMin, int timeMax);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int time);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int timeMin, int timeMax);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int time);
 		// Positional Triggers
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreatePointTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y);
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateRectTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreatePointTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateRectTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height);
 		// Special Target Trigger/Data
-		[DllImport("NativeInterop.dll")] private static extern int Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, IntPtr targetUnit /* Lab */, map_id sourceUnitType /* mapScout */);
-		[DllImport("NativeInterop.dll")] private static extern void Trigger_GetSpecialTargetData(int specialTargetTrigger, IntPtr sourceUnit /* Scout */);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, IntPtr targetUnit /* Lab */, map_id sourceUnitType /* mapScout */);
+		[DllImport("DotNetInterop.dll")] private static extern void Trigger_GetSpecialTargetData(int specialTargetTrigger, IntPtr sourceUnit /* Scout */);
 
 		// Set Trigger  [Note: Used to collect a number of other triggers into a single trigger output. Can be used for something like any 3 in a set of 5 objectives.]
-		//[DllImport("NativeInterop.dll")] private static extern IntPtr Trigger_CreateSetTrigger(int bEnabled, int bOneShot, int totalTriggers, int neededTriggers, string triggerFunction, IntPtr[] triggers); // +list of triggers
+		//[DllImport("DotNetInterop.dll")] private static extern IntPtr Trigger_CreateSetTrigger(int bEnabled, int bOneShot, int totalTriggers, int neededTriggers, string triggerFunction, IntPtr[] triggers); // +list of triggers
 	}
 }

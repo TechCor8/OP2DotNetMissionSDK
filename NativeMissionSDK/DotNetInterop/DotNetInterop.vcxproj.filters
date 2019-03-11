@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Outpost2DLL">
+      <UniqueIdentifier>{deea018f-9ce5-4567-91b2-4d1280e9849c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -27,6 +30,9 @@
     <ClInclude Include="DotNetMissionSDK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx_unmanaged.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -36,6 +42,39 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CppInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\Enumerators.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\GameMap.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\Groups.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\Player.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\ScStub.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\Structs.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\TethysGame.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\Trigger.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\Unit.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="Outpost2DLL\UnitBlock.cpp">
+      <Filter>Outpost2DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx_unmanaged.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

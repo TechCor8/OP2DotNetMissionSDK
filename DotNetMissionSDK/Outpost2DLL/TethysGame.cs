@@ -48,70 +48,70 @@ namespace DotNetMissionSDK
 
 
 		// Player Number and Number of Players
-		[DllImport("NativeInterop.dll")] public static extern int LocalPlayer();            // Returns the local player index
-		[DllImport("NativeInterop.dll")] public static extern int NoPlayers();              // Returns number of players (including both Human and AI)
-		[DllImport("NativeInterop.dll")] private static extern IntPtr TethysGame_GetPlayer(int playerNum);
+		[DllImport("DotNetInterop.dll")] public static extern int LocalPlayer();            // Returns the local player index
+		[DllImport("DotNetInterop.dll")] public static extern int NoPlayers();              // Returns number of players (including both Human and AI)
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr TethysGame_GetPlayer(int playerNum);
 
 		// Multiplayer game options  [Get Property]
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_UsesDayNight();
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_UsesMorale();
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_CanHaveDisasters();
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_InitialUnits();       // Number of Laser/Microwave Lynx to start with
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_CanAllowCheats();     // Useless
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_UsesDayNight();
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_UsesMorale();
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CanHaveDisasters();
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_InitialUnits();       // Number of Laser/Microwave Lynx to start with
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CanAllowCheats();     // Useless
 
 		// Game Time
-		[DllImport("NativeInterop.dll")] public static extern int Tick();   // Current time (tick is the smallest slice of game time)
-		[DllImport("NativeInterop.dll")] public static extern int Time();   // Current tick / 4  (most processing is only done every 4 ticks)
+		[DllImport("DotNetInterop.dll")] public static extern int Tick();   // Current time (tick is the smallest slice of game time)
+		[DllImport("DotNetInterop.dll")] public static extern int Time();   // Current tick / 4  (most processing is only done every 4 ticks)
 
 		// Game Sounds and Voice warnings
 		//  Note: SoundIndex = 94..227 [Inclusive] are recorded voice messages
-		[DllImport("NativeInterop.dll")] public static extern void AddGameSound(int soundIndex, int toPlayerNum);           // Note: toPlayerNum: -1 = PlayerAll
-		[DllImport("NativeInterop.dll")] public static extern void AddMapSound(int soundIndex, int tileX, int tileY);
+		[DllImport("DotNetInterop.dll")] public static extern void AddGameSound(int soundIndex, int toPlayerNum);           // Note: toPlayerNum: -1 = PlayerAll
+		[DllImport("DotNetInterop.dll")] public static extern void AddMapSound(int soundIndex, int tileX, int tileY);
 		// Message log
-		[DllImport("NativeInterop.dll")] public static extern void AddMessage(int pixelX, int pixelY, string message, int toPlayerNum, int soundIndex); // Note: toPlayerNum: -1 = PlayerAll
-		//[DllImport("NativeInterop.dll")] public static extern void AddMessage(Unit owner, string message, int toPlayerNum, int soundIndex);				// Note: toPlayerNum: -1 = PlayerAll
+		[DllImport("DotNetInterop.dll")] public static extern void AddMessage(int pixelX, int pixelY, string message, int toPlayerNum, int soundIndex); // Note: toPlayerNum: -1 = PlayerAll
+		//[DllImport("DotNetInterop.dll")] public static extern void AddMessage(Unit owner, string message, int toPlayerNum, int soundIndex);				// Note: toPlayerNum: -1 = PlayerAll
 
 		// Debug/Cheat flags
-		[DllImport("NativeInterop.dll")] private static extern void TethysGame_SetDaylightEverywhere(int bOn);
-		[DllImport("NativeInterop.dll")] private static extern void TethysGame_SetDaylightMoves(int bOn);
+		[DllImport("DotNetInterop.dll")] private static extern void TethysGame_SetDaylightEverywhere(int bOn);
+		[DllImport("DotNetInterop.dll")] private static extern void TethysGame_SetDaylightMoves(int bOn);
 		// Cheat flags  [gutted and useless by official Sierra update]
-		[DllImport("NativeInterop.dll")] public static extern void SetCheatFastProduction(int bOn);         // Useless
-		[DllImport("NativeInterop.dll")] public static extern void SetCheatFastUnits(int bOn);              // Useless
-		[DllImport("NativeInterop.dll")] public static extern void SetCheatProduceAll(int bOn);             // Useless
-		[DllImport("NativeInterop.dll")] public static extern void SetCheatUnlimitedResources(int bOn);     // Useless
+		[DllImport("DotNetInterop.dll")] public static extern void SetCheatFastProduction(int bOn);         // Useless
+		[DllImport("DotNetInterop.dll")] public static extern void SetCheatFastUnits(int bOn);              // Useless
+		[DllImport("DotNetInterop.dll")] public static extern void SetCheatProduceAll(int bOn);             // Useless
+		[DllImport("DotNetInterop.dll")] public static extern void SetCheatUnlimitedResources(int bOn);     // Useless
 
 		// Unit Creation  [Returns: int numUnitsCreated]
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_CreateUnit(IntPtr returnedUnit, map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation);  // Note: see enum UnitDirection
-		[DllImport("NativeInterop.dll")] public static extern int CreateBeacon(map_id beaconType, int tileX, int tileY, int commonRareType, int barYield, int barVariant);  // Note: see enums BeaconTypes, Yield, Variant
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_CreateWreck(int tileX, int tileY, map_id techID, int bInitiallyVisible);      // Note: techID must be >= 8000 but < (8000+4096) = 12096
-		[DllImport("NativeInterop.dll")] private static extern int TethysGame_PlaceMarker(IntPtr returnedUnit, int tileX, int tileY, int markerType);       // Note: See enum MarkerTypes
-		[DllImport("NativeInterop.dll")] public static extern int CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType);      // Returns: 1 [true] always
-		//[DllImport("NativeInterop.dll")] public static extern int CreateUnitBlock(_Player& ownerPlayer, string exportName, int bLightsOn);		// Returns: numUnitsCreated,  Note: see class UnitBlock
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CreateUnit(IntPtr returnedUnit, map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation);  // Note: see enum UnitDirection
+		[DllImport("DotNetInterop.dll")] public static extern int CreateBeacon(map_id beaconType, int tileX, int tileY, int commonRareType, int barYield, int barVariant);  // Note: see enums BeaconTypes, Yield, Variant
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CreateWreck(int tileX, int tileY, map_id techID, int bInitiallyVisible);      // Note: techID must be >= 8000 but < (8000+4096) = 12096
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_PlaceMarker(IntPtr returnedUnit, int tileX, int tileY, int markerType);       // Note: See enum MarkerTypes
+		[DllImport("DotNetInterop.dll")] public static extern int CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType);      // Returns: 1 [true] always
+		//[DllImport("DotNetInterop.dll")] public static extern int CreateUnitBlock(_Player& ownerPlayer, string exportName, int bLightsOn);		// Returns: numUnitsCreated,  Note: see class UnitBlock
 
 		// Morale Level
 		//  Note: playerNum: -1 = PlayerAll
 		//  Note: Calling ForceMoraleX functions after tick 0 will cause a "Cheated Game!" message to appear. FreeMoraleLevel can be called any time.
 		//  Bug: ForceMoraleX is buggy if playerNum is not -1. You may need to call the function twice for the correct effect (see Forum post). FreeMoraleLevel is not affected by this bug.
-		[DllImport("NativeInterop.dll")] public static extern void ForceMoraleGreat(int playerNum);
-		[DllImport("NativeInterop.dll")] public static extern void ForceMoraleGood(int playerNum);
-		[DllImport("NativeInterop.dll")] public static extern void ForceMoraleOK(int playerNum);
-		[DllImport("NativeInterop.dll")] public static extern void ForceMoralePoor(int playerNum);
-		[DllImport("NativeInterop.dll")] public static extern void ForceMoraleRotten(int playerNum);
-		[DllImport("NativeInterop.dll")] public static extern void FreeMoraleLevel(int playerNum);      // Let Morale vary according to colony state and events
+		[DllImport("DotNetInterop.dll")] public static extern void ForceMoraleGreat(int playerNum);
+		[DllImport("DotNetInterop.dll")] public static extern void ForceMoraleGood(int playerNum);
+		[DllImport("DotNetInterop.dll")] public static extern void ForceMoraleOK(int playerNum);
+		[DllImport("DotNetInterop.dll")] public static extern void ForceMoralePoor(int playerNum);
+		[DllImport("DotNetInterop.dll")] public static extern void ForceMoraleRotten(int playerNum);
+		[DllImport("DotNetInterop.dll")] public static extern void FreeMoraleLevel(int playerNum);      // Let Morale vary according to colony state and events
 
 		// Random number generation
-		[DllImport("NativeInterop.dll")] public static extern void SetSeed(uint randNumSeed);			// Set random number seed
-		[DllImport("NativeInterop.dll")] public static extern int GetRand(int range);                   // Returns a number from 0..(range-1)
+		[DllImport("DotNetInterop.dll")] public static extern void SetSeed(uint randNumSeed);			// Set random number seed
+		[DllImport("DotNetInterop.dll")] public static extern int GetRand(int range);                   // Returns a number from 0..(range-1)
 
 		// Disaster Creation
-		[DllImport("NativeInterop.dll")] public static extern void SetMeteor(int tileX, int tileY, int size);
-		[DllImport("NativeInterop.dll")] public static extern void SetEarthquake(int tileX, int tileY, int magnitude);
-		[DllImport("NativeInterop.dll")] public static extern void SetEruption(int tileX, int tileY, int spreadSpeed);
-		[DllImport("NativeInterop.dll")] public static extern void SetLightning(int startTileX, int startTileY, int duration, int endTileX, int endTileY);
-		[DllImport("NativeInterop.dll")] public static extern void SetTornado(int startTileX, int startTileY, int duration, int endTileX, int endTileY, int bImmediate);
+		[DllImport("DotNetInterop.dll")] public static extern void SetMeteor(int tileX, int tileY, int size);
+		[DllImport("DotNetInterop.dll")] public static extern void SetEarthquake(int tileX, int tileY, int magnitude);
+		[DllImport("DotNetInterop.dll")] public static extern void SetEruption(int tileX, int tileY, int spreadSpeed);
+		[DllImport("DotNetInterop.dll")] public static extern void SetLightning(int startTileX, int startTileY, int duration, int endTileX, int endTileY);
+		[DllImport("DotNetInterop.dll")] public static extern void SetTornado(int startTileX, int startTileY, int duration, int endTileX, int endTileY, int bImmediate);
 		// Disaster spread speed
-		[DllImport("NativeInterop.dll")] public static extern void SetLavaSpeed(int spreadSpeed);
-		[DllImport("NativeInterop.dll")] public static extern void SetMicrobeSpreadSpeed(int spreadSpeed);
+		[DllImport("DotNetInterop.dll")] public static extern void SetLavaSpeed(int spreadSpeed);
+		[DllImport("DotNetInterop.dll")] public static extern void SetMicrobeSpreadSpeed(int spreadSpeed);
 
 		// EMP Missile
 		//  Note: FindEMPMissileTarget searches aligned 8x8 blocks, for the block with the greatest weight
@@ -127,19 +127,19 @@ namespace DotNetMissionSDK
 
 			return loc;
 		}
-		[DllImport("NativeInterop.dll")] private static extern long _FindEMPMissleTarget(int startTileX, int startTileY, int endTileX, int endTileY, int destPlayerNum);
+		[DllImport("DotNetInterop.dll")] private static extern long _FindEMPMissleTarget(int startTileX, int startTileY, int endTileX, int endTileY, int destPlayerNum);
 		// Launches an EMP missile. May be launched from off screen (no spaceport required).
 		// Will not launch an EMP missile if the selected sourcePlayer is not Plymouth.
-		[DllImport("NativeInterop.dll")] public static extern void SetEMPMissile(int launchTileX, int launchTileY, int sourcePlayerNum, int destTileX, int destTileY);
+		[DllImport("DotNetInterop.dll")] public static extern void SetEMPMissile(int launchTileX, int launchTileY, int sourcePlayerNum, int destTileX, int destTileY);
 
 		// Save/Load Games
-		[DllImport("NativeInterop.dll")] public static extern void SaveGame(string savedGameName);		// Note: Unimplemented  [Useless]
-		[DllImport("NativeInterop.dll")] public static extern void LoadGame(string savedGameName);		// Note: Saved game names default to: "SGAME?.OP2" file name format
+		[DllImport("DotNetInterop.dll")] public static extern void SaveGame(string savedGameName);		// Note: Unimplemented  [Useless]
+		[DllImport("DotNetInterop.dll")] public static extern void LoadGame(string savedGameName);		// Note: Saved game names default to: "SGAME?.OP2" file name format
 
 		// Misc
-		[DllImport("NativeInterop.dll")] public static extern void SetMusicPlayList(int numSongs, int repeatStartIndex, int[] songIdList);
+		[DllImport("DotNetInterop.dll")] public static extern void SetMusicPlayList(int numSongs, int repeatStartIndex, int[] songIdList);
 
-		//[DllImport("NativeInterop.dll")] private static extern void Interop_sIssueOptPacket(int variableId, int newValue);
+		//[DllImport("DotNetInterop.dll")] private static extern void Interop_sIssueOptPacket(int variableId, int newValue);
 
 		/// <summary>
 		/// Gets a random value between min and max.

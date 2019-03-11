@@ -72,9 +72,9 @@ namespace DotNetMissionSDK
 			return GroupEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr GroupEnumerator_Create(int groupStubIndex);
-		[DllImport("NativeInterop.dll")] private static extern void GroupEnumerator_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int GroupEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr GroupEnumerator_Create(int groupStubIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void GroupEnumerator_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int GroupEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -107,9 +107,9 @@ namespace DotNetMissionSDK
 			return PlayerVehicleEnum_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr PlayerVehicleEnum_Create(int playerID);
-		[DllImport("NativeInterop.dll")] private static extern void PlayerVehicleEnum_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int PlayerVehicleEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerVehicleEnum_Create(int playerID);
+		[DllImport("DotNetInterop.dll")] private static extern void PlayerVehicleEnum_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int PlayerVehicleEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -142,9 +142,9 @@ namespace DotNetMissionSDK
 			return PlayerBuildingEnum_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr PlayerBuildingEnum_Create(int playerID, map_id buildingType);
-		[DllImport("NativeInterop.dll")] private static extern void PlayerBuildingEnum_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int PlayerBuildingEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerBuildingEnum_Create(int playerID, map_id buildingType);
+		[DllImport("DotNetInterop.dll")] private static extern void PlayerBuildingEnum_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int PlayerBuildingEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -177,9 +177,9 @@ namespace DotNetMissionSDK
 			return PlayerUnitEnum_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr PlayerUnitEnum_Create(int playerID);
-		[DllImport("NativeInterop.dll")] private static extern void PlayerUnitEnum_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int PlayerUnitEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerUnitEnum_Create(int playerID);
+		[DllImport("DotNetInterop.dll")] private static extern void PlayerUnitEnum_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int PlayerUnitEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -212,9 +212,9 @@ namespace DotNetMissionSDK
 			return InRangeEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr InRangeEnumerator_Create(int centerPointX, int centerPointY, int maxTileDistance);
-		[DllImport("NativeInterop.dll")] private static extern void InRangeEnumerator_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int InRangeEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr InRangeEnumerator_Create(int centerPointX, int centerPointY, int maxTileDistance);
+		[DllImport("DotNetInterop.dll")] private static extern void InRangeEnumerator_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int InRangeEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -247,9 +247,9 @@ namespace DotNetMissionSDK
 			return InRectEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr InRectEnumerator_Create(int minX, int minY, int maxX, int maxY);
-		[DllImport("NativeInterop.dll")] private static extern void InRectEnumerator_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int InRectEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr InRectEnumerator_Create(int minX, int minY, int maxX, int maxY);
+		[DllImport("DotNetInterop.dll")] private static extern void InRectEnumerator_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int InRectEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -282,9 +282,9 @@ namespace DotNetMissionSDK
 			return LocationEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr LocationEnumerator_Create(int x, int y);
-		[DllImport("NativeInterop.dll")] private static extern void LocationEnumerator_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int LocationEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr LocationEnumerator_Create(int x, int y);
+		[DllImport("DotNetInterop.dll")] private static extern void LocationEnumerator_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int LocationEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -317,10 +317,10 @@ namespace DotNetMissionSDK
 			return ClosestEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
 		}
 
-		[DllImport("NativeInterop.dll")] private static extern IntPtr ClosestEnumerator_Create(int x, int y);
-		[DllImport("NativeInterop.dll")] private static extern void ClosestEnumerator_Release(IntPtr handle);
-		[DllImport("NativeInterop.dll")] private static extern int ClosestEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
-		//[DllImport("NativeInterop.dll")] private static extern int ClosestEnumerator_GetCurrentPixelDistance(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr ClosestEnumerator_Create(int x, int y);
+		[DllImport("DotNetInterop.dll")] private static extern void ClosestEnumerator_Release(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int ClosestEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		//[DllImport("DotNetInterop.dll")] private static extern int ClosestEnumerator_GetCurrentPixelDistance(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
