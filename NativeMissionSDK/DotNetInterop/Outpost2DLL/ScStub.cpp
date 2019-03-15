@@ -13,37 +13,54 @@
 //		 functions from. Creating an instance of this class serves little
 //		 (or no) purpose and may even crash the game.
 
-/*class OP2 ScStub
-{
-public:
-	ScStub();
-	~ScStub();
-	ScStub& operator = (const ScStub& scStub);
-
-	// Methods
-	void Destroy();
-	void Disable();
-	void Enable();
-	// [Get]
-	int Id() const;
-	int IsEnabled();
-	int IsInitialized();
-	// [Set]
-	void SetId(int stubIndex);
-
-public:	// Why not? ;)
-	int stubIndex;
-};*/
-
 extern "C"
 {
-	extern EXPORT int __stdcall ScStub_GetIndex(ScStub* handle)
+		// Methods
+	extern EXPORT void __stdcall ScStub_Destroy(int stubIndex)
 	{
-		return handle->Id();
-	}
+		ScStub stub;
+		stub.stubIndex = stubIndex;
 
-	extern EXPORT void __stdcall ScStub_Release(ScStub* handle)
-	{
-		delete handle;
+		stub.Destroy();
 	}
+	extern EXPORT void __stdcall ScStub_Disable(int stubIndex)
+	{
+		ScStub stub;
+		stub.stubIndex = stubIndex;
+
+		stub.Disable();
+	}
+	extern EXPORT void __stdcall ScStub_Enable(int stubIndex)
+	{
+		ScStub stub;
+		stub.stubIndex = stubIndex;
+
+		stub.Enable();
+	}
+	// [Get]
+	extern EXPORT int __stdcall ScStub_Id(int stubIndex)
+	{
+		ScStub stub;
+		stub.stubIndex = stubIndex;
+
+		return stub.Id();
+	}
+	extern EXPORT int __stdcall ScStub_IsEnabled(int stubIndex)
+	{
+		ScStub stub;
+		stub.stubIndex = stubIndex;
+
+		return stub.IsEnabled();
+	}
+	extern EXPORT int __stdcall ScStub_IsInitialized(int stubIndex)
+	{
+		ScStub stub;
+		stub.stubIndex = stubIndex;
+
+		return stub.IsInitialized();
+	}
+	// [Set]
+	//extern EXPORT void __stdcall ScStub_SetId(int stubIndex)
+	//{
+	//}
 }

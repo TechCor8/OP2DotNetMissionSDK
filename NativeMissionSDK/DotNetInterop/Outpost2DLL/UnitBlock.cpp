@@ -1,35 +1,22 @@
 #include "stdafx_unmanaged.h"
-/*#pragma once
-#ifndef OP2
-#define OP2 __declspec(dllimport)
+
+#include <Outpost2DLL/Outpost2DLL.h>	// Main Outpost 2 header to interface with the game
+
+#ifndef EXPORT
+#define EXPORT __declspec(dllexport)
 #endif
-
-
-// External type names
-struct UnitRecord;
-
 
 // Note: The UnitBlock class can be used for creating blocks of units
 //		 of certain predefined types.
 
-class OP2 UnitBlock
+extern "C"
 {
-public:
-	UnitBlock(UnitRecord* unitRecordTable);
-	UnitBlock& operator = (const UnitBlock& unitBlock);
-	int CreateUnits(int playerNum, int bLightsOn) const;	// Returns numUnitsCreated
-private:
-	void SortAndInit(UnitRecord* unitRecordTable);	// Sort unitRecordTable and initialize classRange table
-
-public:
-	struct Range
+	extern EXPORT UnitBlock* __stdcall UnitBlock_Create(UnitRecord* unitRecordTable)
 	{
-		int startIndex;
-		int untilIndex;
-	};
-
-	int numUnits;					// 0x0
-	Range classRange[16];			// 0x4  Range of unit indexes in the unitRecordTable for each class
-	UnitRecord* unitRecordTable;	// 0x84
-};
-*/
+		return new UnitBlock(unitRecordTable);
+	}
+	extern EXPORT int __stdcall UnitBlock_CreateUnits(UnitBlock* handle, int playerNum, int bLightsOn)
+	{
+		return handle->CreateUnits(playerNum, bLightsOn);
+	}
+}

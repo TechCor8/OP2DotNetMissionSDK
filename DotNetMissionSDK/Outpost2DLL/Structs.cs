@@ -149,13 +149,37 @@ namespace DotNetMissionSDK
 
 
 
-	/*struct OP2 PatrolRoute
+	public class PatrolRoute : SDKDisposable
 	{
-		int unknown1;
-		LOCATION* waypoints;	// Max waypoints = 8, set Location.x = -1 for last waypoint in list if list is short
-	};
+		private IntPtr m_Handle;
 
-	struct OP2 MrRec
+		public IntPtr GetHandle()			{ return m_Handle;						}
+
+
+		public PatrolRoute(int waypointSize)
+		{
+			m_Handle = PatrolRoute_Create(waypointSize);
+		}
+
+		public void SetWaypoint(int index, LOCATION pt)
+		{
+			PatrolRoute_SetWaypoint(m_Handle, index, pt.x, pt.y);
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+
+			PatrolRoute_Release(m_Handle);
+		}
+
+		// Max waypoints = 8, set Location.x = -1 for last waypoint in list if list is short
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr PatrolRoute_Create(int waypointSize);
+		[DllImport("DotNetInterop.dll")] private static extern void PatrolRoute_SetWaypoint(IntPtr handle, int index, int x, int y);
+		[DllImport("DotNetInterop.dll")] private static extern void PatrolRoute_Release(IntPtr handle);
+	}
+
+	/*struct OP2 MrRec
 	{
 		map_id unitType;
 		map_id weaponType;
@@ -193,19 +217,60 @@ namespace DotNetMissionSDK
 		char dataBuff[0x66];	// 0x0E Dependent on message type
 	};
 	#pragma pack(pop)
-
+	*/
 
 	// Size: 0x20  [0x20 = 32, or 8 dwords]  [Note: last 2 fields are shorts]
-	struct OP2 UnitRecord
+	public class UnitRecord
 	{
-		map_id unitType;							// 0x0
-		int x;										// 0x4
-		int y;										// 0x8
-		int unknown1;								// 0xC  ** [unused?]
-		int rotation;								// 0x10 ** [Byte?]
-		map_id weaponType;							// 0x14
-		UnitClassifactions unitClassification;		// 0x18
-		short cargoType;							// 0x1C
-		short cargoAmount;							// 0x1E
+		public map_id unitType;								// 0x0
+		public int x;										// 0x4
+		public int y;										// 0x8
+		public int unknown1;								// 0xC  ** [unused?]
+		public int rotation;								// 0x10 ** [Byte?]
+		public map_id weaponType;							// 0x14
+		public UnitClassifications unitClassification;		// 0x18
+		public short cargoType;								// 0x1C
+		public short cargoAmount;							// 0x1E
+	};
+
+	// TODO: Delete me if not needed
+	/*public class UnitRecord : SDKDisposable
+	{
+		private IntPtr m_Handle;
+
+		public IntPtr GetHandle()			{ return m_Handle;						}
+
+		public UnitRecord(map_id unitType, int x, int y, int unknown1, int rotation, map_id weaponType,
+						UnitClassifications unitClassification, short cargoType, short cargoAmount)
+		{
+			m_Handle = UnitRecord_Create(unitType, x, y, unknown1, rotation, weaponType, unitClassification, cargoType, cargoAmount);
+		}
+
+
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr UnitRecord_Create(map_id unitType, int x, int y, int unknown1, int rotation, map_id weaponType,
+																						UnitClassifications unitClassification, short cargoType, short cargoAmount);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr UnitRecord_Release(IntPtr handle);
+
+		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
+		protected override void Dispose(bool disposing)
+		{
+			// Release unmanaged resources
+			UnitRecord_Release(m_Handle);
+		}
+
+
+		// Create and manage UnitRecord array
+		public static IntPtr CreateArray(int size)			{ return UnitRecord_CreateArray(size);		}
+		public static void ReleaseArray(IntPtr handle)		{ UnitRecord_ReleaseArray(handle);			}
+		public static void SetArray(IntPtr arr, int index, map_id unitType, int x, int y, int unknown1, int rotation, map_id weaponType,
+												UnitClassifications unitClassification, short cargoType, short cargoAmount)
+		{
+			UnitRecord_SetArray(arr, index, unitType, x, y, unknown1, rotation, weaponType, unitClassification, cargoType, cargoAmount);
+		}
+
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr UnitRecord_CreateArray(int size);
+		[DllImport("DotNetInterop.dll")] private static extern void UnitRecord_SetArray(IntPtr arr, int index, map_id unitType, int x, int y, int unknown1, int rotation, map_id weaponType,
+																						UnitClassifications unitClassification, short cargoType, short cargoAmount);
+		[DllImport("DotNetInterop.dll")] private static extern void UnitRecord_ReleaseArray(IntPtr handle);
 	};*/
 }

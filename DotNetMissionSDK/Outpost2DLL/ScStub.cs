@@ -21,16 +21,25 @@ namespace DotNetMissionSDK
 		}
 
 		// Methods
-		//void Destroy();
-		//void Disable();
-		//void Enable();
-		// [Get]
+		public void Destroy()			{ ScStub_Destroy(stubIndex);					}
+		public void Disable()			{ ScStub_Disable(stubIndex);					}
+		public void Enable()			{ ScStub_Enable(stubIndex);						}
 		
-		//int IsEnabled();
-		//int IsInitialized();
+		// [Get]
+		public bool IsEnabled()			{ return ScStub_IsEnabled(stubIndex) != 0;		}
+		public bool IsInitialized()		{ return ScStub_IsInitialized(stubIndex) != 0;	}
 		// [Set]
 		//void SetId(int stubIndex);
 
-		//[DllImport("DotNetInterop.dll")] private static extern int ScStub_GetIndex(IntPtr handle);
+		// Methods
+		[DllImport("DotNetInterop.dll")] private static extern void ScStub_Destroy(int stubIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void ScStub_Disable(int stubIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void ScStub_Enable(int stubIndex);
+		
+		// [Get]
+		[DllImport("DotNetInterop.dll")] private static extern int ScStub_IsEnabled(int stubIndex);
+		[DllImport("DotNetInterop.dll")] private static extern int ScStub_IsInitialized(int stubIndex);
+		// [Set]
+		//void SetId(int stubIndex);
 	}
 }

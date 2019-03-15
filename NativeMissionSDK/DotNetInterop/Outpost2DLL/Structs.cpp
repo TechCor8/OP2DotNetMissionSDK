@@ -61,13 +61,26 @@ extern "C"
 //		 don't have any. Essentially these are the "true" structs.)
 
 
-
-	/*struct OP2 PatrolRoute
+	// Max waypoints = 8, set Location.x = -1 for last waypoint in list if list is short
+	extern EXPORT PatrolRoute* __stdcall PatrolRoute_Create(int waypointSize)
 	{
-		int unknown1;
-		LOCATION* waypoints;	// Max waypoints = 8, set Location.x = -1 for last waypoint in list if list is short
-	};
+		PatrolRoute* route = new PatrolRoute();
+		route->waypoints = new LOCATION[waypointSize];
 
+		return route;
+	}
+	extern EXPORT void __stdcall PatrolRoute_SetWaypoint(PatrolRoute* handle, int index, int x, int y)
+	{
+		handle->waypoints[index].x = x;
+		handle->waypoints[index].y = y;
+	}
+	extern EXPORT void __stdcall PatrolRoute_Release(PatrolRoute* handle)
+	{
+		delete[] handle->waypoints;
+		delete handle;
+	}
+
+	/*
 	struct OP2 MrRec
 	{
 		map_id unitType;
@@ -106,19 +119,48 @@ extern "C"
 		char dataBuff[0x66];	// 0x0E Dependent on message type
 	};
 	#pragma pack(pop)
+	*/
 
-
-	// Size: 0x20  [0x20 = 32, or 8 dwords]  [Note: last 2 fields are shorts]
-	struct OP2 UnitRecord
+	extern EXPORT UnitRecord* __stdcall UnitRecord_Create(map_id unitType, int x, int y, int unknown1, int rotation, map_id weaponType,
+														UnitClassifactions unitClassification, short cargoType, short cargoAmount)
 	{
-		map_id unitType;							// 0x0
-		int x;										// 0x4
-		int y;										// 0x8
-		int unknown1;								// 0xC  ** [unused?]
-		int rotation;								// 0x10 ** [Byte?]
-		map_id weaponType;							// 0x14
-		UnitClassifactions unitClassification;		// 0x18
-		short cargoType;							// 0x1C
-		short cargoAmount;							// 0x1E
-	};*/
+		UnitRecord* record = new UnitRecord();
+		record->unitType = unitType;
+		record->x = x;
+		record->y = y;
+		record->unknown1 = unknown1;
+		record->rotation = rotation;
+		record->weaponType = weaponType;
+		record->unitClassification = unitClassification;
+		record->cargoType = cargoType;
+		record->cargoAmount = cargoAmount;
+		return record;
+	}
+	extern EXPORT void __stdcall UnitRecord_Release(UnitRecord* handle)
+	{
+		delete handle;
+	}
+
+	// Create and manage an array of UnitRecord
+	extern EXPORT UnitRecord* __stdcall UnitRecord_CreateArray(int size)
+	{
+		return new UnitRecord[size];
+	}
+	extern EXPORT void __stdcall UnitRecord_SetArray(UnitRecord* arr, int index, map_id unitType, int x, int y, int unknown1, int rotation, map_id weaponType,
+													UnitClassifactions unitClassification, short cargoType, short cargoAmount)
+	{
+		arr[index].unitType = unitType;
+		arr[index].x = x;
+		arr[index].y = y;
+		arr[index].unknown1 = unknown1;
+		arr[index].rotation = rotation;
+		arr[index].weaponType = weaponType;
+		arr[index].unitClassification = unitClassification;
+		arr[index].cargoType = cargoType;
+		arr[index].cargoAmount = cargoAmount;
+	}
+	extern EXPORT void __stdcall UnitRecord_ReleaseArray(UnitRecord* handle)
+	{
+		delete[] handle;
+	}
 }
