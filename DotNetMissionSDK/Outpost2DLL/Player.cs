@@ -88,7 +88,7 @@ namespace DotNetMissionSDK
 		public void ResetChecks()						{ Player_ResetChecks(m_Handle);													}
 
 		// [Set] Game Settings
-		public void SetColorNumber(int colorIndex)		{ Player_SetColorNumber(m_Handle, colorIndex);									}
+		public void SetColorNumber(PlayerColor color)	{ Player_SetColorNumber(m_Handle, color);										}
 		// [Set] Population
 		public void SetKids(int numKids)				{ Player_SetKids(m_Handle, numKids);											}
 		public void SetWorkers(int numWorkers)			{ Player_SetWorkers(m_Handle, numWorkers);										}
@@ -163,7 +163,7 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] private static extern void Player_ResetChecks(IntPtr handle);												// Clears checkValue array to -1  [Not Set]
 
 		// [Set] Game Settings
-		[DllImport("DotNetInterop.dll")] private static extern void Player_SetColorNumber(IntPtr handle, int colorIndex);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetColorNumber(IntPtr handle, PlayerColor colorIndex);
 		// [Set] Population
 		[DllImport("DotNetInterop.dll")] private static extern void Player_SetKids(IntPtr handle, int numKids);
 		[DllImport("DotNetInterop.dll")] private static extern void Player_SetWorkers(IntPtr handle, int numWorkers);

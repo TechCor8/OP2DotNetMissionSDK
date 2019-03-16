@@ -117,11 +117,11 @@ extern "C"
 	}
 
 	// Unit Creation  [Returns: int numUnitsCreated]
-	extern EXPORT int __stdcall TethysGame_CreateUnit(map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation)
+	extern EXPORT int __stdcall TethysGame_CreateUnit(map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int direction)
 	{
 		Unit returnedUnit;
 		returnedUnit.unitID = -1;
-		TethysGame::CreateUnit(returnedUnit, unitType, LOCATION(tileX, tileY), playerNum, weaponCargoType, rotation);
+		TethysGame::CreateUnit(returnedUnit, unitType, LOCATION(tileX, tileY), playerNum, weaponCargoType, direction);
 		
 		return returnedUnit.unitID;
 	}

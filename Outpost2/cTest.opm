@@ -4,7 +4,7 @@
 		"LevelDescription":"Colony Game, Eden",
 		"MapName":"on6_01.map",
 		"TechTreeName":"MULTITEK.TXT",
-		"MissionType":-1,
+		"MissionType":"Colony",
 		"NumPlayers":2,
 		"MaxTechLevel":12,
 		"UnitOnlyMission":false
@@ -23,17 +23,17 @@
 		"Beacons":
 		[
 			{
-				"MapID":81,
-				"CommonRareType":0,
-				"BarYield":-1,
-				"BarVariant":-1,
+				"MapID":"mapMiningBeacon",
+				"CommonRareType":"OreTypeCommon",
+				"BarYield":"BarRandom",
+				"BarVariant":"VariantRandom",
 				"SpawnRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 }
 			}
 		],
 		"Markers":
 		[
 			{
-				"MarkerType":0,
+				"MarkerType":"Circle",
 				"SpawnRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 }
 			}
 		],
@@ -48,11 +48,11 @@
 		"WallTubes":
 		[
 			{
-				"TypeID":17,
+				"TypeID":"mapTube",
 				"Location": { "X":19, "Y":14 }
 			},
 			{
-				"TypeID":17,
+				"TypeID":"mapTube",
 				"Location": { "X":20, "Y":14 }
 			}
 		]
@@ -63,11 +63,11 @@
 		{
 			"ID":0,
 			"TechLevel":5,
-			"MoraleLevel":2,
+			"MoraleLevel":"moraleOK",
 			"FreeMorale":true,
 			"IsEden":true,
 			"IsHuman":true,
-			"ColorID":0,
+			"ColorID":"PlayerBlue",
 			"Allies":[1],
 			"CenterView": { "X":15, "Y":14 },
 			
@@ -86,33 +86,33 @@
 			"Units":
 			[
 				{
-					"TypeID":28,
-					"CargoType":0,
-					"Rotation":0,
+					"TypeID":"mapCommandCenter",
+					"CargoType":"mapNone",
+					"Direction":"East",
 					"Location": { "X":15, "Y":13 }
 				},
 				{
-					"TypeID":54,
-					"CargoType":0,
-					"Rotation":0,
+					"TypeID":"mapCommonOreSmelter",
+					"CargoType":"mapNone",
+					"Direction":"East",
 					"Location": { "X":15, "Y":16 }
 				},
 				{
-					"TypeID":58,
-					"CargoType":0,
-					"Rotation":0,
+					"TypeID":"mapTokamak",
+					"CargoType":"mapNone",
+					"Direction":"East",
 					"Location": { "X":21, "Y":18 }
 				},
 				{
-					"TypeID":48,
-					"CargoType":0,
-					"Rotation":0,
+					"TypeID":"mapVehicleFactory",
+					"CargoType":"mapNone",
+					"Direction":"East",
 					"Location": { "X":20, "Y":13 }
 				},
 				{
-					"TypeID":2,
-					"CargoType":28,
-					"Rotation":0,
+					"TypeID":"mapConVec",
+					"CargoType":"mapCommandCenter",
+					"Direction":"East",
 					"Location": { "X":15, "Y":13 }
 				}
 			]
@@ -188,7 +188,7 @@
 			"OneShot":true,
 			
 			"TriggerID":3,
-			"Message":"Create 3 vehicles",
+			"Message":"Create 4 vehicles",
 			
 			"Actions":[]
 		},

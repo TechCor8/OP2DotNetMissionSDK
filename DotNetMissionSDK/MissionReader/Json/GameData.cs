@@ -28,18 +28,25 @@ namespace DotNetMissionSDK.Json
 		[DataContract]
 		public class Beacon
 		{
-			[DataMember(Name = "MapID")]				public map_id mapID						{ get; private set; }
-			[DataMember(Name = "CommonRareType")]		public int commonRareType				{ get; private set; }
-			[DataMember(Name = "BarYield")]				public int barYield						{ get; private set; }
-			[DataMember(Name = "BarVariant")]			public int barVariant					{ get; private set; }
+			[DataMember(Name = "MapID")]				private string m_MapID					{ get; set; }
+			[DataMember(Name = "CommonRareType")]		private string m_CommonRareType			{ get; set; }
+			[DataMember(Name = "BarYield")]				private string m_BarYield				{ get; set; }
+			[DataMember(Name = "BarVariant")]			private string m_BarVariant				{ get; set; }
 			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; private set; }
+
+			public map_id mapID						{ get { return GetEnum<map_id>(m_MapID);					} }
+			public BeaconTypes commonRareType		{ get { return GetEnum<BeaconTypes>(m_CommonRareType);		} }
+			public Yield barYield					{ get { return GetEnum<Yield>(m_BarYield);					} }
+			public Variant barVariant				{ get { return GetEnum<Variant>(m_BarVariant);				} }
 		}
 
 		[DataContract]
 		public class Marker
 		{
-			[DataMember(Name = "MarkerType")]			public int markerType					{ get; private set; }
+			[DataMember(Name = "MarkerType")]			private string m_MarkerType				{ get; set; }
 			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; private set; }
+
+			public MarkerTypes markerType			{ get { return GetEnum<MarkerTypes>(m_MarkerType);			} }
 		}
 
 		[DataContract]
@@ -53,8 +60,17 @@ namespace DotNetMissionSDK.Json
 		[DataContract]
 		public class WallTube
 		{
-			[DataMember(Name = "TypeID")]				public map_id typeID					{ get; private set; }
+			[DataMember(Name = "TypeID")]				private string m_TypeID					{ get; set; }
 			[DataMember(Name = "Location")]				public DataLocation location			{ get; private set; }
+
+			public map_id typeID					{ get { return GetEnum<map_id>(m_TypeID);					} }
+		}
+
+		private static T GetEnum<T>(string val) where T : struct
+		{
+			T result;
+			System.Enum.TryParse(val, out result);
+			return result;
 		}
 	}
 }
