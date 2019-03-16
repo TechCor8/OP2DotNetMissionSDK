@@ -60,9 +60,7 @@ namespace DotNetMissionSDK
 				LOCATION spawnPt = TethysGame.GetRandomLocation(new MAP_RECT(marker.spawnRect));
 				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
 
-				Unit unit;
-				TethysGame.PlaceMarker(out unit, spawnPt.x, spawnPt.y, marker.markerType);
-				unit.Dispose();
+				Unit unit = TethysGame.PlaceMarker(spawnPt.x, spawnPt.y, marker.markerType);
 			}
 
 			// Wreckage
@@ -130,10 +128,8 @@ namespace DotNetMissionSDK
 				{
 					LOCATION spawnPt = TethysGame.GetMapCoordinates(new LOCATION(unitData.location));
 
-					Unit unit;
-					TethysGame.CreateUnit(out unit, unitData.typeID, spawnPt.x, spawnPt.y, data.id, unitData.cargoType, unitData.rotation);
+					Unit unit = TethysGame.CreateUnit(unitData.typeID, spawnPt.x, spawnPt.y, data.id, unitData.cargoType, unitData.rotation);
 					unit.DoSetLights(true);
-					unit.Dispose();
 				}
 			}
 

@@ -20,175 +20,276 @@ extern "C"
 //		 It can also be used to move units around the map and perform simple
 //		 operations such as self destruct and headlight control.
 
-	extern EXPORT Unit* __stdcall Unit_Create()
-	{
-		return new Unit();
-	}
-
-	extern EXPORT void __stdcall Unit_Release(Unit* handle)
-	{
-		delete handle;
-	}
-
 	// Common
 	// [Get]
-	extern EXPORT map_id __stdcall Unit_GetType(Unit* handle)
+	extern EXPORT map_id __stdcall Unit_GetType(int stubIndex)
 	{
-		return handle->GetType();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.GetType();
 	}
 
-	extern EXPORT int __stdcall Unit_OwnerID(Unit* handle)
+	extern EXPORT int __stdcall Unit_OwnerID(int stubIndex)
 	{
-		return  handle->OwnerID();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return  unit.OwnerID();
 	}
-	extern EXPORT int __stdcall Unit_IsBuilding(Unit* handle)
+	extern EXPORT int __stdcall Unit_IsBuilding(int stubIndex)
 	{
-		return handle->IsBuilding();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.IsBuilding();
 	}
-	extern EXPORT int __stdcall Unit_IsVehicle(Unit* handle)
+	extern EXPORT int __stdcall Unit_IsVehicle(int stubIndex)
 	{
-		return handle->IsVehicle();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.IsVehicle();
 	}
-	extern EXPORT int __stdcall Unit_IsBusy(Unit* handle)
+	extern EXPORT int __stdcall Unit_IsBusy(int stubIndex)
 	{
-		return handle->IsBusy();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.IsBusy();
 	}
-	extern EXPORT int __stdcall Unit_IsLive(Unit* handle)
+	extern EXPORT int __stdcall Unit_IsLive(int stubIndex)
 	{
-		return handle->IsLive();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.IsLive();
 	}
-	extern EXPORT int __stdcall Unit_IsEMPed(Unit* handle)
+	extern EXPORT int __stdcall Unit_IsEMPed(int stubIndex)
 	{
-		return handle->isEMPed();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.isEMPed();
 	}
-	extern EXPORT int __stdcall Unit_GetTileX(Unit* handle)
+	extern EXPORT int __stdcall Unit_GetTileX(int stubIndex)
 	{
-		return handle->Location().x;
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.Location().x;
 	}
-	extern EXPORT int __stdcall Unit_GetTileY(Unit* handle)
+	extern EXPORT int __stdcall Unit_GetTileY(int stubIndex)
 	{
-		return handle->Location().y;
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.Location().y;
 	}
 
 	// [Set]
-	extern EXPORT void __stdcall Unit_SetDamage(Unit* handle, int damage)
+	extern EXPORT void __stdcall Unit_SetDamage(int stubIndex, int damage)
 	{
-		handle->SetDamage(damage);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.SetDamage(damage);
 	}
-	extern EXPORT void __stdcall Unit_SetId(Unit* handle, int newUnitId)
+	extern EXPORT void __stdcall Unit_SetId(int stubIndex, int newUnitId)
 	{
-		handle->SetId(newUnitId);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.SetId(newUnitId);
 	}
-	extern EXPORT void __stdcall Unit_SetOppFiredUpon(Unit* handle, int bTrue)
+	extern EXPORT void __stdcall Unit_SetOppFiredUpon(int stubIndex, int bTrue)
 	{
-		handle->SetOppFiredUpon(bTrue);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.SetOppFiredUpon(bTrue);
 	}
 	// [Method]
-	extern EXPORT void __stdcall Unit_DoDeath(Unit* handle)
+	extern EXPORT void __stdcall Unit_DoDeath(int stubIndex)
 	{
-		handle->DoDeath();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoDeath();
 	}
-	extern EXPORT void __stdcall Unit_DoSelfDestruct(Unit* handle)
+	extern EXPORT void __stdcall Unit_DoSelfDestruct(int stubIndex)
 	{
-		handle->DoSelfDestruct();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoSelfDestruct();
 	}
-	extern EXPORT void __stdcall Unit_DoTransfer(Unit* handle, int destPlayerNum)
+	extern EXPORT void __stdcall Unit_DoTransfer(int stubIndex, int destPlayerNum)
 	{
-		handle->DoTransfer(destPlayerNum);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoTransfer(destPlayerNum);
 	}
 
 	// Combat Units
-	extern EXPORT map_id __stdcall Unit_GetWeapon(Unit* handle)
+	extern EXPORT map_id __stdcall Unit_GetWeapon(int stubIndex)
 	{
-		return handle->GetWeapon();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.GetWeapon();
 	}
-	extern EXPORT void __stdcall Unit_SetWeapon(Unit* handle, map_id weaponType)
+	extern EXPORT void __stdcall Unit_SetWeapon(int stubIndex, map_id weaponType)
 	{
-		handle->SetWeapon(weaponType);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.SetWeapon(weaponType);
 	}
-	extern EXPORT void __stdcall Unit_DoAttack(Unit* handle, Unit targetUnit)
+	extern EXPORT void __stdcall Unit_DoAttack(int stubIndex, int targetUnit)
 	{
-		handle->DoAttack(targetUnit);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		Unit tUnit;
+		tUnit.unitID = targetUnit;
+
+		unit.DoAttack(tUnit);
 	}
 
 	// Vehicles
-	extern EXPORT void __stdcall Unit_DoSetLights(Unit* handle, int boolOn)
+	extern EXPORT void __stdcall Unit_DoSetLights(int stubIndex, int boolOn)
 	{
-		handle->DoSetLights(boolOn);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoSetLights(boolOn);
 	}
-	extern EXPORT void __stdcall Unit_DoMove(Unit* handle, int tileX, int tileY)
+	extern EXPORT void __stdcall Unit_DoMove(int stubIndex, int tileX, int tileY)
 	{
-		handle->DoMove(LOCATION(tileX, tileY));
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoMove(LOCATION(tileX, tileY));
 	}
 	// Specific Vehicle
-	extern EXPORT map_id __stdcall Unit_GetCargo(Unit* handle)
+	extern EXPORT map_id __stdcall Unit_GetCargo(int stubIndex)
 	{
-		return handle->GetCargo();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.GetCargo();
 	}
-	extern EXPORT void __stdcall Unit_DoBuild(Unit* handle, map_id buildingType, int tileX, int tileY)
+	extern EXPORT void __stdcall Unit_DoBuild(int stubIndex, map_id buildingType, int tileX, int tileY)
 	{
-		handle->DoBuild(buildingType, LOCATION(tileX, tileY));
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoBuild(buildingType, LOCATION(tileX, tileY));
 	}
-	extern EXPORT void __stdcall Unit_SetCargo(Unit* handle, map_id cargoType, map_id weaponType)
+	extern EXPORT void __stdcall Unit_SetCargo(int stubIndex, map_id cargoType, map_id weaponType)
 	{
-		handle->SetCargo(cargoType, weaponType);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.SetCargo(cargoType, weaponType);
 	}
-	extern EXPORT void __stdcall Unit_SetTruckCargo(Unit* handle, Truck_Cargo cargoType, int amount)
+	extern EXPORT void __stdcall Unit_SetTruckCargo(int stubIndex, Truck_Cargo cargoType, int amount)
 	{
-		handle->SetTruckCargo(cargoType, amount);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.SetTruckCargo(cargoType, amount);
 	}
 
 	// Buildings
-	extern EXPORT void __stdcall Unit_DoIdle(Unit* handle)
+	extern EXPORT void __stdcall Unit_DoIdle(int stubIndex)
 	{
-		handle->DoIdle();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoIdle();
 	}
-	extern EXPORT void __stdcall Unit_DoUnIdle(Unit* handle)
+	extern EXPORT void __stdcall Unit_DoUnIdle(int stubIndex)
 	{
-		handle->DoUnIdle();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoUnIdle();
 	}
-	extern EXPORT void __stdcall Unit_DoStop(Unit* handle)
+	extern EXPORT void __stdcall Unit_DoStop(int stubIndex)
 	{
-		handle->DoStop();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoStop();
 	}
-	extern EXPORT void __stdcall Unit_DoInfect(Unit* handle)
+	extern EXPORT void __stdcall Unit_DoInfect(int stubIndex)
 	{
-		handle->DoInfect();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoInfect();
 	}
 	// Specific Building
-	extern EXPORT map_id __stdcall Unit_GetObjectOnPad(Unit* handle)
+	extern EXPORT map_id __stdcall Unit_GetObjectOnPad(int stubIndex)
 	{
-		return handle->GetObjectOnPad();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.GetObjectOnPad();
 	}
-	extern EXPORT void __stdcall Unit_DoLaunch(Unit* handle, int destPixelX, int destPixelY, int bForceEnable)
+	extern EXPORT void __stdcall Unit_DoLaunch(int stubIndex, int destPixelX, int destPixelY, int bForceEnable)
 	{
-		handle->DoLaunch(destPixelX, destPixelY, bForceEnable);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoLaunch(destPixelX, destPixelY, bForceEnable);
 	}
-	extern EXPORT void __stdcall Unit_PutInGarage(Unit* handle, int bayIndex, int tileX, int tileY)
+	extern EXPORT void __stdcall Unit_PutInGarage(int stubIndex, int bayIndex, int tileX, int tileY)
 	{
-		handle->PutInGarage(bayIndex, tileX, tileY);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.PutInGarage(bayIndex, tileX, tileY);
 	}
-	extern EXPORT int __stdcall Unit_HasOccupiedBay(Unit* handle)
+	extern EXPORT int __stdcall Unit_HasOccupiedBay(int stubIndex)
 	{
-		return handle->HasOccupiedBay();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.HasOccupiedBay();
 	}
-	extern EXPORT void __stdcall Unit_SetFactoryCargo(Unit* handle, int bay, map_id unitType, map_id cargoOrWeaponType)
+	extern EXPORT void __stdcall Unit_SetFactoryCargo(int stubIndex, int bay, map_id unitType, map_id cargoOrWeaponType)
 	{
-		handle->SetFactoryCargo(bay, unitType, cargoOrWeaponType);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.SetFactoryCargo(bay, unitType, cargoOrWeaponType);
 	}
-	extern EXPORT void __stdcall Unit_DoDevelop(Unit* handle, map_id itemToProduce)
+	extern EXPORT void __stdcall Unit_DoDevelop(int stubIndex, map_id itemToProduce)
 	{
-		handle->DoDevelop(itemToProduce);
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.DoDevelop(itemToProduce);
 	}
-	extern EXPORT void __stdcall Unit_ClearSpecialTarget(Unit* handle)
+	extern EXPORT void __stdcall Unit_ClearSpecialTarget(int stubIndex)
 	{
-		handle->ClearSpecialTarget();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		unit.ClearSpecialTarget();
 	}
 
 	// Wreckage
-	extern EXPORT int __stdcall Unit_isDiscovered(Unit* handle)
+	extern EXPORT int __stdcall Unit_isDiscovered(int stubIndex)
 	{
-		return handle->isDiscovered();
+		Unit unit;
+		unit.unitID = stubIndex;
+
+		return unit.isDiscovered();
 	}
 
 //protected: void DoSimpleCommand(int commandPacketType);

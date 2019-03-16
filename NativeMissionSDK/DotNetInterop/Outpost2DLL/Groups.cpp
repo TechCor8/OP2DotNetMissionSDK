@@ -37,19 +37,29 @@ extern "C"
 
 		group.ClearTargCount();
 	}
-	extern EXPORT int __stdcall ScGroup_GetFirstOfType(int stubIndex, Unit* returnedUnit, UnitClassifactions unitType)	// ** Typo **
+	extern EXPORT int __stdcall ScGroup_GetFirstOfType(int stubIndex, UnitClassifactions unitType)	// ** Typo **
 	{
 		ScGroup group;
 		group.stubIndex = stubIndex;
 
-		return group.GetFirstOfType(*returnedUnit, unitType);
+		Unit returnedUnit;
+		returnedUnit.unitID = -1;
+
+		group.GetFirstOfType(returnedUnit, unitType);
+
+		return returnedUnit.unitID;
 	}
-	extern EXPORT int __stdcall ScGroup_GetFirstOfType2(int stubIndex, Unit* returnedUnit, map_id unitType, map_id cargoOrWeapon)
+	extern EXPORT int __stdcall ScGroup_GetFirstOfType2(int stubIndex, map_id unitType, map_id cargoOrWeapon)
 	{
 		ScGroup group;
 		group.stubIndex = stubIndex;
 
-		return group.GetFirstOfType(*returnedUnit, unitType, cargoOrWeapon);
+		Unit returnedUnit;
+		returnedUnit.unitID = -1;
+
+		group.GetFirstOfType(returnedUnit, unitType, cargoOrWeapon);
+
+		return returnedUnit.unitID;
 	}
 	extern EXPORT int __stdcall ScGroup_HasBeenAttacked(int stubIndex)
 	{
@@ -58,12 +68,15 @@ extern "C"
 
 		return group.HasBeenAttacked();
 	}
-	extern EXPORT void __stdcall ScGroup_RemoveUnit(int stubIndex, Unit* unitToRemove)
+	extern EXPORT void __stdcall ScGroup_RemoveUnit(int stubIndex, int unitToRemoveIndex)
 	{
 		ScGroup group;
 		group.stubIndex = stubIndex;
 
-		group.RemoveUnit(*unitToRemove);
+		Unit unitToRemove;
+		unitToRemove.unitID = unitToRemoveIndex;
+
+		group.RemoveUnit(unitToRemove);
 	}
 	extern EXPORT void __stdcall ScGroup_SetDeleteWhenEmpty(int stubIndex, int bDelete)
 	{
@@ -103,12 +116,15 @@ extern "C"
 
 		group.TakeAllUnits(source);
 	}
-	extern EXPORT void __stdcall ScGroup_TakeUnit(int stubIndex, Unit* unitToAdd)
+	extern EXPORT void __stdcall ScGroup_TakeUnit(int stubIndex, int unitToAddIndex)
 	{
 		ScGroup group;
 		group.stubIndex = stubIndex;
 
-		group.TakeUnit(*unitToAdd);
+		Unit unitToAdd;
+		unitToAdd.unitID = unitToAddIndex;
+
+		group.TakeUnit(unitToAdd);
 	}
 	extern EXPORT int __stdcall ScGroup_TotalUnitCount(int stubIndex)
 	{
@@ -239,12 +255,18 @@ extern "C"
 		group.Setup(LOCATION(mineX, mineY), LOCATION(smelterX, smelterY), mineType, smelterType, MAP_RECT(smelterAreaMinX, smelterAreaMinY, smelterAreaMaxX, smelterAreaMaxY));
 	}
 
-	extern EXPORT void __stdcall MiningGroup_Setup3(int stubIndex, Unit* mine, Unit* smelter, int smelterAreaMinX, int smelterAreaMinY, int smelterAreaMaxX, int smelterAreaMaxY)
+	extern EXPORT void __stdcall MiningGroup_Setup3(int stubIndex, int mineIndex, int smelterIndex, int smelterAreaMinX, int smelterAreaMinY, int smelterAreaMaxX, int smelterAreaMaxY)
 	{
 		MiningGroup group;
 		group.stubIndex = stubIndex;
 
-		group.Setup(*mine, *smelter, MAP_RECT(smelterAreaMinX, smelterAreaMinY, smelterAreaMaxX, smelterAreaMaxY));
+		Unit mine;
+		mine.unitID = mineIndex;
+
+		Unit smelter;
+		smelter.unitID = smelterIndex;
+
+		group.Setup(mine, smelter, MAP_RECT(smelterAreaMinX, smelterAreaMinY, smelterAreaMaxX, smelterAreaMaxY));
 	}
 
 
@@ -374,12 +396,15 @@ extern "C"
 
 		group.SetTargetGroup(target);
 	}
-	extern EXPORT void __stdcall FightGroup_SetTargetUnit(int stubIndex, Unit* targetUnit)
+	extern EXPORT void __stdcall FightGroup_SetTargetUnit(int stubIndex, int targetUnitIndex)
 	{
 		FightGroup group;
 		group.stubIndex = stubIndex;
 
-		group.SetTargetUnit(*targetUnit);
+		Unit targetUnit;
+		targetUnit.unitID = targetUnitIndex;
+
+		group.SetTargetUnit(targetUnit);
 	}
 
 

@@ -234,12 +234,12 @@ namespace DotNetMissionSDK.Triggers
 		// Special Target Trigger/Data
 		public static TriggerStub CreateSpecialTarget(int triggerID, bool enabled, bool oneShot, Unit targetUnit /* Lab */, map_id sourceUnitType /* mapScout */)
 		{
-			int index = Trigger_CreateSpecialTarget(enabled ? 1 : 0, oneShot ? 1 : 0, targetUnit.GetHandle(), sourceUnitType);
+			int index = Trigger_CreateSpecialTarget(enabled ? 1 : 0, oneShot ? 1 : 0, targetUnit.GetStubIndex(), sourceUnitType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 		public void GetSpecialTargetData(Unit sourceUnit /* Scout */)
 		{
-			Trigger_GetSpecialTargetData(m_StubData.stubIndex, sourceUnit.GetHandle());
+			Trigger_GetSpecialTargetData(m_StubData.stubIndex, sourceUnit.GetStubIndex());
 		}
 
 		// Set Trigger  [Note: Used to collect a number of other triggers into a single trigger output. Can be used for something like any 3 in a set of 5 objectives.]
@@ -280,8 +280,8 @@ namespace DotNetMissionSDK.Triggers
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreatePointTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y);
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateRectTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height);
 		// Special Target Trigger/Data
-		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, IntPtr targetUnit /* Lab */, map_id sourceUnitType /* mapScout */);
-		[DllImport("DotNetInterop.dll")] private static extern void Trigger_GetSpecialTargetData(int specialTargetTrigger, IntPtr sourceUnit /* Scout */);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, int targetUnit /* Lab */, map_id sourceUnitType /* mapScout */);
+		[DllImport("DotNetInterop.dll")] private static extern void Trigger_GetSpecialTargetData(int specialTargetTrigger, int sourceUnit /* Scout */);
 
 		// Set Trigger  [Note: Used to collect a number of other triggers into a single trigger output. Can be used for something like any 3 in a set of 5 objectives.]
 		//[DllImport("DotNetInterop.dll")] private static extern IntPtr Trigger_CreateSetTrigger(int bEnabled, int bOneShot, int totalTriggers, int neededTriggers, string triggerFunction, IntPtr[] triggers); // +list of triggers

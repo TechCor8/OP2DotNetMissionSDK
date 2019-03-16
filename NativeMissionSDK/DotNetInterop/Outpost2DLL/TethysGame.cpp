@@ -111,9 +111,13 @@ extern "C"
 	}
 
 	// Unit Creation  [Returns: int numUnitsCreated]
-	extern EXPORT int __stdcall TethysGame_CreateUnit(Unit* returnedUnit, map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation)
+	extern EXPORT int __stdcall TethysGame_CreateUnit(map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation)
 	{
-		return TethysGame::CreateUnit(*returnedUnit, unitType, LOCATION(tileX, tileY), playerNum, weaponCargoType, rotation);
+		Unit returnedUnit;
+		returnedUnit.unitID = -1;
+		TethysGame::CreateUnit(returnedUnit, unitType, LOCATION(tileX, tileY), playerNum, weaponCargoType, rotation);
+		
+		return returnedUnit.unitID;
 	}
 	extern EXPORT int __stdcall CreateBeacon(map_id beaconType, int tileX, int tileY, int commonRareType, int barYield, int barVariant)
 	{
@@ -123,9 +127,13 @@ extern "C"
 	{
 		return TethysGame::CreateWreck(tileX, tileY, techID, bInitiallyVisible);
 	}
-	extern EXPORT int __stdcall TethysGame_PlaceMarker(Unit* returnedUnit, int tileX, int tileY, int markerType)
+	extern EXPORT int __stdcall TethysGame_PlaceMarker(int tileX, int tileY, int markerType)
 	{
-		return TethysGame::PlaceMarker(*returnedUnit, tileX, tileY, markerType);
+		Unit returnedUnit;
+		returnedUnit.unitID = -1;
+		TethysGame::PlaceMarker(returnedUnit, tileX, tileY, markerType);
+		
+		return returnedUnit.unitID;
 	}
 	extern EXPORT int __stdcall CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType)
 	{

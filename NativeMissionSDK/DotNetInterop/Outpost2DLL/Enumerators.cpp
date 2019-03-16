@@ -32,9 +32,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall GroupEnumerator_GetNext(GroupEnumerator* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall GroupEnumerator_GetNext(GroupEnumerator* handle)
 	{
-		return handle->GetNext(*returnedUnit);
+		Unit unit;
+		if (handle->GetNext(unit) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 
 	// Vehicles (enumerate all vehicles for a certain player)
@@ -46,9 +50,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall PlayerVehicleEnum_GetNext(PlayerVehicleEnum* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall PlayerVehicleEnum_GetNext(PlayerVehicleEnum* handle)
 	{
-		return handle->GetNext(*returnedUnit);
+		Unit unit;
+		if (handle->GetNext(unit) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 
 	// Buildings (enumerate all buildings of a certain type for a certain player)
@@ -60,9 +68,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall PlayerBuildingEnum_GetNext(PlayerBuildingEnum* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall PlayerBuildingEnum_GetNext(PlayerBuildingEnum* handle)
 	{
-		return handle->GetNext(*returnedUnit);
+		Unit unit;
+		if (handle->GetNext(unit) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 
 	// Units (enumerate all units of a certain player)
@@ -74,9 +86,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall PlayerUnitEnum_GetNext(PlayerUnitEnum* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall PlayerUnitEnum_GetNext(PlayerUnitEnum* handle)
 	{
-		return handle->GetNext(*returnedUnit);
+		Unit unit;
+		if (handle->GetNext(unit) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 
 	// InRange (enumerate all units within a given distance of a given location)
@@ -88,9 +104,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall InRangeEnumerator_GetNext(InRangeEnumerator* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall InRangeEnumerator_GetNext(InRangeEnumerator* handle)
 	{
-		return handle->GetNext(*returnedUnit);
+		Unit unit;
+		if (handle->GetNext(unit) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 
 	// InRect (enumerate all units within a given rectangle)
@@ -102,9 +122,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall InRectEnumerator_GetNext(InRectEnumerator* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall InRectEnumerator_GetNext(InRectEnumerator* handle)
 	{
-		return handle->GetNext(*returnedUnit);
+		Unit unit;
+		if (handle->GetNext(unit) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 
 	// Location (enumerate all units at a given location)
@@ -116,9 +140,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall LocationEnumerator_GetNext(LocationEnumerator* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall LocationEnumerator_GetNext(LocationEnumerator* handle)
 	{
-		return handle->GetNext(*returnedUnit);
+		Unit unit;
+		if (handle->GetNext(unit) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 
 	// Closest (enumerate all units ordered by their distance to a given location)
@@ -130,9 +158,13 @@ extern "C"
 	{
 		delete handle;
 	}
-	extern EXPORT int __stdcall ClosestEnumerator_GetNext(ClosestEnumerator* handle, Unit* returnedUnit)
+	extern EXPORT int __stdcall ClosestEnumerator_GetNext(ClosestEnumerator* handle)
 	{
 		unsigned long pixelDistance;
-		return handle->GetNext(*returnedUnit, pixelDistance);
+		Unit unit;
+		if (handle->GetNext(unit, pixelDistance) == 0)
+			return -1;
+
+		return unit.unitID;
 	}
 }

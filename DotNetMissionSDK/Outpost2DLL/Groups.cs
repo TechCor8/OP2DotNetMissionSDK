@@ -29,13 +29,21 @@ namespace DotNetMissionSDK
 		{
 			ScGroup_ClearTargCount(stubIndex);
 		}
-		public int GetFirstOfType(Unit returnedUnit, UnitClassifications unitType)
+		public Unit GetFirstOfType(UnitClassifications unitType)
 		{
-			return ScGroup_GetFirstOfType(stubIndex, returnedUnit.GetHandle(), unitType);
+			int index = ScGroup_GetFirstOfType(stubIndex, unitType);
+			if (index < 0)
+				return null;
+
+			return new Unit(index);
 		}
-		public int GetFirstOfType(Unit returnedUnit, map_id unitType, map_id cargoOrWeapon)
+		public Unit GetFirstOfType(map_id unitType, map_id cargoOrWeapon)
 		{
-			return ScGroup_GetFirstOfType2(stubIndex, returnedUnit.GetHandle(), unitType, cargoOrWeapon);
+			int index = ScGroup_GetFirstOfType2(stubIndex, unitType, cargoOrWeapon);
+			if (index < 0)
+				return null;
+
+			return new Unit(index);
 		}
 		public int HasBeenAttacked()
 		{
@@ -43,7 +51,7 @@ namespace DotNetMissionSDK
 		}
 		public void RemoveUnit(Unit unitToRemove)
 		{
-			ScGroup_RemoveUnit(stubIndex, unitToRemove.GetHandle());
+			ScGroup_RemoveUnit(stubIndex, unitToRemove.GetStubIndex());
 		}
 		public void SetDeleteWhenEmpty(int bDelete)
 		{
@@ -67,7 +75,7 @@ namespace DotNetMissionSDK
 		}
 		public void TakeUnit(Unit unitToAdd)
 		{
-			ScGroup_TakeUnit(stubIndex, unitToAdd.GetHandle());
+			ScGroup_TakeUnit(stubIndex, unitToAdd.GetStubIndex());
 		}
 		public int TotalUnitCount()
 		{
@@ -80,16 +88,16 @@ namespace DotNetMissionSDK
 
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_AddUnits(int stubIndex, IntPtr unitsToAdd);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_ClearTargCount(int stubIndex);
-		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_GetFirstOfType(int stubIndex, IntPtr returnedUnit, UnitClassifications unitType);	// ** Typo **
-		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_GetFirstOfType2(int stubIndex, IntPtr returnedUnit, map_id unitType, map_id cargoOrWeapon);
+		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_GetFirstOfType(int stubIndex, UnitClassifications unitType);	// ** Typo **
+		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_GetFirstOfType2(int stubIndex, map_id unitType, map_id cargoOrWeapon);
 		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_HasBeenAttacked(int stubIndex);
-		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_RemoveUnit(int stubIndex, IntPtr unitToRemove);
+		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_RemoveUnit(int stubIndex, int unitToRemoveIndex);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_SetDeleteWhenEmpty(int stubIndex, int bDelete);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_SetLights(int stubIndex, int bOn);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_SetTargCount(int stubIndex, IntPtr unitTypes);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_SetTargCount2(int stubIndex, map_id unitType, map_id weaponType, int targetCount);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_TakeAllUnits(int stubIndex, int sourceGroup);
-		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_TakeUnit(int stubIndex, IntPtr unitToAdd);
+		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_TakeUnit(int stubIndex, int unitToAddIndex);
 		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_TotalUnitCount(int stubIndex);
 		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_UnitCount(int stubIndex, UnitClassifications unitType);	// ** Typo **
 	}
@@ -196,13 +204,13 @@ namespace DotNetMissionSDK
 		}
 		public void Setup(Unit mine, Unit smelter, MAP_RECT smelterArea)
 		{
-			MiningGroup_Setup3(stubIndex, mine.GetHandle(), smelter.GetHandle(), smelterArea.minX, smelterArea.minY, smelterArea.maxX, smelterArea.maxY);
+			MiningGroup_Setup3(stubIndex, mine.GetStubIndex(), smelter.GetStubIndex(), smelterArea.minX, smelterArea.minY, smelterArea.maxX, smelterArea.maxY);
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern int MiningGroup_Create(IntPtr playerOwner);
 		[DllImport("DotNetInterop.dll")] private static extern void MiningGroup_Setup(int stubIndex, int mineX, int mineY, int smelterX, int smelterY, int smelterAreaMinX, int smelterAreaMinY, int smelterAreaMaxX, int smelterAreaMaxY);
 		[DllImport("DotNetInterop.dll")] private static extern void MiningGroup_Setup2(int stubIndex, int mineX, int mineY, int smelterX, int smelterY, map_id mineType, map_id smelterType, int smelterAreaMinX, int smelterAreaMinY, int smelterAreaMaxX, int smelterAreaMaxY);
-		[DllImport("DotNetInterop.dll")] private static extern void MiningGroup_Setup3(int stubIndex, IntPtr mine, IntPtr smelter, int smelterAreaMinX, int smelterAreaMinY, int smelterAreaMaxX, int smelterAreaMaxY);
+		[DllImport("DotNetInterop.dll")] private static extern void MiningGroup_Setup3(int stubIndex, int mineIndex, int smelterIndex, int smelterAreaMinX, int smelterAreaMinY, int smelterAreaMaxX, int smelterAreaMaxY);
 	}
 
 
@@ -248,7 +256,7 @@ namespace DotNetMissionSDK
 
 		// Use in combination with DoGuardGroup()
 		public void SetTargetGroup(ScGroup targetGroup)	{ FightGroup_SetTargetGroup(stubIndex, targetGroup.stubIndex);		}
-		public void SetTargetUnit(Unit targetUnit)		{ FightGroup_SetTargetUnit(stubIndex, targetUnit.GetHandle());		}
+		public void SetTargetUnit(Unit targetUnit)		{ FightGroup_SetTargetUnit(stubIndex, targetUnit.GetStubIndex());	}
 
 		[DllImport("DotNetInterop.dll")] private static extern int FightGroup_Create(IntPtr playerOwner);
 		[DllImport("DotNetInterop.dll")] private static extern void FightGroup_AddGuardedRect(int stubIndex, int guardedRectMinX, int guardedRectMinY, int guardedRectMaxX, int guardedRectMaxY);
@@ -268,7 +276,7 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] private static extern void FightGroup_SetPatrolMode(int stubIndex, IntPtr waypts);
 		[DllImport("DotNetInterop.dll")] private static extern void FightGroup_SetRect(int stubIndex, int idleRectMinX, int idleRectMinY, int idleRectMaxX, int idleRectMaxY);
 		[DllImport("DotNetInterop.dll")] private static extern void FightGroup_SetTargetGroup(int stubIndex, int targetGroup);  // Use in combination with DoGuardGroup()
-		[DllImport("DotNetInterop.dll")] private static extern void FightGroup_SetTargetUnit(int stubIndex, IntPtr targetUnit);
+		[DllImport("DotNetInterop.dll")] private static extern void FightGroup_SetTargetUnit(int stubIndex, int targetUnitIndex);
 	}
 
 

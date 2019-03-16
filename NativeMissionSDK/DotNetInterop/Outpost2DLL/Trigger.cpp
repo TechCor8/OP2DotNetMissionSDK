@@ -150,13 +150,19 @@ extern "C"
 		return CreateRectTrigger(bEnabled, bOneShot, playerNum, x, y, width, height, "NoResponseToTrigger").stubIndex;
 	}
 	// Special Target Trigger/Data
-	extern EXPORT int __stdcall Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, Unit* targetUnit /* Lab */, map_id sourceUnitType /* mapScout */)
+	extern EXPORT int __stdcall Trigger_CreateSpecialTarget(int bEnabled, int bOneShot, int targetUnit /* Lab */, map_id sourceUnitType /* mapScout */)
 	{
-		return CreateSpecialTarget(bEnabled, bOneShot, *targetUnit, sourceUnitType, "NoResponseToTrigger").stubIndex;
+		Unit unit;
+		unit.unitID = targetUnit;
+
+		return CreateSpecialTarget(bEnabled, bOneShot, unit, sourceUnitType, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT void __stdcall Trigger_GetSpecialTargetData(Trigger* specialTargetTrigger, Unit* sourceUnit /* Scout */)
+	extern EXPORT void __stdcall Trigger_GetSpecialTargetData(Trigger* specialTargetTrigger, int sourceUnit /* Scout */)
 	{
-		GetSpecialTargetData(*specialTargetTrigger, *sourceUnit);
+		Unit unit;
+		unit.unitID = sourceUnit;
+
+		GetSpecialTargetData(*specialTargetTrigger, unit);
 	}
 
 	// Set Trigger  [Note: Used to collect a number of other triggers into a single trigger output. Can be used for something like any 3 in a set of 5 objectives.]

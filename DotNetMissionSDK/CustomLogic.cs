@@ -63,12 +63,12 @@ namespace DotNetMissionSDK
 
 			if (trigger.id == 999)
 			{
-				TethysGame.AddMessage(0, 0, "Trigger Fired!", TethysGame.LocalPlayer(), 0);
-				Console.WriteLine("Trigger Fired!");
+				TethysGame.AddMessage(0, 0, "Check me out!", TethysGame.LocalPlayer(), 0);
+				Console.WriteLine("Check me out!");
 
 				using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
-				using (Unit unit = new Unit())
 				{
+					Unit unit = new Unit();
 					while (myEnum.GetNext(unit))
 					{
 						unit.DoMove(30, 30);

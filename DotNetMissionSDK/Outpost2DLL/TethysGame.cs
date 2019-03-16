@@ -28,22 +28,26 @@ namespace DotNetMissionSDK
 		public static void SetDaylightMoves(bool isOn)		{ TethysGame_SetDaylightMoves(isOn ? 1 : 0);			}
 
 		// Unit Creation  [Returns: int numUnitsCreated]
-		public static int CreateUnit(out Unit returnedUnit, map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation)
+		public static Unit CreateUnit(map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation)
 		{
-			returnedUnit = new Unit();
+			int index = TethysGame_CreateUnit(unitType, tileX, tileY, playerNum, weaponCargoType, rotation);
+			if (index < 0)
+				return null;
 
-			return TethysGame_CreateUnit(returnedUnit.GetHandle(), unitType, tileX, tileY, playerNum, weaponCargoType, rotation);
+			return new Unit(index);
 		}
 		// Note: techID must be >= 8000 but < (8000+4096) = 12096
 		public static int CreateWreck(int tileX, int tileY, map_id techID, bool isInitiallyVisible)
 		{
 			return TethysGame_CreateWreck(tileX, tileY, techID, isInitiallyVisible ? 1 : 0);
 		}
-		public static int PlaceMarker(out Unit returnedUnit, int tileX, int tileY, int markerType)
+		public static Unit PlaceMarker(int tileX, int tileY, int markerType)
 		{
-			returnedUnit = new Unit();
+			int index = TethysGame_PlaceMarker(tileX, tileY, markerType);
+			if (index < 0)
+				return null;
 
-			return TethysGame_PlaceMarker(returnedUnit.GetHandle(), tileX, tileY, markerType);
+			return new Unit(index);
 		}
 
 
@@ -81,10 +85,10 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] public static extern void SetCheatUnlimitedResources(int bOn);     // Useless
 
 		// Unit Creation  [Returns: int numUnitsCreated]
-		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CreateUnit(IntPtr returnedUnit, map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation);  // Note: see enum UnitDirection
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CreateUnit(map_id unitType, int tileX, int tileY, int playerNum, map_id weaponCargoType, int rotation);  // Note: see enum UnitDirection
 		[DllImport("DotNetInterop.dll")] public static extern int CreateBeacon(map_id beaconType, int tileX, int tileY, int commonRareType, int barYield, int barVariant);  // Note: see enums BeaconTypes, Yield, Variant
 		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CreateWreck(int tileX, int tileY, map_id techID, int bInitiallyVisible);      // Note: techID must be >= 8000 but < (8000+4096) = 12096
-		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_PlaceMarker(IntPtr returnedUnit, int tileX, int tileY, int markerType);       // Note: See enum MarkerTypes
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_PlaceMarker(int tileX, int tileY, int markerType);       // Note: See enum MarkerTypes
 		[DllImport("DotNetInterop.dll")] public static extern int CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType);      // Returns: 1 [true] always
 		//[DllImport("DotNetInterop.dll")] public static extern int CreateUnitBlock(_Player& ownerPlayer, string exportName, int bLightsOn);		// Returns: numUnitsCreated,  Note: see class UnitBlock
 

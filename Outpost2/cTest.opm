@@ -175,7 +175,7 @@
 			"OneShot":true,
 			
 			"PlayerID":0,
-			"Count":3,
+			"Count":4,
 			"CompareType":"cmpGreaterEqual",
 			
 			"Actions":[]

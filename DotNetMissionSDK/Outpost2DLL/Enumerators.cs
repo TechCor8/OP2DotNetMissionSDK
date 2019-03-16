@@ -28,6 +28,19 @@ namespace DotNetMissionSDK
 
 		public abstract bool GetNext(Unit unit);
 
+		/// <summary>
+		/// Returns the next unit in the enumerator.
+		/// </summary>
+		/// <returns>The next unit or null if not found.</returns>
+		public Unit GetNext()
+		{
+			Unit unit = new Unit();
+			if (!GetNext(unit))
+				return null;
+
+			return unit;
+		}
+
 		// NOTE: IEnumerable may discourage proper disposal of Unit and the Enumerator itself as well as allocate more unmanaged memory for Units than necessary.
 		/*IEnumerator IEnumerable.GetEnumerator()
 		{
@@ -69,12 +82,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return GroupEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = GroupEnumerator_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr GroupEnumerator_Create(int groupStubIndex);
 		[DllImport("DotNetInterop.dll")] private static extern void GroupEnumerator_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int GroupEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int GroupEnumerator_GetNext(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -104,12 +122,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return PlayerVehicleEnum_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = PlayerVehicleEnum_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerVehicleEnum_Create(int playerID);
 		[DllImport("DotNetInterop.dll")] private static extern void PlayerVehicleEnum_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int PlayerVehicleEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int PlayerVehicleEnum_GetNext(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -139,12 +162,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return PlayerBuildingEnum_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = PlayerBuildingEnum_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerBuildingEnum_Create(int playerID, map_id buildingType);
 		[DllImport("DotNetInterop.dll")] private static extern void PlayerBuildingEnum_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int PlayerBuildingEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int PlayerBuildingEnum_GetNext(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -174,12 +202,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return PlayerUnitEnum_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = PlayerUnitEnum_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerUnitEnum_Create(int playerID);
 		[DllImport("DotNetInterop.dll")] private static extern void PlayerUnitEnum_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int PlayerUnitEnum_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int PlayerUnitEnum_GetNext(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -209,12 +242,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return InRangeEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = InRangeEnumerator_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr InRangeEnumerator_Create(int centerPointX, int centerPointY, int maxTileDistance);
 		[DllImport("DotNetInterop.dll")] private static extern void InRangeEnumerator_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int InRangeEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int InRangeEnumerator_GetNext(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -244,12 +282,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return InRectEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = InRectEnumerator_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr InRectEnumerator_Create(int minX, int minY, int maxX, int maxY);
 		[DllImport("DotNetInterop.dll")] private static extern void InRectEnumerator_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int InRectEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int InRectEnumerator_GetNext(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -279,12 +322,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return LocationEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = LocationEnumerator_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr LocationEnumerator_Create(int x, int y);
 		[DllImport("DotNetInterop.dll")] private static extern void LocationEnumerator_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int LocationEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int LocationEnumerator_GetNext(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
@@ -314,12 +362,17 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
-			return ClosestEnumerator_GetNext(m_Handle, returnedUnit.GetHandle()) != 0;
+			int stubIndex = ClosestEnumerator_GetNext(m_Handle);
+			if (stubIndex < 0)
+				return false;
+
+			returnedUnit.SetStubIndex(stubIndex);
+			return true;
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr ClosestEnumerator_Create(int x, int y);
 		[DllImport("DotNetInterop.dll")] private static extern void ClosestEnumerator_Release(IntPtr handle);
-		[DllImport("DotNetInterop.dll")] private static extern int ClosestEnumerator_GetNext(IntPtr handle, IntPtr returnedUnit);
+		[DllImport("DotNetInterop.dll")] private static extern int ClosestEnumerator_GetNext(IntPtr handle);
 		//[DllImport("DotNetInterop.dll")] private static extern int ClosestEnumerator_GetCurrentPixelDistance(IntPtr handle);
 
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
