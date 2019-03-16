@@ -104,10 +104,7 @@ namespace DotNetMissionSDK
 		public void SetTechLevel(int techLevel)			{ Player_SetTechLevel(m_Handle, techLevel);										}
 		// Gives the tech with the given tech ID, and all free subsequent techs
 		public void MarkResearchComplete(int techID)	{ Player_MarkResearchComplete(m_Handle, techID);								}
-		//public void SetDefaultGroup(ScGroup newDefaultGroup)
-		//{
-		//	Player_SetDefaultGroup(m_Handle, newDefaultGroup.GetHandle());
-		//}
+		public void SetDefaultGroup(ScGroup newDefaultGroup)	{ Player_SetDefaultGroup(m_Handle, newDefaultGroup.stubIndex);			}
 
 		// [Method]
 		public void GoEden()							{ Player_GoEden(m_Handle);														}
@@ -180,7 +177,7 @@ namespace DotNetMissionSDK
 		// [Set] Indirect property setting
 		[DllImport("DotNetInterop.dll")] private static extern void Player_SetTechLevel(IntPtr handle, int techLevel);								// Gives all techs with techID <= (techLevel * 1000), and all free subsequent techs
 		[DllImport("DotNetInterop.dll")] private static extern void Player_MarkResearchComplete(IntPtr handle, int techID);							// Gives the tech with the given tech ID, and all free subsequent techs
-		[DllImport("DotNetInterop.dll")] private static extern void Player_SetDefaultGroup(IntPtr handle, IntPtr newDefaultGroup);
+		[DllImport("DotNetInterop.dll")] private static extern void Player_SetDefaultGroup(IntPtr handle, int newDefaultGroupIndex);
 
 		// [Method]
 		[DllImport("DotNetInterop.dll")] private static extern void Player_GoEden(IntPtr handle);

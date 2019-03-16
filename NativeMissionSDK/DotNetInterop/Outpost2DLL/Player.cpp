@@ -195,9 +195,12 @@ extern "C"
 	{
 		handle->MarkResearchComplete(techID);
 	}
-	extern EXPORT void __stdcall Player_SetDefaultGroup(_Player* handle, ScGroup* newDefaultGroup)
+	extern EXPORT void __stdcall Player_SetDefaultGroup(_Player* handle, int newDefaultGroupIndex)
 	{
-		handle->SetDefaultGroup(*newDefaultGroup);
+		ScGroup newDefaultGroup;
+		newDefaultGroup.stubIndex = newDefaultGroupIndex;
+
+		handle->SetDefaultGroup(newDefaultGroup);
 	}
 
 	// [Method]

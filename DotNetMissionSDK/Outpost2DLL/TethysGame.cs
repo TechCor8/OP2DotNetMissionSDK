@@ -16,6 +16,13 @@ namespace DotNetMissionSDK
 	{
 		public static Player GetPlayer(int playerNum)		{ return new Player(TethysGame_GetPlayer(playerNum));	}
 
+		// Message log
+		// Note: toPlayerNum: -1 = PlayerAll
+		public static void AddMessage(Unit owner, string message, int toPlayerNum, int soundIndex)
+		{
+			TethysGame_AddMessage2(owner.GetStubIndex(), message, toPlayerNum, soundIndex);
+		}
+
 		// Multiplayer game options  [Get Property]
 		public static bool UsesDayNight()					{ return TethysGame_UsesDayNight() != 0;				}
 		public static bool UsesMorale()						{ return TethysGame_UsesMorale() != 0;					}
@@ -72,8 +79,8 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] public static extern void AddGameSound(int soundIndex, int toPlayerNum);           // Note: toPlayerNum: -1 = PlayerAll
 		[DllImport("DotNetInterop.dll")] public static extern void AddMapSound(int soundIndex, int tileX, int tileY);
 		// Message log
-		[DllImport("DotNetInterop.dll")] public static extern void AddMessage(int pixelX, int pixelY, string message, int toPlayerNum, int soundIndex); // Note: toPlayerNum: -1 = PlayerAll
-		//[DllImport("DotNetInterop.dll")] public static extern void AddMessage(Unit owner, string message, int toPlayerNum, int soundIndex);				// Note: toPlayerNum: -1 = PlayerAll
+		[DllImport("DotNetInterop.dll")] public static extern void AddMessage(int pixelX, int pixelY, string message, int toPlayerNum, int soundIndex);			// Note: toPlayerNum: -1 = PlayerAll
+		[DllImport("DotNetInterop.dll")] private static extern void TethysGame_AddMessage2(int ownerIndex, string message, int toPlayerNum, int soundIndex);	// Note: toPlayerNum: -1 = PlayerAll
 
 		// Debug/Cheat flags
 		[DllImport("DotNetInterop.dll")] private static extern void TethysGame_SetDaylightEverywhere(int bOn);

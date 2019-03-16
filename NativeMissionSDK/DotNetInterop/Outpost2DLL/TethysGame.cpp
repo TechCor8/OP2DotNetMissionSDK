@@ -81,7 +81,13 @@ extern "C"
 		TethysGame::AddMessage(pixelX, pixelY, message, toPlayerNum, soundIndex);
 	}
 
-	//extern EXPORT void __stdcall AddMessage(Unit owner, char *message, int toPlayerNum, int soundIndex);
+	extern EXPORT void __stdcall TethysGame_AddMessage2(int ownerIndex, char *message, int toPlayerNum, int soundIndex)
+	{
+		Unit owner;
+		owner.unitID = ownerIndex;
+
+		TethysGame::AddMessage(owner, message, toPlayerNum, soundIndex);
+	}
 
 	// Debug/Cheat flags
 	extern EXPORT void __stdcall TethysGame_SetDaylightEverywhere(int bOn)

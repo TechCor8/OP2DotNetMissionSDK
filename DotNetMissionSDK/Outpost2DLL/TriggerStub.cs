@@ -207,8 +207,16 @@ namespace DotNetMissionSDK.Triggers
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 		// Attack/Damage Triggers
-		//public static TriggerStub CreateAttackedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup& group);
-		//public static TriggerStub CreateDamagedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup& group, int damage);
+		public static TriggerStub CreateAttackedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup group)
+		{
+			int index = Trigger_CreateAttackedTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, group.stubIndex);
+			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
+		}
+		public static TriggerStub CreateDamagedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup group, int damage)
+		{
+			int index = Trigger_CreateDamagedTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, group.stubIndex, damage);
+			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
+		}
 		// Time Triggers
 		public static TriggerStub CreateTimeTrigger(int triggerID, bool enabled, bool oneShot, int timeMin, int timeMax)
 		{
@@ -271,8 +279,8 @@ namespace DotNetMissionSDK.Triggers
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateVehicleCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateBuildingCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
 		// Attack/Damage Triggers
-		//[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, ScGroup& group);
-		//[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, ScGroup& group, int damage);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, int groupIndex);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, int groupIndex, int damage);
 		// Time Triggers
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int timeMin, int timeMax);
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int time);

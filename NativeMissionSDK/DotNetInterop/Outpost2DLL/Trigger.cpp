@@ -123,13 +123,19 @@ extern "C"
 		return CreateBuildingCountTrigger(bEnabled, bOneShot, playerNum, refCount, compareType, "NoResponseToTrigger").stubIndex;
 	}
 	// Attack/Damage Triggers
-	extern EXPORT int __stdcall Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, ScGroup* group)
+	extern EXPORT int __stdcall Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, int groupIndex)
 	{
-		return CreateAttackedTrigger(bEnabled, bOneShot, *group, "NoResponseToTrigger").stubIndex;
+		ScGroup group;
+		group.stubIndex = groupIndex;
+
+		return CreateAttackedTrigger(bEnabled, bOneShot, group, "NoResponseToTrigger").stubIndex;
 	}
-	extern EXPORT int __stdcall Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, ScGroup* group, int damage)
+	extern EXPORT int __stdcall Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, int groupIndex, int damage)
 	{
-		return CreateDamagedTrigger(bEnabled, bOneShot, *group, damage, "NoResponseToTrigger").stubIndex;
+		ScGroup group;
+		group.stubIndex = groupIndex;
+
+		return CreateDamagedTrigger(bEnabled, bOneShot, group, damage, "NoResponseToTrigger").stubIndex;
 	}
 	// Time Triggers
 	extern EXPORT int __stdcall Trigger_CreateTimeTrigger(int bEnabled, int bOneShot, int timeMin, int timeMax)
