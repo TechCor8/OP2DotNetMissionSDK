@@ -66,11 +66,11 @@ namespace DotNetMissionSDK.Json
 
 
 		public TriggerType type						{ get { return GetEnum<TriggerType>(m_Type);				} }
-		public compare_mode compareType				{ get { return GetEnum<compare_mode>(m_CompareType);		} }
+		public CompareMode compareType				{ get { return GetEnum<CompareMode>(m_CompareType);		} }
 		public map_id unitType						{ get { return GetEnum<map_id>(m_UnitType);					} }
 		public map_id cargoOrWeaponType				{ get { return GetEnum<map_id>(m_CargoOrWeaponType);		} }
-		public trig_res resourceType				{ get { return GetEnum<trig_res>(m_ResourceType);			} }
-		public Truck_Cargo cargoType				{ get { return GetEnum<Truck_Cargo>(m_CargoType);			} }
+		public TriggerResource resourceType				{ get { return GetEnum<TriggerResource>(m_ResourceType);			} }
+		public TruckCargo cargoType				{ get { return GetEnum<TruckCargo>(m_CargoType);			} }
 
 		private T GetEnum<T>(string val) where T : struct
 		{

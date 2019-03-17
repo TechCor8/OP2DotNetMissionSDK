@@ -48,7 +48,7 @@ namespace DotNetMissionSDK
 		{
 			return TethysGame_CreateWreck(tileX, tileY, techID, isInitiallyVisible ? 1 : 0);
 		}
-		public static Unit PlaceMarker(int tileX, int tileY, MarkerTypes markerType)
+		public static Unit PlaceMarker(int tileX, int tileY, MarkerType markerType)
 		{
 			int index = TethysGame_PlaceMarker(tileX, tileY, markerType);
 			if (index < 0)
@@ -93,9 +93,9 @@ namespace DotNetMissionSDK
 
 		// Unit Creation  [Returns: int numUnitsCreated]
 		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CreateUnit(map_id unitType, int tileX, int tileY, int playerNum, int weaponCargoType, UnitDirection direction);  // Note: see enum UnitDirection
-		[DllImport("DotNetInterop.dll")] public static extern int CreateBeacon(map_id beaconType, int tileX, int tileY, BeaconTypes commonRareType, Yield barYield, Variant barVariant);  // Note: see enums BeaconTypes, Yield, Variant
+		[DllImport("DotNetInterop.dll")] public static extern int CreateBeacon(map_id beaconType, int tileX, int tileY, BeaconType commonRareType, Yield barYield, Variant barVariant);  // Note: see enums BeaconTypes, Yield, Variant
 		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_CreateWreck(int tileX, int tileY, map_id techID, int bInitiallyVisible);      // Note: techID must be >= 8000 but < (8000+4096) = 12096
-		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_PlaceMarker(int tileX, int tileY, MarkerTypes markerType);       // Note: See enum MarkerTypes
+		[DllImport("DotNetInterop.dll")] private static extern int TethysGame_PlaceMarker(int tileX, int tileY, MarkerType markerType);       // Note: See enum MarkerTypes
 		[DllImport("DotNetInterop.dll")] public static extern int CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType);      // Returns: 1 [true] always
 		//[DllImport("DotNetInterop.dll")] public static extern int CreateUnitBlock(_Player& ownerPlayer, string exportName, int bLightsOn);		// Returns: numUnitsCreated,  Note: see class UnitBlock
 

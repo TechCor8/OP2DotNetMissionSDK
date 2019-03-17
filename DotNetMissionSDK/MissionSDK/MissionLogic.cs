@@ -51,7 +51,7 @@ namespace DotNetMissionSDK
 				LOCATION spawnPt = TethysGame.GetRandomLocation(new MAP_RECT(beacon.spawnRect));
 				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
 
-				TethysGame.CreateBeacon(beacon.mapID, spawnPt.x, spawnPt.y, beacon.commonRareType, beacon.barYield, beacon.barVariant);
+				TethysGame.CreateBeacon(beacon.mapID, spawnPt.x, spawnPt.y, beacon.oreType, beacon.barYield, beacon.barVariant);
 			}
 
 			// Markers
@@ -86,16 +86,16 @@ namespace DotNetMissionSDK
 
 				player.SetTechLevel(data.techLevel);
 
-				switch ((MoraleLevels)data.moraleLevel)
+				switch ((MoraleLevel)data.moraleLevel)
 				{
-					case MoraleLevels.moraleGreat:		TethysGame.ForceMoraleGreat(data.id);		break;
-					case MoraleLevels.moraleGood:		TethysGame.ForceMoraleGood(data.id);		break;
-					case MoraleLevels.moraleOK:			TethysGame.ForceMoraleOK(data.id);			break;
-					case MoraleLevels.moralePoor:		TethysGame.ForceMoralePoor(data.id);		break;
-					case MoraleLevels.moraleRotten:		TethysGame.ForceMoraleRotten(data.id);		break;
+					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.id);		break;
+					case MoraleLevel.Good:		TethysGame.ForceMoraleGood(data.id);		break;
+					case MoraleLevel.Fair:			TethysGame.ForceMoraleOK(data.id);			break;
+					case MoraleLevel.Poor:		TethysGame.ForceMoralePoor(data.id);		break;
+					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.id);		break;
 				}
 
-				if ((TethysGame.UsesMorale() || root.levelDetails.missionType == MissionTypes.Colony) && data.freeMorale)
+				if ((TethysGame.UsesMorale() || root.levelDetails.missionType == MissionType.Colony) && data.freeMorale)
 					TethysGame.FreeMoraleLevel(data.id);
 
 				if (data.isEden)
@@ -105,7 +105,7 @@ namespace DotNetMissionSDK
 
 				// TODO: data.isHuman - If not human, use fancy AI code
 
-				player.SetColorNumber(data.colorID);
+				player.SetColorNumber(data.color);
 
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
@@ -312,7 +312,7 @@ namespace DotNetMissionSDK
 			m_Disasters.Clear();
 
 			// Setup Disasters
-			if (TethysGame.CanHaveDisasters() || root.levelDetails.missionType == MissionTypes.Colony)
+			if (TethysGame.CanHaveDisasters() || root.levelDetails.missionType == MissionType.Colony)
 			{
 				foreach (DisasterData disaster in root.disasters)
 				{

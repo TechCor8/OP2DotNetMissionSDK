@@ -23,10 +23,10 @@
 		"Beacons":
 		[
 			{
-				"MapID":"mapMiningBeacon",
-				"CommonRareType":"OreTypeCommon",
-				"BarYield":"BarRandom",
-				"BarVariant":"VariantRandom",
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Random",
+				"BarVariant":"Random",
 				"SpawnRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 }
 			}
 		],
@@ -48,11 +48,11 @@
 		"WallTubes":
 		[
 			{
-				"TypeID":"mapTube",
+				"TypeID":"Tube",
 				"Location": { "X":19, "Y":14 }
 			},
 			{
-				"TypeID":"mapTube",
+				"TypeID":"Tube",
 				"Location": { "X":20, "Y":14 }
 			}
 		]
@@ -63,11 +63,11 @@
 		{
 			"ID":0,
 			"TechLevel":5,
-			"MoraleLevel":"moraleOK",
+			"MoraleLevel":"Fair",
 			"FreeMorale":true,
 			"IsEden":true,
 			"IsHuman":true,
-			"ColorID":"PlayerBlue",
+			"Color":"Blue",
 			"Allies":[1],
 			"CenterView": { "X":15, "Y":14 },
 			
@@ -86,32 +86,32 @@
 			"Units":
 			[
 				{
-					"TypeID":"mapCommandCenter",
-					"CargoType":"mapNone",
+					"TypeID":"CommandCenter",
+					"CargoType":"None",
 					"Direction":"East",
 					"Location": { "X":15, "Y":13 }
 				},
 				{
-					"TypeID":"mapCommonOreSmelter",
-					"CargoType":"mapNone",
+					"TypeID":"CommonOreSmelter",
+					"CargoType":"None",
 					"Direction":"East",
 					"Location": { "X":15, "Y":16 }
 				},
 				{
-					"TypeID":"mapTokamak",
-					"CargoType":"mapNone",
+					"TypeID":"Tokamak",
+					"CargoType":"None",
 					"Direction":"East",
 					"Location": { "X":21, "Y":18 }
 				},
 				{
-					"TypeID":"mapVehicleFactory",
-					"CargoType":"mapNone",
+					"TypeID":"VehicleFactory",
+					"CargoType":"None",
 					"Direction":"East",
 					"Location": { "X":20, "Y":13 }
 				},
 				{
-					"TypeID":"mapConVec",
-					"CargoType":"mapCommandCenter",
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
 					"Direction":"East",
 					"Location": { "X":15, "Y":13 }
 				}
@@ -145,9 +145,9 @@
 			"OneShot":true,
 			
 			"PlayerID":0,
-			"UnitType":"mapCommandCenter",
+			"UnitType":"CommandCenter",
 			"Count":1,
-			"CompareType":"cmpLower",
+			"CompareType":"Lower",
 			
 			"Actions":[]
 		},
@@ -160,7 +160,7 @@
 			
 			"PlayerID":0,
 			"Count":2,
-			"CompareType":"cmpGreaterEqual",
+			"CompareType":"GreaterEqual",
 			
 			"Actions":
 			[
@@ -176,7 +176,7 @@
 			
 			"PlayerID":0,
 			"Count":4,
-			"CompareType":"cmpGreaterEqual",
+			"CompareType":"GreaterEqual",
 			
 			"Actions":[]
 		},

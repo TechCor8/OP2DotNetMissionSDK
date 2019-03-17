@@ -163,7 +163,7 @@ namespace DotNetMissionSDK.Triggers
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 
-		public static TriggerStub CreateOperationalTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id buildingType, int refValue, compare_mode compareType)  // Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
+		public static TriggerStub CreateOperationalTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id buildingType, int refValue, CompareMode compareType)  // Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
 		{
 			int index = Trigger_CreateOperationalTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, buildingType, refValue, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
@@ -175,7 +175,7 @@ namespace DotNetMissionSDK.Triggers
 			int index = Trigger_CreateResearchTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, techID, playerID);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateResourceTrigger(int triggerID, bool enabled, bool oneShot, trig_res resourceType, int refAmount, int playerID, compare_mode compareType)
+		public static TriggerStub CreateResourceTrigger(int triggerID, bool enabled, bool oneShot, TriggerResource resourceType, int refAmount, int playerID, CompareMode compareType)
 		{
 			int index = Trigger_CreateResourceTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, resourceType, refAmount, playerID, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
@@ -185,23 +185,23 @@ namespace DotNetMissionSDK.Triggers
 			int index = Trigger_CreateKitTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, id, refCount);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateEscapeTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y, int width, int height, int refValue, map_id unitType, Truck_Cargo cargoType, int cargoAmount)
+		public static TriggerStub CreateEscapeTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y, int width, int height, int refValue, map_id unitType, TruckCargo cargoType, int cargoAmount)
 		{
 			int index = Trigger_CreateEscapeTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, x, y, width, height, refValue, unitType, cargoType, cargoAmount);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType)
+		public static TriggerStub CreateCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id unitType, map_id cargoOrWeapon, int refCount, CompareMode compareType)
 		{
 			int index = Trigger_CreateCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, unitType, cargoOrWeapon, refCount, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 		// Unit Count Triggers  [Note: See also CreateCountTrigger]
-		public static TriggerStub CreateVehicleCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, compare_mode compareType)
+		public static TriggerStub CreateVehicleCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, CompareMode compareType)
 		{
 			int index = Trigger_CreateVehicleCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, refCount, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
-		public static TriggerStub CreateBuildingCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, compare_mode compareType)
+		public static TriggerStub CreateBuildingCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, CompareMode compareType)
 		{
 			int index = Trigger_CreateBuildingCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, refCount, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
@@ -268,16 +268,16 @@ namespace DotNetMissionSDK.Triggers
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateOnePlayerLeftTrigger(int bEnabled, int bOneShot);			// Last One Standing (and later part of Land Rush)
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateEvacTrigger(int bEnabled, int bOneShot, int playerNum);	// Spacerace
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateMidasTrigger(int bEnabled, int bOneShot, int time);		// Midas
-		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateOperationalTrigger(int bEnabled, int bOneShot, int playerNum, map_id buildingType, int refValue, compare_mode compareType);	// Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateOperationalTrigger(int bEnabled, int bOneShot, int playerNum, map_id buildingType, int refValue, CompareMode compareType);	// Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
 		// Research and Resource Count Triggers  [Note: Typically used to set what needs to be done by the end of a campaign mission]
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateResearchTrigger(int bEnabled, int bOneShot, int techID, int playerNum);
-		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateResourceTrigger(int bEnabled, int bOneShot, trig_res resourceType, int refAmount, int playerNum, compare_mode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateResourceTrigger(int bEnabled, int bOneShot, TriggerResource resourceType, int refAmount, int playerNum, CompareMode compareType);
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateKitTrigger(int bEnabled, int bOneShot, int playerNum, map_id id, int refCount);
-		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateEscapeTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height, int refValue, map_id unitType, Truck_Cargo cargoType, int cargoAmount);
-		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateCountTrigger(int bEnabled, int bOneShot, int playerNum, map_id unitType, map_id cargoOrWeapon, int refCount, compare_mode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateEscapeTrigger(int bEnabled, int bOneShot, int playerNum, int x, int y, int width, int height, int refValue, map_id unitType, TruckCargo cargoType, int cargoAmount);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateCountTrigger(int bEnabled, int bOneShot, int playerNum, map_id unitType, map_id cargoOrWeapon, int refCount, CompareMode compareType);
 		// Unit Count Triggers  [Note: See also CreateCountTrigger]
-		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateVehicleCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
-		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateBuildingCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, compare_mode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateVehicleCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, CompareMode compareType);
+		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateBuildingCountTrigger(int bEnabled, int bOneShot, int playerNum, int refCount, CompareMode compareType);
 		// Attack/Damage Triggers
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateAttackedTrigger(int bEnabled, int bOneShot, int groupIndex);
 		[DllImport("DotNetInterop.dll")] private static extern int Trigger_CreateDamagedTrigger(int bEnabled, int bOneShot, int groupIndex, int damage);

@@ -19,8 +19,8 @@ namespace DotNetMissionSDK.Json
 		{
 			switch (typeID)
 			{
-				case map_id.mapCargoTruck:
-					return (int)GetEnum<Truck_Cargo>(val);
+				case map_id.CargoTruck:
+					return (int)GetEnum<TruckCargo>(val);
 			}
 
 			return (int)GetEnum<map_id>(val);

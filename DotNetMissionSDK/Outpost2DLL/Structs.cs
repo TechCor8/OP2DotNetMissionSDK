@@ -228,7 +228,7 @@ namespace DotNetMissionSDK
 		public int unknown1;								// 0xC  ** [unused?]
 		public int rotation;								// 0x10 ** [Byte?]
 		public map_id weaponType;							// 0x14
-		public UnitClassifications unitClassification;		// 0x18
+		public UnitClassification unitClassification;		// 0x18
 		public short cargoType;								// 0x1C
 		public short cargoAmount;							// 0x1E
 	};

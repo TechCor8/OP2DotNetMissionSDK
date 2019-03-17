@@ -42,7 +42,7 @@ namespace DotNetMissionSDK
 		// Create and manage UnitRecord array
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr UnitRecord_CreateArray(int size);
 		[DllImport("DotNetInterop.dll")] private static extern void UnitRecord_SetArray(IntPtr arr, int index, map_id unitType, int x, int y, int unknown1, int rotation, map_id weaponType,
-																						UnitClassifications unitClassification, short cargoType, short cargoAmount);
+																						UnitClassification unitClassification, short cargoType, short cargoAmount);
 		[DllImport("DotNetInterop.dll")] private static extern void UnitRecord_ReleaseArray(IntPtr handle);
 	}
 }

@@ -29,7 +29,7 @@ namespace DotNetMissionSDK
 		{
 			ScGroup_ClearTargCount(stubIndex);
 		}
-		public Unit GetFirstOfType(UnitClassifications unitType)
+		public Unit GetFirstOfType(UnitClassification unitType)
 		{
 			int index = ScGroup_GetFirstOfType(stubIndex, unitType);
 			if (index < 0)
@@ -81,14 +81,14 @@ namespace DotNetMissionSDK
 		{
 			return ScGroup_TotalUnitCount(stubIndex);
 		}
-		public int UnitCount(UnitClassifications unitType)
+		public int UnitCount(UnitClassification unitType)
 		{
 			return ScGroup_UnitCount(stubIndex, unitType);
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_AddUnits(int stubIndex, IntPtr unitsToAdd);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_ClearTargCount(int stubIndex);
-		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_GetFirstOfType(int stubIndex, UnitClassifications unitType);	// ** Typo **
+		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_GetFirstOfType(int stubIndex, UnitClassification unitType);	// ** Typo **
 		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_GetFirstOfType2(int stubIndex, map_id unitType, map_id cargoOrWeapon);
 		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_HasBeenAttacked(int stubIndex);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_RemoveUnit(int stubIndex, int unitToRemoveIndex);
@@ -99,7 +99,7 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_TakeAllUnits(int stubIndex, int sourceGroup);
 		[DllImport("DotNetInterop.dll")] private static extern void ScGroup_TakeUnit(int stubIndex, int unitToAddIndex);
 		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_TotalUnitCount(int stubIndex);
-		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_UnitCount(int stubIndex, UnitClassifications unitType);	// ** Typo **
+		[DllImport("DotNetInterop.dll")] private static extern int ScGroup_UnitCount(int stubIndex, UnitClassification unitType);	// ** Typo **
 	}
 	
 

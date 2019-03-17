@@ -8,7 +8,7 @@
 
 namespace DotNetMissionSDK
 {
-	public enum PlayerNum
+	public enum PlayerID
 	{
 		PlayerAll = -1,
 		Player0 = 0,
@@ -22,23 +22,23 @@ namespace DotNetMissionSDK
 
 	public enum PlayerDifficulty
 	{
-		DiffEasy = 0,
-		DiffNormal = 1,
-		DiffHard = 2,
+		Easy = 0,
+		Normal = 1,
+		Hard = 2,
 	};
 
 	// Mining beacon's
-	public enum BeaconTypes
+	public enum BeaconType
 	{
-		OreTypeRandom = -1,
-		OreTypeCommon = 0,
-		OreTypeRare = 1,
+		Random = -1,
+		Common = 0,
+		Rare = 1,
 	};
 
 	// Yield Type's (Number of "Bars" a mine has)
 	public enum Yield
 	{
-		BarRandom = -1,
+		Random = -1,
 		Bar3 = 0,
 		Bar2 = 1,
 		Bar1 = 2,
@@ -48,7 +48,7 @@ namespace DotNetMissionSDK
 	// a certain "bar" yield to produce.
 	public enum Variant
 	{
-		VariantRandom = -1,		// Randomly choose one of the 3 variant values
+		Random = -1,		// Randomly choose one of the 3 variant values
 		Variant1 = 0,
 		Variant2 = 1,
 		Variant3 = 2,
@@ -66,7 +66,7 @@ namespace DotNetMissionSDK
 
 
 	// Marker Types
-	public enum MarkerTypes
+	public enum MarkerType
 	{
 		Circle	= 0,			// Circular marker
 		DNA		= 1,			// DNA strand
@@ -89,55 +89,55 @@ namespace DotNetMissionSDK
 
 
 	// CellTypes returned and set by the GameMap class
-	public enum CellTypes
+	public enum CellType
 	{
-		cellFastPassible1 = 0,	// Rock vegetation
-		cellImpassible2,		// Meteor craters, cracks/crevases
-		cellSlowPassible1,		// Lava rock (dark)
-		cellSlowPassible2,		// Rippled dirt/Lava rock bumps
-		cellMediumPassible1,	// Dirt
-		cellMediumPassible2,	// Lava rock
-		cellImpassible1,		// Dirt/Rock/Lava rock mound/ice/volcano
-		cellFastPassible2,		// Rock
-		cellNorthCliffs,
-		cellCliffsHighSide,
-		cellCliffsLowSide,
-		cellVentsAndFumaroles,	// Fumaroles (passable by GeoCons)
-		cellzPad12,
-		cellzPad13,
-		cellzPad14,
-		cellzPad15,
-		cellzPad16,
-		cellzPad17,
-		cellzPad18,
-		cellzPad19,
-		cellzPad20,
-		cellDozedArea,
-		cellRubble,
-		cellNormalWall,
-		cellMicrobeWall,
-		cellLavaWall,
-		cellTube0,				// Used for tubes and areas under buildings
-		cellTube1,				// Note: Tube values 1-5 don't appear to be used
-		cellTube2,
-		cellTube3,
-		cellTube4,
-		cellTube5,
+		FastPassible1 = 0,	// Rock vegetation
+		Impassible2,		// Meteor craters, cracks/crevases
+		SlowPassible1,		// Lava rock (dark)
+		SlowPassible2,		// Rippled dirt/Lava rock bumps
+		MediumPassible1,	// Dirt
+		MediumPassible2,	// Lava rock
+		Impassible1,		// Dirt/Rock/Lava rock mound/ice/volcano
+		FastPassible2,		// Rock
+		NorthCliffs,
+		CliffsHighSide,
+		CliffsLowSide,
+		VentsAndFumaroles,	// Fumaroles (passable by GeoCons)
+		zPad12,
+		zPad13,
+		zPad14,
+		zPad15,
+		zPad16,
+		zPad17,
+		zPad18,
+		zPad19,
+		zPad20,
+		DozedArea,
+		Rubble,
+		NormalWall,
+		MicrobeWall,
+		LavaWall,
+		Tube0,				// Used for tubes and areas under buildings
+		Tube1,				// Note: Tube values 1-5 don't appear to be used
+		Tube2,
+		Tube3,
+		Tube4,
+		Tube5,
 	};
 
 	// Color of structures and units belonging to a given player
 	public enum PlayerColor
 	{
-		PlayerBlue = 0, //Standard Eden color
-		PlayerRed,      //Standard Plymouth color
-		PlayerGreen,
-		PlayerYellow,
-		PlayerCyan,
-		PlayerMagenta,
-		PlayerBlack     //Not selectable as a player color from the multiplayer game initialization screen
+		Blue = 0, //Standard Eden color
+		Red,      //Standard Plymouth color
+		Green,
+		Yellow,
+		Cyan,
+		Magenta,
+		Black     //Not selectable as a player color from the multiplayer game initialization screen
 	};
 
-	public enum MissionTypes
+	public enum MissionType
 	{
 		Colony					= -1, //0xFF	// c
 		AutoDemo				= -2, //0xFF	// a

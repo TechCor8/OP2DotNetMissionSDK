@@ -11,7 +11,7 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "FreeMorale")]		public bool freeMorale				{ get; private set; }
 		[DataMember(Name = "IsEden")]			public bool isEden					{ get; private set; }
 		[DataMember(Name = "IsHuman")]			public bool isHuman					{ get; private set; }
-		[DataMember(Name = "ColorID")]			private string m_ColorID			{ get; set; }
+		[DataMember(Name = "Color")]			private string m_Color				{ get; set; }
 		[DataMember(Name = "Allies")]			public int[] allies					{ get; private set; }
 		[DataMember(Name = "CenterView")]		public DataLocation centerView		{ get; private set; }
 
@@ -27,8 +27,8 @@ namespace DotNetMissionSDK.Json
 
 		[DataMember(Name = "Units")]			public UnitData[] units				{ get; private set; }
 
-		public MoraleLevels moraleLevel			{ get { return GetEnum<MoraleLevels>(m_MoraleLevel);	} }
-		public PlayerColor colorID				{ get { return GetEnum<PlayerColor>(m_ColorID);			} }
+		public MoraleLevel moraleLevel			{ get { return GetEnum<MoraleLevel>(m_MoraleLevel);	} }
+		public PlayerColor color				{ get { return GetEnum<PlayerColor>(m_Color);		} }
 		
 
 		private static T GetEnum<T>(string val) where T : struct

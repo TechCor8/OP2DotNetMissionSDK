@@ -13,7 +13,7 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "MaxTechLevel")]			public int maxTechLevel			{ get; private set; }
 		[DataMember(Name = "UnitOnlyMission")]		public bool unitOnlyMission		{ get; private set; }
 
-		public MissionTypes missionType				{ get { return GetEnum<MissionTypes>(m_MissionType);			} }
+		public MissionType missionType				{ get { return GetEnum<MissionType>(m_MissionType);			} }
 
 		private static T GetEnum<T>(string val) where T : struct
 		{

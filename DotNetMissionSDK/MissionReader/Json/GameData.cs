@@ -29,13 +29,13 @@ namespace DotNetMissionSDK.Json
 		public class Beacon
 		{
 			[DataMember(Name = "MapID")]				private string m_MapID					{ get; set; }
-			[DataMember(Name = "CommonRareType")]		private string m_CommonRareType			{ get; set; }
+			[DataMember(Name = "OreType")]				private string m_OreType				{ get; set; }
 			[DataMember(Name = "BarYield")]				private string m_BarYield				{ get; set; }
 			[DataMember(Name = "BarVariant")]			private string m_BarVariant				{ get; set; }
 			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; private set; }
 
 			public map_id mapID						{ get { return GetEnum<map_id>(m_MapID);					} }
-			public BeaconTypes commonRareType		{ get { return GetEnum<BeaconTypes>(m_CommonRareType);		} }
+			public BeaconType oreType				{ get { return GetEnum<BeaconType>(m_OreType);				} }
 			public Yield barYield					{ get { return GetEnum<Yield>(m_BarYield);					} }
 			public Variant barVariant				{ get { return GetEnum<Variant>(m_BarVariant);				} }
 		}
@@ -46,7 +46,7 @@ namespace DotNetMissionSDK.Json
 			[DataMember(Name = "MarkerType")]			private string m_MarkerType				{ get; set; }
 			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; private set; }
 
-			public MarkerTypes markerType			{ get { return GetEnum<MarkerTypes>(m_MarkerType);			} }
+			public MarkerType markerType			{ get { return GetEnum<MarkerType>(m_MarkerType);			} }
 		}
 
 		[DataContract]

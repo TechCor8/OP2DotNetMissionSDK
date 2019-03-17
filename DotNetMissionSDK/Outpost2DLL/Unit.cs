@@ -70,7 +70,7 @@ namespace DotNetMissionSDK
 		public map_id GetCargo()										{ return Unit_GetCargo(m_StubIndex);						}	// [Convec]
 		public void DoBuild(map_id buildingType, int tileX, int tileY)	{ Unit_DoBuild(m_StubIndex, buildingType, tileX, tileY);	}	// [Convec]
 		public void SetCargo(map_id cargoType, map_id weaponType)		{ Unit_SetCargo(m_StubIndex, cargoType, weaponType);		}	// [Convec]
-		public void SetTruckCargo(Truck_Cargo cargoType, int amount)	{ Unit_SetTruckCargo(m_StubIndex, cargoType, amount);		}	// [Cargo Truck]
+		public void SetTruckCargo(TruckCargo cargoType, int amount)	{ Unit_SetTruckCargo(m_StubIndex, cargoType, amount);		}	// [Cargo Truck]
 
 		// Buildings
 		public void DoIdle()								{ Unit_DoIdle(m_StubIndex);									}
@@ -127,7 +127,7 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] private static extern map_id Unit_GetCargo(int stubIndex);																// [Convec]
 		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoBuild(int stubIndex, map_id buildingType, int tileX, int tileY);						// [Convec]
 		[DllImport("DotNetInterop.dll")] private static extern void Unit_SetCargo(int stubIndex, map_id cargoType, map_id weaponType);							// [Convec]
-		[DllImport("DotNetInterop.dll")] private static extern void Unit_SetTruckCargo(int stubIndex, Truck_Cargo cargoType, int amount);						// [Cargo Truck]
+		[DllImport("DotNetInterop.dll")] private static extern void Unit_SetTruckCargo(int stubIndex, TruckCargo cargoType, int amount);						// [Cargo Truck]
 
 		// Buildings
 		[DllImport("DotNetInterop.dll")] private static extern void Unit_DoIdle(int stubIndex);

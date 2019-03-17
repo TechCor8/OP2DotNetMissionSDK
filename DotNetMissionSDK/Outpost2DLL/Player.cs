@@ -46,7 +46,7 @@ namespace DotNetMissionSDK
 		public int FoodStored()				{ return Player_FoodStored(m_Handle);						}
 		public FoodStatus FoodSupply()		{ return Player_FoodSupply(m_Handle);						}
 		// [Get] Misc
-		public MoraleLevels MoraleLevel()	{ return Player_MoraleLevel(m_Handle);						}
+		public MoraleLevel MoraleLevel()	{ return Player_MoraleLevel(m_Handle);						}
 		public int GetRLVCount()			{ return Player_GetRLVCount(m_Handle);						}
 		// [Get] Indirect property lookups
 		public bool HasTechnology(int techID){ return Player_HasTechnology(m_Handle, techID) != 0;		}
@@ -135,7 +135,7 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] private static extern int Player_FoodStored(IntPtr handle);
 		[DllImport("DotNetInterop.dll")] private static extern FoodStatus Player_FoodSupply(IntPtr handle);
 		// [Get] Misc
-		[DllImport("DotNetInterop.dll")] private static extern MoraleLevels Player_MoraleLevel(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern MoraleLevel Player_MoraleLevel(IntPtr handle);
 		[DllImport("DotNetInterop.dll")] private static extern int Player_GetRLVCount(IntPtr handle);
 		// [Get] Indirect property lookups
 		[DllImport("DotNetInterop.dll")] private static extern int Player_HasTechnology(IntPtr handle, int techID);
