@@ -65,7 +65,7 @@ namespace DotNetMissionSDK
 		public int width		{ get { return maxX - minX; } }
 		public int height		{ get { return maxY - minY; } }
 
-
+		
 		public MAP_RECT() { }
 		public MAP_RECT(int minX, int minY, int maxX, int maxY)
 		{
@@ -122,6 +122,13 @@ namespace DotNetMissionSDK
 		{
 			// NOTE: Is this necessary? Can we check in managed code instead of native?
 			return MAP_RECT_Check(minX, minY, maxX, maxY, x, y) != 0;
+		}
+
+		public bool DoesRectIntersect(MAP_RECT other)
+		{
+			// AABB check
+			return	other.minX <= maxX && other.minY <= maxY &&
+					other.maxX >= minX && other.maxY >= minY;
 		}
 
 		public void ClipToMap()

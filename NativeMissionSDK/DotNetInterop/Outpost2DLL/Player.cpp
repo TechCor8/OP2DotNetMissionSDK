@@ -206,24 +206,31 @@ extern "C"
 	// [Method]
 	extern EXPORT void __stdcall Player_GoEden(_Player* handle)
 	{
+		handle->GoEden();
 	}
 	extern EXPORT void __stdcall Player_GoPlymouth(_Player* handle)
 	{
+		handle->GoPlymouth();
 	}
 	extern EXPORT void __stdcall Player_GoAI(_Player* handle)
 	{
+		handle->GoAI();
 	}
 	extern EXPORT void __stdcall Player_GoHuman(_Player* handle)
 	{
+		handle->GoHuman();
 	}
 	extern EXPORT void __stdcall Player_AllyWith(_Player* handle, int playerNum)
 	{
+		handle->AllyWith(playerNum);
 	}
 	extern EXPORT void __stdcall Player_CaptureRLV(_Player* handle, int sourcePlayerNum)
 	{
+		handle->CaptureRLV(sourcePlayerNum);
 	}
 	extern EXPORT void __stdcall Player_CenterViewOn(_Player* handle, int tileX, int tileY)
 	{
+		handle->CenterViewOn(tileX, tileY);
 	}
 
 	//char checkValue[8];		// 0 = False, 1 = True, -1 = Not Set

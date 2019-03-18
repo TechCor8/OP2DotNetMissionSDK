@@ -7,5 +7,12 @@ namespace DotNetMissionSDK.Json
 	{
 		[DataMember(Name = "X")]		public int x			{ get; private set; }
 		[DataMember(Name = "Y")]		public int y			{ get; private set; }
+
+
+		public DataLocation(LOCATION location)
+		{
+			x = location.x;
+			y = location.y;
+		}
 	}
 }

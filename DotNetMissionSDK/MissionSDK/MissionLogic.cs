@@ -39,6 +39,8 @@ namespace DotNetMissionSDK
 		{
 			MissionRoot root = m_Root;
 
+			BaseGenerator baseGenerator = new BaseGenerator();
+
 			// Setup Game
 			TethysGame.SetDaylightEverywhere(root.tethysGame.daylightEverywhere);
 			TethysGame.SetDaylightMoves(root.tethysGame.daylightMoves);
@@ -89,9 +91,9 @@ namespace DotNetMissionSDK
 				switch ((MoraleLevel)data.moraleLevel)
 				{
 					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.id);		break;
-					case MoraleLevel.Good:		TethysGame.ForceMoraleGood(data.id);		break;
+					case MoraleLevel.Good:			TethysGame.ForceMoraleGood(data.id);		break;
 					case MoraleLevel.Fair:			TethysGame.ForceMoraleOK(data.id);			break;
-					case MoraleLevel.Poor:		TethysGame.ForceMoralePoor(data.id);		break;
+					case MoraleLevel.Poor:			TethysGame.ForceMoralePoor(data.id);		break;
 					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.id);		break;
 				}
 
@@ -110,7 +112,8 @@ namespace DotNetMissionSDK
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
 
-				player.CenterViewOn(data.centerView.x, data.centerView.y);
+				LOCATION centerView = TethysGame.GetMapCoordinates(new LOCATION(data.centerView));
+				player.CenterViewOn(centerView.x, centerView.y);
 
 				player.SetKids(data.kids);
 				player.SetWorkers(data.workers);
@@ -124,13 +127,18 @@ namespace DotNetMissionSDK
 					player.MarkResearchComplete(techID);
 
 				// Units
-				foreach (UnitData unitData in data.units)
+				baseGenerator.Generate(player, new LOCATION(data.baseCenterPt), data.units);
+
+				foreach (Unit unit in baseGenerator.generatedUnits)
+					unit.DoSetLights(true);
+
+				/*foreach (UnitData unitData in data.units)
 				{
 					LOCATION spawnPt = TethysGame.GetMapCoordinates(new LOCATION(unitData.location));
 
-					Unit unit = TethysGame.CreateUnit(unitData.typeID, spawnPt.x, spawnPt.y, data.id, unitData.cargoType, unitData.rotation);
+					Unit unit = TethysGame.CreateUnit(unitData.typeID, spawnPt.x, spawnPt.y, data.id, unitData.cargoType, unitData.direction);
 					unit.DoSetLights(true);
-				}
+				}*/
 			}
 
 			InitializeDisasters();

@@ -65,15 +65,15 @@
 			"TechLevel":5,
 			"MoraleLevel":"Fair",
 			"FreeMorale":true,
-			"IsEden":true,
+			"IsEden":false,
 			"IsHuman":true,
 			"Color":"Blue",
 			"Allies":[1],
-			"CenterView": { "X":15, "Y":14 },
+			"CenterView": { "X":27, "Y":38 },
 			
 			"Kids":10,
-			"Workers":25,
-			"Scientists":12,
+			"Workers":30,
+			"Scientists":17,
 			"CommonOre":5000,
 			"RareOre":0,
 			"Food":2000,
@@ -83,38 +83,58 @@
 			[
 			],
 			
+			"AutoLayout":true,
+			"BaseCenterPt": { "X":27, "Y":38 },
+			
 			"Units":
 			[
-				{
-					"TypeID":"CommandCenter",
-					"CargoType":"None",
-					"Direction":"East",
-					"Location": { "X":15, "Y":13 }
-				},
-				{
-					"TypeID":"CommonOreSmelter",
-					"CargoType":"None",
-					"Direction":"East",
-					"Location": { "X":15, "Y":16 }
-				},
-				{
-					"TypeID":"Tokamak",
-					"CargoType":"None",
-					"Direction":"East",
-					"Location": { "X":21, "Y":18 }
-				},
-				{
-					"TypeID":"VehicleFactory",
-					"CargoType":"None",
-					"Direction":"East",
-					"Location": { "X":20, "Y":13 }
-				},
+				{ "TypeID":"CommandCenter",			"MinDistance":1 },
+				{ "TypeID":"StructureFactory",		"MinDistance":0 },
 				{
 					"TypeID":"ConVec",
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":15, "Y":13 }
-				}
+					"Location": { "X":15, "Y":13 },
+					"IgnoreLayout":false,
+					"MinDistance":1,
+					"SpawnDistance":3
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"None",
+					"Direction":"East",
+					"MinDistance":1,
+					"SpawnDistance":3
+				},
+				{ "TypeID":"CommonOreSmelter",		"MinDistance":0 },
+				{ "TypeID":"Agridome",				"MinDistance":0 },
+				{ "TypeID":"Agridome",				"MinDistance":1 },
+				{ "TypeID":"GORF",					"MinDistance":0 },
+				{ "TypeID":"Residence",				"MinDistance":1 },
+				{ "TypeID":"StandardLab",			"MinDistance":0 },
+				{ "TypeID":"Nursery",				"MinDistance":0 },
+				{ "TypeID":"Residence",				"MinDistance":1 },
+				{ "TypeID":"University",			"MinDistance":0 },
+				{ "TypeID":"RobotCommand",			"MinDistance":0 },
+				{ "TypeID":"Residence",				"MinDistance":1 },
+				{ "TypeID":"MedicalCenter",			"MinDistance":1 },
+				{ "TypeID":"DIRT",					"MinDistance":0 },
+				{ "TypeID":"Agridome",				"MinDistance":1 },
+				{ "TypeID":"MedicalCenter",			"MinDistance":1 },
+				{ "TypeID":"RecreationFacility",	"MinDistance":0 },
+				{ "TypeID":"RecreationFacility",	"MinDistance":1 },
+				{ "TypeID":"DIRT", 					"MinDistance":2 },
+				{ "TypeID":"VehicleFactory",		"MinDistance":1,	"CreateWall":true },
+				{ "TypeID":"Tokamak",	"MinDistance":3 },
+				{ "TypeID":"Tokamak",	"MinDistance":2 },
+				{ "TypeID":"GuardPost",	"CargoType":"Microwave",	"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"EMP",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"Microwave",	"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"ESG",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"RPG",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"EMP",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"RPG",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"Tokamak",	"MinDistance":3 }
 			]
 		}
 	],
@@ -124,14 +144,14 @@
 		{
 			"ID":0,
 			"Type":"Meteor",
-			"SrcRect":{ "MinX":30, "MinY":30, "MaxX":60, "MaxY":60 },
-			"DestRect":{ "MinX":60, "MinY":60, "MaxX":90, "MaxY":90 },
+			"SrcRect":{ "MinX":60, "MinY":30, "MaxX":90, "MaxY":60 },
+			"DestRect":{ "MinX":90, "MinY":60, "MaxX":120, "MaxY":90 },
 			"Size":1,
 			"Duration":80,
 			"StartTime":10,
 			"EndTime":1500,
-			"MinDelay":5,
-			"MaxDelay":10
+			"MinDelay":50,
+			"MaxDelay":100
 		}
 	],
 	

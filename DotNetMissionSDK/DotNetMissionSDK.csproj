@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="CustomLogic.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="MissionSDK\BaseGenerator.cs" />
     <Compile Include="MissionSDK\MissionLogic.cs" />
     <Compile Include="MissionReader\Json\ActionData.cs" />
     <Compile Include="MissionReader\Json\DataLocation.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="MissionReader\Json\PlayerData.cs" />
     <Compile Include="MissionReader\MissionReader.cs" />
     <Compile Include="MissionSDK\TriggerManager.cs" />
+    <Compile Include="MissionSDK\Utility\UnitInfo.cs" />
     <Compile Include="Outpost2DLL\Enumerators.cs" />
     <Compile Include="Outpost2DLL\Enums.cs" />
     <Compile Include="Outpost2DLL\GameMap.cs" />

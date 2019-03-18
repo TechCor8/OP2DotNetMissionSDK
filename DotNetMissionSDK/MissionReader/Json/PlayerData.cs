@@ -25,6 +25,9 @@ namespace DotNetMissionSDK.Json
 
 		[DataMember(Name = "CompletedResearch")]public int[] completedResearch		{ get; private set; }
 
+		[DataMember(Name = "AutoLayout")]		public bool autoLayout				{ get; private set; }
+		[DataMember(Name = "BaseCenterPt")]		public DataLocation baseCenterPt	{ get; private set; }
+
 		[DataMember(Name = "Units")]			public UnitData[] units				{ get; private set; }
 
 		public MoraleLevel moraleLevel			{ get { return GetEnum<MoraleLevel>(m_MoraleLevel);	} }
