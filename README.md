@@ -7,25 +7,23 @@ DotNetMissionSDK is a project to move Outpost 2 scenario development from C++ to
 
 
 ## TECHNICAL OVERVIEW
-DotNetMissionSDK intentionally avoids the use of Windows COM. To do this, the project has to jump through a few hoops. Starting from the unmanaged scenario DLL called by Outpost 2, the DLL calls the managed C++ CLR project DLL, which in turn calls the Managed C# DotNetMissionSDK DLL, which then calls the Native interface.
+DotNetMissionSDK intentionally avoids the use of Windows COM. To do this, the project has to jump through a few hoops. Starting from the unmanaged scenario DLL called by Outpost 2, the DLL calls the managed C++ CLR project DLL, which in turn calls the Managed C# DotNetMissionSDK DLL, which then calls the Outpost 2 interface through the CLR project.
 
 The DLL flow looks like this:
-NativePlugin (cMissionName.dll) > DotNetInterop.dll > DotNetMissionSDK.dll (Mission Code and JSON reader) > NativeInterop > Outpost2.dll
+NativePlugin (cMissionName.dll) > DotNetInterop.dll > DotNetMissionSDK.dll (Mission Code and JSON reader) > DotNetInterop.dll > Outpost2.dll
 
 ### NativePlugin
-This contains the scenario details which can't be forwarded to the C# DLL due to how it is loaded at app startup.
-It forwards Init, AIProc, and GetSaveRegions to the CLR.
+This contains the scenario details which can't be forwarded to the C# DLL due to how it is loaded at app startup.\
+It forwards Init, AIProc, and GetSaveRegions to the CLR.\
 Also forwards Attach to the CLR with the DLLs name for determining the JSON filename to call.
 
 ### DotNetInterop
-Contains Init, AIProc, GetSaveRegions and Attach interface for the NativePlugin and forwards them to the DotNetMissionSDK.
+Contains Init, AIProc, GetSaveRegions and Attach interface for the NativePlugin and forwards them to the DotNetMissionSDK.\
+Forwards Outpost 2 DLL functions called from DotNetMissionSDK.
 
 ### DotNetMissionSDK
-Calls JSON MissionReader and executes all mission logic.
-Calls NativeInterop to interact with Outpost 2.
-
-### NativeInterop
-Forwards Outpost 2 DLL functions called from DotNetMissionSDK.
+Calls JSON MissionReader and executes all mission logic.\
+Calls DotNetInterop to interact with Outpost 2.
 
 
 ## CREATING A NEW SCENARIO IN JSON
@@ -34,7 +32,6 @@ If you want to avoid coding all together, copy the following files from the DotN
 cTest.dll\
 DotNetInterop.dll\
 DotNetMissionSDK.dll\
-NativeInterop.dll\
 cTest.opm
 
 You can change the cTest.opm JSON file in any text editor.
