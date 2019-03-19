@@ -50,8 +50,6 @@ namespace DotNetMissionSDK
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern long LOCATION_Clip(int x, int y);
-		
-		//int Norm(); WTF is Norm? The magnitude? The developer's name?
 	};
 
 	public class MAP_RECT
@@ -62,8 +60,8 @@ namespace DotNetMissionSDK
 		public int maxX;
 		public int maxY;
 
-		public int width		{ get { return maxX - minX; } }
-		public int height		{ get { return maxY - minY; } }
+		public int width		{ get { return maxX - minX + 1; } } // + 1 because max is inclusive
+		public int height		{ get { return maxY - minY + 1; } } // + 1 because max is inclusive
 
 		
 		public MAP_RECT() { }
@@ -82,6 +80,13 @@ namespace DotNetMissionSDK
 			this.maxY = max.y;
 		}
 		public MAP_RECT(DataRect rect)
+		{
+			this.minX = rect.minX;
+			this.minY = rect.minY;
+			this.maxX = rect.maxX;
+			this.maxY = rect.maxY;
+		}
+		public MAP_RECT(MAP_RECT rect)
 		{
 			this.minX = rect.minX;
 			this.minY = rect.minY;

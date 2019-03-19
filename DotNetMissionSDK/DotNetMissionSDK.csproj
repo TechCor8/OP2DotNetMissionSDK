@@ -60,6 +60,7 @@
     <Compile Include="MissionReader\Json\PlayerData.cs" />
     <Compile Include="MissionReader\MissionReader.cs" />
     <Compile Include="MissionSDK\TriggerManager.cs" />
+    <Compile Include="MissionSDK\Pathfinding\Pathfinder.cs" />
     <Compile Include="MissionSDK\Utility\UnitInfo.cs" />
     <Compile Include="Outpost2DLL\Enumerators.cs" />
     <Compile Include="Outpost2DLL\Enums.cs" />

@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.Json;
+using DotNetMissionSDK.Pathfinding;
 using DotNetMissionSDK.Utility;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,18 @@ namespace DotNetMissionSDK
 {
 	public class BaseGenerator
 	{
+		private struct VehicleSpawnArea
+		{
+			public UnitData vehicleData;
+			public MAP_RECT spawnArea;
+
+			public VehicleSpawnArea(UnitData vehicleData, MAP_RECT spawnArea)
+			{
+				this.vehicleData = vehicleData;
+				this.spawnArea = spawnArea;
+			}
+		}
+
 		private List<Unit> m_CreatedUnits;
 		private Dictionary<int, UnitData> m_CreatedUnitData;
 
@@ -36,10 +49,12 @@ namespace DotNetMissionSDK
 		public void Generate(Player owner, LOCATION baseCenterPt, UnitData[] unitData)
 		{
 			baseCenterPt = TethysGame.GetMapCoordinates(baseCenterPt);
-			LOCATION spawnPt = baseCenterPt;
+			MAP_RECT spawnArea = new MAP_RECT(baseCenterPt, baseCenterPt);
 			m_CreatedUnitData = new Dictionary<int, UnitData>();
 
-			// Generate all units in order
+			List<VehicleSpawnArea> vehicleSpawns = new List<VehicleSpawnArea>();
+
+			// Generate all structures in order
 			foreach (UnitData data in unitData)
 			{
 				if (data.ignoreLayout)
@@ -49,114 +64,129 @@ namespace DotNetMissionSDK
 					Unit unit = TethysGame.CreateUnit(data.typeID, loc.x, loc.y, owner.playerID, data.cargoType, data.direction);
 					m_CreatedUnits.Add(unit);
 					m_GeneratedUnits.Add(unit);
-					continue;
-				}
 
-				// Create unit with auto-layout
-				if (IsStructure(data.typeID))
-					spawnPt = GenerateUnit(owner, baseCenterPt, data);
-				else if (IsVehicle(data.typeID))
-					GenerateUnit(owner, spawnPt, data, data.spawnDistance);
+					// Store spawn area for units that spawn after this structure
+					if (IsStructure(data.typeID))
+						spawnArea = UnitInfo.GetRect(loc, data.typeID);
+				}
+				else
+				{
+					if (IsStructure(data.typeID))
+					{
+						// Create structure with auto-layout
+						spawnArea = GenerateUnit(owner, baseCenterPt, data);
+					}
+					else if (IsVehicle(data.typeID))
+					{
+						// Save vehicle for later
+						vehicleSpawns.Add(new VehicleSpawnArea(data, spawnArea));
+					}
+				}
+			}
+
+			// Generate vehicles that spawn from structure
+			foreach (VehicleSpawnArea spawn in vehicleSpawns)
+			{
+				// Create vehicle with auto-layout
+				GenerateUnit(owner, spawn.spawnArea, spawn.vehicleData, spawn.vehicleData.spawnDistance);
 			}
 		}
 
-		private LOCATION GenerateUnit(Player owner, LOCATION spawnPt, UnitData data, int startDistance=0)
+		private MAP_RECT GenerateUnit(Player owner, LOCATION spawnPt, UnitData data, int startDistance = 0)
 		{
-			LOCATION preferredPt = new LOCATION(spawnPt.x, spawnPt.y);
+			return GenerateUnit(owner, new MAP_RECT(spawnPt, spawnPt), data, startDistance);
+		}
 
-			Console.WriteLine("Placing unit: " + data.typeID.ToString());
-			Console.WriteLine("Preferred Pt = " + preferredPt.x + ", " + preferredPt.y);
-
-			int step = 0;
-			int turn = 0;
-
-			// Move rect by the start distance
-			if (startDistance > 0)
+		private MAP_RECT GenerateUnit(Player owner, MAP_RECT spawnArea, UnitData data, int startDistance=0)
+		{
+			// Determine if tile is passable
+			Pathfinder.TileCostCallback tileCostCB = (int x, int y) =>
 			{
-				turn = startDistance * 4;
-				preferredPt.y += startDistance;
+				// Get spawn rect
+				MAP_RECT targetSpawnRect = UnitInfo.GetRect(new LOCATION(x,y), data.typeID);
+				if (IsStructure(data.typeID))
+					targetSpawnRect.Inflate(1, 1); // Include bulldozed area
+				
+				// Check if clipped by map
+				MAP_RECT mapClip = new MAP_RECT(targetSpawnRect);
+				mapClip.ClipToMap();
+				if (targetSpawnRect.minX != mapClip.minX || targetSpawnRect.minY != mapClip.minY ||
+					targetSpawnRect.maxX != mapClip.maxX || targetSpawnRect.maxY != mapClip.maxY)
+				{
+					return Pathfinder.Impassable;
+				}
+
+				// Check if terrain is passable
+				if (!IsTilePassable(x,y))
+					return Pathfinder.Impassable;
+
+				return 1;
+			};
+
+			// Determine if tile is a valid place point
+			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
+			{
+				// Get spawn rect
+				MAP_RECT targetSpawnRect = UnitInfo.GetRect(new LOCATION(x,y), data.typeID);
+				if (IsStructure(data.typeID))
+					targetSpawnRect.Inflate(1, 1); // Include bulldozed area
+
+				// Check if colliding
+				if (IsColliding(targetSpawnRect, data.minDistance, IsStructure(data.typeID), IsVehicle(data.typeID)))
+					return false;
+				
+				return true;
+			};
+
+			LOCATION foundPt = Pathfinder.GetValidTile(GetTilesInRect(spawnArea), tileCostCB, validTileCB);
+			if (foundPt == null)
+			{
+				Console.WriteLine("Failed to place unit: " + data.typeID);
+				return spawnArea;
 			}
 
-			// Attempt to place unit
-			for (int i=0; i < 1000000; ++i)
-			{
-				// Calculate spawn rect
-				MAP_RECT spawnRect = UnitInfo.GetRect(preferredPt, data.typeID);
+			// Get spawn rect
+			MAP_RECT spawnRect = UnitInfo.GetRect(foundPt, data.typeID);
+			if (IsStructure(data.typeID))
 				spawnRect.Inflate(1, 1); // Include bulldozed area
 
-				Console.WriteLine("pt = " + preferredPt.x + ", " + preferredPt.y);
-				Console.WriteLine("Rect = " + spawnRect.minX + ", " + spawnRect.minY + " Max = " + spawnRect.maxX + ", " + spawnRect.maxY);
+			// Calculate unit direction
+			UnitDirection direction = UnitDirection.East;
 
-				// Check if clipped by map
-				MAP_RECT mapClip = new MAP_RECT(spawnRect.minX, spawnRect.minY, spawnRect.maxX, spawnRect.maxY);
-				mapClip.ClipToMap();
-				if (spawnRect.minX != mapClip.minX || spawnRect.minY != mapClip.minY ||
-					spawnRect.maxX != mapClip.maxX || spawnRect.maxY != mapClip.maxY)
-				{
-					ShiftPoint(preferredPt, ref step, ref turn);
-					continue;
-				}
-				
-				// Check if colliding
-				if (IsColliding(spawnRect, data.minDistance, IsStructure(data.typeID), IsVehicle(data.typeID)))
-				{
-					ShiftPoint(preferredPt, ref step, ref turn);
-					continue;
-				}
+			// Place unit
+			Unit unit = TethysGame.CreateUnit(data.typeID, foundPt.x, foundPt.y, owner.playerID, data.cargoType, direction);
 
-				// Check if reachable
+			if (IsStructure(data.typeID))
+			{
+				// Structures that aren't power plants need tubes
+				if (data.typeID != map_id.Tokamak && data.typeID != map_id.SolarPowerArray && data.typeID != map_id.MHDGenerator)
+					GenerateTubes(owner, foundPt, spawnRect, data.minDistance);
 
-				// Calculate unit direction
-				UnitDirection direction = UnitDirection.East;
-
-				// Place unit
-				Unit unit = TethysGame.CreateUnit(data.typeID, preferredPt.x, preferredPt.y, owner.playerID, data.cargoType, direction);
-
-				if (IsStructure(data.typeID))
-				{
-					// Structures that aren't power plants need tubes
-					if (data.typeID != map_id.Tokamak && data.typeID != map_id.SolarPowerArray && data.typeID != map_id.MHDGenerator)
-						GenerateTubes(owner, preferredPt, spawnRect, data.minDistance);
-
-					// Generate walls
-					if (data.createWall)
-						GenerateWalls(spawnRect);
-				}
-
-				// Add to generation lists
-				m_CreatedUnits.Add(unit);
-				m_CreatedUnitData.Add(unit.GetStubIndex(), data);
-				m_GeneratedUnits.Add(unit);
-
-				return preferredPt;
+				// Generate walls
+				if (data.createWall)
+					GenerateWalls(spawnRect);
 			}
 
-			Console.WriteLine("Failed to place unit: " + data.typeID);
+			// Add to generation lists
+			m_CreatedUnits.Add(unit);
+			m_CreatedUnitData.Add(unit.GetStubIndex(), data);
+			m_GeneratedUnits.Add(unit);
 
-			return spawnPt;
+			return spawnRect;
 		}
 
-		// Moves the rect in a widening circle with each iteration
-		private void ShiftPoint(LOCATION pt, ref int step, ref int turn)
+		private LOCATION[] GetTilesInRect(MAP_RECT rect)
 		{
-			int direction = turn % 4;
-			int requiredSteps = turn / 2 + 1;
+			LOCATION[] tiles = new LOCATION[rect.width * rect.height];
 
-			switch (direction)
+			int i=0;
+			for (int x=rect.minX; x <= rect.maxX; ++x)
 			{
-				case 0:		++pt.y;	break;	// Down
-				case 1:		++pt.x;	break;	// Right
-				case 2:		--pt.y;	break;	// Up
-				case 3:		--pt.x;	break;	// Left
+				for (int y=rect.minY; y <= rect.maxY; ++y, ++i)
+					tiles[i] = new LOCATION(x,y);
 			}
 
-			++step;
-
-			if (step == requiredSteps)
-			{
-				step = 0;
-				++turn;
-			}
+			return tiles;
 		}
 
 		private bool IsColliding(MAP_RECT spawnRect, int minDistance, bool useStructureMinDistance, bool useVehicleMinDistance)
@@ -214,8 +244,6 @@ namespace DotNetMissionSDK
 						area.Inflate(targetMinDistance, targetMinDistance);
 					else
 						area.Inflate(minDistance, minDistance);
-
-					Console.WriteLine("InflateRect = " + area.minX + ", " + area.minY + " Max = " + area.maxX + ", " + area.maxY);
 				}
 
 				if (spawnRect.DoesRectIntersect(area))
@@ -249,7 +277,7 @@ namespace DotNetMissionSDK
 				// Get target location and area
 				LOCATION targetPosition = new LOCATION(target.GetTileX(), target.GetTileY());
 				MAP_RECT targetRect = UnitInfo.GetRect(targetPosition, targetType);
-				//targetRect.Inflate(1, 1); // Include bulldozed area
+				targetRect.Inflate(1, 1); // Include bulldozed area
 
 				// Find closest unit
 				int distance = Math.Abs(targetPosition.x - unitPosition.x) + Math.Abs(targetPosition.y - unitPosition.y);
@@ -273,44 +301,11 @@ namespace DotNetMissionSDK
 			{
 				LOCATION targetPosition = new LOCATION(target.GetTileX(), target.GetTileY());
 
-				int xMin, yMin, xMax, yMax;
+				LOCATION[] tubePath = Pathfinder.GetPath(unitPosition, targetPosition, false, (int x, int y) => { return CanBuildTube(x, y) ? 1 : 0; });
 
-				if (targetPosition.x < unitPosition.x)
+				foreach (LOCATION tile in tubePath)
 				{
-					xMin = targetPosition.x;
-					xMax = unitPosition.x;
-				}
-				else
-				{
-					xMax = targetPosition.x;
-					xMin = unitPosition.x;
-				}
-
-				if (targetPosition.y < unitPosition.y)
-				{
-					yMin = targetPosition.y;
-					yMax = unitPosition.y;
-				}
-				else
-				{
-					yMax = targetPosition.y;
-					yMin = unitPosition.y;
-				}
-				
-				for (int x=xMin; x <= xMax; ++x)
-				{
-					if (!CanBuildTube(x, unitPosition.y))
-						continue;
-
-					TethysGame.CreateWallOrTube(x, unitPosition.y, 0, map_id.Tube);
-				}
-
-				for (int y=yMin; y <= yMax; ++y)
-				{
-					if (!CanBuildTube(targetPosition.x, y))
-						continue;
-
-					TethysGame.CreateWallOrTube(targetPosition.x, y, 0, map_id.Tube);
+					TethysGame.CreateWallOrTube(tile.x, tile.y, 0, map_id.Tube);
 				}
 			}
 		}
@@ -333,6 +328,25 @@ namespace DotNetMissionSDK
 				if (CanBuildWall(area.maxX+1, y))
 					TethysGame.CreateWallOrTube(area.maxX+1, y, 0, map_id.Wall);
 			}
+		}
+
+		private bool IsTilePassable(int x, int y)
+		{
+			switch ((CellType)GameMap.GetCellType(x,y))
+			{
+				case CellType.FastPassible1:
+				case CellType.SlowPassible1:
+				case CellType.SlowPassible2:
+				case CellType.MediumPassible1:
+				case CellType.MediumPassible2:
+				case CellType.FastPassible2:
+				case CellType.DozedArea:
+				case CellType.Rubble:
+				case CellType.Tube0:
+					return true;
+			}
+
+			return false;
 		}
 
 		private bool CanBuildWall(int x, int y)
@@ -389,16 +403,8 @@ namespace DotNetMissionSDK
 	/*
 	Tube generation needs to ignore underside of buildings
 	Tube generation that comes out of right and left sides should use default tubes
-	Regeneration for tubes that are simple blocked
-	Pathfinding for completely blocked tubes
-	Pathfinding to detect unreachable building location
-	Pathfinding to determine building distance
+	
+	Spawn walls after structures
 
-
-	For the purposes of the rules above, distance is calculated based on the "walking distance", so that units are not placed on the other side of impassable terrain.
-
-	Tubes will be generated as right angles to any structures that are at "MinDistance" to each other. Longest uninterrupted axis gets placed first. If a tube is blocked during generation, the tube will use the last point as the start point and attempt to regenerate from there. This is to create as few corners as possible.
-
-	If a direct tube route is not possible, perform a* pathfinding.
 	*/
 }
