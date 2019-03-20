@@ -9,6 +9,7 @@ namespace DotNetMissionSDK
 {
 	public class BaseGenerator
 	{
+		// Stores the link between a vehicle and the structure area that needs to spawn it
 		private struct VehicleSpawnArea
 		{
 			public UnitData vehicleData;
@@ -20,6 +21,9 @@ namespace DotNetMissionSDK
 				this.spawnArea = spawnArea;
 			}
 		}
+
+
+		private bool m_FirstStructure;		// Is this the first structure being generated for this base?
 
 		private List<Unit> m_CreatedUnits;
 		private Dictionary<int, UnitData> m_CreatedUnitData;
@@ -48,6 +52,7 @@ namespace DotNetMissionSDK
 
 		public void Generate(Player owner, LOCATION baseCenterPt, UnitData[] unitData)
 		{
+			m_FirstStructure = true;
 			baseCenterPt = TethysGame.GetMapCoordinates(baseCenterPt);
 			MAP_RECT spawnArea = new MAP_RECT(baseCenterPt, baseCenterPt);
 			m_CreatedUnitData = new Dictionary<int, UnitData>();
@@ -150,11 +155,8 @@ namespace DotNetMissionSDK
 			if (IsStructure(data.typeID))
 				spawnRect.Inflate(1, 1); // Include bulldozed area
 
-			// Calculate unit direction
-			UnitDirection direction = UnitDirection.East;
-
 			// Place unit
-			Unit unit = TethysGame.CreateUnit(data.typeID, foundPt.x, foundPt.y, owner.playerID, data.cargoType, direction);
+			Unit unit = TethysGame.CreateUnit(data.typeID, foundPt.x, foundPt.y, owner.playerID, data.cargoType, data.direction);
 
 			if (IsStructure(data.typeID))
 			{
@@ -255,6 +257,14 @@ namespace DotNetMissionSDK
 
 		private void GenerateTubes(Player owner, LOCATION unitPosition, MAP_RECT unitArea, int maxDistance)
 		{
+			// First structure does not generate any tubes.
+			// We check this here to prevent multiple bases from attempting to connect to each other.
+			if (m_FirstStructure)
+			{
+				m_FirstStructure = false;
+				return;
+			}
+
 			// Find structures for tubes
 			List<Unit> connections = new List<Unit>();
 			Unit closestUnit = null;
@@ -405,6 +415,8 @@ namespace DotNetMissionSDK
 	Tube generation that comes out of right and left sides should use default tubes
 	
 	Spawn walls after structures
+
+	map wrap around support
 
 	*/
 }

@@ -71,9 +71,9 @@
 			"Allies":[1],
 			"CenterView": { "X":27, "Y":38 },
 			
-			"Kids":10,
-			"Workers":30,
-			"Scientists":17,
+			"Kids":50,
+			"Workers":70,
+			"Scientists":27,
 			"CommonOre":5000,
 			"RareOre":0,
 			"Food":2000,
@@ -83,9 +83,23 @@
 			[
 			],
 			
-			"AutoLayout":true,
+			"Units":
+			[
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
+					"Direction":"East",
+					"Location": { "X":15, "Y":13 },
+				}
+			],
+		}
+	],
+	
+	"AutoLayouts":
+	[
+		{
+			"PlayerID":0,
 			"BaseCenterPt": { "X":27, "Y":38 },
-			
 			"Units":
 			[
 				{ "TypeID":"CommandCenter",			"MinDistance":1 },
@@ -99,13 +113,44 @@
 					"MinDistance":1,
 					"SpawnDistance":3
 				},
-				{
-					"TypeID":"ConVec",
-					"CargoType":"None",
-					"Direction":"East",
-					"MinDistance":1,
-					"SpawnDistance":3
-				},
+				{ "TypeID":"CommonOreSmelter",		"MinDistance":0 },
+				{ "TypeID":"Agridome",				"MinDistance":0 },
+				{ "TypeID":"Agridome",				"MinDistance":1 },
+				{ "TypeID":"GORF",					"MinDistance":0 },
+				{ "TypeID":"Residence",				"MinDistance":1 },
+				{ "TypeID":"StandardLab",			"MinDistance":0 },
+				{ "TypeID":"Nursery",				"MinDistance":0 },
+				{ "TypeID":"Residence",				"MinDistance":1 },
+				{ "TypeID":"University",			"MinDistance":0 },
+				{ "TypeID":"RobotCommand",			"MinDistance":0 },
+				{ "TypeID":"Residence",				"MinDistance":1 },
+				{ "TypeID":"MedicalCenter",			"MinDistance":1 },
+				{ "TypeID":"DIRT",					"MinDistance":0 },
+				{ "TypeID":"Agridome",				"MinDistance":1 },
+				{ "TypeID":"MedicalCenter",			"MinDistance":1 },
+				{ "TypeID":"RecreationFacility",	"MinDistance":0 },
+				{ "TypeID":"RecreationFacility",	"MinDistance":1 },
+				{ "TypeID":"DIRT", 					"MinDistance":2 },
+				{ "TypeID":"VehicleFactory",		"MinDistance":1,	"CreateWall":true },
+				{ "TypeID":"Tokamak",	"MinDistance":3 },
+				{ "TypeID":"Tokamak",	"MinDistance":2 },
+				{ "TypeID":"GuardPost",	"CargoType":"Microwave",	"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"EMP",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"Microwave",	"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"ESG",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"RPG",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"EMP",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"GuardPost",	"CargoType":"RPG",			"MinDistance":2, "CreateWall":true },
+				{ "TypeID":"Tokamak",	"MinDistance":3 }
+			]
+		},
+		{
+			"PlayerID":0,
+			"BaseCenterPt": { "X":105, "Y":85 },
+			"Units":
+			[
+				{ "TypeID":"CommandCenter",			"MinDistance":1 },
+				{ "TypeID":"StructureFactory",		"MinDistance":0 },
 				{ "TypeID":"CommonOreSmelter",		"MinDistance":0 },
 				{ "TypeID":"Agridome",				"MinDistance":0 },
 				{ "TypeID":"Agridome",				"MinDistance":1 },

@@ -39,7 +39,7 @@ namespace DotNetMissionSDK
 		{
 			MissionRoot root = m_Root;
 
-			BaseGenerator baseGenerator = new BaseGenerator();
+			List<Unit> createdUnits = new List<Unit>();
 
 			// Setup Game
 			TethysGame.SetDaylightEverywhere(root.tethysGame.daylightEverywhere);
@@ -127,20 +127,29 @@ namespace DotNetMissionSDK
 					player.MarkResearchComplete(techID);
 
 				// Units
-				baseGenerator.Generate(player, new LOCATION(data.baseCenterPt), data.units);
-
-				foreach (Unit unit in baseGenerator.generatedUnits)
-					unit.DoSetLights(true);
-
-				/*foreach (UnitData unitData in data.units)
+				foreach (UnitData unitData in data.units)
 				{
 					LOCATION spawnPt = TethysGame.GetMapCoordinates(new LOCATION(unitData.location));
 
 					Unit unit = TethysGame.CreateUnit(unitData.typeID, spawnPt.x, spawnPt.y, data.id, unitData.cargoType, unitData.direction);
 					unit.DoSetLights(true);
-				}*/
+
+					createdUnits.Add(unit);
+				}
 			}
 
+			// Setup Autolayout bases
+			BaseGenerator baseGenerator = new BaseGenerator(createdUnits);
+
+			foreach (AutoLayout layout in root.layouts)
+			{
+				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), new LOCATION(layout.baseCenterPt), layout.units);
+			}
+
+			foreach (Unit unit in baseGenerator.generatedUnits)
+				unit.DoSetLights(true);
+
+			// Setup Disasters
 			InitializeDisasters();
 
 			// Setup Triggers

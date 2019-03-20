@@ -38,7 +38,7 @@ namespace DotNetMissionSDK
 				return false;
 
 			// Test code
-			AddTrigger(TriggerStub.CreateVehicleCountTrigger(999, true, true, TethysGame.LocalPlayer(), 3, CompareMode.GreaterEqual));
+			AddTrigger(TriggerStub.CreateVehicleCountTrigger(999, true, true, TethysGame.LocalPlayer(), 4, CompareMode.GreaterEqual));
 			
 			return true;
 		}
