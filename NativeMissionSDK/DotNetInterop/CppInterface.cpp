@@ -4,25 +4,29 @@
 
 namespace DotNetInterop
 {
-	// Interface for Mission Entry in the C# mission DLL
-	public interface class IMissionEntry
-	{
-		bool Attach(String^ dllPath);
-		bool Initialize();
-		void Update();
-		IntPtr GetSaveBuffer();
-		int GetSaveBufferLength();
-		void Detach();
-	};
-
 	// Singleton class for accessing DotNetMissionEntry
 	public ref class DotNetMissionDLL
 	{
 		static Assembly^ m_Assembly;
-		static IMissionEntry^ m_Instance;
+		
+	public:
+		// Interface for Mission Entry in the C# mission DLL
+		delegate bool AttachDelegate(String^ dllPath);
+		delegate bool InitializeDelegate();
+		delegate void UpdateDelegate();
+		delegate IntPtr GetSaveBufferDelegate();
+		delegate int GetSaveBufferLengthDelegate();
+		delegate void DetachDelegate();
 
 	public:
-		static property IMissionEntry^ Instance { IMissionEntry^ get() { return m_Instance; } }
+		static Object^ Instance;
+
+		static AttachDelegate^ Attach;
+		static InitializeDelegate^ Initialize;
+		static UpdateDelegate^ Update;
+		static GetSaveBufferDelegate^ GetSaveBuffer;
+		static GetSaveBufferLengthDelegate^ GetSaveBufferLength;
+		static DetachDelegate^ Detach;
 
 		// Attach creates the app domain, loads the assembly and creates the entry point
 		static bool Load(String^ dotNetPath)
@@ -31,10 +35,32 @@ namespace DotNetInterop
 			m_Assembly = Assembly::LoadFile(dotNetPath);
 
 			// Create entry point
-			m_Instance = (IMissionEntry^)m_Assembly->CreateInstance("DotNetMissionSDK.DotNetMissionEntry");
+			Type^ entryType = m_Assembly->GetType("DotNetMissionSDK.DotNetMissionEntry");
 
-			if (m_Instance == nullptr)
-				return false;
+			Instance = Activator::CreateInstance(entryType);
+
+			MethodInfo^ methodAttach = entryType->GetMethod("Attach");
+			MethodInfo^ methodInitialize = entryType->GetMethod("Initialize");
+			MethodInfo^ methodUpdate = entryType->GetMethod("Update");
+			MethodInfo^ methodGetSaveBuffer = entryType->GetMethod("GetSaveBuffer");
+			MethodInfo^ methodGetSaveBufferLength = entryType->GetMethod("GetSaveBufferLength");
+			MethodInfo^ methodDetach = entryType->GetMethod("Detach");
+
+			Attach				= (AttachDelegate^)				methodAttach->CreateDelegate(AttachDelegate::typeid, Instance);
+			Initialize			= (InitializeDelegate^)			methodInitialize->CreateDelegate(InitializeDelegate::typeid, Instance);
+			Update				= (UpdateDelegate^)				methodUpdate->CreateDelegate(UpdateDelegate::typeid, Instance);
+			GetSaveBuffer		= (GetSaveBufferDelegate^)		methodGetSaveBuffer->CreateDelegate(GetSaveBufferDelegate::typeid, Instance);
+			GetSaveBufferLength = (GetSaveBufferLengthDelegate^)methodGetSaveBufferLength->CreateDelegate(GetSaveBufferLengthDelegate::typeid, Instance);
+			Detach				= (DetachDelegate^)				methodDetach->CreateDelegate(DetachDelegate::typeid, Instance);
+			
+			// Check if everything is valid
+			if (Instance == nullptr)			return false;
+			if (Attach == nullptr)				return false;
+			if (Initialize == nullptr)			return false;
+			if (Update == nullptr)				return false;
+			if (GetSaveBuffer == nullptr)		return false;
+			if (GetSaveBufferLength == nullptr)	return false;
+			if (Detach == nullptr)				return false;
 
 			return true;
 		}
@@ -62,32 +88,32 @@ namespace DotNetInterop
 			return false;
 		
 		// Call Attach() on DLL
-		return DotNetMissionDLL::Instance->Attach(strDllPath);
+		return DotNetMissionDLL::Attach(strDllPath);
 	}
 
 	bool Initialize()
 	{
-		return DotNetMissionDLL::Instance->Initialize();
+		return DotNetMissionDLL::Initialize();
 	}
 
 	void Update()
 	{
-		DotNetMissionDLL::Instance->Update();
+		DotNetMissionDLL::Update();
 	}
 
 	void* GetSaveBuffer()
 	{
-		return (void*)DotNetMissionDLL::Instance->GetSaveBuffer();
+		return (void*)DotNetMissionDLL::GetSaveBuffer();
 	}
 
 	int GetSaveBufferLength()
 	{
-		return DotNetMissionDLL::Instance->GetSaveBufferLength();
+		return DotNetMissionDLL::GetSaveBufferLength();
 	}
 
 	void Detach()
 	{
-		DotNetMissionDLL::Instance->Detach();
+		DotNetMissionDLL::Detach();
 	}
 }
 

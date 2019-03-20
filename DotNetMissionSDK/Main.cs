@@ -1,5 +1,4 @@
-﻿using DotNetInterop;
-using DotNetMissionSDK.Json;
+﻿using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ namespace DotNetMissionSDK
 	/// <summary>
 	/// The class containing entry points from Outpost 2.
 	/// </summary>
-    public class DotNetMissionEntry : IMissionEntry
+    public class DotNetMissionEntry
 	{
 		// Debug log streams
 		private FileStream m_LogFileStream;
