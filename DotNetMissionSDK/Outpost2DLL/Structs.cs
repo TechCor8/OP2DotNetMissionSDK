@@ -122,12 +122,13 @@ namespace DotNetMissionSDK
 			return new LOCATION(minX + TethysGame.GetRand(width)+1, minY + TethysGame.GetRand(height)+1);
 		}
 
+		// WARNING: IsInRect may not work the way MAP_RECT is being used in this SDK! Assumption has been that min and max are inclusive.
 		// int bInRect  [Checks if the point is in the rect  [handles x wrap around for rect coordinates]]
-		public bool IsInRect(int x, int y)
+		/*public bool IsInRect(int x, int y)
 		{
 			// NOTE: Is this necessary? Can we check in managed code instead of native?
 			return MAP_RECT_Check(minX, minY, maxX, maxY, x, y) != 0;
-		}
+		}*/
 
 		public bool DoesRectIntersect(MAP_RECT other)
 		{

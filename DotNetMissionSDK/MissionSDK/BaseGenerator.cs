@@ -58,6 +58,7 @@ namespace DotNetMissionSDK
 			m_CreatedUnitData = new Dictionary<int, UnitData>();
 
 			List<VehicleSpawnArea> vehicleSpawns = new List<VehicleSpawnArea>();
+			List<MAP_RECT> wallSpawns = new List<MAP_RECT>(); // List of structure rects that need walls
 
 			// Generate all structures in order
 			foreach (UnitData data in unitData)
@@ -80,6 +81,10 @@ namespace DotNetMissionSDK
 					{
 						// Create structure with auto-layout
 						spawnArea = GenerateUnit(owner, baseCenterPt, data);
+
+						// If structure should have a wall, add it to the spawn list to generate later
+						if (data.createWall)
+							wallSpawns.Add(spawnArea);
 					}
 					else if (IsVehicle(data.typeID))
 					{
@@ -88,6 +93,10 @@ namespace DotNetMissionSDK
 					}
 				}
 			}
+
+			// Generate walls
+			foreach (MAP_RECT rect in wallSpawns)
+				GenerateWalls(rect);
 
 			// Generate vehicles that spawn from structure
 			foreach (VehicleSpawnArea spawn in vehicleSpawns)
@@ -158,21 +167,17 @@ namespace DotNetMissionSDK
 			// Place unit
 			Unit unit = TethysGame.CreateUnit(data.typeID, foundPt.x, foundPt.y, owner.playerID, data.cargoType, data.direction);
 
-			if (IsStructure(data.typeID))
-			{
-				// Structures that aren't power plants need tubes
-				if (data.typeID != map_id.Tokamak && data.typeID != map_id.SolarPowerArray && data.typeID != map_id.MHDGenerator)
-					GenerateTubes(owner, foundPt, spawnRect, data.minDistance);
-
-				// Generate walls
-				if (data.createWall)
-					GenerateWalls(spawnRect);
-			}
-
 			// Add to generation lists
 			m_CreatedUnits.Add(unit);
 			m_CreatedUnitData.Add(unit.GetStubIndex(), data);
 			m_GeneratedUnits.Add(unit);
+
+			if (IsStructure(data.typeID))
+			{
+				// Structures that aren't power plants need tubes
+				if (data.typeID != map_id.Tokamak && data.typeID != map_id.SolarPowerArray && data.typeID != map_id.MHDGenerator)
+					GenerateTubes(owner, foundPt, unit, data.minDistance);
+			}
 
 			return spawnRect;
 		}
@@ -255,7 +260,7 @@ namespace DotNetMissionSDK
 			return false;
 		}
 
-		private void GenerateTubes(Player owner, LOCATION unitPosition, MAP_RECT unitArea, int maxDistance)
+		private void GenerateTubes(Player owner, LOCATION unitPosition, Unit sourceUnit, int maxDistance)
 		{
 			// First structure does not generate any tubes.
 			// We check this here to prevent multiple bases from attempting to connect to each other.
@@ -264,6 +269,13 @@ namespace DotNetMissionSDK
 				m_FirstStructure = false;
 				return;
 			}
+
+			map_id sourceUnitType = sourceUnit.GetUnitType();
+
+			// Get unit area
+			MAP_RECT unitArea = UnitInfo.GetRect(new LOCATION(sourceUnit.GetTileX(), sourceUnit.GetTileY()), sourceUnitType);
+			if (IsStructure(sourceUnitType))
+				unitArea.Inflate(1, 1); // Include bulldozed area
 
 			// Find structures for tubes
 			List<Unit> connections = new List<Unit>();
@@ -275,6 +287,10 @@ namespace DotNetMissionSDK
 
 			foreach (Unit target in m_CreatedUnits)
 			{
+				// Don't connect to self
+				if (sourceUnit == target)
+					continue;
+
 				// Only connect to player's own structures
 				if (target.GetOwnerID() != owner.playerID)
 					continue;
@@ -311,10 +327,16 @@ namespace DotNetMissionSDK
 			{
 				LOCATION targetPosition = new LOCATION(target.GetTileX(), target.GetTileY());
 
+				// GetPath will avoid obstacles, but ignore structures so that tubes don't wrap around them.
 				LOCATION[] tubePath = Pathfinder.GetPath(unitPosition, targetPosition, false, (int x, int y) => { return CanBuildTube(x, y) ? 1 : 0; });
 
 				foreach (LOCATION tile in tubePath)
 				{
+					// We need to check if the tile has a structure on it, and skip creating the tube if it does.
+					// Pathfinding passes through structures, but we don't want to have an underlayer of tubes.
+					if (IsColliding(new MAP_RECT(tile, tile), 0, false, false))
+						continue;
+
 					TethysGame.CreateWallOrTube(tile.x, tile.y, 0, map_id.Tube);
 				}
 			}
@@ -390,9 +412,9 @@ namespace DotNetMissionSDK
 				case CellType.DozedArea:
 				case CellType.Rubble:
 				case CellType.Tube0:
-				case CellType.NormalWall:
-				case CellType.LavaWall:
-				case CellType.MicrobeWall:
+				//case CellType.NormalWall:
+				//case CellType.LavaWall:
+				//case CellType.MicrobeWall:
 					return true;
 			}
 
@@ -411,11 +433,8 @@ namespace DotNetMissionSDK
 	}
 
 	/*
-	Tube generation needs to ignore underside of buildings
 	Tube generation that comes out of right and left sides should use default tubes
 	
-	Spawn walls after structures
-
 	map wrap around support
 
 	*/
