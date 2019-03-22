@@ -4,56 +4,67 @@ namespace DotNetMissionSDK.Utility
 {
 	public class UnitInfo
 	{
-		public static LOCATION GetSize(map_id type)
+		public static LOCATION GetSize(map_id type, bool includeBulldozedArea=false)
 		{
+			LOCATION result;
+
 			switch (type)
 			{
-				case map_id.CommonOreMine:			return new LOCATION(2,1);
-				case map_id.RareOreMine:			return new LOCATION(2,1);
-				case map_id.GuardPost:				return new LOCATION(1,1);
-				case map_id.LightTower:				return new LOCATION(1,1);
-				case map_id.CommonStorage:			return new LOCATION(1,2);
-				case map_id.RareStorage:			return new LOCATION(1,2);
-				case map_id.Forum:					return new LOCATION(2,2);
-				case map_id.CommandCenter:			return new LOCATION(3,2);
-				case map_id.MHDGenerator:			return new LOCATION(2,2);
-				case map_id.Residence:				return new LOCATION(2,2);
-				case map_id.RobotCommand:			return new LOCATION(2,2);
-				case map_id.TradeCenter:			return new LOCATION(2,2);
-				case map_id.BasicLab:				return new LOCATION(2,2);
-				case map_id.MedicalCenter:			return new LOCATION(2,2);
-				case map_id.Nursery:				return new LOCATION(2,2);
-				case map_id.SolarPowerArray:		return new LOCATION(3,2);
-				case map_id.RecreationFacility:		return new LOCATION(2,2);
-				case map_id.University:				return new LOCATION(2,2);
-				case map_id.Agridome:				return new LOCATION(3,2);
-				case map_id.DIRT:					return new LOCATION(3,2);
-				case map_id.Garage:					return new LOCATION(3,2);
-				case map_id.MagmaWell:				return new LOCATION(2,1);
-				case map_id.MeteorDefense:			return new LOCATION(2,2);
-				case map_id.GeothermalPlant:		return new LOCATION(2,1);
-				case map_id.ArachnidFactory:		return new LOCATION(2,2);
-				case map_id.ConsumerFactory:		return new LOCATION(3,3);
-				case map_id.StructureFactory:		return new LOCATION(4,3);
-				case map_id.VehicleFactory:			return new LOCATION(4,3);
-				case map_id.StandardLab:			return new LOCATION(3,2);
-				case map_id.AdvancedLab:			return new LOCATION(3,3);
-				case map_id.Observatory:			return new LOCATION(2,2);
-				case map_id.ReinforcedResidence:	return new LOCATION(3,2);
-				case map_id.AdvancedResidence:		return new LOCATION(3,3);
-				case map_id.CommonOreSmelter:		return new LOCATION(4,3);
-				case map_id.Spaceport:				return new LOCATION(5,4);
-				case map_id.RareOreSmelter:			return new LOCATION(4,3);
-				case map_id.GORF:					return new LOCATION(3,2);
-				case map_id.Tokamak:				return new LOCATION(2,2);
+				case map_id.CommonOreMine:			result = new LOCATION(2,1);		break;
+				case map_id.RareOreMine:			result = new LOCATION(2,1);		break;
+				case map_id.GuardPost:				result = new LOCATION(1,1);		break;
+				case map_id.LightTower:				result = new LOCATION(1,1);		break;
+				case map_id.CommonStorage:			result = new LOCATION(1,2);		break;
+				case map_id.RareStorage:			result = new LOCATION(1,2);		break;
+				case map_id.Forum:					result = new LOCATION(2,2);		break;
+				case map_id.CommandCenter:			result = new LOCATION(3,2);		break;
+				case map_id.MHDGenerator:			result = new LOCATION(2,2);		break;
+				case map_id.Residence:				result = new LOCATION(2,2);		break;
+				case map_id.RobotCommand:			result = new LOCATION(2,2);		break;
+				case map_id.TradeCenter:			result = new LOCATION(2,2);		break;
+				case map_id.BasicLab:				result = new LOCATION(2,2);		break;
+				case map_id.MedicalCenter:			result = new LOCATION(2,2);		break;
+				case map_id.Nursery:				result = new LOCATION(2,2);		break;
+				case map_id.SolarPowerArray:		result = new LOCATION(3,2);		break;
+				case map_id.RecreationFacility:		result = new LOCATION(2,2);		break;
+				case map_id.University:				result = new LOCATION(2,2);		break;
+				case map_id.Agridome:				result = new LOCATION(3,2);		break;
+				case map_id.DIRT:					result = new LOCATION(3,2);		break;
+				case map_id.Garage:					result = new LOCATION(3,2);		break;
+				case map_id.MagmaWell:				result = new LOCATION(2,1);		break;
+				case map_id.MeteorDefense:			result = new LOCATION(2,2);		break;
+				case map_id.GeothermalPlant:		result = new LOCATION(2,1);		break;
+				case map_id.ArachnidFactory:		result = new LOCATION(2,2);		break;
+				case map_id.ConsumerFactory:		result = new LOCATION(3,3);		break;
+				case map_id.StructureFactory:		result = new LOCATION(4,3);		break;
+				case map_id.VehicleFactory:			result = new LOCATION(4,3);		break;
+				case map_id.StandardLab:			result = new LOCATION(3,2);		break;
+				case map_id.AdvancedLab:			result = new LOCATION(3,3);		break;
+				case map_id.Observatory:			result = new LOCATION(2,2);		break;
+				case map_id.ReinforcedResidence:	result = new LOCATION(3,2);		break;
+				case map_id.AdvancedResidence:		result = new LOCATION(3,3);		break;
+				case map_id.CommonOreSmelter:		result = new LOCATION(4,3);		break;
+				case map_id.Spaceport:				result = new LOCATION(5,4);		break;
+				case map_id.RareOreSmelter:			result = new LOCATION(4,3);		break;
+				case map_id.GORF:					result = new LOCATION(3,2);		break;
+				case map_id.Tokamak:				result = new LOCATION(2,2);		break;
+				default:
+					// Not a structure
+					return new LOCATION(1,1);
 			}
 
-			return new LOCATION(1,1);
+			if (includeBulldozedArea)
+			{
+				result.x += 2;
+				result.y += 2;
+			}
+
+			return result;
 		}
 
-		public static MAP_RECT GetRect(LOCATION position, map_id unitType)
+		public static MAP_RECT GetRect(LOCATION position, map_id unitType, bool includeBulldozedArea=false)
 		{
-			LOCATION size = GetSize(unitType);
+			LOCATION size = GetSize(unitType, includeBulldozedArea);
 
 			return new MAP_RECT(
 				position.x - size.x / 2,

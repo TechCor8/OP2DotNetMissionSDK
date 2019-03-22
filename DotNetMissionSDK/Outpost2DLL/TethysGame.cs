@@ -171,9 +171,17 @@ namespace DotNetMissionSDK
 				);
 		}
 
+		/// <summary>
+		/// Converts coordinates from game coordinates (HUD status bar) to map coordinates (internal rect of arbitrary min/max)
+		/// </summary>
+		/// <param name="gameCoordinates">The game coordinates to convert.</param>
+		/// <returns>The equivalent map coordinates.</returns>
 		public static LOCATION GetMapCoordinates(LOCATION gameCoordinates)
 		{
-			return new LOCATION(gameCoordinates.x + 31, gameCoordinates.y - 1);
+			MAP_RECT area = GameMap.area;
+			LOCATION mapCoordinates = new LOCATION(gameCoordinates.x + area.minX - 1, gameCoordinates.y + area.minY - 1);
+			mapCoordinates.ClipToMap();
+			return mapCoordinates;
 		}
 	}
 }

@@ -110,6 +110,8 @@ namespace DotNetMissionSDK
 			// Prepare save buffer
 			m_SaveBuffer.Load();
 
+			GameMap.Initialize();
+
 			// Init essential systems
 			m_Triggers = new TriggerManager(m_SaveBuffer.saveData);
 			

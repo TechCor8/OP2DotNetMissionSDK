@@ -99,7 +99,7 @@
 	[
 		{
 			"PlayerID":0,
-			"BaseCenterPt": { "X":27, "Y":38 },
+			"BaseCenterPt": { "X":2, "Y":38 },
 			"Units":
 			[
 				{ "TypeID":"CommandCenter",			"MinDistance":1 },
