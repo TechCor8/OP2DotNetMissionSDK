@@ -86,7 +86,7 @@ namespace DotNetMissionSDK
 				if (data.ignoreLayout)
 				{
 					// Create unit that ignores layout
-					LOCATION loc = TethysGame.GetMapCoordinates(new LOCATION(data.location));
+					LOCATION loc = TethysGame.GetMapCoordinates(data.location);
 					Unit unit = TethysGame.CreateUnit(data.typeID, loc.x, loc.y, owner.playerID, data.cargoType, data.direction);
 					m_CreatedUnits.Add(unit);
 					m_GeneratedUnits.Add(unit);
@@ -147,8 +147,8 @@ namespace DotNetMissionSDK
 			};
 
 			// Get the closest valid tile for this unit
-			LOCATION foundPt = Pathfinder.GetClosestValidTile(GetTilesInRect(spawnArea), GetTileCost, validTileCB);
-			if (foundPt == null)
+			LOCATION foundPt;
+			if (!Pathfinder.GetClosestValidTile(GetTilesInRect(spawnArea), GetTileCost, validTileCB, out foundPt))
 			{
 				Console.WriteLine("Failed to place unit: " + data.typeID);
 				return spawnArea;
@@ -206,7 +206,6 @@ namespace DotNetMissionSDK
 			// Vehicles must be at least spawnDistance away from spawnArea
 			if (IsVehicle(unitToSpawn.typeID))
 			{
-				spawnArea = new MAP_RECT(spawnArea);
 				spawnArea.Inflate(unitToSpawn.spawnDistance, unitToSpawn.spawnDistance);
 
 				// Tile is not valid if extended spawn area contains the tile

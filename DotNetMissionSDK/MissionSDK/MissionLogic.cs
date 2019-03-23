@@ -50,7 +50,7 @@ namespace DotNetMissionSDK
 			// Beacons
 			foreach (GameData.Beacon beacon in root.tethysGame.beacons)
 			{
-				LOCATION spawnPt = TethysGame.GetRandomLocation(new MAP_RECT(beacon.spawnRect));
+				LOCATION spawnPt = beacon.spawnRect.GetRandomPointInRect();
 				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
 
 				TethysGame.CreateBeacon(beacon.mapID, spawnPt.x, spawnPt.y, beacon.oreType, beacon.barYield, beacon.barVariant);
@@ -59,7 +59,7 @@ namespace DotNetMissionSDK
 			// Markers
 			foreach (GameData.Marker marker in root.tethysGame.markers)
 			{
-				LOCATION spawnPt = TethysGame.GetRandomLocation(new MAP_RECT(marker.spawnRect));
+				LOCATION spawnPt = marker.spawnRect.GetRandomPointInRect();
 				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
 
 				Unit unit = TethysGame.PlaceMarker(spawnPt.x, spawnPt.y, marker.markerType);
@@ -68,7 +68,7 @@ namespace DotNetMissionSDK
 			// Wreckage
 			foreach (GameData.Wreckage wreck in root.tethysGame.wreckage)
 			{
-				LOCATION spawnPt = TethysGame.GetRandomLocation(new MAP_RECT(wreck.spawnRect));
+				LOCATION spawnPt = wreck.spawnRect.GetRandomPointInRect();
 				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
 
 				TethysGame.CreateWreck(spawnPt.x, spawnPt.y, wreck.techID, wreck.isVisible);
@@ -77,7 +77,7 @@ namespace DotNetMissionSDK
 			// Tubes
 			foreach (GameData.WallTube wallTube in root.tethysGame.wallTubes)
 			{
-				LOCATION location = TethysGame.GetMapCoordinates(new LOCATION(wallTube.location));
+				LOCATION location = TethysGame.GetMapCoordinates(wallTube.location);
 				TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.typeID);
 			}
 
@@ -112,7 +112,7 @@ namespace DotNetMissionSDK
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
 
-				LOCATION centerView = TethysGame.GetMapCoordinates(new LOCATION(data.centerView));
+				LOCATION centerView = TethysGame.GetMapCoordinates(data.centerView);
 				player.CenterViewOn(centerView.x, centerView.y);
 
 				player.SetKids(data.kids);
@@ -129,7 +129,7 @@ namespace DotNetMissionSDK
 				// Units
 				foreach (UnitData unitData in data.units)
 				{
-					LOCATION spawnPt = TethysGame.GetMapCoordinates(new LOCATION(unitData.location));
+					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.location);
 
 					Unit unit = TethysGame.CreateUnit(unitData.typeID, spawnPt.x, spawnPt.y, data.id, unitData.cargoType, unitData.direction);
 					unit.DoSetLights(true);
@@ -143,7 +143,7 @@ namespace DotNetMissionSDK
 
 			foreach (AutoLayout layout in root.layouts)
 			{
-				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), new LOCATION(layout.baseCenterPt), layout.units);
+				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), layout.baseCenterPt, layout.units);
 			}
 
 			foreach (Unit unit in baseGenerator.generatedUnits)
@@ -403,8 +403,8 @@ namespace DotNetMissionSDK
 
 		private void FireDisaster(DisasterData disaster)
 		{
-			LOCATION spawnPt = TethysGame.GetMapCoordinates(TethysGame.GetRandomLocation(new MAP_RECT(disaster.srcRect)));
-			LOCATION destPt = TethysGame.GetMapCoordinates(TethysGame.GetRandomLocation(new MAP_RECT(disaster.destRect)));
+			LOCATION spawnPt = TethysGame.GetMapCoordinates(disaster.srcRect.GetRandomPointInRect());
+			LOCATION destPt = TethysGame.GetMapCoordinates(disaster.destRect.GetRandomPointInRect());
 
 			switch (disaster.type)
 			{

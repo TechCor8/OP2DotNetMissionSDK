@@ -1,9 +1,12 @@
 ﻿using DotNetMissionSDK.Json;
-using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK
 {
-	public class MAP_RECT
+	/// <summary>
+	/// Extended wrapper for OP2 MAP_RECT.
+	/// Min and Max values are expected to be inclusive.
+	/// </summary>
+	public struct MAP_RECT
 	{
 		// Min = Top-Left, Max = Bottom-Right
 		public int minX;
@@ -16,7 +19,7 @@ namespace DotNetMissionSDK
 		public int height		{ get { return maxY - minY + 1; } } // + 1 because max is inclusive
 
 		
-		public MAP_RECT() { }
+		//public MAP_RECT() { }
 		public MAP_RECT(int minX, int minY, int maxX, int maxY)
 		{
 			this.minX = minX;
@@ -75,16 +78,9 @@ namespace DotNetMissionSDK
 		/// <returns>Random point in rect.</returns>
 		public LOCATION GetRandomPointInRect()
 		{
-			return new LOCATION(minX + TethysGame.GetRand(width)+1, minY + TethysGame.GetRand(height)+1);
+			return new LOCATION(minX + TethysGame.GetRand(width)+1,
+								minY + TethysGame.GetRand(height)+1);
 		}
-
-		// WARNING: IsInRect may not work the way MAP_RECT is being used in this SDK! Assumption has been that min and max are inclusive.
-		// int bInRect  [Checks if the point is in the rect  [handles x wrap around for rect coordinates]]
-		/*public bool IsInRect(int x, int y)
-		{
-			// NOTE: Is this necessary? Can we check in managed code instead of native?
-			return MAP_RECT_Check(minX, minY, maxX, maxY, x, y) != 0;
-		}*/
 
 		/// <summary>
 		/// Checks if point is inside rect. Min and max inclusive.
@@ -108,10 +104,6 @@ namespace DotNetMissionSDK
 
 			if (GameMap.doesWrap)
 			{
-				// Copy data to prevent overwriting
-				rect = new MAP_RECT(this);
-				point = new LOCATION(point);
-
 				rect.ClipToMap();
 				point.ClipToMap();
 
@@ -148,8 +140,8 @@ namespace DotNetMissionSDK
 		{
 			if (GameMap.doesWrap)
 			{
-				MAP_RECT a = new MAP_RECT(this);
-				MAP_RECT b = new MAP_RECT(other);
+				MAP_RECT a = this;
+				MAP_RECT b = other;
 
 				// Clip rects to map
 				a.ClipToMap();
@@ -205,14 +197,15 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public void ClipToMap()
 		{
-			long min = MAP_RECT_ClipToMapMin(minX, minY, maxX, maxY);
-			long max = MAP_RECT_ClipToMapMax(minX, minY, maxX, maxY);
+			LOCATION min = new LOCATION(minX, minY);
+			min.ClipToMap();
+			minX = min.x;
+			minY = min.y;
 
-			minX = (int)(min & uint.MaxValue);
-			minY = (int)(min >> 32);
-
-			maxX = (int)(max & uint.MaxValue);
-			maxY = (int)(max >> 32);
+			LOCATION max = new LOCATION(maxX, maxY);
+			max.ClipToMap();
+			maxX = max.x;
+			maxY = max.y;
 		}
 
 		/// <summary>
@@ -224,20 +217,20 @@ namespace DotNetMissionSDK
 		public bool IsInMapBounds()
 		{
 			// Check if y-axis is out of bounds
-			if (minY < GameMap.area.minY) return false;
-			if (maxY > GameMap.area.maxY) return false;
+			if (minY < GameMap.bounds.minY) return false;
+			if (maxY > GameMap.bounds.maxY) return false;
 
 			if (GameMap.doesWrap)
 			{
 				// Out of bounds if rect is too wide to fit
-				if (minX < GameMap.area.minX && maxX > GameMap.area.maxX)
+				if (minX < GameMap.bounds.minX && maxX > GameMap.bounds.maxX)
 					return false;
 			}
 			else
 			{
 				// Check if x-axis is out of bounds
-				if (minX < GameMap.area.minX) return false;
-				if (maxX > GameMap.area.maxX) return false;
+				if (minX < GameMap.bounds.minX) return false;
+				if (maxX > GameMap.bounds.maxX) return false;
 			}
 
 			return true;
@@ -258,7 +251,7 @@ namespace DotNetMissionSDK
 				return false;
 
 			// Unclipped wrap
-			if (minX < GameMap.area.minX || maxX > GameMap.area.maxX)
+			if (minX < GameMap.bounds.minX || maxX > GameMap.bounds.maxX)
 				return true;
 
 			// Clipped wrap
@@ -272,9 +265,5 @@ namespace DotNetMissionSDK
 		{
 			return "min (" + minX + ", " + minY + ")" + " max (" + maxX + ", " + maxY + ")";
 		}
-
-		//[DllImport("DotNetInterop.dll")] private static extern int MAP_RECT_Check(int minX, int minY, int maxX, int maxY, int x, int y);		
-		[DllImport("DotNetInterop.dll")] private static extern long MAP_RECT_ClipToMapMin(int minX, int minY, int maxX, int maxY);
-		[DllImport("DotNetInterop.dll")] private static extern long MAP_RECT_ClipToMapMax(int minX, int minY, int maxX, int maxY);
 	}
 }

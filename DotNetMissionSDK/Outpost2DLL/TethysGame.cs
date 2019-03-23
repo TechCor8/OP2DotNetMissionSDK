@@ -163,14 +163,6 @@ namespace DotNetMissionSDK
 			return GetRand(max-min) + min;
 		}
 
-		public static LOCATION GetRandomLocation(MAP_RECT rect)
-		{
-			return new LOCATION(
-				GetRand(rect.width) + rect.minX+1,
-				GetRand(rect.height) + rect.minY+1
-				);
-		}
-
 		/// <summary>
 		/// Converts coordinates from game coordinates (HUD status bar) to map coordinates (internal rect of arbitrary min/max)
 		/// </summary>
@@ -178,8 +170,7 @@ namespace DotNetMissionSDK
 		/// <returns>The equivalent map coordinates.</returns>
 		public static LOCATION GetMapCoordinates(LOCATION gameCoordinates)
 		{
-			MAP_RECT area = GameMap.area;
-			LOCATION mapCoordinates = new LOCATION(gameCoordinates.x + area.minX - 1, gameCoordinates.y + area.minY - 1);
+			LOCATION mapCoordinates = new LOCATION(gameCoordinates.x + GameMap.bounds.minX - 1, gameCoordinates.y + GameMap.bounds.minY - 1);
 			mapCoordinates.ClipToMap();
 			return mapCoordinates;
 		}

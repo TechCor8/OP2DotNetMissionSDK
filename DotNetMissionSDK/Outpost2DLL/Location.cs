@@ -1,15 +1,11 @@
-﻿using DotNetMissionSDK.Json;
-using System;
-using System.Runtime.InteropServices;
+﻿using System;
 
 namespace DotNetMissionSDK
 {
-	public class LOCATION
+	public struct LOCATION
 	{
 		public int x;
 		public int y;
-
-		public LOCATION() { }
 
 		public LOCATION(int tileX, int tileY)
 		{
@@ -21,12 +17,6 @@ namespace DotNetMissionSDK
 			this.x = location.x;
 			this.y = location.y;
 		}
-		public LOCATION(DataLocation location)
-		{
-			this.x = location.x;
-			this.y = location.y;
-		}
-
 		public void Add(LOCATION vector)
 		{
 			x += vector.x;
@@ -43,9 +33,23 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public void ClipToMap()
 		{
-			long result = LOCATION_Clip(x,y);
-			x = (int)(result & uint.MaxValue);
-			y = (int)(result >> 32);
+			if (GameMap.doesWrap)
+			{
+				// Wrap around x-axis
+				x = x % GameMap.width;
+				if (x < 0)
+					x = GameMap.width + x;
+			}
+			else
+			{
+				// Clamp x-axis
+				if (x < GameMap.bounds.minX) x = GameMap.bounds.minX;
+				if (x > GameMap.bounds.maxX) x = GameMap.bounds.maxX;
+			}
+
+			// Clamp y-axis
+			if (y < GameMap.bounds.minY) y = GameMap.bounds.minY;
+			if (y > GameMap.bounds.maxY) y = GameMap.bounds.maxY;
 		}
 
 		/// <summary>
@@ -56,13 +60,13 @@ namespace DotNetMissionSDK
 		/// <returns>True if the location is in the map bounds.</returns>
 		public bool IsInMapBounds()
 		{
-			if (y < GameMap.area.minY) return false;
-			if (y > GameMap.area.maxY) return false;
+			if (y < GameMap.bounds.minY) return false;
+			if (y > GameMap.bounds.maxY) return false;
 
 			if (!GameMap.doesWrap)
 			{
-				if (x < GameMap.area.minX) return false;
-				if (x > GameMap.area.maxX) return false;
+				if (x < GameMap.bounds.minX) return false;
+				if (x > GameMap.bounds.maxX) return false;
 			}
 
 			return true;
@@ -72,7 +76,5 @@ namespace DotNetMissionSDK
 		{
 			return "(" + x + ", " + y + ")";
 		}
-
-		[DllImport("DotNetInterop.dll")] private static extern long LOCATION_Clip(int x, int y);
 	}
 }

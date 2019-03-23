@@ -16,7 +16,7 @@ namespace DotNetMissionSDK
 		public static bool doesWrap												{ get; private set; }
 		public static int width													{ get; private set; }
 		public static int height												{ get; private set; }
-		public static MAP_RECT area												{ get; private set; } // In "map coordinates" Ex: (32,0,160,127)
+		public static MAP_RECT bounds											{ get; private set; } // In "map coordinates" Ex: (32,0,160,127)
 
 		// [Get]
 		public static CellType GetCellType(int x, int y)						{ return (CellType)GameMap_GetCellType(x, y);				}
@@ -76,60 +76,53 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public static void Initialize()
 		{
-			// ************ WARNING *************
-			// Width has been oversized on some maps (+1). The reason is unknown.
-			// Recommended to verify whether a bug actually exists.
-			// **********************************
-			
-			// Calculate map size and determine if map wraps
-			// Clip to top left
-			LOCATION mapSize = new LOCATION();
-			mapSize.ClipToMap();
+			// Calculate the map bounds
+			LOCATION min = new LOCATION(-1,-1);
+			LOCATION max;
 
-			// Initialize to top left corner
-			area = new MAP_RECT(mapSize, mapSize);
-			
-			for (int i=0; i < MaxMapSize; ++i)
+			min = _ClipToMap(min);
+
+			// Clamped maps set minimum to 32.
+			doesWrap = min.x != 32;
+
+			if (doesWrap)
 			{
-				int x = mapSize.x;
-				int y = mapSize.y;
+				min = new LOCATION(0,0);
+				max = new LOCATION(511,255);
+			}
+			else
+			{
+				max = new LOCATION(5000,5000);
+				max = _ClipToMap(max);
 
-				++mapSize.x;
-				++mapSize.y;
-
-				mapSize.ClipToMap();
-
-				// Clamped map will pull mapSize.x back to x.
-				// The max value is the current and previous value.
-				if (mapSize.x == x)
-				{
-					area.maxX = x;
-					doesWrap = false;
-				}
-
-				// Unclamped map will wrap mapSize.x back to 0.
-				// The max value is the previous value.
-				if (mapSize.x == 0)
-				{
-					area.maxX = x;
-					doesWrap = true;
-				}
-
-				// Y is always clamped.
-				// When mapSize.y is pulled back to y, and we have our clamped or wrapped values, end search.
-				if ((mapSize.x == x || doesWrap) && mapSize.y == y)
-				{
-					area.maxY = y;
-					break;
-				}
+				// For some reason, OP2 clipping includes the max exclusive value. Remove it.
+				--max.x;
+				--max.y;
 			}
 
-			width = area.width;
-			height = area.height;
+			bounds = new MAP_RECT(min,max);
 
+			width = bounds.width;
+			height = bounds.height;
+
+			Console.WriteLine("MapWrap: " + doesWrap);
 			Console.WriteLine("MapWidth: " + width);
 			Console.WriteLine("MapHeight: " + height);
-			Console.WriteLine("MapArea: " + area);
+			Console.WriteLine("MapBounds: " + bounds);
 		}
+
+		/// <summary>
+		/// If the map wraps, the coordinates will roll over. Otherwise, the coordinates will clamp to the min/max of the map.
+		/// <para>Pulled from OP2 clip rect. Do not use elsewhere in the SDK.</para>
+		/// </summary>
+		private static LOCATION _ClipToMap(LOCATION pos)
+		{
+			long result = LOCATION_Clip(pos.x,pos.y);
+			pos.x = (int)(result & uint.MaxValue);
+			pos.y = (int)(result >> 32);
+			return pos;
+		}
+
+		[DllImport("DotNetInterop.dll")] private static extern long LOCATION_Clip(int x, int y);
 	}
 }

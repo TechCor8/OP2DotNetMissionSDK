@@ -48,6 +48,9 @@
     <ClInclude Include="UnitInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameMapEx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameMapEx.cpp">

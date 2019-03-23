@@ -29,16 +29,15 @@ namespace DotNetMissionSDK.Pathfinding
 		/// Gets an optimal path from a start point to an end point.
 		/// </summary>
 		/// <param name="startPt">The starting point for the path.</param>
-		/// <param name="endPt">The target point to reach.</param>
+		/// <param name="goal">The target point to reach.</param>
 		/// <param name="allowDiagonal">Can the path move diagonally?</param>
 		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
 		/// <returns>The path from startPt to endPt, or null, if a path could not be found.</returns>
-		public static LOCATION[] GetPath(LOCATION startPt, LOCATION endPt, bool allowDiagonal, TileCostCallback tileCostCB)
+		public static LOCATION[] GetPath(LOCATION startPt, LOCATION goal, bool allowDiagonal, TileCostCallback tileCostCB)
 		{
-			if (!endPt.IsInMapBounds())
+			if (!goal.IsInMapBounds())
 				return null;
 
-			LOCATION goal = new LOCATION(endPt);
 			goal.ClipToMap();
 
 			List<PathNode> openSet = new List<PathNode>();
@@ -137,7 +136,7 @@ namespace DotNetMissionSDK.Pathfinding
 			if (GameMap.doesWrap)
 			{
 				// Check if going around the wrap side is shorter
-				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.area.minX, GameMap.area.maxX);
+				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.bounds.minX, GameMap.bounds.maxX);
 				dx = Math.Min(wrapDistX, dx);
 			}
 
@@ -163,7 +162,7 @@ namespace DotNetMissionSDK.Pathfinding
 			if (GameMap.doesWrap)
 			{
 				// Check if going around the wrap side is shorter
-				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.area.minX, GameMap.area.maxX);
+				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.bounds.minX, GameMap.bounds.maxX);
 				dx = Math.Min(wrapDistX, dx);
 			}
 
@@ -183,9 +182,10 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <returns>The wrap distance between current and goal.</returns>
 		private static int GetWrapDistance(int currentXY, int goalXY, int mapMinXY, int mapMaxXY)
 		{
-			int dWrapCur = Math.Min(currentXY - mapMinXY, mapMaxXY - currentXY);
-			int dWrapGoal = Math.Min(goalXY - mapMinXY, mapMaxXY - goalXY);
-			return dWrapCur + dWrapGoal;
+			if (currentXY < goalXY)
+				return (currentXY - mapMinXY) + ((mapMaxXY+1) - goalXY);
+			else
+				return (goalXY - mapMinXY) + ((mapMaxXY+1) - currentXY);
 		}
 
 		/// <summary>
@@ -194,20 +194,22 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <param name="startPt">The starting point for the search.</param>
 		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
 		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
-		/// <returns>The first valid tile found.</returns>
-		public static LOCATION GetClosestValidTile(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB)
+		/// <param name="foundPt">The closest valid tile point received.</param>
+		/// <returns>True if a valid tile was found.</returns>
+		public static bool GetClosestValidTile(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION foundPt)
 		{
-			return GetClosestValidTile(new LOCATION[] { startPt }, tileCostCB, validTileCB);
+			return GetClosestValidTile(new LOCATION[] { startPt }, tileCostCB, validTileCB, out foundPt);
 		}
 
 		/// <summary>
 		/// Performs a breadth-first search. When validTileCB returns true, the search ends and the tile location is returned.
 		/// </summary>
-		/// <param name="startPt">The starting point for the search.</param>
+		/// <param name="startPts">The starting points for the search.</param>
 		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
 		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
-		/// <returns>The first valid tile found.</returns>
-		public static LOCATION GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB)
+		/// <param name="foundPt">The closest valid tile point received.</param>
+		/// <returns>True if a valid tile was found.</returns>
+		public static bool GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION foundPt)
 		{
 			List<PathNode> openSet = new List<PathNode>();
 			Dictionary<int, PathNode> closedSet = new Dictionary<int, PathNode>();
@@ -230,25 +232,28 @@ namespace DotNetMissionSDK.Pathfinding
 
 				// If adjacent tile is goal, return it
 				if (validTileCB(node.x, node.y))
-					return new LOCATION(node.x, node.y);
+				{
+					foundPt = new LOCATION(node.x, node.y);
+					return true;
+				}
 				else
 				{
 					closedSet.Add(node.GetHashCode(), node);
 
-					for (int i=0; i < adjacentCount; ++i)
+					for (int i = 0; i < adjacentCount; ++i)
 					{
 						PathNode adjacentNode = null;
 
 						switch (i)
 						{
-							case 0:		adjacentNode = new PathNode(node.x, node.y+1);		break;	// Down
-							case 1:		adjacentNode = new PathNode(node.x+1, node.y);		break;	// Right
-							case 2:		adjacentNode = new PathNode(node.x, node.y-1);		break;	// Up
-							case 3:		adjacentNode = new PathNode(node.x-1, node.y);		break;	// Left
-							case 4:		adjacentNode = new PathNode(node.x+1, node.y+1);	break;	// Down-Right
-							case 5:		adjacentNode = new PathNode(node.x+1, node.y-1);	break;	// Up-Right
-							case 6:		adjacentNode = new PathNode(node.x-1, node.y-1);	break;	// Up-Left
-							case 7:		adjacentNode = new PathNode(node.x-1, node.y+1);	break;	// Down-Left
+							case 0: adjacentNode = new PathNode(node.x, node.y + 1); break; // Down
+							case 1: adjacentNode = new PathNode(node.x + 1, node.y); break; // Right
+							case 2: adjacentNode = new PathNode(node.x, node.y - 1); break; // Up
+							case 3: adjacentNode = new PathNode(node.x - 1, node.y); break; // Left
+							case 4: adjacentNode = new PathNode(node.x + 1, node.y + 1); break; // Down-Right
+							case 5: adjacentNode = new PathNode(node.x + 1, node.y - 1); break; // Up-Right
+							case 6: adjacentNode = new PathNode(node.x - 1, node.y - 1); break; // Up-Left
+							case 7: adjacentNode = new PathNode(node.x - 1, node.y + 1); break; // Down-Left
 						}
 
 						// If adjacent is closed, skip it
@@ -282,7 +287,8 @@ namespace DotNetMissionSDK.Pathfinding
 			}
 
 			// Unreachable / Path not found
-			return null;
+			foundPt = new LOCATION();
+			return false;
 		}
 	}
 }

@@ -16,11 +16,10 @@ namespace DotNetMissionSDK.Pathfinding.Internal
 
 		public PathNode(LOCATION pt)
 		{
-			LOCATION pos = new LOCATION(pt.x, pt.y);
-			pos.ClipToMap();
+			pt.ClipToMap();
 
-			x = pos.x;
-			y = pos.y;
+			x = pt.x;
+			y = pt.y;
 		}
 
 		public PathNode(int x, int y)

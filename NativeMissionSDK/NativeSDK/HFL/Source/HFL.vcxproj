@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameMapEx.h" />
     <ClInclude Include="HFL.h" />
     <ClInclude Include="HFLTypes.h" />
     <ClInclude Include="PaneButton.h" />
@@ -85,11 +86,11 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MinSpace</Optimization>
-	  <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-	  <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-	  <OmitFramePointers>true</OmitFramePointers>
+      <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
