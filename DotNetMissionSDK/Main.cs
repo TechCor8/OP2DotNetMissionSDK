@@ -64,7 +64,8 @@ namespace DotNetMissionSDK
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine(ex.ToString());
+					Console.WriteLine(ex.Message);
+					return false;
 				}
 			}
 
