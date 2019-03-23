@@ -66,14 +66,14 @@ namespace DotNetMissionSDK
 				TethysGame.AddMessage(0, 0, "Check me out!", TethysGame.LocalPlayer(), 0);
 				Console.WriteLine("Check me out!");
 
-				using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
+				/*using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
 				{
 					Unit unit = new Unit();
 					while (myEnum.GetNext(unit))
 					{
 						unit.DoMove(30, 30);
 					}
-				}
+				}*/
 			}
 
 			//Console.WriteLine("PRE");

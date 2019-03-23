@@ -141,7 +141,20 @@
 				{ "TypeID":"GuardPost",	"CargoType":"RPG",			"MinDistance":2, "CreateWall":true },
 				{ "TypeID":"GuardPost",	"CargoType":"EMP",			"MinDistance":2, "CreateWall":true },
 				{ "TypeID":"GuardPost",	"CargoType":"RPG",			"MinDistance":2, "CreateWall":true },
-				{ "TypeID":"Tokamak",	"MinDistance":3 }
+				{ "TypeID":"Tokamak",	"MinDistance":3 },
+				{
+					"TypeID":"CommonOreMine",
+					"MinDistance":3,
+					"BarYield":"Random",
+					"BarVariant":"Random"
+				},
+				{ "TypeID":"Lynx", "CargoType":"RPG", "Direction":"East", "MinDistance":1, "SpawnDistance":3 },
+				{ "TypeID":"Lynx", "CargoType":"RPG", "Direction":"East", "MinDistance":1, "SpawnDistance":3 },
+				{ "TypeID":"Lynx", "CargoType":"RPG", "Direction":"East", "MinDistance":1, "SpawnDistance":3 },
+				{ "TypeID":"Lynx", "CargoType":"RPG", "Direction":"East", "MinDistance":1, "SpawnDistance":3 },
+				{ "TypeID":"Lynx", "CargoType":"RPG", "Direction":"East", "MinDistance":1, "SpawnDistance":3 },
+				{ "TypeID":"Lynx", "CargoType":"RPG", "Direction":"East", "MinDistance":1, "SpawnDistance":3 },
+				{ "TypeID":"LightTower",	"MinDistance":7 }
 			]
 		},
 		{
@@ -240,7 +253,7 @@
 			"OneShot":true,
 			
 			"PlayerID":0,
-			"Count":4,
+			"Count":40,
 			"CompareType":"GreaterEqual",
 			
 			"Actions":[]
@@ -253,7 +266,7 @@
 			"OneShot":true,
 			
 			"TriggerID":3,
-			"Message":"Create 4 vehicles",
+			"Message":"Create 40 vehicles",
 			
 			"Actions":[]
 		},

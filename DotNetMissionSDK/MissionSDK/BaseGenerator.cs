@@ -87,7 +87,7 @@ namespace DotNetMissionSDK
 				{
 					// Create unit that ignores layout
 					LOCATION loc = TethysGame.GetMapCoordinates(data.location);
-					Unit unit = TethysGame.CreateUnit(data.typeID, loc.x, loc.y, owner.playerID, data.cargoType, data.direction);
+					Unit unit = UnitData.CreateUnit(owner.playerID, data, loc);
 					m_CreatedUnits.Add(unit);
 					m_GeneratedUnits.Add(unit);
 
@@ -155,15 +155,15 @@ namespace DotNetMissionSDK
 			}
 
 			// Create unit
-			Unit unit = TethysGame.CreateUnit(data.typeID, foundPt.x, foundPt.y, owner.playerID, data.cargoType, data.direction);
+			Unit unit = UnitData.CreateUnit(owner.playerID, data, foundPt);
 
 			// Add to generation lists
 			m_CreatedUnits.Add(unit);
 			m_CreatedUnitData.Add(unit.GetStubIndex(), data);
 			m_GeneratedUnits.Add(unit);
 
-			// Structures that aren't power plants need tubes
-			if (IsStructure(data.typeID) && !IsPowerPlant(data.typeID))
+			// Only generate tubes for structures that need them
+			if (NeedsTube(data.typeID))
 				GenerateTubes(owner, unit, foundPt, data.minDistance);
 
 			// Return spawn rect for found point
@@ -324,7 +324,7 @@ namespace DotNetMissionSDK
 
 				// Target must be a structure that uses tubes
 				map_id targetType = target.GetUnitType();
-				if (!IsStructure(targetType) || IsPowerPlant(targetType))
+				if (!NeedsTube(targetType))
 					continue;
 
 				// Get target location and area
@@ -437,9 +437,20 @@ namespace DotNetMissionSDK
 			return (int)typeID >= 21 && (int)typeID <= 58;
 		}
 
-		private bool IsPowerPlant(map_id typeID)
+		private bool NeedsTube(map_id typeID)
 		{
-			return typeID == map_id.Tokamak || typeID == map_id.SolarPowerArray || typeID == map_id.MHDGenerator;
+			switch (typeID)
+			{
+				case map_id.LightTower:
+				case map_id.CommonOreMine:
+				case map_id.RareOreMine:
+				case map_id.Tokamak:
+				case map_id.SolarPowerArray:
+				case map_id.MHDGenerator:
+					return false;
+			}
+
+			return IsStructure(typeID);
 		}
 	}
 }
