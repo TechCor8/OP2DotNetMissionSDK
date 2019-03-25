@@ -4,72 +4,73 @@ namespace DotNetMissionSDK
 {
 	/// <summary>
 	/// Extended wrapper for OP2 MAP_RECT.
-	/// Min and Max values are expected to be inclusive.
 	/// </summary>
 	public struct MAP_RECT
 	{
-		// Min = Top-Left, Max = Bottom-Right
-		public int minX;
-		public int minY;
-		public int maxX;
-		public int maxY;
+		// Min = Top-Left inclusive
+		// Max = Bottom-Right exclusive
+		public int xMin;
+		public int yMin;
+		public int xMax;
+		public int yMax;
 
-		// Only valid for unclipped rects
-		public int width		{ get { return maxX - minX + 1; } } // + 1 because max is inclusive
-		public int height		{ get { return maxY - minY + 1; } } // + 1 because max is inclusive
+		public int x				{ get { return xMin;						} set { xMax = value+width; xMin = value;	} }
+		public int y				{ get { return yMin;						} set { yMax = value+height; yMin = value;	} }
+		public int width			{ get { return xMax - xMin;					} set { xMax = xMin + value;				} }
+		public int height			{ get { return yMax - yMin;					} set { yMax = yMin + value;				} }
+
+		public LOCATION position	{ get { return new LOCATION(x, y);			} set { x = value.x; y = value.y;			} }
+		public LOCATION size		{ get { return new LOCATION(width, height); } set { width = value.x; height = value.y;	} }
 
 		
 		//public MAP_RECT() { }
-		public MAP_RECT(int minX, int minY, int maxX, int maxY)
+		public MAP_RECT(int x, int y, int width, int height)
 		{
-			this.minX = minX;
-			this.minY = minY;
-			this.maxX = maxX;
-			this.maxY = maxY;
+			xMin = x;
+			yMin = y;
+			xMax = x + width;
+			yMax = y + height;
 		}
-		public MAP_RECT(LOCATION min, LOCATION max)
+		public MAP_RECT(LOCATION point, LOCATION size)
 		{
-			this.minX = min.x;
-			this.minY = min.y;
-			this.maxX = max.x;
-			this.maxY = max.y;
+			this.xMin = point.x;
+			this.yMin = point.y;
+			this.xMax = point.x + size.x;
+			this.yMax = point.y + size.y;
 		}
 		public MAP_RECT(MAP_RECT rect)
 		{
-			this.minX = rect.minX;
-			this.minY = rect.minY;
-			this.maxX = rect.maxX;
-			this.maxY = rect.maxY;
+			this.xMin = rect.xMin;
+			this.yMin = rect.yMin;
+			this.xMax = rect.xMax;
+			this.yMax = rect.yMax;
 		}
-		public MAP_RECT(DataRect rect)
+		public static MAP_RECT FromMinMax(int xMin, int yMin, int xMax, int yMax)
 		{
-			this.minX = rect.minX;
-			this.minY = rect.minY;
-			this.maxX = rect.maxX;
-			this.maxY = rect.maxY;
+			return new MAP_RECT(xMin, yMin, xMax-xMin, yMax-yMin);
 		}
 
-		public static MAP_RECT FromPointSize(int x, int y, int width, int height)
+		public void Inflate(int size)
 		{
-			return new MAP_RECT(x - width/2, y - height/2, x + width/2, y + height/2);
+			Inflate(size, size);
 		}
 
 		public void Inflate(int unitsWide, int unitsHigh)
 		{
-			minX -= unitsWide;
-			maxX += unitsWide;
+			xMin -= unitsWide;
+			xMax += unitsWide;
 
-			minY -= unitsHigh;
-			maxY += unitsHigh;
+			yMin -= unitsHigh;
+			yMax += unitsHigh;
 		}
 
 		public void Offset(int shiftRight, int shiftDown)
 		{
-			minX += shiftRight;
-			maxX += shiftRight;
+			xMin += shiftRight;
+			xMax += shiftRight;
 
-			minY += shiftDown;
-			maxY += shiftDown;
+			yMin += shiftDown;
+			yMax += shiftDown;
 		}
 
 		/// <summary>
@@ -78,8 +79,8 @@ namespace DotNetMissionSDK
 		/// <returns>Random point in rect.</returns>
 		public LOCATION GetRandomPointInRect()
 		{
-			return new LOCATION(minX + TethysGame.GetRand(width)+1,
-								minY + TethysGame.GetRand(height)+1);
+			return new LOCATION(xMin + TethysGame.GetRand(width),
+								yMin + TethysGame.GetRand(height));
 		}
 
 		/// <summary>
@@ -94,7 +95,7 @@ namespace DotNetMissionSDK
 		}
 
 		/// <summary>
-		/// Checks if point is inside rect. Min and max inclusive.
+		/// Checks if point is inside rect. Min inclusive and max exclusive.
 		/// </summary>
 		/// <param name="point">The point to check.</param>
 		/// <returns>True, if the point is in the rect.</returns>
@@ -107,11 +108,11 @@ namespace DotNetMissionSDK
 				rect.ClipToMap();
 				point.ClipToMap();
 
-				if (rect.minX > rect.maxX)
+				if (rect.xMin > rect.xMax)
 				{
 					// Rect is wrapped. Compare point to rect above map max and below map min
-					MAP_RECT aHigher = new MAP_RECT(rect.minX, rect.minY, rect.maxX + GameMap.width, rect.maxY);
-					MAP_RECT aLower = new MAP_RECT(rect.minX - GameMap.width, rect.minY, rect.maxX, rect.maxY);
+					MAP_RECT aHigher = new MAP_RECT(rect.x, rect.y, rect.width + GameMap.bounds.width, rect.height);
+					MAP_RECT aLower = new MAP_RECT(rect.x - GameMap.bounds.width, rect.y, rect.width, rect.height);
 
 					if (CheckPointInRect(aHigher, point))
 						return true;
@@ -126,8 +127,8 @@ namespace DotNetMissionSDK
 
 		private static bool CheckPointInRect(MAP_RECT rect, LOCATION point)
 		{
-			return (point.x >= rect.minX && point.x <= rect.maxX &&
-					point.y >= rect.minY && point.y <= rect.maxY);
+			return (point.x >= rect.xMin && point.x < rect.xMax &&
+					point.y >= rect.yMin && point.y < rect.yMax);
 		}
 
 		/// <summary>
@@ -147,30 +148,30 @@ namespace DotNetMissionSDK
 				a.ClipToMap();
 				b.ClipToMap();
 
-				if (a.minX > a.maxX && b.minX > b.maxX)
+				if (a.xMin > a.xMax && b.xMin > b.xMax)
 				{
 					// If both rects are wrapped, unwrap both to above max and compare
-					a.maxX += GameMap.width;
-					b.maxX += GameMap.width;
+					a.xMax += GameMap.bounds.width;
+					b.xMax += GameMap.bounds.width;
 
 					return CheckAABB(a,b);
 				}
-				else if (a.minX > a.maxX)
+				else if (a.xMin > a.xMax)
 				{
 					// Only a is wrapped, compare b to a above map max and below map min
-					MAP_RECT aHigher = new MAP_RECT(a.minX, a.minY, a.maxX + GameMap.width, a.maxY);
-					MAP_RECT aLower = new MAP_RECT(a.minX - GameMap.width, a.minY, a.maxX, a.maxY);
+					MAP_RECT aHigher = FromMinMax(a.xMin, a.yMin, a.xMax + GameMap.bounds.width, a.yMax);
+					MAP_RECT aLower = FromMinMax(a.xMin - GameMap.bounds.width, a.yMin, a.xMax, a.yMax);
 
 					if (CheckAABB(aLower, b))
 						return true;
 
 					return CheckAABB(aHigher, b);
 				}
-				else if (b.minX > b.maxX)
+				else if (b.xMin > b.xMax)
 				{
 					// Only b is wrapped, compare a to b above map max and below map min
-					MAP_RECT bHigher = new MAP_RECT(b.minX, b.minY, b.maxX + GameMap.width, b.maxY);
-					MAP_RECT bLower = new MAP_RECT(b.minX - GameMap.width, b.minY, b.maxX, b.maxY);
+					MAP_RECT bHigher = FromMinMax(b.xMin, b.yMin, b.xMax + GameMap.bounds.width, b.yMax);
+					MAP_RECT bLower = FromMinMax(b.xMin - GameMap.bounds.width, b.yMin, b.xMax, b.yMax);
 
 					if (CheckAABB(bLower, a))
 						return true;
@@ -188,8 +189,8 @@ namespace DotNetMissionSDK
 
 		private static bool CheckAABB(MAP_RECT a, MAP_RECT b)
 		{
-			return b.minX <= a.maxX && b.minY <= a.maxY &&
-					b.maxX >= a.minX && b.maxY >= a.minY;
+			return b.xMin < a.xMax && b.yMin < a.yMax &&
+					b.xMax > a.xMin && b.yMax > a.yMin;
 		}
 
 		/// <summary>
@@ -197,15 +198,15 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public void ClipToMap()
 		{
-			LOCATION min = new LOCATION(minX, minY);
+			LOCATION min = new LOCATION(xMin, yMin);
 			min.ClipToMap();
-			minX = min.x;
-			minY = min.y;
+			xMin = min.x;
+			yMin = min.y;
 
-			LOCATION max = new LOCATION(maxX, maxY);
-			max.ClipToMap();
-			maxX = max.x;
-			maxY = max.y;
+			LOCATION max = new LOCATION(xMax, yMax);
+			max.ClipToMapInclusive();
+			xMax = max.x;
+			yMax = max.y;
 		}
 
 		/// <summary>
@@ -217,20 +218,20 @@ namespace DotNetMissionSDK
 		public bool IsInMapBounds()
 		{
 			// Check if y-axis is out of bounds
-			if (minY < GameMap.bounds.minY) return false;
-			if (maxY > GameMap.bounds.maxY) return false;
+			if (yMin < GameMap.bounds.yMin) return false;
+			if (yMax > GameMap.bounds.yMax) return false;
 
 			if (GameMap.doesWrap)
 			{
 				// Out of bounds if rect is too wide to fit
-				if (minX < GameMap.bounds.minX && maxX > GameMap.bounds.maxX)
+				if (xMin < GameMap.bounds.xMin && xMax > GameMap.bounds.xMax)
 					return false;
 			}
 			else
 			{
 				// Check if x-axis is out of bounds
-				if (minX < GameMap.bounds.minX) return false;
-				if (maxX > GameMap.bounds.maxX) return false;
+				if (xMin < GameMap.bounds.xMin) return false;
+				if (xMax > GameMap.bounds.xMax) return false;
 			}
 
 			return true;
@@ -251,11 +252,11 @@ namespace DotNetMissionSDK
 				return false;
 
 			// Unclipped wrap
-			if (minX < GameMap.bounds.minX || maxX > GameMap.bounds.maxX)
+			if (xMin < GameMap.bounds.xMin || xMax > GameMap.bounds.xMax)
 				return true;
 
 			// Clipped wrap
-			if (minX > maxX)
+			if (xMin > xMax)
 				return true;
 
 			return false;
@@ -263,7 +264,7 @@ namespace DotNetMissionSDK
 
 		public override string ToString()
 		{
-			return "min (" + minX + ", " + minY + ")" + " max (" + maxX + ", " + maxY + ")";
+			return "min (" + xMin + ", " + yMin + ")" + " max (" + xMax + ", " + yMax + ")";
 		}
 	}
 }

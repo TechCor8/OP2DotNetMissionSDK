@@ -14,8 +14,6 @@ namespace DotNetMissionSDK
 		public const int MaxMapSize = 512;
 
 		public static bool doesWrap												{ get; private set; }
-		public static int width													{ get; private set; }
-		public static int height												{ get; private set; }
 		public static MAP_RECT bounds											{ get; private set; } // In "map coordinates" Ex: (32,0,160,127)
 
 		// [Get]
@@ -88,26 +86,22 @@ namespace DotNetMissionSDK
 			if (doesWrap)
 			{
 				min = new LOCATION(0,0);
-				max = new LOCATION(511,255);
+				max = new LOCATION(512,256);
 			}
 			else
 			{
 				max = new LOCATION(5000,5000);
 				max = _ClipToMap(max);
 
-				// For some reason, OP2 clipping includes the max exclusive value. Remove it.
-				--max.x;
-				--max.y;
+				// NOTE: OP2 clipping includes the max exclusive value for the x-axis.
+				++max.y;
 			}
 
-			bounds = new MAP_RECT(min,max);
-
-			width = bounds.width;
-			height = bounds.height;
+			bounds = new MAP_RECT(min,max-min);
 
 			Console.WriteLine("MapWrap: " + doesWrap);
-			Console.WriteLine("MapWidth: " + width);
-			Console.WriteLine("MapHeight: " + height);
+			Console.WriteLine("MapWidth: " + bounds.width);
+			Console.WriteLine("MapHeight: " + bounds.height);
 			Console.WriteLine("MapBounds: " + bounds);
 		}
 

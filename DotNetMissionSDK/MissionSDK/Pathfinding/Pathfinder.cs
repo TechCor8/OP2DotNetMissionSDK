@@ -136,7 +136,7 @@ namespace DotNetMissionSDK.Pathfinding
 			if (GameMap.doesWrap)
 			{
 				// Check if going around the wrap side is shorter
-				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.bounds.minX, GameMap.bounds.maxX);
+				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.bounds.xMin, GameMap.bounds.xMax);
 				dx = Math.Min(wrapDistX, dx);
 			}
 
@@ -162,7 +162,7 @@ namespace DotNetMissionSDK.Pathfinding
 			if (GameMap.doesWrap)
 			{
 				// Check if going around the wrap side is shorter
-				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.bounds.minX, GameMap.bounds.maxX);
+				int wrapDistX = GetWrapDistance(current.x, goal.x, GameMap.bounds.xMin, GameMap.bounds.xMax);
 				dx = Math.Min(wrapDistX, dx);
 			}
 
@@ -183,9 +183,9 @@ namespace DotNetMissionSDK.Pathfinding
 		private static int GetWrapDistance(int currentXY, int goalXY, int mapMinXY, int mapMaxXY)
 		{
 			if (currentXY < goalXY)
-				return (currentXY - mapMinXY) + ((mapMaxXY+1) - goalXY);
+				return (currentXY - mapMinXY) + (mapMaxXY - goalXY);
 			else
-				return (goalXY - mapMinXY) + ((mapMaxXY+1) - currentXY);
+				return (goalXY - mapMinXY) + (mapMaxXY - currentXY);
 		}
 
 		/// <summary>

@@ -66,11 +66,7 @@ namespace DotNetMissionSDK.Utility
 		{
 			LOCATION size = GetSize(unitType, includeBulldozedArea);
 
-			return new MAP_RECT(
-				position.x - size.x / 2,
-				position.y - size.y / 2,
-				position.x + (size.x-1) / 2,
-				position.y + (size.y-1) / 2);
+			return new MAP_RECT(position - (size / 2), size);
 		}
 	}
 }

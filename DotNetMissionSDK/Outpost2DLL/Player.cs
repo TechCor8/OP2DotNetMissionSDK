@@ -61,7 +61,7 @@ namespace DotNetMissionSDK
 		//	Other			: 0  [Including Units in a Garage]
 	
 		// Returns (strength / 8), where strength is the sum of all units owned by the player in the given map rectangle
-		public int GetPlayerStrength(MAP_RECT mapRect)	{ return Player_GetPlayerStrength(m_Handle, mapRect.minX, mapRect.minY, mapRect.maxX, mapRect.maxY);	}
+		public int GetPlayerStrength(MAP_RECT mapRect)	{ return Player_GetPlayerStrength(m_Handle, mapRect.xMin, mapRect.yMin, mapRect.xMax, mapRect.yMax);	}
 		// Returns (strength / 8), where strength is the sum of all units owned by the player
 		public int GetTotalPlayerStrength()				{ return Player_GetTotalPlayerStrength(m_Handle);								}
 		// [Get] Checks  [Prerequisite searching]

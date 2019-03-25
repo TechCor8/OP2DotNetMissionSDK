@@ -47,6 +47,8 @@ namespace DotNetMissionSDK
 		public int GetTileX()				{ return Unit_GetTileX(m_StubIndex);		}
 		public int GetTileY()				{ return Unit_GetTileY(m_StubIndex);		}
 
+		public LOCATION GetPosition()		{ return new LOCATION(GetTileX(), GetTileY());	}
+
 		// [Set]
 		public void SetDamage(int damage)					{ Unit_SetDamage(m_StubIndex, damage);						}
 		public void SetCanAutoTarget(bool autoTarget)		{ Unit_SetOppFiredUpon(m_StubIndex, autoTarget ? 1 : 0);	}

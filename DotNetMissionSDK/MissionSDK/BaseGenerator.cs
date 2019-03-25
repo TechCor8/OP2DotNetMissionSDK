@@ -73,7 +73,7 @@ namespace DotNetMissionSDK
 		{
 			m_FirstStructure = true;
 			baseCenterPt = TethysGame.GetMapCoordinates(baseCenterPt);
-			MAP_RECT spawnArea = new MAP_RECT(baseCenterPt, baseCenterPt);
+			MAP_RECT spawnArea = new MAP_RECT(baseCenterPt, new LOCATION(1,1));
 			m_CreatedUnitData = new Dictionary<int, UnitData>();
 			m_GeneratedUnits.Clear();
 
@@ -104,7 +104,7 @@ namespace DotNetMissionSDK
 
 						// If structure should have a wall, add it to the spawn list to generate later
 						if (data.createWall)
-							wallSpawns.Add(new MAP_RECT(spawnArea.minX-1, spawnArea.minY-1, spawnArea.maxX+1, spawnArea.maxY+1));
+							wallSpawns.Add(MAP_RECT.FromMinMax(spawnArea.xMin-1, spawnArea.yMin-1, spawnArea.xMax+1, spawnArea.yMax+1));
 					}
 					else if (IsVehicle(data.typeID))
 					{
@@ -128,7 +128,7 @@ namespace DotNetMissionSDK
 
 		private MAP_RECT GenerateUnit(Player owner, LOCATION spawnPt, UnitData data)
 		{
-			return GenerateUnit(owner, new MAP_RECT(spawnPt, spawnPt), data);
+			return GenerateUnit(owner, new MAP_RECT(spawnPt, new LOCATION(1,1)), data);
 		}
 
 		/// <summary>
@@ -175,9 +175,9 @@ namespace DotNetMissionSDK
 			LOCATION[] tiles = new LOCATION[rect.width * rect.height];
 
 			int i=0;
-			for (int x=rect.minX; x <= rect.maxX; ++x)
+			for (int x=rect.xMin; x < rect.xMax; ++x)
 			{
-				for (int y=rect.minY; y <= rect.maxY; ++y, ++i)
+				for (int y=rect.yMin; y < rect.yMax; ++y, ++i)
 					tiles[i] = new LOCATION(x,y);
 			}
 
@@ -238,9 +238,9 @@ namespace DotNetMissionSDK
 				return true;
 
 			// Check if colliding with ground
-			for (int x=spawnRect.minX; x <= spawnRect.maxX; ++x)
+			for (int x=spawnRect.xMin; x < spawnRect.xMax; ++x)
 			{
-				for (int y=spawnRect.minY; y <= spawnRect.maxY; ++y)
+				for (int y=spawnRect.yMin; y < spawnRect.yMax; ++y)
 				{
 					LOCATION position = new LOCATION(x,y);
 					position.ClipToMap();
@@ -302,14 +302,14 @@ namespace DotNetMissionSDK
 			map_id sourceUnitType = sourceUnit.GetUnitType();
 
 			// Get unit area
-			MAP_RECT unitArea = UnitInfo.GetRect(new LOCATION(sourceUnit.GetTileX(), sourceUnit.GetTileY()), sourceUnitType, true);
+			MAP_RECT unitArea = UnitInfo.GetRect(sourceUnit.GetPosition(), sourceUnitType, true);
 			
 			// Find structures for tubes
 			List<Unit> connections = new List<Unit>();
 			Unit closestUnit = null;
 			int closestDistance = 9999999;
 
-			MAP_RECT region = new MAP_RECT(unitArea.minX, unitArea.minY, unitArea.maxX, unitArea.maxY);
+			MAP_RECT region = new MAP_RECT(unitArea);
 			region.Inflate(maxDistance, maxDistance);
 
 			foreach (Unit target in m_CreatedUnits)
@@ -355,12 +355,17 @@ namespace DotNetMissionSDK
 
 				// GetPath will avoid obstacles, but pass through structures so that tubes don't wrap around them.
 				LOCATION[] tubePath = Pathfinder.GetPath(sourcePosition, targetPosition, false, GetTileCost);
-
+				if (tubePath == null)
+				{
+					Console.WriteLine("Failed to find path for tube: " + sourcePosition + " to " + targetPosition);
+					return;
+				}
+				
 				foreach (LOCATION tile in tubePath)
 				{
 					// We need to check if the tile has a structure on it, and skip creating the tube if it does.
 					// Pathfinding passes through structures, but we don't want to have an underlayer of tubes.
-					if (IsColliding(new MAP_RECT(tile, tile), 0, false, false))
+					if (IsColliding(new MAP_RECT(tile, new LOCATION(1,1)), 0, false, false))
 						continue;
 
 					TethysGame.CreateWallOrTube(tile.x, tile.y, 0, map_id.Tube);
@@ -376,16 +381,16 @@ namespace DotNetMissionSDK
 		private void GenerateWalls(MAP_RECT area)
 		{
 			// Generate walls around area
-			for (int x=area.minX-1; x <= area.maxX+1; ++x)
+			for (int x=area.xMin-1; x <= area.xMax; ++x)
 			{
-				CreateWall(x, area.minY-1);
-				CreateWall(x, area.maxY+1);
+				CreateWall(x, area.yMin-1);
+				CreateWall(x, area.yMax);
 			}
 
-			for (int y=area.minY-1; y <= area.maxY+1; ++y)
+			for (int y=area.yMin-1; y <= area.yMax; ++y)
 			{
-				CreateWall(area.minX-1, y);
-				CreateWall(area.maxX+1, y);
+				CreateWall(area.xMin-1, y);
+				CreateWall(area.xMax, y);
 			}
 		}
 

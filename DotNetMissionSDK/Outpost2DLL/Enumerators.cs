@@ -271,7 +271,7 @@ namespace DotNetMissionSDK
 
 		public InRectEnumerator(MAP_RECT rect)
 		{
-			m_Handle = InRectEnumerator_Create(rect.minX, rect.minY, rect.maxX, rect.maxY);
+			m_Handle = InRectEnumerator_Create(rect.xMin, rect.yMin, rect.xMax, rect.yMax);
 		}
 
 		/// <summary>

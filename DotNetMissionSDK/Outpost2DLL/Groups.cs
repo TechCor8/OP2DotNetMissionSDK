@@ -158,7 +158,7 @@ namespace DotNetMissionSDK
 		}
 		public void SetRect(MAP_RECT defaultLocation)
 		{
-			BuildingGroup_SetRect(stubIndex, defaultLocation.minX, defaultLocation.minY, defaultLocation.maxX, defaultLocation.maxY);
+			BuildingGroup_SetRect(stubIndex, defaultLocation.xMin, defaultLocation.yMin, defaultLocation.xMax, defaultLocation.yMax);
 		}
 		public void UnRecordVehGroup(ScGroup group)
 		{
@@ -196,15 +196,15 @@ namespace DotNetMissionSDK
 
 		public void Setup(LOCATION mine, LOCATION smelter, MAP_RECT smelterArea)
 		{
-			MiningGroup_Setup(stubIndex, mine.x, mine.y, smelter.x, smelter.y, smelterArea.minX, smelterArea.minY, smelterArea.maxX, smelterArea.maxY);
+			MiningGroup_Setup(stubIndex, mine.x, mine.y, smelter.x, smelter.y, smelterArea.xMin, smelterArea.yMin, smelterArea.xMax, smelterArea.yMax);
 		}
 		public void Setup(LOCATION mine, LOCATION smelter, map_id mineType, map_id smelterType, MAP_RECT smelterArea)
 		{
-			MiningGroup_Setup2(stubIndex, mine.x, mine.y, smelter.x, smelter.y, mineType, smelterType, smelterArea.minX, smelterArea.minY, smelterArea.maxX, smelterArea.maxY);
+			MiningGroup_Setup2(stubIndex, mine.x, mine.y, smelter.x, smelter.y, mineType, smelterType, smelterArea.xMin, smelterArea.yMin, smelterArea.xMax, smelterArea.yMax);
 		}
 		public void Setup(Unit mine, Unit smelter, MAP_RECT smelterArea)
 		{
-			MiningGroup_Setup3(stubIndex, mine.GetStubIndex(), smelter.GetStubIndex(), smelterArea.minX, smelterArea.minY, smelterArea.maxX, smelterArea.maxY);
+			MiningGroup_Setup3(stubIndex, mine.GetStubIndex(), smelter.GetStubIndex(), smelterArea.xMin, smelterArea.yMin, smelterArea.xMax, smelterArea.yMax);
 		}
 
 		[DllImport("DotNetInterop.dll")] private static extern int MiningGroup_Create(IntPtr playerOwner);
@@ -232,7 +232,7 @@ namespace DotNetMissionSDK
 
 		public void AddGuardedRect(MAP_RECT guardedRect)
 		{
-			FightGroup_AddGuardedRect(stubIndex, guardedRect.minX, guardedRect.minY, guardedRect.maxX, guardedRect.maxY);
+			FightGroup_AddGuardedRect(stubIndex, guardedRect.xMin, guardedRect.yMin, guardedRect.xMax, guardedRect.yMax);
 		}
 		public void ClearCombineFire()					{ FightGroup_ClearCombineFire(stubIndex);	}
 		public void ClearGuarderdRects()				{ FightGroup_ClearGuarderdRects(stubIndex);	}
@@ -252,7 +252,7 @@ namespace DotNetMissionSDK
 		public void SetCombineFire()					{ FightGroup_SetCombineFire(stubIndex);								}
 		public void SetFollowMode(int followMode)		{ FightGroup_SetFollowMode(stubIndex, followMode);					}
 		public void SetPatrolMode(PatrolRoute waypts)	{ FightGroup_SetPatrolMode(stubIndex, waypts.GetHandle());			}
-		public void SetRect(MAP_RECT idleRect)			{ FightGroup_SetRect(stubIndex, idleRect.minX, idleRect.minY, idleRect.maxX, idleRect.maxY);		}
+		public void SetRect(MAP_RECT idleRect)			{ FightGroup_SetRect(stubIndex, idleRect.xMin, idleRect.yMin, idleRect.xMax, idleRect.yMax);		}
 
 		// Use in combination with DoGuardGroup()
 		public void SetTargetGroup(ScGroup targetGroup)	{ FightGroup_SetTargetGroup(stubIndex, targetGroup.stubIndex);		}

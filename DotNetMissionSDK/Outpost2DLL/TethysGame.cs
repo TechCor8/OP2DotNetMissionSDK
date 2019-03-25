@@ -170,7 +170,7 @@ namespace DotNetMissionSDK
 		/// <returns>The equivalent map coordinates.</returns>
 		public static LOCATION GetMapCoordinates(LOCATION gameCoordinates)
 		{
-			LOCATION mapCoordinates = new LOCATION(gameCoordinates.x + GameMap.bounds.minX - 1, gameCoordinates.y + GameMap.bounds.minY - 1);
+			LOCATION mapCoordinates = new LOCATION(gameCoordinates.x + GameMap.bounds.xMin - 1, gameCoordinates.y + GameMap.bounds.yMin - 1);
 			mapCoordinates.ClipToMap();
 			return mapCoordinates;
 		}
