@@ -19,7 +19,7 @@ namespace DotNetMissionSDK
 	/// <summary>
 	/// Abstract base class for Outpost2 enumerators
 	/// </summary>
-	public abstract class OP2Enumerator : SDKDisposable//, IEnumerable<Unit>
+	public abstract class OP2Enumerator : SDKDisposable, IEnumerable<Unit>
 	{
 		protected override void Dispose(bool disposing)
 		{
@@ -41,8 +41,7 @@ namespace DotNetMissionSDK
 			return unit;
 		}
 
-		// NOTE: IEnumerable may discourage proper disposal of Unit and the Enumerator itself as well as allocate more unmanaged memory for Units than necessary.
-		/*IEnumerator IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
 		}
@@ -61,7 +60,7 @@ namespace DotNetMissionSDK
 			{
 				Dispose();
 			}
-		}*/
+		}
 	}
 
 	// Group (enumerate all units in a group)
