@@ -39,6 +39,10 @@ namespace DotNetMissionSDK
 		{
 			MissionRoot root = m_Root;
 
+			// If JSON not loaded, skip it
+			if (root == null)
+				return true;
+
 			List<Unit> createdUnits = new List<Unit>();
 
 			// Setup Game
