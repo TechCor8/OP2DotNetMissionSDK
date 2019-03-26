@@ -135,7 +135,7 @@ namespace DotNetMissionSDK
 				{
 					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.location);
 
-					Unit unit = UnitData.CreateUnit(data.id, unitData, spawnPt);
+					Unit unit = unitData.CreateUnit(data.id, spawnPt);
 					unit.DoSetLights(true);
 
 					createdUnits.Add(unit);

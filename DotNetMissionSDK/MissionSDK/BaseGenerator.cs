@@ -15,10 +15,10 @@ namespace DotNetMissionSDK
 		/// <summary>
 		/// Stores the link between a vehicle and the structure area that needs to spawn it.
 		/// </summary>
-		private struct VehicleSpawnArea
+		private class VehicleSpawnArea
 		{
-			public UnitData vehicleData;
-			public MAP_RECT spawnArea;
+			public UnitData vehicleData		{ get; private set; }
+			public MAP_RECT spawnArea		{ get; private set; }
 
 			/// <summary>
 			/// Creates a spawn area for a vehicle.
@@ -32,13 +32,29 @@ namespace DotNetMissionSDK
 			}
 		}
 
+		/// <summary>
+		/// Store information about a created unit.
+		/// </summary>
+		private class CreatedUnitData
+		{
+			public UnitData unitData	{ get; private set; }
+			public int tubesCreated		{ get; private set; }
 
-		private bool m_FirstStructure;							// Is this the first structure being generated for this base?
+			public void AddTube()		{ ++tubesCreated;	}
 
-		private List<Unit> m_CreatedUnits;						// The list of units that already exist on the map
-		private Dictionary<int, UnitData> m_CreatedUnitData;	// Unit definitions that have already been created. Used to calculate min distances for collision.
+			public CreatedUnitData(UnitData data)
+			{
+				unitData = data;
+			}
+		}
 
-		private List<Unit> m_GeneratedUnits = new List<Unit>();	// The list of units generated in the most recent call to Generate().
+
+		private bool m_FirstStructure;								// Is this the first structure being generated for this base?
+
+		private List<Unit> m_CreatedUnits;							// The list of units that already exist on the map
+		private Dictionary<int, CreatedUnitData> m_CreatedUnitData;	// Unit definitions that have already been created. Key is the unit stubIndex.
+
+		private List<Unit> m_GeneratedUnits = new List<Unit>();		// The list of units generated in the most recent call to Generate().
 
 		/// <summary>
 		/// The list of units generated in the most recent call to Generate().
@@ -74,7 +90,7 @@ namespace DotNetMissionSDK
 			m_FirstStructure = true;
 			baseCenterPt = TethysGame.GetMapCoordinates(baseCenterPt);
 			MAP_RECT spawnArea = new MAP_RECT(baseCenterPt, new LOCATION(1,1));
-			m_CreatedUnitData = new Dictionary<int, UnitData>();
+			m_CreatedUnitData = new Dictionary<int, CreatedUnitData>();
 			m_GeneratedUnits.Clear();
 
 			List<VehicleSpawnArea> vehicleSpawns = new List<VehicleSpawnArea>();
@@ -87,13 +103,27 @@ namespace DotNetMissionSDK
 				{
 					// Create unit that ignores layout
 					LOCATION loc = TethysGame.GetMapCoordinates(data.location);
-					Unit unit = UnitData.CreateUnit(owner.playerID, data, loc);
+					Unit unit = data.CreateUnit(owner.playerID, loc);
+					CreatedUnitData createdUnitData = new CreatedUnitData(data);
+
+					// If unit overlaps another unit, it will be moved to fit by OP2. Make sure location is up-to-date.
+					loc = new LOCATION(unit.GetTileX(), unit.GetTileY());
+
 					m_CreatedUnits.Add(unit);
+					m_CreatedUnitData.Add(unit.GetStubIndex(), createdUnitData);
 					m_GeneratedUnits.Add(unit);
 
 					// Store spawn area for units that spawn after this structure
 					if (IsStructure(data.typeID))
+					{
 						spawnArea = UnitInfo.GetRect(loc, data.typeID);
+
+						GenerateTubes(owner, unit, loc, createdUnitData);
+
+						// If structure should have a wall, add it to the spawn list to generate later
+						if (data.createWall)
+							wallSpawns.Add(MAP_RECT.FromMinMax(spawnArea.xMin-1, spawnArea.yMin-1, spawnArea.xMax+1, spawnArea.yMax+1));
+					}
 				}
 				else
 				{
@@ -155,16 +185,16 @@ namespace DotNetMissionSDK
 			}
 
 			// Create unit
-			Unit unit = UnitData.CreateUnit(owner.playerID, data, foundPt);
+			Unit unit = data.CreateUnit(owner.playerID, foundPt);
+			CreatedUnitData createdUnitData = new CreatedUnitData(data);
 
 			// Add to generation lists
 			m_CreatedUnits.Add(unit);
-			m_CreatedUnitData.Add(unit.GetStubIndex(), data);
+			m_CreatedUnitData.Add(unit.GetStubIndex(), createdUnitData);
 			m_GeneratedUnits.Add(unit);
 
-			// Only generate tubes for structures that need them
-			if (NeedsTube(data.typeID))
-				GenerateTubes(owner, unit, foundPt, data.minDistance);
+			// Generate tubes
+			GenerateTubes(owner, unit, foundPt, createdUnitData);
 
 			// Return spawn rect for found point
 			return UnitInfo.GetRect(foundPt, data.typeID);
@@ -263,10 +293,10 @@ namespace DotNetMissionSDK
 					useVehicleMinDistance && IsVehicle(unitType))
 				{
 					// Get unit creation data. If found, get min distance.
-					UnitData data;
+					CreatedUnitData data;
 					int targetMinDistance = 0;
 					if (m_CreatedUnitData.TryGetValue(unit.GetStubIndex(), out data))
-						targetMinDistance = data.minDistance;
+						targetMinDistance = data.unitData.minDistance;
 
 					// Inflate by min distance
 					if (minDistance < targetMinDistance)
@@ -288,9 +318,12 @@ namespace DotNetMissionSDK
 		/// <param name="owner">The player to connect tubes to.</param>
 		/// <param name="sourceUnit">The source unit to connect tubes from.</param>
 		/// <param name="sourcePosition">The source unit's position to connect tubes from.</param>
-		/// <param name="maxDistance">The maximum distance the owner's structures can be for a tube to be generated between it and the source unit.</param>
-		private void GenerateTubes(Player owner, Unit sourceUnit, LOCATION sourcePosition, int maxDistance)
+		/// <param name="createdUnitData">The source unit's created unit data.</param>
+		private void GenerateTubes(Player owner, Unit sourceUnit, LOCATION sourcePosition, CreatedUnitData createdUnitData)
 		{
+			int maxDistance = createdUnitData.unitData.minDistance;
+			int maxTubes = createdUnitData.unitData.maxTubes;
+
 			// First structure does not generate any tubes.
 			// We check this here to prevent multiple bases from attempting to connect to each other.
 			if (m_FirstStructure)
@@ -300,6 +333,10 @@ namespace DotNetMissionSDK
 			}
 
 			map_id sourceUnitType = sourceUnit.GetUnitType();
+
+			// If tube limit reached, or doesn't need tubes, cancel
+			if (maxTubes == createdUnitData.tubesCreated || (maxTubes < 0 && !NeedsTube(sourceUnitType)))
+				return;
 
 			// Get unit area
 			MAP_RECT unitArea = UnitInfo.GetRect(sourceUnit.GetPosition(), sourceUnitType, true);
@@ -312,7 +349,7 @@ namespace DotNetMissionSDK
 			MAP_RECT region = new MAP_RECT(unitArea);
 			region.Inflate(maxDistance, maxDistance);
 
-			foreach (Unit target in m_CreatedUnits)
+			foreach (Unit target in m_GeneratedUnits)
 			{
 				// Don't connect to self
 				if (sourceUnit == target)
@@ -325,6 +362,18 @@ namespace DotNetMissionSDK
 				// Target must be a structure that uses tubes
 				map_id targetType = target.GetUnitType();
 				if (!NeedsTube(targetType))
+					continue;
+
+				// Check if target can receive tubes
+				CreatedUnitData targetCreatedData;
+				if (!m_CreatedUnitData.TryGetValue(target.GetStubIndex(), out targetCreatedData))
+				{
+					Console.WriteLine("StubIndex not found in m_CreatedUnitData!");
+					continue;
+				}
+
+				// If tube limit reached, or doesn't need tubes, cancel
+				if (targetCreatedData.unitData.maxTubes == targetCreatedData.tubesCreated || (targetCreatedData.unitData.maxTubes < 0 && !NeedsTube(targetType)))
 					continue;
 
 				// Get target location and area
@@ -346,11 +395,20 @@ namespace DotNetMissionSDK
 
 			// Connect to closest unit
 			if (closestUnit != null && !connections.Contains(closestUnit))
-				connections.Add(closestUnit);
+				connections.Insert(0, closestUnit);
+
+			// Remove excess tubing
+			if (maxTubes >= 0)
+			{
+				int removeCount = connections.Count - maxTubes;
+				if (removeCount > 0)
+					connections.RemoveRange(connections.Count - removeCount, removeCount);
+			}
 
 			// Create tubes
 			foreach (Unit target in connections)
 			{
+				// Create tube
 				LOCATION targetPosition = new LOCATION(target.GetTileX(), target.GetTileY());
 
 				// GetPath will avoid obstacles, but pass through structures so that tubes don't wrap around them.
@@ -360,6 +418,18 @@ namespace DotNetMissionSDK
 					Console.WriteLine("Failed to find path for tube: " + sourcePosition + " to " + targetPosition);
 					return;
 				}
+
+				// Get target created unit data to add tube connection
+				CreatedUnitData targetCreatedData;
+				if (!m_CreatedUnitData.TryGetValue(target.GetStubIndex(), out targetCreatedData))
+				{
+					Console.WriteLine("StubIndex not found in m_CreatedUnitData!");
+					continue;
+				}
+
+				// Track tubes created on these units
+				createdUnitData.AddTube();
+				targetCreatedData.AddTube();
 				
 				foreach (LOCATION tile in tubePath)
 				{

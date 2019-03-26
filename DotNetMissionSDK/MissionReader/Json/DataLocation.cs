@@ -19,5 +19,10 @@ namespace DotNetMissionSDK.Json
 		{
 			return new LOCATION(data.x, data.y);
 		}
+
+		public static implicit operator DataLocation(LOCATION data)
+		{
+			return new DataLocation(data);
+		}
 	}
 }

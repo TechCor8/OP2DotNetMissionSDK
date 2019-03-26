@@ -89,7 +89,7 @@
 					"TypeID":"ConVec",
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":15, "Y":13 },
+					"Location": { "X":19, "Y":13 },
 				}
 			],
 		}
@@ -113,7 +113,7 @@
 					"MinDistance":1,
 					"SpawnDistance":3
 				},
-				{ "TypeID":"CommonOreSmelter",		"MinDistance":0 },
+				{ "TypeID":"CommonOreSmelter",		"MinDistance":0, "IgnoreLayout":true, "Location": { "X":15, "Y":13 }, "MaxTubes":-1, "CreateWall":true },
 				{ "TypeID":"Agridome",				"MinDistance":0 },
 				{ "TypeID":"Agridome",				"MinDistance":1 },
 				{ "TypeID":"GORF",					"MinDistance":0 },

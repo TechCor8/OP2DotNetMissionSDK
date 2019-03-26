@@ -20,6 +20,7 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "MinDistance")]	public int minDistance				{ get; private set; }
 		[DataMember(Name = "SpawnDistance")]public int spawnDistance			{ get; private set; }
 		[DataMember(Name = "CreateWall")]	public bool createWall				{ get; private set; }
+		[DataMember(Name = "MaxTubes")]		private int? m_MaxTubes				{ get; set; }
 
 		public map_id typeID				{ get { return GetEnum<map_id>(m_TypeID);			} }
 		public int cargoType				{ get { return GetCargoType(m_CargoType);			} }
@@ -29,37 +30,76 @@ namespace DotNetMissionSDK.Json
 		public Yield barYield				{ get { return GetEnum<Yield>(m_BarYield);			} }
 		public Variant barVariant			{ get { return GetEnum<Variant>(m_BarVariant);		} }
 
+		// AutoLayout
+		public int maxTubes					{ get { return m_MaxTubes != null ? m_MaxTubes.Value : -1; } }
+
 
 		/// <summary>
-		/// Creates an unmodifiable instance of UnitData with the passed in values.
+		/// Constructor for manual layout unit.
 		/// </summary>
-		/// <param name="typeID"></param>
-		/// <param name="cargoType"></param>
-		/// <param name="direction"></param>
-		/// <param name="location"></param>
-		/// <param name="ignoreLayout"></param>
-		/// <param name="minDistance"></param>
-		/// <param name="spawnDistance"></param>
-		public UnitData(map_id typeID, int cargoType, UnitDirection direction, LOCATION location, bool ignoreLayout, int minDistance, int spawnDistance)
+		public UnitData(map_id typeID, int cargoType, UnitDirection direction, LOCATION position)
+		{
+			SetUnitData(typeID, cargoType, direction, position, Yield.Random, Variant.Random, true, 0, 0, false, 0);
+		}
+
+		/// <summary>
+		/// Constructor for manual layout mine.
+		/// </summary>
+		public UnitData(map_id typeID, int cargoType, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant)
+		{
+			SetUnitData(typeID, cargoType, direction, position, barYield, barVariant, true, 0, 0, false, 0);
+		}
+
+		/// <summary>
+		/// Constructor for AutoLayout structure.
+		/// </summary>
+		public UnitData(map_id typeID, int cargoType, UnitDirection direction, int minDistance, bool createWall=false, int maxTubes=-1)
+		{
+			SetUnitData(typeID, cargoType, direction, new LOCATION(), Yield.Random, Variant.Random, true, minDistance, 0, createWall, maxTubes);
+		}
+
+		/// <summary>
+		/// Constructor for AutoLayout mine.
+		/// </summary>
+		public UnitData(map_id typeID, int cargoType, UnitDirection direction, Yield barYield, Variant barVariant, int minDistance, bool createWall=false, int maxTubes=-1)
+		{
+			SetUnitData(typeID, cargoType, direction, new LOCATION(), barYield, barVariant, true, minDistance, 0, createWall, maxTubes);
+		}
+
+		/// <summary>
+		/// Constructor for AutoLayout vehicle.
+		/// </summary>
+		public UnitData(map_id typeID, int cargoType, UnitDirection direction, int minDistance, int spawnDistance)
+		{
+			SetUnitData(typeID, cargoType, direction, new LOCATION(), Yield.Random, Variant.Random, true, minDistance, spawnDistance, false, 0);
+		}
+
+		private void SetUnitData(map_id typeID, int cargoType, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant,
+								bool ignoreLayout, int minDistance, int spawnDistance, bool createWall, int maxTubes)
 		{
 			m_TypeID = typeID.ToString();
 			m_CargoType = GetCargoType(cargoType);
 			m_Direction = direction.ToString();
-			this.location = new DataLocation(location);
+			location = position;
+			m_BarYield = barYield.ToString();
+			m_BarVariant = barVariant.ToString();
 			this.ignoreLayout = ignoreLayout;
 			this.minDistance = minDistance;
 			this.spawnDistance = spawnDistance;
+			this.createWall = createWall;
+			m_MaxTubes = maxTubes;
 		}
 
 		/// <summary>
 		/// Creates a unit from UnitData.
 		/// </summary>
-		/// <param name="playerID"></param>
-		/// <param name="data"></param>
-		/// <param name="pt"></param>
+		/// <param name="playerID">The player to assign the unit to.</param>
+		/// <param name="pt">The position to spawn the unit.</param>
 		/// <returns></returns>
-		public static Unit CreateUnit(int playerID, UnitData data, LOCATION pt)
+		public Unit CreateUnit(int playerID, LOCATION pt)
 		{
+			UnitData data = this;
+
 			// Must create the beacon for mines
 			switch (data.typeID)
 			{
