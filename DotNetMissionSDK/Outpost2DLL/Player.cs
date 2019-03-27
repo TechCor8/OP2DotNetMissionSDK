@@ -21,12 +21,13 @@ namespace DotNetMissionSDK
 	{
 		private IntPtr m_Handle;
 
-		public int playerID { get; }
+		public int playerID { get; private set; }
 
 
-		public Player(IntPtr handle)
+		public Player(IntPtr handle, int playerID)
 		{
 			m_Handle = handle;
+			this.playerID = playerID;
 		}
 
 		public IntPtr GetHandle()			{ return m_Handle;											}
