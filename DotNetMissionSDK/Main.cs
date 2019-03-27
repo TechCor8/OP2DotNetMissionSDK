@@ -101,9 +101,7 @@ namespace DotNetMissionSDK
 			InitializeSystems();
 			
 			// Initialize mission with JSON data
-			m_MissionLogic.InitializeNewMission();
-
-			return true;
+			return m_MissionLogic.InitializeNewMission();
 		}
 
 		private void InitializeSystems()

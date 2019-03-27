@@ -73,14 +73,17 @@
 			
 			"Kids":50,
 			"Workers":70,
-			"Scientists":27,
-			"CommonOre":5000,
-			"RareOre":0,
+			"Scientists":47,
+			"CommonOre":7000,
+			"RareOre":5000,
 			"Food":2000,
 			"SolarSatellites":1,
 			
 			"CompletedResearch":
 			[
+				5110,
+				5405,
+				8601
 			],
 			
 			"Units":
@@ -128,6 +131,9 @@
 				{ "TypeID":"DIRT",					"MinDistance":0 },
 				{ "TypeID":"Agridome",				"MinDistance":1 },
 				{ "TypeID":"MedicalCenter",			"MinDistance":1 },
+				{ "TypeID":"RareOreSmelter",		"MinDistance":1 },
+				{ "TypeID":"Spaceport", 			"MinDistance":2 },
+				{ "TypeID":"AdvancedLab", 			"MinDistance":2 },
 				{ "TypeID":"RecreationFacility",	"MinDistance":0 },
 				{ "TypeID":"RecreationFacility",	"MinDistance":1 },
 				{ "TypeID":"DIRT", 					"MinDistance":2 },

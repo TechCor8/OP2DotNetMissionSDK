@@ -28,6 +28,11 @@ namespace DotNetMissionSDK.Triggers
 	{
 		private TriggerStubData m_StubData = new TriggerStubData();
 
+		/// <summary>
+		/// Trigger IDs above this number are reserved for SDK systems
+		/// </summary>
+		public const int ReservedIDStart = 30000;
+
 
 		// [Properties]
 		public int stubIndex

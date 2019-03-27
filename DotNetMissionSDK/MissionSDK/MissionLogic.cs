@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
+using DotNetMissionSDK.Utility;
 using System;
 using System.Collections.Generic;
 
@@ -9,6 +10,7 @@ namespace DotNetMissionSDK
 	{
 		private MissionRoot m_Root;
 		private SaveData m_SaveData;
+		private PlayerInfo[] m_PlayerInfo = new PlayerInfo[8];
 		
 		private TriggerManager m_TriggerManager;
 
@@ -29,6 +31,10 @@ namespace DotNetMissionSDK
 			m_TriggerManager = triggerManager;
 
 			m_TriggerManager.onTriggerFired += OnTriggerExecuted;
+
+			// Initialize PlayerInfo
+			for (int i=0; i < TethysGame.NoPlayers(); ++i)
+				m_PlayerInfo[i] = new PlayerInfo(triggerManager, TethysGame.GetPlayer(i), saveData);
 		}
 
 		/// <summary>
@@ -37,6 +43,10 @@ namespace DotNetMissionSDK
 		/// <returns>True on success.</returns>
 		public virtual bool InitializeNewMission()
 		{
+			// Initialize PlayerInfo triggers
+			for (int i=0; i < m_PlayerInfo.Length; ++i)
+				m_PlayerInfo[i]?.InitializeNewMission();
+
 			MissionRoot root = m_Root;
 
 			// If JSON not loaded, skip it
@@ -363,7 +373,8 @@ namespace DotNetMissionSDK
 			TriggerData data;
 			if (!m_TriggerData.TryGetValue(trigger.id, out data))
 			{
-				Console.WriteLine("Could not find trigger data for ID: " + trigger.id);
+				if (trigger.id < TriggerStub.ReservedIDStart)
+					Console.WriteLine("Could not find trigger data for ID: " + trigger.id);
 				return;
 			}
 
@@ -388,6 +399,10 @@ namespace DotNetMissionSDK
 		public virtual void Update()
 		{
 			int currentTime = TethysGame.Time();
+
+			// Update PlayerInfo state
+			for (int i=0; i < m_PlayerInfo.Length; ++i)
+				m_PlayerInfo[i]?.Update();
 
 			// Update disasters
 			foreach (DisasterData disaster in m_Disasters)
@@ -435,6 +450,10 @@ namespace DotNetMissionSDK
 		public virtual void Dispose()
 		{
 			m_TriggerManager.onTriggerFired -= OnTriggerExecuted;
+
+			// Dispose PlayerInfo
+			for (int i=0; i < m_PlayerInfo.Length; ++i)
+				m_PlayerInfo[i]?.Dispose();
 		}
 	}
 }

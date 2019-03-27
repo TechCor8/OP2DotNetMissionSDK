@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.Triggers;
+using DotNetMissionSDK.Utility.PlayerState;
 using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK
@@ -15,10 +16,10 @@ namespace DotNetMissionSDK
 		public TriggerStubData[] triggers;
 		public int triggerCount;
 
-		// Custom Mission Data
-		public int test;
-		public int test2;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)] // Maximum supported players
+		public PlayerInfoSaveData[] playerInfo;
 
+		// Custom Mission Data
 		[MarshalAs(UnmanagedType.LPStr, SizeConst = 50)]
 		public string testStr;
 	}
