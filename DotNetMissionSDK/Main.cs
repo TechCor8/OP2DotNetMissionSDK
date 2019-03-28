@@ -124,7 +124,10 @@ namespace DotNetMissionSDK
 		{
 			// Load the save buffer if it isn't loaded
 			if (!m_SaveBuffer.isLoaded)
+			{
 				InitializeSystems();
+				m_MissionLogic.LoadMission();
+			}
 
 			// Update essential systems
 			m_Triggers.Update();
