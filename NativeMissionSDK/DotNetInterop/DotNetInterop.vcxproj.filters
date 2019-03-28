@@ -16,6 +16,9 @@
     <Filter Include="Outpost2DLL">
       <UniqueIdentifier>{deea018f-9ce5-4567-91b2-4d1280e9849c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HFL">
+      <UniqueIdentifier>{b630e38b-5693-4376-8a10-5db7ead57ab1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -76,6 +79,24 @@
     </ClCompile>
     <ClCompile Include="stdafx_unmanaged.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HFL\GameMapEx.cpp">
+      <Filter>HFL</Filter>
+    </ClCompile>
+    <ClCompile Include="HFL\HFL.cpp">
+      <Filter>HFL</Filter>
+    </ClCompile>
+    <ClCompile Include="HFL\PlayerEx.cpp">
+      <Filter>HFL</Filter>
+    </ClCompile>
+    <ClCompile Include="HFL\TethysGameEx.cpp">
+      <Filter>HFL</Filter>
+    </ClCompile>
+    <ClCompile Include="HFL\UnitEx.cpp">
+      <Filter>HFL</Filter>
+    </ClCompile>
+    <ClCompile Include="HFL\UnitInfo.cpp">
+      <Filter>HFL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
