@@ -17,7 +17,7 @@ namespace DotNetMissionSDK
 {
 	public class Unit
 	{
-		private int m_StubIndex;
+		protected int m_StubIndex;
 		
 		/// <summary>
 		/// Creates a wrapper that references a unit stub.
@@ -38,7 +38,7 @@ namespace DotNetMissionSDK
 		// Common
 		// [Get]
 		public map_id GetUnitType()			{ return Unit_GetType(m_StubIndex);			}
-		public int GetOwnerID()				{ return Unit_OwnerID(m_StubIndex);			}
+		public int GetOwnerID()				{ return Unit_OwnerID(m_StubIndex);			} // The player that owns this unit
 		public bool IsBuilding()			{ return Unit_IsBuilding(m_StubIndex) != 0;	}
 		public bool IsVehicle()				{ return Unit_IsVehicle(m_StubIndex) != 0;	}
 		public bool IsBusy()				{ return Unit_IsBusy(m_StubIndex) != 0;		}
