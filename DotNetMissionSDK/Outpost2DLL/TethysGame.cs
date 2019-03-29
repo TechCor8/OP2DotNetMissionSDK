@@ -1,6 +1,7 @@
 // Note: This file contains the defintion of the TethysGame class
 //		which controls the overall game environment
 
+using DotNetMissionSDK.HFL;
 using System;
 using System.Runtime.InteropServices;
 
@@ -14,7 +15,7 @@ namespace DotNetMissionSDK
 {
 	public class TethysGame
 	{
-		public static Player GetPlayer(int playerNum)		{ return new Player(TethysGame_GetPlayer(playerNum), playerNum);	}
+		public static Player GetPlayer(int playerNum)		{ return new PlayerEx(TethysGame_GetPlayer(playerNum), playerNum);	}
 
 		// Message log
 		// Note: toPlayerNum: -1 = PlayerAll
@@ -41,7 +42,7 @@ namespace DotNetMissionSDK
 			if (index < 0)
 				return null;
 
-			return new Unit(index);
+			return new UnitEx(index);
 		}
 		// Note: techID must be >= 8000 but < (8000+4096) = 12096
 		public static int CreateWreck(int tileX, int tileY, map_id techID, bool isInitiallyVisible)
@@ -54,7 +55,7 @@ namespace DotNetMissionSDK
 			if (index < 0)
 				return null;
 
-			return new Unit(index);
+			return new UnitEx(index);
 		}
 
 

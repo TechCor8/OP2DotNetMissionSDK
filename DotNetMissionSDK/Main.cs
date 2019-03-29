@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.Json;
+﻿using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
 using System;
 using System.Collections.Generic;
@@ -109,6 +110,9 @@ namespace DotNetMissionSDK
 			// Prepare save buffer
 			m_SaveBuffer.Load();
 
+			if (!HFLCore.Init())
+				Console.WriteLine("Could not initialize HFL!");
+
 			GameMap.Initialize();
 
 			// Init essential systems
@@ -172,6 +176,8 @@ namespace DotNetMissionSDK
 				m_LogWriter.Close();
 				m_LogFileStream.Close();
 			}
+
+			HFLCore.Cleanup();
 
 			// Restore console
 			StreamWriter sOut = new StreamWriter(Console.OpenStandardOutput());

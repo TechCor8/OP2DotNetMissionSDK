@@ -11,6 +11,7 @@
 //		 simply as a base parent class from which other classes inherit
 //		 functions from. Creating an instance of this class serves little
 //		 (or no) purpose and may even crash the game.
+using DotNetMissionSDK.HFL;
 using System;
 using System.Runtime.InteropServices;
 
@@ -35,7 +36,7 @@ namespace DotNetMissionSDK
 			if (index < 0)
 				return null;
 
-			return new Unit(index);
+			return new UnitEx(index);
 		}
 		public Unit GetFirstOfType(map_id unitType, map_id cargoOrWeapon)
 		{
@@ -43,7 +44,7 @@ namespace DotNetMissionSDK
 			if (index < 0)
 				return null;
 
-			return new Unit(index);
+			return new UnitEx(index);
 		}
 		public int HasBeenAttacked()
 		{
