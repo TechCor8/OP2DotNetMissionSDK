@@ -103,16 +103,18 @@ namespace DotNetMissionSDK.HFL
 		public string GetProduceListName()							{ return UnitInfo_GetProduceListName(m_UnitType);						}
 		public void SetProduceListName(string newName)				{ UnitInfo_SetProduceListName(m_UnitType, newName);						}
 		
-		public int GetXSize()										{ return UnitInfo_GetXSize(m_UnitType);									}
+		public int GetXSize()										{ return IsStructure() ? UnitInfo_GetXSize(m_UnitType) : 1;				} // If not a structure, returns 1
 		public void SetXSize(int value)								{ UnitInfo_SetXSize(m_UnitType, value);									}
 		
+		// Only valid for weapons
 		public int GetDamageRadius()								{ return UnitInfo_GetDamageRadius(m_UnitType);							}
 		public void SetDamageRadius(int value)						{ UnitInfo_SetDamageRadius(m_UnitType, value);							}
 		
+		// Only valid for vehicles
 		public VehicleFlags GetVehicleFlags()						{ return (VehicleFlags)UnitInfo_GetVehicleFlags(m_UnitType);			}
 		public void SetVehicleFlags(VehicleFlags flags)				{ UnitInfo_SetVehicleFlags(m_UnitType, (int)flags);						}
 		
-		public int GetYSize()										{ return UnitInfo_GetYSize(m_UnitType);									}
+		public int GetYSize()										{ return IsStructure() ? UnitInfo_GetYSize(m_UnitType) : 1;				} // If not a structure, returns 1
 		public void SetYSize(int value)								{ UnitInfo_SetYSize(m_UnitType, value);									}
 		
 		public int GetPixelsSkippedWhenFiring()						{ return UnitInfo_GetPixelsSkippedWhenFiring(m_UnitType);				}
@@ -142,6 +144,37 @@ namespace DotNetMissionSDK.HFL
 		public string GetCodeName()									{ return UnitInfo_GetCodeName(m_UnitType);								}
 		
 		//public int CreateUnit(int tileX, int tileY, int unitID)	{ return UnitInfo_CreateUnit(m_UnitType, tileX, tileY, unitID);			}
+
+		// Helper Functions
+		private bool IsVehicle()									{ return (int)m_UnitType >= 1 && (int)m_UnitType <= 15;					}
+		private bool IsStructure()									{ return (int)m_UnitType >= 21 && (int)m_UnitType <= 58;				}
+
+		// includeBulldozedArea only applies to structures.
+		public LOCATION GetSize(bool includeBulldozedArea=false)
+		{
+			LOCATION result = new LOCATION(GetXSize(), GetYSize());
+
+			if (includeBulldozedArea && IsStructure())
+			{
+				result.x += 2;
+				result.y += 2;
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Gets a rect representing the unit's size around a center point.
+		/// </summary>
+		/// <param name="position">The center point of the unit rect.</param>
+		/// <param name="includeBulldozedArea">Whether or not to include the bulldozed area (structures only).</param>
+		/// <returns>The unit rect.</returns>
+		public MAP_RECT GetRect(LOCATION position, bool includeBulldozedArea=false)
+		{
+			LOCATION size = GetSize(includeBulldozedArea);
+
+			return new MAP_RECT(position - (size / 2), size);
+		}
 
 
 

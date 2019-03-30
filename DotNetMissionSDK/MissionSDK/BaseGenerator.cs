@@ -1,6 +1,6 @@
 ﻿using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.HFL;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -116,7 +116,7 @@ namespace DotNetMissionSDK
 					// Store spawn area for units that spawn after this structure
 					if (IsStructure(data.typeID))
 					{
-						spawnArea = UnitInfo.GetRect(loc, data.typeID);
+						spawnArea = new UnitInfo(data.typeID).GetRect(loc);
 
 						GenerateTubes(owner, unit, loc, createdUnitData);
 
@@ -197,7 +197,7 @@ namespace DotNetMissionSDK
 			GenerateTubes(owner, unit, foundPt, createdUnitData);
 
 			// Return spawn rect for found point
-			return UnitInfo.GetRect(foundPt, data.typeID);
+			return new UnitInfo(data.typeID).GetRect(foundPt);
 		}
 
 		private LOCATION[] GetTilesInRect(MAP_RECT rect)
@@ -244,7 +244,7 @@ namespace DotNetMissionSDK
 			}
 
 			// Get spawn rect
-			MAP_RECT targetSpawnRect = UnitInfo.GetRect(new LOCATION(x,y), unitToSpawn.typeID, true);
+			MAP_RECT targetSpawnRect = new UnitInfo(unitToSpawn.typeID).GetRect(new LOCATION(x,y), true);
 
 			// Check if colliding
 			if (IsColliding(targetSpawnRect, unitToSpawn.minDistance, IsStructure(unitToSpawn.typeID), IsVehicle(unitToSpawn.typeID)))
@@ -287,7 +287,7 @@ namespace DotNetMissionSDK
 				// Unit data
 				map_id unitType = unit.GetUnitType();
 				LOCATION loc = new LOCATION(unit.GetTileX(), unit.GetTileY());
-				MAP_RECT area = UnitInfo.GetRect(loc, unitType);
+				MAP_RECT area = new UnitInfo(unitType).GetRect(loc);
 
 				if (useStructureMinDistance && IsStructure(unitType) ||
 					useVehicleMinDistance && IsVehicle(unitType))
@@ -339,7 +339,7 @@ namespace DotNetMissionSDK
 				return;
 
 			// Get unit area
-			MAP_RECT unitArea = UnitInfo.GetRect(sourceUnit.GetPosition(), sourceUnitType, true);
+			MAP_RECT unitArea = new UnitInfo(sourceUnitType).GetRect(sourceUnit.GetPosition(), true);
 			
 			// Find structures for tubes
 			List<Unit> connections = new List<Unit>();
@@ -378,7 +378,7 @@ namespace DotNetMissionSDK
 
 				// Get target location and area
 				LOCATION targetPosition = new LOCATION(target.GetTileX(), target.GetTileY());
-				MAP_RECT targetRect = UnitInfo.GetRect(targetPosition, targetType, true);
+				MAP_RECT targetRect = new UnitInfo(targetType).GetRect(targetPosition, true);
 				
 				// Find closest unit
 				int distance = Math.Abs(targetPosition.x - sourcePosition.x) + Math.Abs(targetPosition.y - sourcePosition.y);
