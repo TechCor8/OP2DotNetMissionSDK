@@ -9,6 +9,7 @@
 //	passed as the first parameter.
 // ------------------------------------------------------------------------
 
+using DotNetMissionSDK.HFL;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace DotNetMissionSDK
 		/// <returns>The next unit or null if not found.</returns>
 		public Unit GetNext()
 		{
-			Unit unit = new Unit();
+			Unit unit = new UnitEx();
 			if (!GetNext(unit))
 				return null;
 
@@ -50,7 +51,7 @@ namespace DotNetMissionSDK
 		{
 			try
 			{
-				Unit unit = new Unit();
+				Unit unit = new UnitEx();
 				while (GetNext(unit))
 				{
 					yield return unit;

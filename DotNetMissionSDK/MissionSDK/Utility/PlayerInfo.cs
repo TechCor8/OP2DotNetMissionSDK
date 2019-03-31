@@ -9,8 +9,9 @@ namespace DotNetMissionSDK.Utility
 	/// </summary>
 	public class PlayerInfo : IDisposable
 	{
-		private Player m_Player;			// The player to get info from
 		private SaveData m_SaveData;		// The save data object to store persistent player state
+
+		public Player player					{ get; private set; }
 
 		/// <summary>
 		/// Contains lists of player units by type.
@@ -27,7 +28,7 @@ namespace DotNetMissionSDK.Utility
 		/// <param name="saveData">The global save object for storing persistent state.</param>
 		public PlayerInfo(TriggerManager triggerManager, Player player, SaveData saveData)
 		{
-			m_Player = player;
+			this.player = player;
 			m_SaveData = saveData;
 			
 			units = new PlayerUnitList(triggerManager, player, saveData.playerInfo[player.playerID]);
@@ -40,7 +41,7 @@ namespace DotNetMissionSDK.Utility
 		{
 			PlayerInfoSaveData infoSaveData = new PlayerInfoSaveData();
 
-			m_SaveData.playerInfo[m_Player.playerID] = infoSaveData;
+			m_SaveData.playerInfo[player.playerID] = infoSaveData;
 
 			units.InitializeNewMission(infoSaveData);
 		}

@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.Triggers;
+﻿using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.Triggers;
 using System;
 using System.Collections.Generic;
 
@@ -33,61 +34,61 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		public const int TriggerID_ChildrenModule		= 30016;
 
 		// Units
-		public List<Unit> cargoTrucks			= new List<Unit>();
-		public List<Unit> convecs				= new List<Unit>();
-		public List<Unit> spiders				= new List<Unit>();
-		public List<Unit> scorpions				= new List<Unit>();
-		public List<Unit> lynx					= new List<Unit>();
-		public List<Unit> panthers				= new List<Unit>();
-		public List<Unit> tigers				= new List<Unit>();
-		public List<Unit> roboSurveyors			= new List<Unit>();
-		public List<Unit> roboMiners			= new List<Unit>();
-		public List<Unit> geoCons				= new List<Unit>();
-		public List<Unit> scouts				= new List<Unit>();
-		public List<Unit> roboDozers			= new List<Unit>();
-		public List<Unit> evacTransports		= new List<Unit>();
-		public List<Unit> repairVehicles		= new List<Unit>();
-		public List<Unit> earthWorkers			= new List<Unit>();
+		public List<UnitEx> cargoTrucks			= new List<UnitEx>();
+		public List<UnitEx> convecs				= new List<UnitEx>();
+		public List<UnitEx> spiders				= new List<UnitEx>();
+		public List<UnitEx> scorpions			= new List<UnitEx>();
+		public List<UnitEx> lynx				= new List<UnitEx>();
+		public List<UnitEx> panthers			= new List<UnitEx>();
+		public List<UnitEx> tigers				= new List<UnitEx>();
+		public List<UnitEx> roboSurveyors		= new List<UnitEx>();
+		public List<UnitEx> roboMiners			= new List<UnitEx>();
+		public List<UnitEx> geoCons				= new List<UnitEx>();
+		public List<UnitEx> scouts				= new List<UnitEx>();
+		public List<UnitEx> roboDozers			= new List<UnitEx>();
+		public List<UnitEx> evacTransports		= new List<UnitEx>();
+		public List<UnitEx> repairVehicles		= new List<UnitEx>();
+		public List<UnitEx> earthWorkers		= new List<UnitEx>();
 
 		// Structures
-		public List<Unit> commonOreMines		= new List<Unit>();
-		public List<Unit> rareOreMines			= new List<Unit>();
-		public List<Unit> guardPosts			= new List<Unit>();
-		public List<Unit> lightTowers			= new List<Unit>();
-		public List<Unit> commonStorages		= new List<Unit>();
-		public List<Unit> rareStorages			= new List<Unit>();
-		public List<Unit> forums				= new List<Unit>();
-		public List<Unit> commandCenters		= new List<Unit>();
-		public List<Unit> mhdGenerators			= new List<Unit>();
-		public List<Unit> residences			= new List<Unit>();
-		public List<Unit> robotCommands			= new List<Unit>();
-		public List<Unit> tradeCenters			= new List<Unit>();
-		public List<Unit> basicLabs				= new List<Unit>();
-		public List<Unit> medicalCenters		= new List<Unit>();
-		public List<Unit> nurseries				= new List<Unit>();
-		public List<Unit> solarPowerArrays		= new List<Unit>();
-		public List<Unit> recreationFacilities	= new List<Unit>();
-		public List<Unit> universities			= new List<Unit>();
-		public List<Unit> agridomes				= new List<Unit>();
-		public List<Unit> dirts					= new List<Unit>();
-		public List<Unit> garages				= new List<Unit>();
-		public List<Unit> magmaWells			= new List<Unit>();
-		public List<Unit> meteorDefenses		= new List<Unit>();
-		public List<Unit> geothermalPlants		= new List<Unit>();
-		public List<Unit> arachnidFactories		= new List<Unit>();
-		public List<Unit> consumerFactories		= new List<Unit>();
-		public List<Unit> structureFactories	= new List<Unit>();
-		public List<Unit> vehicleFactories		= new List<Unit>();
-		public List<Unit> standardLabs			= new List<Unit>();
-		public List<Unit> advancedLabs			= new List<Unit>();
-		public List<Unit> observatories			= new List<Unit>();
-		public List<Unit> reinforcedResidences	= new List<Unit>();
-		public List<Unit> advancedResidences	= new List<Unit>();
-		public List<Unit> commonOreSmelters		= new List<Unit>();
-		public List<Unit> spaceports			= new List<Unit>();
-		public List<Unit> rareOreSmelters		= new List<Unit>();
-		public List<Unit> gorfs					= new List<Unit>();
-		public List<Unit> tokamaks				= new List<Unit>();
+		public List<UnitEx> commonOreMines			= new List<UnitEx>();
+		public List<UnitEx> rareOreMines			= new List<UnitEx>();
+		public List<UnitEx> guardPosts				= new List<UnitEx>();
+		public List<UnitEx> lightTowers				= new List<UnitEx>();
+		public List<UnitEx> commonStorages			= new List<UnitEx>();
+		public List<UnitEx> rareStorages			= new List<UnitEx>();
+		public List<UnitEx> forums					= new List<UnitEx>();
+		public List<UnitEx> commandCenters			= new List<UnitEx>();
+		public List<UnitEx> mhdGenerators			= new List<UnitEx>();
+		public List<UnitEx> residences				= new List<UnitEx>();
+		public List<UnitEx> robotCommands			= new List<UnitEx>();
+		public List<UnitEx> tradeCenters			= new List<UnitEx>();
+		public List<UnitEx> basicLabs				= new List<UnitEx>();
+		public List<UnitEx> medicalCenters			= new List<UnitEx>();
+		public List<UnitEx> nurseries				= new List<UnitEx>();
+		public List<UnitEx> solarPowerArrays		= new List<UnitEx>();
+		public List<UnitEx> recreationFacilities	= new List<UnitEx>();
+		public List<UnitEx> universities			= new List<UnitEx>();
+		public List<UnitEx> agridomes				= new List<UnitEx>();
+		public List<UnitEx> dirts					= new List<UnitEx>();
+		public List<UnitEx> garages					= new List<UnitEx>();
+		public List<UnitEx> magmaWells				= new List<UnitEx>();
+		public List<UnitEx> meteorDefenses			= new List<UnitEx>();
+		public List<UnitEx> geothermalPlants		= new List<UnitEx>();
+		public List<UnitEx> arachnidFactories		= new List<UnitEx>();
+		public List<UnitEx> consumerFactories		= new List<UnitEx>();
+		public List<UnitEx> structureFactories		= new List<UnitEx>();
+		public List<UnitEx> vehicleFactories		= new List<UnitEx>();
+		public List<UnitEx> standardLabs			= new List<UnitEx>();
+		public List<UnitEx> advancedLabs			= new List<UnitEx>();
+		public List<UnitEx> observatories			= new List<UnitEx>();
+		public List<UnitEx> reinforcedResidences	= new List<UnitEx>();
+		public List<UnitEx> advancedResidences		= new List<UnitEx>();
+		public List<UnitEx> commonOreSmelters		= new List<UnitEx>();
+		public List<UnitEx> spaceports				= new List<UnitEx>();
+		public List<UnitEx> rareOreSmelters			= new List<UnitEx>();
+		public List<UnitEx> gorfs					= new List<UnitEx>();
+		public List<UnitEx> tokamaks				= new List<UnitEx>();
 
 		// Starship module counts
 		public byte EDWARDSatelliteCount	{ get { return m_SaveData.EDWARDSatelliteCount;		} }
@@ -153,7 +154,55 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		/// </summary>
 		public void Update()
 		{
-			foreach (Unit unit in new PlayerUnitEnum(m_Player.playerID))
+			for (int i=21; i < 59; ++i)
+			{
+				foreach (UnitEx unit in new PlayerBuildingEnum(m_Player.playerID, (map_id)i))
+				{
+					switch ((map_id)i)
+					{
+						case map_id.CommonOreMine:			commonOreMines.Add(unit);		break;
+						case map_id.RareOreMine:			rareOreMines.Add(unit);			break;
+						case map_id.GuardPost:				guardPosts.Add(unit);			break;
+						case map_id.LightTower:				lightTowers.Add(unit);			break;
+						case map_id.CommonStorage:			commonStorages.Add(unit);		break;
+						case map_id.RareStorage:			rareStorages.Add(unit);			break;
+						case map_id.Forum:					forums.Add(unit);				break;
+						case map_id.CommandCenter:			commandCenters.Add(unit);		break;
+						case map_id.MHDGenerator:			mhdGenerators.Add(unit);		break;
+						case map_id.Residence:				residences.Add(unit);			break;
+						case map_id.RobotCommand:			robotCommands.Add(unit);		break;
+						case map_id.TradeCenter:			tradeCenters.Add(unit);			break;
+						case map_id.BasicLab:				basicLabs.Add(unit);			break;
+						case map_id.MedicalCenter:			medicalCenters.Add(unit);		break;
+						case map_id.Nursery:				nurseries.Add(unit);			break;
+						case map_id.SolarPowerArray:		solarPowerArrays.Add(unit);		break;
+						case map_id.RecreationFacility:		recreationFacilities.Add(unit);	break;
+						case map_id.University:				universities.Add(unit);			break;
+						case map_id.Agridome:				agridomes.Add(unit);			break;
+						case map_id.DIRT:					dirts.Add(unit);				break;
+						case map_id.Garage:					garages.Add(unit);				break;
+						case map_id.MagmaWell:				magmaWells.Add(unit);			break;
+						case map_id.MeteorDefense:			meteorDefenses.Add(unit);		break;
+						case map_id.GeothermalPlant:		geothermalPlants.Add(unit);		break;
+						case map_id.ArachnidFactory:		arachnidFactories.Add(unit);	break;
+						case map_id.ConsumerFactory:		consumerFactories.Add(unit);	break;
+						case map_id.StructureFactory:		structureFactories.Add(unit);	break;
+						case map_id.VehicleFactory:			vehicleFactories.Add(unit);		break;
+						case map_id.StandardLab:			standardLabs.Add(unit);			break;
+						case map_id.AdvancedLab:			advancedLabs.Add(unit);			break;
+						case map_id.Observatory:			observatories.Add(unit);		break;
+						case map_id.ReinforcedResidence:	reinforcedResidences.Add(unit);	break;
+						case map_id.AdvancedResidence:		advancedResidences.Add(unit);	break;
+						case map_id.CommonOreSmelter:		commonOreSmelters.Add(unit);	break;
+						case map_id.Spaceport:				spaceports.Add(unit);			break;
+						case map_id.RareOreSmelter:			rareOreSmelters.Add(unit);		break;
+						case map_id.GORF:					gorfs.Add(unit);				break;
+						case map_id.Tokamak:				tokamaks.Add(unit);				break;
+					}
+				}
+			}
+
+			foreach (UnitEx unit in new PlayerUnitEnum(m_Player.playerID))
 			{
 				switch (unit.GetUnitType())
 				{
@@ -172,45 +221,6 @@ namespace DotNetMissionSDK.Utility.PlayerState
 					case map_id.EvacuationTransport:	evacTransports.Add(unit);		break;
 					case map_id.RepairVehicle:			repairVehicles.Add(unit);		break;
 					case map_id.Earthworker:			earthWorkers.Add(unit);			break;
-
-					case map_id.CommonOreMine:			commonOreMines.Add(unit);		break;
-					case map_id.RareOreMine:			rareOreMines.Add(unit);			break;
-					case map_id.GuardPost:				guardPosts.Add(unit);			break;
-					case map_id.LightTower:				lightTowers.Add(unit);			break;
-					case map_id.CommonStorage:			commonStorages.Add(unit);		break;
-					case map_id.RareStorage:			rareStorages.Add(unit);			break;
-					case map_id.Forum:					forums.Add(unit);				break;
-					case map_id.CommandCenter:			commandCenters.Add(unit);		break;
-					case map_id.MHDGenerator:			mhdGenerators.Add(unit);		break;
-					case map_id.Residence:				residences.Add(unit);			break;
-					case map_id.RobotCommand:			robotCommands.Add(unit);		break;
-					case map_id.TradeCenter:			tradeCenters.Add(unit);			break;
-					case map_id.BasicLab:				basicLabs.Add(unit);			break;
-					case map_id.MedicalCenter:			medicalCenters.Add(unit);		break;
-					case map_id.Nursery:				nurseries.Add(unit);			break;
-					case map_id.SolarPowerArray:		solarPowerArrays.Add(unit);		break;
-					case map_id.RecreationFacility:		recreationFacilities.Add(unit);	break;
-					case map_id.University:				universities.Add(unit);			break;
-					case map_id.Agridome:				agridomes.Add(unit);			break;
-					case map_id.DIRT:					dirts.Add(unit);				break;
-					case map_id.Garage:					garages.Add(unit);				break;
-					case map_id.MagmaWell:				magmaWells.Add(unit);			break;
-					case map_id.MeteorDefense:			meteorDefenses.Add(unit);		break;
-					case map_id.GeothermalPlant:		geothermalPlants.Add(unit);		break;
-					case map_id.ArachnidFactory:		arachnidFactories.Add(unit);	break;
-					case map_id.ConsumerFactory:		consumerFactories.Add(unit);	break;
-					case map_id.StructureFactory:		structureFactories.Add(unit);	break;
-					case map_id.VehicleFactory:			vehicleFactories.Add(unit);		break;
-					case map_id.StandardLab:			standardLabs.Add(unit);			break;
-					case map_id.AdvancedLab:			advancedLabs.Add(unit);			break;
-					case map_id.Observatory:			observatories.Add(unit);		break;
-					case map_id.ReinforcedResidence:	reinforcedResidences.Add(unit);	break;
-					case map_id.AdvancedResidence:		advancedResidences.Add(unit);	break;
-					case map_id.CommonOreSmelter:		commonOreSmelters.Add(unit);	break;
-					case map_id.Spaceport:				spaceports.Add(unit);			break;
-					case map_id.RareOreSmelter:			rareOreSmelters.Add(unit);		break;
-					case map_id.GORF:					gorfs.Add(unit);				break;
-					case map_id.Tokamak:				tokamaks.Add(unit);				break;
 				}
 			}
 		}
