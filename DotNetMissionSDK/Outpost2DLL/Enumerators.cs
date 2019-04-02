@@ -51,8 +51,8 @@ namespace DotNetMissionSDK
 		{
 			try
 			{
-				Unit unit = new UnitEx();
-				while (GetNext(unit))
+				Unit unit;
+				while ((unit = GetNext()) != null)
 				{
 					yield return unit;
 				}
