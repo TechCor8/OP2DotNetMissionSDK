@@ -184,6 +184,46 @@ namespace DotNetMissionSDK
 		}
 	}
 
+	public class PlayerAllBuildingEnum : OP2Enumerator
+	{
+		private int m_PlayerID;
+		private int m_BuildingIndex;
+		private PlayerBuildingEnum m_CurEnumerator;
+
+
+		public PlayerAllBuildingEnum(int playerID)
+		{
+			m_PlayerID = playerID;
+			m_BuildingIndex = 21;
+			m_CurEnumerator = new PlayerBuildingEnum(m_PlayerID, (map_id)m_BuildingIndex);
+		}
+
+		public override bool GetNext(Unit returnedUnit)
+		{
+			do
+			{
+				if (m_CurEnumerator.GetNext(returnedUnit))
+					return true;
+
+				++m_BuildingIndex;
+				if (m_BuildingIndex == 59)
+					return false;
+
+				m_CurEnumerator.Dispose();
+				m_CurEnumerator = new PlayerBuildingEnum(m_PlayerID, (map_id)m_BuildingIndex);
+			}
+			while (true);
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+
+			if (disposing)
+				m_CurEnumerator.Dispose();
+		}
+	}
+
 	// Units (enumerate all units of a certain player)
 	public class PlayerUnitEnum : OP2Enumerator
 	{
