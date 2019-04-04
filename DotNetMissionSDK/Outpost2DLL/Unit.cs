@@ -81,7 +81,7 @@ namespace DotNetMissionSDK
 		public void DoInfect()								{ Unit_DoInfect(m_StubIndex);								}
 		// Specific Building
 		public map_id GetObjectOnPad()						{ return Unit_GetObjectOnPad(m_StubIndex);					}										// [Spaceport]
-		public void DoLaunch(int destPixelX, int destPixelY, int bForceEnable)	{ Unit_DoLaunch(m_StubIndex, destPixelX, destPixelY, bForceEnable);	}			// [Spaceport]
+		public void DoLaunch(int destPixelX, int destPixelY, bool bForceEnable)	{ Unit_DoLaunch(m_StubIndex, destPixelX, destPixelY, bForceEnable ? 1 : 0);	}	// [Spaceport]
 		public void PutInGarage(int bayIndex, int tileX, int tileY)				{ Unit_PutInGarage(m_StubIndex, bayIndex, tileX, tileY);			}			// [Garage]
 		public bool HasOccupiedBay()											{ return Unit_HasOccupiedBay(m_StubIndex) != 0;						}			// [Garage, StructureFactory, Spaceport]
 		// [StructureFactory, Spaceport]  [Note: If items is an SULV, RLV, or EMP Missile, it is placed on the launch pad instead of in the bay]
