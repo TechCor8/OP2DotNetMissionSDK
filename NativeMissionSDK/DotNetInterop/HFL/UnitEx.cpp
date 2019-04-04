@@ -249,6 +249,20 @@ extern "C"
 
 		return unit.GetFactoryCargoWeapon(bay);
 	}
+	extern EXPORT map_id __stdcall UnitEx_GetLaunchPadCargo(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetLaunchPadCargo();
+	}
+	extern EXPORT void __stdcall UnitEx_SetLaunchPadCargo(int unitID, map_id moduleType)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		unit.SetLaunchPadCargo(moduleType);
+	}
 	extern EXPORT int __stdcall UnitEx_GetLights(int unitID)
 	{
 		UnitEx unit;
@@ -269,6 +283,27 @@ extern "C"
 		unit.unitID = unitID;
 
 		return unit.GetInvisible();
+	}
+	extern EXPORT int __stdcall UnitEx_HasPower(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.HasPower();
+	}
+	extern EXPORT int __stdcall UnitEx_HasWorkers(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.HasWorkers();
+	}
+	extern EXPORT int __stdcall UnitEx_HasScientists(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.HasScientists();
 	}
 
 	extern EXPORT void __stdcall UnitEx_SetDoubleFireRate(int unitID, int boolOn)
@@ -311,5 +346,57 @@ extern "C"
 		unit.unitID = unitID;
 
 		unit.SetAnimation(animIdx, animDelay, animStartDelay, boolInvisible, boolSkipDoDeath);
+	}
+
+	extern EXPORT int __stdcall UnitEx_GetNumTruckLoadsSoFar(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetNumTruckLoadsSoFar();
+	}
+	extern EXPORT int __stdcall UnitEx_GetBarYield(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetBarYield();
+	}
+	extern EXPORT int __stdcall UnitEx_GetVariant(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetNumTruckLoadsSoFar();
+	}
+	extern EXPORT int __stdcall UnitEx_GetOreType(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetOreType();
+	}
+	extern EXPORT int __stdcall UnitEx_GetSurveyedBy(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetSurveyedBy();
+	}
+
+	extern EXPORT int __stdcall UnitEx_GetUnknownValue(int unitID, int index)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetUnknownValue(index);
+	}
+
+	extern EXPORT void __stdcall UnitEx_SetUnknownValue(int unitID, int index, int value)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.SetUnknownValue(index, value);
 	}
 }

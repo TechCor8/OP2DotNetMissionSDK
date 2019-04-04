@@ -8,14 +8,17 @@ namespace DotNetMissionSDK.HFL
 	/// </summary>
 	public class UnitEx : Unit
 	{
-		public UnitEx(int stubIndex) : base(stubIndex)
-		{
-		}
+		/// <summary>
+		/// Creates an empty UnitEx stub. Call SetStubIndex with a valid unit before using.
+		/// </summary>
+		public UnitEx() { }
+
+		public UnitEx(int stubIndex) : base(stubIndex) { }
 
 		public void DoAttack(int tileX, int tileY)									{ UnitEx_DoAttack(m_StubIndex, tileX, tileY);													}
 		public void DoDoze(MAP_RECT dozeArea)										{ UnitEx_DoDoze(m_StubIndex, dozeArea.xMin, dozeArea.yMin, dozeArea.xMax, dozeArea.yMax);		}
 
-		public void DoDock(UnitEx targetDock)										{ LOCATION tile = targetDock.GetDockLocation(); UnitEx_DoDock(m_StubIndex, tile.x, tile.y);		}
+		public void DoDock(UnitEx targetDock)										{ LOCATION tile = targetDock.GetDockLocation(); DoMove(tile.x, tile.y);							}
 		public void DoDock(int tileX, int tileY)									{ UnitEx_DoDock(m_StubIndex, tileX, tileY);														}
 		public void DoDockAtGarage(int tileX, int tileY)							{ UnitEx_DoDockAtGarage(m_StubIndex, tileX, tileY);												}
 
@@ -55,14 +58,51 @@ namespace DotNetMissionSDK.HFL
 		public TruckCargo GetCargoType()											{ return UnitEx_GetCargoType(m_StubIndex);														}
 		public map_id GetFactoryCargo(int bay)										{ return UnitEx_GetFactoryCargo(m_StubIndex, bay);												}
 		public map_id GetFactoryCargoWeapon(int bay)								{ return UnitEx_GetFactoryCargoWeapon(m_StubIndex, bay);										}
+		public map_id GetLaunchpadCargo()											{ return UnitEx_GetLaunchPadCargo(m_StubIndex);													}
+		public void SetLaunchpadCargo(map_id moduleType)							{ UnitEx_SetLaunchPadCargo(m_StubIndex, moduleType);											}
 
 		public bool GetLights()														{ return UnitEx_GetLights(m_StubIndex) > 0;														}
+		public bool HasPower()														{ return UnitEx_HasPower(m_StubIndex) > 0;														}
+		public bool HasWorkers()													{ return UnitEx_HasWorkers(m_StubIndex) > 0;													}
+		public bool HasScientists()													{ return UnitEx_HasScientists(m_StubIndex) > 0;													}
 
 		public bool GetDoubleFireRate()												{ return UnitEx_GetDoubleFireRate(m_StubIndex) > 0;												}
 		public bool GetInvisible()													{ return UnitEx_GetInvisible(m_StubIndex) > 0;													}
 
 		public void SetDoubleFireRate(bool active)									{ UnitEx_SetDoubleFireRate(m_StubIndex, active ? 1 : 0);										}
 		public void SetInvisible(bool active)										{ UnitEx_SetInvisible(m_StubIndex, active ? 1 : 0);												}
+
+		public UnitInfo GetUnitInfo()												{ return new UnitInfo(GetUnitType());															}
+
+		public void SetAnimation(int animIdx, int animDelay, int animStartDelay, bool invisible, bool skipDoDeath)	{ UnitEx_SetAnimation(m_StubIndex, animIdx, animDelay, animStartDelay, invisible ? 1 : 0, skipDoDeath ? 1 : 0);	}
+
+		// Mining beacon
+		public int GetNumTruckLoadsSoFar()											{ return UnitEx_GetNumTruckLoadsSoFar(m_StubIndex);												}
+		public Yield GetBarYield()													{ return (Yield)UnitEx_GetBarYield(m_StubIndex);												}
+		public Variant GetVariant()													{ return (Variant)UnitEx_GetVariant(m_StubIndex);												}
+		public BeaconType GetOreType()												{ return (BeaconType)UnitEx_GetOreType(m_StubIndex);											}
+		public bool GetSurveyedBy(int playerID)										{ return ((1 << playerID) & UnitEx_GetSurveyedBy(m_StubIndex)) != 0;							}
+
+		public bool HasEmptyBay()													{ return GetBayWithCargo(map_id.None) >= 0;														}
+		public bool HasBayWithCargo(map_id cargoType)								{ return GetBayWithCargo(cargoType) >= 0;														}
+
+		/// <summary>
+		/// Returns the bay index that contains cargo type.
+		/// Returns -1 if cargo type is not found.
+		/// </summary>
+		/// <param name="cargoType">The cargo type to search for.</param>
+		public int GetBayWithCargo(map_id cargoType)
+		{
+			UnitInfo info = GetUnitInfo();
+			int bayCount = info.GetNumStorageBays(GetOwnerID());
+			for (int i=0; i < bayCount; ++i)
+			{
+				if (GetFactoryCargo(i) == cargoType)
+					return i;
+			}
+
+			return -1;
+		}
 
 		public LOCATION GetDockLocation()
 		{
@@ -73,10 +113,46 @@ namespace DotNetMissionSDK.HFL
 			return pos;
 		}
 
-		public UnitInfo GetUnitInfo()												{ return new UnitInfo(GetUnitType());															}
+		public bool IsOnDock(UnitEx unitWithDock)
+		{
+			LOCATION dock = unitWithDock.GetDockLocation();
+			return dock.Equals(GetPosition());
+		}
 
-		public void SetAnimation(int animIdx, int animDelay, int animStartDelay, bool invisible, bool skipDoDeath)	{ UnitEx_SetAnimation(m_StubIndex, animIdx, animDelay, animStartDelay, invisible ? 1 : 0, skipDoDeath ? 1 : 0);	}
+		// True if structure is enabled.
+		public bool IsEnabled()														{ return UnitEx_GetLights(m_StubIndex) == 1;													}
 
+		// True if structure is disabled. A structure is not disabled if it is idle.
+		public bool IsDisabled()													{ return UnitEx_GetLights(m_StubIndex) == 0 && UnitEx_GetLastCommand(m_StubIndex) != CommandType.ctMoIdle;	}
+
+		// Swaps cargo between bay and launchpad
+		public void DoTransferLaunchpadCargo(int bay)
+		{
+			if (GetUnitType() != map_id.Spaceport)
+				return;
+
+			map_id objectOnPad = GetObjectOnPad();
+			if (objectOnPad != map_id.SULV && objectOnPad != map_id.RLV)
+				return;
+
+			int currentCargo = UnitEx_GetUnknownValue(m_StubIndex, 46);
+			int bayCargo = (int)UnitEx_GetFactoryCargo(m_StubIndex, bay);
+			UnitEx_SetUnknownValue(m_StubIndex, 46, bayCargo);
+			SetFactoryCargo(bay, (map_id)currentCargo, map_id.None);
+		}
+
+		public string VarDump()
+		{
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			sb.AppendLine("** " + GetUnitType() + " Vars **");
+
+			for (int i=0; i < 48; ++i)
+				sb.AppendLine(UnitEx_GetUnknownValue(m_StubIndex, i).ToString());
+
+			sb.AppendLine("** Dump Complete **");
+
+			return sb.ToString();
+		}
 
 
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoAttack(int unitID, int tileX, int tileY);
@@ -121,8 +197,13 @@ namespace DotNetMissionSDK.HFL
 		[DllImport("DotNetInterop.dll")] private static extern TruckCargo UnitEx_GetCargoType(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern map_id UnitEx_GetFactoryCargo(int unitID, int bay);
 		[DllImport("DotNetInterop.dll")] private static extern map_id UnitEx_GetFactoryCargoWeapon(int unitID, int bay);
+		[DllImport("DotNetInterop.dll")] private static extern map_id UnitEx_GetLaunchPadCargo(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_SetLaunchPadCargo(int unitID, map_id moduleType);
 
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetLights(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_HasPower(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_HasWorkers(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_HasScientists(int unitID);
 
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetDoubleFireRate(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetInvisible(int unitID);
@@ -136,5 +217,15 @@ namespace DotNetMissionSDK.HFL
 		//extern EXPORT UnitInfo* __stdcall UnitEx_GetUnitInfo(int unitID);
 
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_SetAnimation(int unitID, int animIdx, int animDelay, int animStartDelay, int boolInvisible, int boolSkipDoDeath);
+
+		// Mining beacon
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetNumTruckLoadsSoFar(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetBarYield(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetVariant(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetOreType(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetSurveyedBy(int unitID);
+		
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetUnknownValue(int unitID, int index);
+		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_SetUnknownValue(int unitID, int index, int value);
 	}
 }
