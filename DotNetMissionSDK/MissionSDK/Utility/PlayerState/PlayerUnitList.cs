@@ -318,6 +318,69 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			}
 		}
 
+		public List<UnitEx> GetListForType(map_id type)
+		{
+			switch (type)
+			{
+				case map_id.CommonOreMine:			return commonOreMines;
+				case map_id.RareOreMine:			return rareOreMines;
+				case map_id.GuardPost:				return guardPosts;
+				case map_id.LightTower:				return lightTowers;
+				case map_id.CommonStorage:			return commonStorages;
+				case map_id.RareStorage:			return rareStorages;
+				case map_id.Forum:					return forums;
+				case map_id.CommandCenter:			return commandCenters;
+				case map_id.MHDGenerator:			return mhdGenerators;
+				case map_id.Residence:				return residences;
+				case map_id.RobotCommand:			return robotCommands;
+				case map_id.TradeCenter:			return tradeCenters;
+				case map_id.BasicLab:				return basicLabs;
+				case map_id.MedicalCenter:			return medicalCenters;
+				case map_id.Nursery:				return nurseries;
+				case map_id.SolarPowerArray:		return solarPowerArrays;
+				case map_id.RecreationFacility:		return recreationFacilities;
+				case map_id.University:				return universities;
+				case map_id.Agridome:				return agridomes;
+				case map_id.DIRT:					return dirts;
+				case map_id.Garage:					return garages;
+				case map_id.MagmaWell:				return magmaWells;
+				case map_id.MeteorDefense:			return meteorDefenses;
+				case map_id.GeothermalPlant:		return geothermalPlants;
+				case map_id.ArachnidFactory:		return arachnidFactories;
+				case map_id.ConsumerFactory:		return consumerFactories;
+				case map_id.StructureFactory:		return structureFactories;
+				case map_id.VehicleFactory:			return vehicleFactories;
+				case map_id.StandardLab:			return standardLabs;
+				case map_id.AdvancedLab:			return advancedLabs;
+				case map_id.Observatory:			return observatories;
+				case map_id.ReinforcedResidence:	return reinforcedResidences;
+				case map_id.AdvancedResidence:		return advancedResidences;
+				case map_id.CommonOreSmelter:		return commonOreSmelters;
+				case map_id.Spaceport:				return spaceports;
+				case map_id.RareOreSmelter:			return rareOreSmelters;
+				case map_id.GORF:					return gorfs;
+				case map_id.Tokamak:				return tokamaks;
+
+				case map_id.CargoTruck:				return cargoTrucks;
+				case map_id.ConVec:					return convecs;
+				case map_id.Spider:					return spiders;
+				case map_id.Scorpion:				return scorpions;
+				case map_id.Lynx:					return lynx;
+				case map_id.Panther:				return panthers;
+				case map_id.Tiger:					return tigers;
+				case map_id.RoboSurveyor:			return roboSurveyors;
+				case map_id.RoboMiner:				return roboMiners;
+				case map_id.GeoCon:					return geoCons;
+				case map_id.Scout:					return scouts;
+				case map_id.RoboDozer:				return roboDozers;
+				case map_id.EvacuationTransport:	return evacTransports;
+				case map_id.RepairVehicle:			return repairVehicles;
+				case map_id.Earthworker:			return earthWorkers;
+			}
+
+			return null;
+		}
+
 		/// <summary>
 		/// Disposes events.
 		/// </summary>
