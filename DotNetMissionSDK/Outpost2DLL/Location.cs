@@ -87,6 +87,26 @@ namespace DotNetMissionSDK
 			return true;
 		}
 
+		public int GetDiagonalDistance(LOCATION otherPt)
+		{
+			int dx = Math.Abs(x - otherPt.x);
+			int dy = Math.Abs(y - otherPt.y);
+
+			if (GameMap.doesWrap)
+			{
+				// Check if going around the wrap side is shorter
+				int wrapDistX;
+				if (x < otherPt.x)
+					wrapDistX = (x - GameMap.bounds.xMin) + (GameMap.bounds.xMax - otherPt.x);
+				else
+					wrapDistX = (otherPt.x - GameMap.bounds.xMin) + (GameMap.bounds.xMax - x);
+				
+				dx = Math.Min(wrapDistX, dx);
+			}
+
+			return dx + dy + -Math.Min(dx, dy);
+		}
+
 		public static LOCATION operator +(LOCATION point1, LOCATION point2)
 		{
 			return new LOCATION(point1.x + point2.x,
