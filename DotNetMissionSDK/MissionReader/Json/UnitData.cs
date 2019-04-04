@@ -8,6 +8,7 @@ namespace DotNetMissionSDK.Json
 		// Standard info
 		[DataMember(Name = "TypeID")]		private string m_TypeID				{ get; set; }
 		[DataMember(Name = "CargoType")]	private string m_CargoType			{ get; set; }
+		[DataMember(Name = "CargoAmount")]	public int cargoAmount				{ get; private set; }
 		[DataMember(Name = "Direction")]	private string m_Direction			{ get; set; }
 		[DataMember(Name = "Location")]		public DataLocation location		{ get; private set; }
 
@@ -37,48 +38,49 @@ namespace DotNetMissionSDK.Json
 		/// <summary>
 		/// Constructor for manual layout unit.
 		/// </summary>
-		public UnitData(map_id typeID, int cargoType, UnitDirection direction, LOCATION position)
+		public UnitData(map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, LOCATION position)
 		{
-			SetUnitData(typeID, cargoType, direction, position, Yield.Random, Variant.Random, true, 0, 0, false, 0);
+			SetUnitData(typeID, cargoType, cargoAmount, direction, position, Yield.Random, Variant.Random, true, 0, 0, false, 0);
 		}
 
 		/// <summary>
 		/// Constructor for manual layout mine.
 		/// </summary>
-		public UnitData(map_id typeID, int cargoType, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant)
+		public UnitData(map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant)
 		{
-			SetUnitData(typeID, cargoType, direction, position, barYield, barVariant, true, 0, 0, false, 0);
+			SetUnitData(typeID, cargoType, cargoAmount, direction, position, barYield, barVariant, true, 0, 0, false, 0);
 		}
 
 		/// <summary>
 		/// Constructor for AutoLayout structure.
 		/// </summary>
-		public UnitData(map_id typeID, int cargoType, UnitDirection direction, int minDistance, bool createWall=false, int maxTubes=-1)
+		public UnitData(map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, int minDistance, bool createWall=false, int maxTubes=-1)
 		{
-			SetUnitData(typeID, cargoType, direction, new LOCATION(), Yield.Random, Variant.Random, true, minDistance, 0, createWall, maxTubes);
+			SetUnitData(typeID, cargoType, cargoAmount, direction, new LOCATION(), Yield.Random, Variant.Random, true, minDistance, 0, createWall, maxTubes);
 		}
 
 		/// <summary>
 		/// Constructor for AutoLayout mine.
 		/// </summary>
-		public UnitData(map_id typeID, int cargoType, UnitDirection direction, Yield barYield, Variant barVariant, int minDistance, bool createWall=false, int maxTubes=-1)
+		public UnitData(map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, Yield barYield, Variant barVariant, int minDistance, bool createWall=false, int maxTubes=-1)
 		{
-			SetUnitData(typeID, cargoType, direction, new LOCATION(), barYield, barVariant, true, minDistance, 0, createWall, maxTubes);
+			SetUnitData(typeID, cargoType, cargoAmount, direction, new LOCATION(), barYield, barVariant, true, minDistance, 0, createWall, maxTubes);
 		}
 
 		/// <summary>
 		/// Constructor for AutoLayout vehicle.
 		/// </summary>
-		public UnitData(map_id typeID, int cargoType, UnitDirection direction, int minDistance, int spawnDistance)
+		public UnitData(map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, int minDistance, int spawnDistance)
 		{
-			SetUnitData(typeID, cargoType, direction, new LOCATION(), Yield.Random, Variant.Random, true, minDistance, spawnDistance, false, 0);
+			SetUnitData(typeID, cargoType, cargoAmount, direction, new LOCATION(), Yield.Random, Variant.Random, true, minDistance, spawnDistance, false, 0);
 		}
 
-		private void SetUnitData(map_id typeID, int cargoType, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant,
+		private void SetUnitData(map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant,
 								bool ignoreLayout, int minDistance, int spawnDistance, bool createWall, int maxTubes)
 		{
 			m_TypeID = typeID.ToString();
 			m_CargoType = GetCargoType(cargoType);
+			this.cargoAmount = cargoAmount;
 			m_Direction = direction.ToString();
 			location = position;
 			m_BarYield = barYield.ToString();
@@ -111,6 +113,11 @@ namespace DotNetMissionSDK.Json
 					// Game has a bug where rare ore mines can't be created. Common ore mines will turn into the rare mine instead.
 					TethysGame.CreateBeacon(map_id.MiningBeacon, pt.x, pt.y, BeaconType.Rare, data.barYield, data.barVariant);
 					return TethysGame.CreateUnit(map_id.CommonOreMine, pt.x, pt.y, playerID, data.cargoType, data.direction);
+
+				case map_id.CargoTruck:
+					Unit truck = TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
+					truck.SetTruckCargo((TruckCargo)data.cargoType, data.cargoAmount);
+					return truck;
 			}
 
 			return TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
