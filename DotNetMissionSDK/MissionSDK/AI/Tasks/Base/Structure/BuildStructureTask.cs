@@ -122,10 +122,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			if (!AreTilesPassable(targetArea, x, y))
 				return false;
-			
+
 			// Apply minimum distance if we can build this disconnected
 			if (m_CanBuildDisconnected)
 				targetArea.Inflate(m_DesiredDistance, m_DesiredDistance);
+			else
+			{
+				// Force structure to build on connected ground
+				MAP_RECT unbulldozedArea = targetArea;
+				unbulldozedArea.Inflate(-1, -1);
+				owner.commandGrid.ConnectsTo(unbulldozedArea);
+			}
 
 			// Check if area is blocked by structure or enemy
 			if (IsAreaBlocked(targetArea, owner.player.playerID))
@@ -175,6 +182,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			switch (typeID)
 			{
+				case map_id.CommandCenter:
 				case map_id.LightTower:
 				case map_id.CommonOreMine:
 				case map_id.RareOreMine:

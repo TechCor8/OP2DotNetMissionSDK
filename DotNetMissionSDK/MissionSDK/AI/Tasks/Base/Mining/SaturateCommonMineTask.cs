@@ -110,9 +110,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				if (BuildStructureTask.IsAreaBlocked(targetArea, owner.player.playerID))
 					return false;
 
-				// TODO: If can't build tubes, must be touching connected structure to be valid (Apply this to BuildStructureTask, too)
-				//if (!owner.CanBuildTubes())
-				//	return owner.commandGrid.ConnectsTo(targetArea);
+				// If can't build tubes, must be touching connected structure to be valid (Apply this to BuildStructureTask, too)
+				if (!CanBuildTubes())
+				{
+					MAP_RECT unbulldozedArea = targetArea;
+					unbulldozedArea.Inflate(-1, -1);
+					return owner.commandGrid.ConnectsTo(unbulldozedArea);
+				}
 
 				return true;
 			};
@@ -129,6 +133,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			convec.DoBuild(convec.GetCargo(), foundPt.x, foundPt.y);
 
 			return true;
+		}
+
+		private bool CanBuildTubes()
+		{
+			// Must have enough ore to build tubes
+			if (owner.player.Ore() < 500)
+				return false;
+
+			if (owner.units.earthWorkers.Count > 0)
+				return true;
+
+			// Can build earthworker?
+			if (owner.units.vehicleFactories.Find((UnitEx unit) => unit.IsEnabled()) != null)
+				return true;
+
+			return false;
 		}
 	}
 }
