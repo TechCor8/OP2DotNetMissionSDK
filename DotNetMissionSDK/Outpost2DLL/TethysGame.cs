@@ -175,5 +175,11 @@ namespace DotNetMissionSDK
 			mapCoordinates.ClipToMap();
 			return mapCoordinates;
 		}
+
+		public static LOCATION GetGameCoordinates(LOCATION mapCoordinates)
+		{
+			mapCoordinates.ClipToMap();
+			return new LOCATION(mapCoordinates.x - GameMap.bounds.xMin + 1, mapCoordinates.y - GameMap.bounds.yMin + 1);
+		}
 	}
 }
