@@ -146,6 +146,20 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] private static extern void Unit_ClearSpecialTarget(int stubIndex);														// [Lab]
 
 		// Wreckage
-		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsDiscovered(int stubIndex);															// Wreckage
+		[DllImport("DotNetInterop.dll")] private static extern int Unit_IsDiscovered(int stubIndex);                                                            // Wreckage
+
+		public override bool Equals(object obj)
+		{
+			Unit unit = obj as Unit;
+			if (unit == null)
+				return false;
+
+			return m_StubIndex == unit.m_StubIndex;
+		}
+
+		public override int GetHashCode()
+		{
+			return m_StubIndex;
+		}
 	}
 }
