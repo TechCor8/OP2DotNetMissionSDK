@@ -9,7 +9,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 	{
 		protected map_id m_VehicleToBuild;
 		protected map_id m_VehicleToBuildCargo;
-		public int targetCountToBuild;
+		public int targetCountToBuild = 1;
 
 
 		public BuildVehicleTask() { }

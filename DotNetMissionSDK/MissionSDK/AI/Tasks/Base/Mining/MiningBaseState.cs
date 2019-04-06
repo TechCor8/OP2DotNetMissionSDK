@@ -10,6 +10,10 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int MaxSmelterDistanceToCC = 15;
 		public const int SmelterSaturationCount = 2;
 
+		public const int MinTrucksPerSmelter = 2;
+		public const int MaxTrucksPerSmelter = 5;
+		public const int TilesPerTruck = 5;
+
 		private PlayerInfo owner;
 
 		private List<UnitEx> m_AllBeacons = new List<UnitEx>();
@@ -75,13 +79,28 @@ namespace DotNetMissionSDK.AI.Managers
 		public UnitEx beacon;
 		public UnitEx mine;
 
-		public List<UnitEx> smelters = new List<UnitEx>();
-		public List<UnitEx> trucks = new List<UnitEx>();
-
+		public List<MiningSmelter> smelters = new List<MiningSmelter>();
+		
 		public MiningSite(UnitEx beacon, UnitEx mine)
 		{
 			this.beacon = beacon;
 			this.mine = mine;
+		}
+	}
+
+	public class MiningSmelter
+	{
+		public UnitEx smelter;
+
+		public List<UnitEx> trucks = new List<UnitEx>();
+
+		public int desiredTruckCount;
+
+
+		public MiningSmelter(UnitEx smelter, int desiredTruckCount)
+		{
+			this.smelter = smelter;
+			this.desiredTruckCount = desiredTruckCount;
 		}
 	}
 
@@ -129,18 +148,30 @@ namespace DotNetMissionSDK.AI.Managers
 				// Add closest smelters until mine site is saturated
 				while (site.smelters.Count < MiningBaseState.SmelterSaturationCount && ccSmelters.Count > 0)
 				{
-					int closestIndex = GetClosestUnitIndex(site.mine.GetPosition(), ccSmelters);
-					
-					site.smelters.Add(ccSmelters[closestIndex]);
+					int distance;
+					int closestIndex = GetClosestUnitIndex(site.mine.GetPosition(), ccSmelters, out distance);
+
+					UnitEx smelter = ccSmelters[closestIndex];
+
+					// Calculate desiredTruckCount
+					int desiredTruckCount = distance / MiningBaseState.TilesPerTruck;
+
+					if (desiredTruckCount < MiningBaseState.MinTrucksPerSmelter)
+						desiredTruckCount = MiningBaseState.MinTrucksPerSmelter;
+					if (desiredTruckCount > MiningBaseState.MaxTrucksPerSmelter)
+						desiredTruckCount = MiningBaseState.MaxTrucksPerSmelter;
+
+					// Add smelter
+					site.smelters.Add(new MiningSmelter(smelter, desiredTruckCount));
 					ccSmelters.RemoveAt(closestIndex);
 				}
 			}
 		}
 
-		private int GetClosestUnitIndex(LOCATION position, List<UnitEx> units)
+		private int GetClosestUnitIndex(LOCATION position, List<UnitEx> units, out int closestDistance)
 		{
 			int closestUnitIndex = -1;
-			int closestDistance = 999999;
+			closestDistance = 999999;
 
 			for (int i=0; i < units.Count; ++i)
 			{

@@ -41,6 +41,7 @@ namespace DotNetMissionSDK
 		public int Kids()					{ return Player_Kids(m_Handle);								}
 		public int Workers()				{ return Player_Workers(m_Handle);							}
 		public int Scientists()				{ return Player_Scientists(m_Handle);						}
+		public int TotalPopulation()		{ return Kids() + Workers() + Scientists();					}
 		// [Get] Resources
 		public int Ore()					{ return Player_Ore(m_Handle);								}
 		public int RareOre()				{ return Player_RareOre(m_Handle);							}

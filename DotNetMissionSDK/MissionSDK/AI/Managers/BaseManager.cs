@@ -2,12 +2,17 @@
 using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.AI.Tasks;
 using DotNetMissionSDK.AI.Tasks.Base.Mining;
+using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
 
 namespace DotNetMissionSDK.AI.Managers
 {
 	public class BaseManager
 	{
 		public const int ExpandCommonMining_GoalID			= 0;
+		public const int MaintainPower_GoalID				= 1;
+		public const int UnloadSupplies_GoalID				= 2;
+		public const int MaintainFood_GoalID				= 3;
+		public const int LaunchStarship_GoalID				= 4;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -26,6 +31,10 @@ namespace DotNetMissionSDK.AI.Managers
 			goals = new Goal[]
 			{
 				new Goal(new CreateCommonMiningBaseTask(owner, m_MiningBaseState), 1),
+				new Goal(new MaintainPowerTask(owner), 1),
+				new Goal(new UnloadSuppliesTask(owner), 1),
+				new Goal(new MaintainFoodTask(owner), 1),
+				new Goal(new DeployEvacModuleTask(owner), 1),
 			};
 
 			// TODO: Fill out goal weights
@@ -48,14 +57,38 @@ namespace DotNetMissionSDK.AI.Managers
 		{
 			m_MiningBaseState.Update();
 
-			Goal currentGoal = SelectGoal();
-
-			currentGoal.task.PerformTaskTree();
+			UpdateGoal();
 		}
 
-		private Goal SelectGoal()
+		private bool UpdateGoal()
 		{
-			return goals[ExpandCommonMining_GoalID];
+			// Top priority is establishing a base with common metals
+			if (owner.units.commandCenters.Count == 0 || owner.units.commonOreMines.Count == 0 || owner.units.commonOreSmelters.Count == 0)
+				return goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
+
+			// Power level is high priority
+			if (!goals[MaintainPower_GoalID].task.IsTaskComplete())
+				goals[MaintainPower_GoalID].task.PerformTaskTree();
+
+			// Unload supplies
+			if (!goals[UnloadSupplies_GoalID].task.IsTaskComplete())
+				goals[UnloadSupplies_GoalID].task.PerformTaskTree();
+
+			// Maintain truck routes
+
+			// Fix disconnected structures
+
+			// Keep people fed
+			if (!goals[MaintainFood_GoalID].task.IsTaskComplete())
+				return goals[MaintainFood_GoalID].task.PerformTaskTree();
+
+			// Grow population
+
+			// Build defenses
+
+			// Aspire to primary goal
+			return goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
+			//return goals[LaunchStarship_GoalID];
 		}
 	}
 }

@@ -4,8 +4,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
 	public class BuildStructureFactoryTask : BuildStructureTask
 	{
-		public BuildStructureFactoryTask()									{ m_KitToBuild = map_id.StructureFactory;				}
-		public BuildStructureFactoryTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.StructureFactory;				}
+		public BuildStructureFactoryTask()									{ m_KitToBuild = map_id.StructureFactory;						}
+		public BuildStructureFactoryTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.StructureFactory;						}
 
 		public override void GeneratePrerequisites()
 		{
@@ -16,8 +16,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 	public class BuildCommonSmelterTask : BuildStructureTask
 	{
-		public BuildCommonSmelterTask()										{ m_KitToBuild = map_id.CommonOreSmelter;				}
-		public BuildCommonSmelterTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.CommonOreSmelter;				}
+		public BuildCommonSmelterTask()										{ m_KitToBuild = map_id.CommonOreSmelter;						}
+		public BuildCommonSmelterTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.CommonOreSmelter;						}
 
 		public override void GeneratePrerequisites()
 		{
@@ -27,30 +27,30 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 	public class BuildAgridomeTask : BuildStructureTask
 	{
-		public BuildAgridomeTask()											{ m_KitToBuild = map_id.Agridome;						}
-		public BuildAgridomeTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Agridome;						}
+		public BuildAgridomeTask()											{ m_KitToBuild = map_id.Agridome;								}
+		public BuildAgridomeTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Agridome;								}
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildCommonSmelterKitTask());
+			AddPrerequisite(new BuildAgridomeKitTask());
 		}
 	}
 
 	public class BuildTokamakTask : BuildStructureTask
 	{
-		public BuildTokamakTask()											{ m_KitToBuild = map_id.Tokamak;						}
-		public BuildTokamakTask(PlayerInfo owner) : base(owner)				{ m_KitToBuild = map_id.Tokamak;						}
+		public BuildTokamakTask()											{ m_KitToBuild = map_id.Tokamak;	m_DesiredDistance = 5;		}
+		public BuildTokamakTask(PlayerInfo owner) : base(owner)				{ m_KitToBuild = map_id.Tokamak;	m_DesiredDistance = 5;		}
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildCommonSmelterKitTask());
+			AddPrerequisite(new BuildTokamakKitTask());
 		}
 	}
 
 	public class BuildVehicleFactoryTask : BuildStructureTask
 	{
-		public BuildVehicleFactoryTask()									{ m_KitToBuild = map_id.VehicleFactory;					}
-		public BuildVehicleFactoryTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.VehicleFactory;					}
+		public BuildVehicleFactoryTask()									{ m_KitToBuild = map_id.VehicleFactory;							}
+		public BuildVehicleFactoryTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.VehicleFactory;							}
 
 		public override void GeneratePrerequisites()
 		{

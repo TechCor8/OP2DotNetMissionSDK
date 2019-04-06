@@ -21,4 +21,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 		public BuildMinerTask()												{ m_VehicleToBuild = map_id.RoboMiner;					}
 		public BuildMinerTask(PlayerInfo owner) : base(owner)				{ m_VehicleToBuild = map_id.RoboMiner;					}
 	}
+
+	public class BuildCargoTruckTask : BuildVehicleTask
+	{
+		public BuildCargoTruckTask()										{ m_VehicleToBuild = map_id.CargoTruck;					}
+		public BuildCargoTruckTask(PlayerInfo owner) : base(owner)			{ m_VehicleToBuild = map_id.CargoTruck;					}
+	}
 }

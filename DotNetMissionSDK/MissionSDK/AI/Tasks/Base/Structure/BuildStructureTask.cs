@@ -15,13 +15,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		private bool m_CanBuildDisconnected;
 
+		public int targetCountToBuild = 1;
+
 		public BuildStructureTask() { }
 		public BuildStructureTask(PlayerInfo owner) : base(owner) { }
 
 		public override bool IsTaskComplete()
 		{
 			List<UnitEx> units = owner.units.GetListForType(m_KitToBuild);
-			return units.Count > 0;
+			return units.Count >= targetCountToBuild;
 		}
 
 
