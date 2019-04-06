@@ -7,6 +7,7 @@ class UnitEx : public Unit
 {
 public:
 	void DoAttack(LOCATION where);
+	void DoDeployMiner(LOCATION where);
 	void DoDoze(MAP_RECT area);
 	void DoDock(LOCATION dockLocation);
 	void DoDockAtGarage(LOCATION dockLocation);

@@ -19,6 +19,14 @@ extern "C"
 		unit.DoAttack(LOCATION(tileX, tileY));
 	}
 
+	extern EXPORT void __stdcall UnitEx_DoDeployMiner(int unitID, int tileX, int tileY)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		unit.DoDeployMiner(LOCATION(tileX, tileY));
+	}
+
 	extern EXPORT void __stdcall UnitEx_DoDoze(int unitID, int xMin, int yMin, int xMax, int yMax)
 	{
 		UnitEx unit;

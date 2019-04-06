@@ -21,6 +21,19 @@ struct cmdGuard
 	short unused; // FFFF
 };
 
+struct cmdDeploy
+{
+	char numUnits;
+	short unitId;
+	short numWayPoints;
+	long wptLoc;		// Pixel-based X/Y location, X coordinate = low byte, Y coordinate = high byte
+	short x1;
+	short y1;
+	short x2;
+	short y2;
+	short unknown;
+};
+
 struct cmdDoze
 {
 	char numUnits;
@@ -235,6 +248,39 @@ void UnitEx::DoAttack(LOCATION where)
 	ExtPlayer[OwnerID()].ProcessCommandPacket(&packet);
 }
 
+void UnitEx::DoDeployMiner(LOCATION where)
+{
+	if (!isInited)
+		return;
+
+	if (!IsLive())
+		return;
+
+	CommandPacket packet;
+	cmdDeploy *data = (cmdDeploy*)packet.dataBuff;
+
+	// Convert x/y location to pixel
+	int pxLoc = 0;
+	int x = where.x * 32;
+	int y = where.y * 32;
+	pxLoc = (x & 0x07FFF) | (y & 0x03FFF) << 15;
+
+	// Build command packet
+	packet.type = ctMoBuild;
+	packet.dataLength = sizeof(cmdDeploy);
+	data->numUnits = 1;
+	data->unitId = unitID;
+	data->numWayPoints = 1;
+	data->wptLoc = pxLoc;
+	data->x1 = where.x-1;
+	data->y1 = where.y;
+	data->x2 = where.x;
+	data->y2 = where.y;
+	data->unknown = -1;
+
+	ExtPlayer[OwnerID()].ProcessCommandPacket(&packet);
+}
+
 void UnitEx::DoDoze(MAP_RECT area)
 {
 	if (!isInited)
@@ -274,8 +320,12 @@ void UnitEx::DoDock(LOCATION dockLocation)
 	data->numUnits = 1;
 	data->unitId = unitID;
 	data->numWayPoints = 1;
-	data->pts.points.x = dockLocation.x;
-	data->pts.points.y = dockLocation.y;
+	long wpt = 0,
+		x = dockLocation.x,
+		y = dockLocation.y;
+	wpt |= (x & 0x7ff) << 5;
+	wpt |= (y & 0x3ff) << 20;
+	data->pts.rawPoints = wpt;
 
 	ExtPlayer[OwnerID()].ProcessCommandPacket(&packet);
 }

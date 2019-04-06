@@ -16,9 +16,10 @@ namespace DotNetMissionSDK.HFL
 		public UnitEx(int stubIndex) : base(stubIndex) { }
 
 		public void DoAttack(int tileX, int tileY)									{ UnitEx_DoAttack(m_StubIndex, tileX, tileY);													}
+		public void DoDeployMiner(int tileX, int tileY)								{ UnitEx_DoDeployMiner(m_StubIndex, tileX, tileY);												}
 		public void DoDoze(MAP_RECT dozeArea)										{ UnitEx_DoDoze(m_StubIndex, dozeArea.xMin, dozeArea.yMin, dozeArea.xMax, dozeArea.yMax);		}
 
-		public void DoDock(UnitEx targetDock)										{ LOCATION tile = targetDock.GetDockLocation(); DoMove(tile.x, tile.y);							}
+		public void DoDock(UnitEx targetDock)										{ LOCATION tile = targetDock.GetDockLocation(); DoDock(tile.x, tile.y);							}
 		public void DoDock(int tileX, int tileY)									{ UnitEx_DoDock(m_StubIndex, tileX, tileY);														}
 		public void DoDockAtGarage(int tileX, int tileY)							{ UnitEx_DoDockAtGarage(m_StubIndex, tileX, tileY);												}
 
@@ -156,6 +157,7 @@ namespace DotNetMissionSDK.HFL
 
 
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoAttack(int unitID, int tileX, int tileY);
+		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoDeployMiner(int unitID, int tileX, int tileY);
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoDoze(int unitID, int xMin, int yMin, int xMax, int yMax);
 
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoDock(int unitID, int tileX, int tileY);
