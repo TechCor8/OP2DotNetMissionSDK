@@ -1,4 +1,6 @@
-﻿using DotNetMissionSDK.Json;
+﻿using DotNetMissionSDK.AI;
+using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
 using System;
 
@@ -16,6 +18,8 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public const bool useJson = true;
 
+		private BotPlayer m_BotPlayer;
+
 		/// <summary>
 		/// Called when the mission is first loaded, regardless of whether it is a new game or saved game.
 		/// </summary>
@@ -24,6 +28,9 @@ namespace DotNetMissionSDK
 		/// <param name="triggerManager">The trigger manager used for the mission.</param>
 		public CustomLogic(MissionRoot root, SaveData saveData, TriggerManager triggerManager) : base(root, saveData, triggerManager)
 		{
+			// *** Add custom init code here ***
+			m_BotPlayer = new BotPlayer(BotType.LaunchStarship, GetPlayerInfo(TethysGame.LocalPlayer()));
+			m_BotPlayer.Start();
 		}
 
 		/// <summary>
@@ -32,11 +39,11 @@ namespace DotNetMissionSDK
 		/// <returns>True on success.</returns>
 		public override bool InitializeNewMission()
 		{
-			Console.WriteLine("Mission started.");
-
 			if (!base.InitializeNewMission())
 				return false;
 
+			// *** Add custom "New Mission" code here ***
+			
 			// Test code
 			AddTrigger(TriggerStub.CreateVehicleCountTrigger(999, true, true, TethysGame.LocalPlayer(), 4, CompareMode.GreaterEqual));
 			
@@ -48,9 +55,9 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public override void LoadMission()
 		{
-			Console.WriteLine("Mission loaded.");
-
 			base.LoadMission();
+
+			// *** Add custom "Load Mission" code here ***
 		}
 
 		/// <summary>
@@ -59,30 +66,17 @@ namespace DotNetMissionSDK
 		/// <param name="trigger">The trigger that was executed.</param>
 		protected override void OnTriggerExecuted(TriggerStub trigger)
 		{
-			base.OnTriggerExecuted(trigger);
-
-			if (trigger.id == 999)
+			switch (trigger.id)
 			{
-				TethysGame.AddMessage(0, 0, "Check me out!", TethysGame.LocalPlayer(), 0);
-				Console.WriteLine("Check me out!");
+				case 999:
+					TethysGame.AddMessage(0, 0, "Check me out!", TethysGame.LocalPlayer(), 0);
+					Console.WriteLine("Check me out!");
+					break;
 
-				/*using (PlayerUnitEnum myEnum = new PlayerUnitEnum(TethysGame.LocalPlayer()))
-				{
-					Unit unit = new Unit();
-					while (myEnum.GetNext(unit))
-					{
-						unit.DoMove(30, 30);
-					}
-				}*/
+				default:
+					base.OnTriggerExecuted(trigger);
+					break;
 			}
-
-			//Console.WriteLine("PRE");
-			//Player p = TethysGame.GetPlayer(TethysGame.LocalPlayer());
-			//Console.WriteLine("P");
-			//ScGroup g = p.GetDefaultGroup();
-
-			//Console.WriteLine("G");
-			//Console.WriteLine("Stub: " + g.stubIndex);
 		}
 
 		/// <summary>
@@ -91,6 +85,9 @@ namespace DotNetMissionSDK
 		public override void Update()
 		{
 			base.Update();
+
+			// *** Add custom update code here ***
+			m_BotPlayer.Update();
 		}
 
 		/// <summary>
@@ -98,7 +95,7 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public override void Dispose()
 		{
-			Console.WriteLine("Mission Ended.");
+			// *** Add Custom "Dispose" code here ***
 
 			base.Dispose();
 		}

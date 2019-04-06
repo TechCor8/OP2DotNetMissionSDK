@@ -17,7 +17,7 @@ namespace DotNetMissionSDK
 		private List<DisasterData> m_Disasters = new List<DisasterData>();
 		private Dictionary<int, TriggerData> m_TriggerData = new Dictionary<int, TriggerData>();
 
-
+		
 		/// <summary>
 		/// Prepares mission logic for use.
 		/// </summary>
@@ -43,6 +43,8 @@ namespace DotNetMissionSDK
 		/// <returns>True on success.</returns>
 		public virtual bool InitializeNewMission()
 		{
+			Console.WriteLine("Mission started.");
+
 			// Initialize PlayerInfo triggers
 			for (int i=0; i < m_PlayerInfo.Length; ++i)
 				m_PlayerInfo[i]?.InitializeNewMission();
@@ -332,6 +334,8 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public virtual void LoadMission()
 		{
+			Console.WriteLine("Mission loaded.");
+
 			InitializeDisasters();
 			CreateTriggerDataLookupTable();
 		}
@@ -444,11 +448,18 @@ namespace DotNetMissionSDK
 			return m_TriggerManager.AddTrigger(triggerStub);
 		}
 
+		protected PlayerInfo GetPlayerInfo(int playerID)
+		{
+			return m_PlayerInfo[playerID];
+		}
+
 		/// <summary>
 		/// Releases all mission resources.
 		/// </summary>
 		public virtual void Dispose()
 		{
+			Console.WriteLine("Mission Ended.");
+
 			m_TriggerManager.onTriggerFired -= OnTriggerExecuted;
 
 			// Dispose PlayerInfo
