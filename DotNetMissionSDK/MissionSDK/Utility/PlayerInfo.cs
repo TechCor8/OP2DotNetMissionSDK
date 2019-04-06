@@ -19,6 +19,8 @@ namespace DotNetMissionSDK.Utility
 		/// </summary>
 		public PlayerUnitList units				{ get; private set; }
 
+		public PlayerCommandGrid commandGrid	{ get; private set; }
+
 
 		/// <summary>
 		/// Creates a new player info object. There should only be one per player.
@@ -30,7 +32,8 @@ namespace DotNetMissionSDK.Utility
 		{
 			this.player = player;
 			m_SaveData = saveData;
-			
+
+			commandGrid = new PlayerCommandGrid();
 			units = new PlayerUnitList(triggerManager, player, saveData.playerInfo[player.playerID]);
 		}
 
@@ -51,8 +54,8 @@ namespace DotNetMissionSDK.Utility
 		/// </summary>
 		public void Update()
 		{
-			units.Clear();
 			units.Update();
+			commandGrid.Update(units, player.playerID);
 		}
 		
 		public void Dispose()

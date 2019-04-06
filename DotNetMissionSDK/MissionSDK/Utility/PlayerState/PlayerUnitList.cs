@@ -154,6 +154,8 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		/// </summary>
 		public void Update()
 		{
+			Clear();
+
 			for (int i=21; i < 59; ++i)
 			{
 				foreach (UnitEx unit in new PlayerBuildingEnum(m_Player.playerID, (map_id)i))
@@ -228,7 +230,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		/// <summary>
 		/// Clears all unit lists.
 		/// </summary>
-		public void Clear()
+		private void Clear()
 		{
 			// Units
 			cargoTrucks.Clear();
