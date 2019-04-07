@@ -374,6 +374,30 @@ void UnitEx::DoStandGround(LOCATION where)
 	ExtPlayer[OwnerID()].ProcessCommandPacket(&packet);
 }
 
+void UnitEx::DoBuildWall(map_id wallType, MAP_RECT area)
+{
+	if (!isInited)
+		return;
+
+	if (!IsLive())
+		return;
+
+	CommandPacket packet;
+	cmdBuildWall *data = (cmdBuildWall*)packet.dataBuff;
+
+	packet.type = ctMoBuildWall;
+	packet.dataLength = sizeof(cmdBuildWall);
+	data->numUnits = 1;
+	data->unitId = unitID;
+	data->wallType = wallType;
+	data->x1 = area.x1;
+	data->x2 = area.x2;
+	data->y1 = area.y1;
+	data->y2 = area.y2;
+
+	ExtPlayer[OwnerID()].ProcessCommandPacket(&packet);
+}
+
 void UnitEx::DoRemoveWall(MAP_RECT area)
 {
 	if (!isInited)

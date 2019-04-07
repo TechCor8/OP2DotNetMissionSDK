@@ -24,6 +24,7 @@ namespace DotNetMissionSDK.HFL
 		public void DoDockAtGarage(int tileX, int tileY)							{ UnitEx_DoDockAtGarage(m_StubIndex, tileX, tileY);												}
 
 		public void DoStandGround(int tileX, int tileY)								{ UnitEx_DoStandGround(m_StubIndex, tileX, tileY);												}
+		public void DoBuildWall(map_id wallType, MAP_RECT area)						{ UnitEx_DoBuildWall(m_StubIndex, wallType, area.xMin, area.yMin, area.xMax, area.yMax);		}
 		public void DoRemoveWall(MAP_RECT area)										{ UnitEx_DoRemoveWall(m_StubIndex, area.xMin, area.yMin, area.xMax, area.yMax);					}
 
 		public void DoProduce(map_id unitType, map_id cargoWeaponType)				{ UnitEx_DoProduce(m_StubIndex, unitType, cargoWeaponType);										}
@@ -86,6 +87,8 @@ namespace DotNetMissionSDK.HFL
 
 		public bool HasEmptyBay()													{ return GetBayWithCargo(map_id.None) >= 0;														}
 		public bool HasBayWithCargo(map_id cargoType)								{ return GetBayWithCargo(cargoType) >= 0;														}
+
+		public MAP_RECT GetRect(bool includeBulldozedArea=false)					{ return GetUnitInfo().GetRect(GetPosition(), includeBulldozedArea);							}
 
 		/// <summary>
 		/// Returns the bay index that contains cargo type.
@@ -164,6 +167,7 @@ namespace DotNetMissionSDK.HFL
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoDockAtGarage(int unitID, int tileX, int tileY);
 
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoStandGround(int unitID, int tileX, int tileY);
+		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoBuildWall(int unitID, map_id wallType, int xMin, int yMin, int xMax, int yMax);
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoRemoveWall(int unitID, int xMin, int yMin, int xMax, int yMax);
 
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoProduce(int unitID, map_id unitType, map_id cargoWeaponType);

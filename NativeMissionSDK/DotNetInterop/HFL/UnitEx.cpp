@@ -58,6 +58,14 @@ extern "C"
 		unit.DoStandGround(LOCATION(tileX, tileY));
 	}
 
+	extern EXPORT void __stdcall UnitEx_DoBuildWall(int unitID, map_id wallType, int xMin, int yMin, int xMax, int yMax)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		unit.DoBuildWall(wallType, MAP_RECT(xMin, yMin, xMax, yMax));
+	}
+
 	extern EXPORT void __stdcall UnitEx_DoRemoveWall(int unitID, int xMin, int yMin, int xMax, int yMax)
 	{
 		UnitEx unit;

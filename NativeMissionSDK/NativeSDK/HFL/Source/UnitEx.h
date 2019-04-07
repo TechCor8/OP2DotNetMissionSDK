@@ -12,6 +12,7 @@ public:
 	void DoDock(LOCATION dockLocation);
 	void DoDockAtGarage(LOCATION dockLocation);
 	void DoStandGround(LOCATION where);
+	void DoBuildWall(map_id wallType, MAP_RECT area);
 	void DoRemoveWall(MAP_RECT area);
 	void DoProduce(map_id unitType, map_id cargoWeaponType);
 	void DoTransferCargo(int bay);
