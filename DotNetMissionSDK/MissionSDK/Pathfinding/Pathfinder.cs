@@ -196,9 +196,9 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
 		/// <param name="foundPt">The closest valid tile point received.</param>
 		/// <returns>True if a valid tile was found.</returns>
-		public static bool GetClosestValidTile(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION foundPt)
+		public static bool GetClosestValidTile(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION foundPt, bool allowDiagonal=true)
 		{
-			return GetClosestValidTile(new LOCATION[] { startPt }, tileCostCB, validTileCB, out foundPt);
+			return GetClosestValidTile(new LOCATION[] { startPt }, tileCostCB, validTileCB, out foundPt, allowDiagonal);
 		}
 
 		/// <summary>
@@ -209,12 +209,14 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
 		/// <param name="foundPt">The closest valid tile point received.</param>
 		/// <returns>True if a valid tile was found.</returns>
-		public static bool GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION foundPt)
+		public static bool GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION foundPt, bool allowDiagonal=true)
 		{
 			List<PathNode> openSet = new List<PathNode>();
 			Dictionary<int, PathNode> closedSet = new Dictionary<int, PathNode>();
 
-			int adjacentCount = 8;
+			int adjacentCount = 4;
+			if (allowDiagonal)
+				adjacentCount = 8;
 
 			// Add start points
 			foreach (LOCATION startPt in startPts)
