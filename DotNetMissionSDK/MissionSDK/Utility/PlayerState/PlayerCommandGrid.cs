@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
 using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.Utility.PlayerState
 {
@@ -60,6 +61,75 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			return false;
 		}
 
+		public bool GetClosestConnectedTile(LOCATION pt, out LOCATION closestPt)
+		{
+			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
+			{
+				return m_Grid[x,y] > 0;
+			};
+
+			bool result = Pathfinder.GetClosestValidTile(pt, GetDefaultTileCost, validTileCB, out closestPt, false);
+			Console.WriteLine("pt = " + TethysGame.GetGameCoordinates(pt));
+			Console.WriteLine("closest = " + TethysGame.GetGameCoordinates(closestPt));
+
+			return result;
+		}
+
+		public LOCATION[] GetPathToClosestConnectedTile(LOCATION pt)
+		{
+			LOCATION closestPt;
+
+			if (!GetClosestConnectedTile(pt, out closestPt))
+				return null;
+
+			return Pathfinder.GetPath(pt, closestPt, false, GetDefaultTileCost);
+		}
+
+		public LOCATION[] GetPathToClosestConnectedTile(MAP_RECT area)
+		{
+			LOCATION centerPt = new LOCATION((area.xMin+area.xMax)/2, (area.yMin+area.yMax)/2);
+			LOCATION closestPt;
+
+			if (!GetClosestConnectedTile(centerPt, out closestPt))
+				return null;
+
+			LOCATION[] path = Pathfinder.GetPath(closestPt, centerPt, false, GetDefaultTileCost);
+			if (path == null)
+				return path;
+
+			// Remove excess tubing. If path is adjacent to area, we don't need anything after it.
+			List<LOCATION> cullPath = new List<LOCATION>(path);
+
+			area.Inflate(1,1);
+
+			for (int i=0; i < cullPath.Count; ++i)
+			{
+				LOCATION pt = cullPath[i];
+
+				if (area.Contains(pt))
+				{
+					if (pt.x != area.xMin && pt.y != area.yMin &&	// Top left
+						pt.x != area.xMax && pt.y != area.yMin &&	// Top right
+						pt.x != area.xMax && pt.y != area.yMax &&	// Bottom right
+						pt.x != area.xMin && pt.y != area.yMax)		// Bottom left
+					{
+						++i;
+						cullPath.RemoveRange(i, cullPath.Count-i);
+					}
+				}
+			}
+
+			return cullPath.ToArray();
+		}
+
+		private int GetDefaultTileCost(int x, int y)
+		{
+			if (!GameMap.IsTilePassable(x,y))
+				return Pathfinder.Impassable;
+
+			return 1;
+		}
+
 		public void Update(PlayerUnitList units, int playerID)
 		{
 			m_PlayerID = playerID;
@@ -70,7 +140,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			{
 				LOCATION temp;
 				LOCATION ccPos = cc.GetPosition();
-				Pathfinder.GetClosestValidTile(ccPos, GetTileCost, IsValidTile, out temp);
+				Pathfinder.GetClosestValidTile(ccPos, GetTileCost, IsValidTile, out temp, false);
 
 				m_Grid[ccPos.x, ccPos.y] = 1;
 			}
