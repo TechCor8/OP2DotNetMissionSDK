@@ -14,7 +14,8 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int UnloadSupplies_GoalID				= 3;
 		public const int FixDisconnectedStructures_GoalID	= 4;
 		public const int MaintainFood_GoalID				= 5;
-		public const int LaunchStarship_GoalID				= 6;
+		public const int MaintainPopulation_GoalID			= 6;
+		public const int LaunchStarship_GoalID				= 7;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -38,6 +39,7 @@ namespace DotNetMissionSDK.AI.Managers
 				new Goal(new UnloadSuppliesTask(owner), 1),
 				new Goal(new FixDisconnectedStructures(owner), 1),
 				new Goal(new MaintainFoodTask(owner), 1),
+				new Goal(new MaintainPopulationTask(owner), 1),
 				new Goal(new DeployEvacModuleTask(owner), 1),
 			};
 
@@ -96,6 +98,8 @@ namespace DotNetMissionSDK.AI.Managers
 				return goals[MaintainFood_GoalID].task.PerformTaskTree();
 
 			// Grow population
+			if (!goals[MaintainPopulation_GoalID].task.IsTaskComplete())
+				return goals[MaintainPopulation_GoalID].task.PerformTaskTree();
 
 			// Build defenses
 

@@ -68,11 +68,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 				return m_Grid[x,y] > 0;
 			};
 
-			bool result = Pathfinder.GetClosestValidTile(pt, GetDefaultTileCost, validTileCB, out closestPt, false);
-			Console.WriteLine("pt = " + TethysGame.GetGameCoordinates(pt));
-			Console.WriteLine("closest = " + TethysGame.GetGameCoordinates(closestPt));
-
-			return result;
+			return Pathfinder.GetClosestValidTile(pt, GetDefaultTileCost, validTileCB, out closestPt, false);
 		}
 
 		public LOCATION[] GetPathToClosestConnectedTile(LOCATION pt)

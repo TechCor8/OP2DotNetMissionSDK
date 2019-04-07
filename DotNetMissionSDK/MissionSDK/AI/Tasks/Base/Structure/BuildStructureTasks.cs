@@ -47,6 +47,50 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		}
 	}
 
+	public class BuildNurseryTask : BuildStructureTask
+	{
+		public BuildNurseryTask()											{ m_KitToBuild = map_id.Nursery;	m_DesiredDistance = 1;		}
+		public BuildNurseryTask(PlayerInfo owner) : base(owner)				{ m_KitToBuild = map_id.Nursery;	m_DesiredDistance = 1;		}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(new BuildNurseryKitTask());
+		}
+	}
+
+	public class BuildUniversityTask : BuildStructureTask
+	{
+		public BuildUniversityTask()										{ m_KitToBuild = map_id.University;	m_DesiredDistance = 1;		}
+		public BuildUniversityTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.University;	m_DesiredDistance = 1;		}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(new BuildUniversityKitTask());
+		}
+	}
+
+	public class BuildResidenceTask : BuildStructureTask
+	{
+		public BuildResidenceTask()											{ m_KitToBuild = map_id.Residence;	m_DesiredDistance = 1;		}
+		public BuildResidenceTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Residence;	m_DesiredDistance = 1;		}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(new BuildResidenceKitTask());
+		}
+	}
+
+	public class BuildMedicalCenterTask : BuildStructureTask
+	{
+		public BuildMedicalCenterTask()										{ m_KitToBuild = map_id.MedicalCenter;	m_DesiredDistance = 1;	}
+		public BuildMedicalCenterTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.MedicalCenter;	m_DesiredDistance = 1;	}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(new BuildMedicalCenterKitTask());
+		}
+	}
+
 	public class BuildVehicleFactoryTask : BuildStructureTask
 	{
 		public BuildVehicleFactoryTask()									{ m_KitToBuild = map_id.VehicleFactory;	m_DesiredDistance = 2;	}

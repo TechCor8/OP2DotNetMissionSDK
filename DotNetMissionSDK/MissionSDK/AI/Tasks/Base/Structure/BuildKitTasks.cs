@@ -32,6 +32,30 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildTokamakKitTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Tokamak;						}
 	}
 
+	public sealed class BuildNurseryKitTask : BuildStructureKitTask
+	{
+		public BuildNurseryKitTask()										{ m_KitToBuild = map_id.Nursery;						}
+		public BuildNurseryKitTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Nursery;						}
+	}
+
+	public sealed class BuildUniversityKitTask : BuildStructureKitTask
+	{
+		public BuildUniversityKitTask()										{ m_KitToBuild = map_id.University;						}
+		public BuildUniversityKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.University;						}
+	}
+
+	public sealed class BuildResidenceKitTask : BuildStructureKitTask
+	{
+		public BuildResidenceKitTask()										{ m_KitToBuild = map_id.Residence;						}
+		public BuildResidenceKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.Residence;						}
+	}
+
+	public sealed class BuildMedicalCenterKitTask : BuildStructureKitTask
+	{
+		public BuildMedicalCenterKitTask()									{ m_KitToBuild = map_id.MedicalCenter;					}
+		public BuildMedicalCenterKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.MedicalCenter;					}
+	}
+
 	public sealed class BuildVehicleFactoryKitTask : BuildStructureKitTask
 	{
 		public BuildVehicleFactoryKitTask()									{ m_KitToBuild = map_id.VehicleFactory;					}
