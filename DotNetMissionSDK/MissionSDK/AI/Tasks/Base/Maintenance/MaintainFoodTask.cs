@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
@@ -23,6 +24,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		protected override bool PerformTask()
 		{
+			// Don't build more agridomes if we aren't using all the ones we have
+			foreach (UnitEx agridome in owner.units.agridomes)
+			{
+				if (!agridome.IsEnabled())
+					return false;
+			}
+
 			// Keep building one more agridome until task complete
 			m_BuildAgridomeTask.targetCountToBuild = owner.units.agridomes.Count+1;
 

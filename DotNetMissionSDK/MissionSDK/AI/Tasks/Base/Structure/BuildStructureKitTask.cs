@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.AI.Tasks.Base.Vehicle;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 
@@ -33,8 +34,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
-			// BuildStructureFactory
-			// BuildConvec
+			AddPrerequisite(new BuildStructureFactoryTask());
+			AddPrerequisite(new BuildConvecTask());
 		}
 
 		protected override bool PerformTask()

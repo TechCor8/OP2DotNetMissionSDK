@@ -27,8 +27,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 	public class BuildAgridomeTask : BuildStructureTask
 	{
-		public BuildAgridomeTask()											{ m_KitToBuild = map_id.Agridome;								}
-		public BuildAgridomeTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Agridome;								}
+		public BuildAgridomeTask()											{ m_KitToBuild = map_id.Agridome;	m_DesiredDistance = 2;		}
+		public BuildAgridomeTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Agridome;	m_DesiredDistance = 2;		}
 
 		public override void GeneratePrerequisites()
 		{
@@ -49,8 +49,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 	public class BuildVehicleFactoryTask : BuildStructureTask
 	{
-		public BuildVehicleFactoryTask()									{ m_KitToBuild = map_id.VehicleFactory;							}
-		public BuildVehicleFactoryTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.VehicleFactory;							}
+		public BuildVehicleFactoryTask()									{ m_KitToBuild = map_id.VehicleFactory;	m_DesiredDistance = 2;	}
+		public BuildVehicleFactoryTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.VehicleFactory;	m_DesiredDistance = 2;	}
 
 		public override void GeneratePrerequisites()
 		{
@@ -60,8 +60,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 	public class BuildSpaceportTask : BuildStructureTask
 	{
-		public BuildSpaceportTask()											{ m_KitToBuild = map_id.Spaceport;						}
-		public BuildSpaceportTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Spaceport;						}
+		public BuildSpaceportTask()											{ m_KitToBuild = map_id.Spaceport;	m_DesiredDistance = 2;		}
+		public BuildSpaceportTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Spaceport;	m_DesiredDistance = 2;		}
 
 		public override void GeneratePrerequisites()
 		{

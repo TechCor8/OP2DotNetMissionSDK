@@ -12,8 +12,9 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int MaintainTruckRoutes_GoalID			= 1;
 		public const int MaintainPower_GoalID				= 2;
 		public const int UnloadSupplies_GoalID				= 3;
-		public const int MaintainFood_GoalID				= 4;
-		public const int LaunchStarship_GoalID				= 5;
+		public const int FixDisconnectedStructures_GoalID	= 4;
+		public const int MaintainFood_GoalID				= 5;
+		public const int LaunchStarship_GoalID				= 6;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -35,6 +36,7 @@ namespace DotNetMissionSDK.AI.Managers
 				new Goal(new MaintainTruckRoutes(owner, m_MiningBaseState), 1),
 				new Goal(new MaintainPowerTask(owner), 1),
 				new Goal(new UnloadSuppliesTask(owner), 1),
+				new Goal(new FixDisconnectedStructures(owner), 1),
 				new Goal(new MaintainFoodTask(owner), 1),
 				new Goal(new DeployEvacModuleTask(owner), 1),
 			};
@@ -86,6 +88,8 @@ namespace DotNetMissionSDK.AI.Managers
 			truckRoutes.PerformTruckRoutes();
 
 			// Fix disconnected structures
+			if (!goals[FixDisconnectedStructures_GoalID].task.IsTaskComplete())
+				goals[FixDisconnectedStructures_GoalID].task.PerformTaskTree();
 
 			// Keep people fed
 			if (!goals[MaintainFood_GoalID].task.IsTaskComplete())

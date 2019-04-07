@@ -70,14 +70,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				// Deploy miner
 				BuildStructureTask.ClearDeployArea(miner, map_id.CommonOreMine, beacon.GetPosition());
 
-				if (!miner.GetPosition().Equals(beaconPosition)) // WARNING: If unit is EMP'd, it will get stuck
+				if (!miner.GetPosition().Equals(beaconPosition) && miner.GetCurAction() == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
 					miner.DoDeployMiner(beaconPosition.x, beaconPosition.y);
 
 				return true;
 			}
 
 			// Move miner involved in expansion close to beacon for efficiency
-			miner.DoMove(beaconPosition.x-1, beaconPosition.y+1);
+			if (miner.GetCurAction() == ActionType.moDone)
+				miner.DoMove(beaconPosition.x-1, beaconPosition.y+1);
 
 			// Survey beacon
 			if (owner.units.roboSurveyors.Count == 0)
@@ -85,7 +86,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 			UnitEx surveyor = owner.units.roboSurveyors[0];
 
-			if (!surveyor.GetPosition().Equals(beaconPosition)) // WARNING: If unit is EMP'd, it will get stuck
+			if (!surveyor.GetPosition().Equals(beaconPosition) && surveyor.GetCurAction() == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
 				surveyor.DoMove(beaconPosition.x, beaconPosition.y);
 
 			return true;

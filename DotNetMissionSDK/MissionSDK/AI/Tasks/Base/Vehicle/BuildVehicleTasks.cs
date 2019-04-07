@@ -22,9 +22,21 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 		public BuildMinerTask(PlayerInfo owner) : base(owner)				{ m_VehicleToBuild = map_id.RoboMiner;					}
 	}
 
+	public class BuildConvecTask : BuildVehicleTask
+	{
+		public BuildConvecTask()											{ m_VehicleToBuild = map_id.ConVec;						}
+		public BuildConvecTask(PlayerInfo owner) : base(owner)				{ m_VehicleToBuild = map_id.ConVec;						}
+	}
+
 	public class BuildCargoTruckTask : BuildVehicleTask
 	{
 		public BuildCargoTruckTask()										{ m_VehicleToBuild = map_id.CargoTruck;					}
 		public BuildCargoTruckTask(PlayerInfo owner) : base(owner)			{ m_VehicleToBuild = map_id.CargoTruck;					}
+	}
+
+	public class BuildEarthworkerTask : BuildVehicleTask
+	{
+		public BuildEarthworkerTask()										{ m_VehicleToBuild = map_id.Earthworker;				}
+		public BuildEarthworkerTask(PlayerInfo owner) : base(owner)			{ m_VehicleToBuild = map_id.Earthworker;				}
 	}
 }

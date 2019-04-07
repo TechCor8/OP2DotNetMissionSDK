@@ -180,7 +180,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return false;
 		}
 
-		private static bool NeedsTube(map_id typeID)
+		public static bool NeedsTube(map_id typeID)
 		{
 			switch (typeID)
 			{

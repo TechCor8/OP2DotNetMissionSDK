@@ -146,12 +146,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 					continue;
 
 				// Detect if occupied
+				bool isOccupied = false;
 				for (int i=0; i < TethysGame.NoPlayers(); ++i)
 				{
 					UnitEx building = GetClosestBuildingOfType(i, map_id.Any, beacon.GetPosition());
 					if (building != null && building.GetPosition().GetDiagonalDistance(beacon.GetPosition()) < MiningBaseState.MaxMineDistanceToCC)
-						continue;
+					{
+						isOccupied = true;
+						break;
+					}
 				}
+
+				if (isOccupied)
+					continue;
 				
 				// Closest distance
 				int distance = position.GetDiagonalDistance(beacon.GetPosition());
