@@ -64,7 +64,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				}
 
 				// Get closest convec that isn't doing anything
-				convec = owner.units.convecs.Find((UnitEx unit) => unit.GetCurAction() == ActionType.moDone && !UnitContainsKit(unit, m_SkipConvecsWithKits));
+				List<UnitEx> emptyConvecs = owner.units.convecs.FindAll((UnitEx unit) => unit.GetCargo() == map_id.None && unit.GetCurAction() != ActionType.moBuild);
+				if (emptyConvecs.Count > 0)
+				{
+					emptyConvecs.Sort((a,b) => a.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition()).CompareTo(b.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition())));
+					convec = emptyConvecs[0];
+				}
+				else
+				{
+					// As a last resort, pull an idle convec that has cargo
+					List<UnitEx> idleConvecs = owner.units.convecs.FindAll((UnitEx unit) => unit.GetCurAction() == ActionType.moDone && !UnitContainsKit(unit, m_SkipConvecsWithKits));
+					if (idleConvecs.Count > 0)
+					{
+						idleConvecs.Sort((a,b) => a.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition()).CompareTo(b.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition())));
+						convec = idleConvecs[0];
+					}
+				}
 
 				if (convec == null)
 					return true;
