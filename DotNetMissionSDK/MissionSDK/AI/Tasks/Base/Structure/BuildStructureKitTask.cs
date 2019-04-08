@@ -56,7 +56,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				if (convec != null)
 				{
 					// Wait if docking is in progress
-					if (convec.GetCurAction() == ActionType.moObjDocking)
+					if (convec.GetCurAction() != ActionType.moDone)
 						return true;
 
 					factoryWithKit.DoTransferCargo(factoryWithKit.GetBayWithCargo(m_KitToBuild));

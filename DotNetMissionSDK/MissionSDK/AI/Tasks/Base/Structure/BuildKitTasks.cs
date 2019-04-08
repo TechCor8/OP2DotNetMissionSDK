@@ -32,6 +32,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildTokamakKitTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Tokamak;						}
 	}
 
+	public sealed class BuildMHDGeneratorKitTask : BuildStructureKitTask
+	{
+		public BuildMHDGeneratorKitTask()									{ m_KitToBuild = map_id.MHDGenerator;					}
+		public BuildMHDGeneratorKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.MHDGenerator;					}
+	}
+
+	public sealed class BuildSolarArrayKitTask : BuildStructureKitTask
+	{
+		public BuildSolarArrayKitTask()										{ m_KitToBuild = map_id.SolarPowerArray;				}
+		public BuildSolarArrayKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.SolarPowerArray;				}
+	}
+
 	public sealed class BuildNurseryKitTask : BuildStructureKitTask
 	{
 		public BuildNurseryKitTask()										{ m_KitToBuild = map_id.Nursery;						}
@@ -50,16 +62,70 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildResidenceKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.Residence;						}
 	}
 
+	public sealed class BuildReinforcedResidenceKitTask : BuildStructureKitTask
+	{
+		public BuildReinforcedResidenceKitTask()								{ m_KitToBuild = map_id.ReinforcedResidence;		}
+		public BuildReinforcedResidenceKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.ReinforcedResidence;		}
+	}
+
+	public sealed class BuildAdvancedResidenceKitTask : BuildStructureKitTask
+	{
+		public BuildAdvancedResidenceKitTask()								{ m_KitToBuild = map_id.AdvancedResidence;				}
+		public BuildAdvancedResidenceKitTask(PlayerInfo owner) : base(owner){ m_KitToBuild = map_id.AdvancedResidence;				}
+	}
+
 	public sealed class BuildMedicalCenterKitTask : BuildStructureKitTask
 	{
 		public BuildMedicalCenterKitTask()									{ m_KitToBuild = map_id.MedicalCenter;					}
 		public BuildMedicalCenterKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.MedicalCenter;					}
 	}
 
+	public sealed class BuildDIRTKitTask : BuildStructureKitTask
+	{
+		public BuildDIRTKitTask()											{ m_KitToBuild = map_id.DIRT;							}
+		public BuildDIRTKitTask(PlayerInfo owner) : base(owner)				{ m_KitToBuild = map_id.DIRT;							}
+	}
+
+	public sealed class BuildRecreationKitTask : BuildStructureKitTask
+	{
+		public BuildRecreationKitTask()										{ m_KitToBuild = map_id.RecreationFacility;				}
+		public BuildRecreationKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.RecreationFacility;				}
+	}
+
+	public sealed class BuildForumKitTask : BuildStructureKitTask
+	{
+		public BuildForumKitTask()											{ m_KitToBuild = map_id.Forum;							}
+		public BuildForumKitTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Forum;							}
+	}
+
+	public sealed class BuildGORFKitTask : BuildStructureKitTask
+	{
+		public BuildGORFKitTask()											{ m_KitToBuild = map_id.GORF;							}
+		public BuildGORFKitTask(PlayerInfo owner) : base(owner)				{ m_KitToBuild = map_id.GORF;							}
+	}
+
 	public sealed class BuildVehicleFactoryKitTask : BuildStructureKitTask
 	{
 		public BuildVehicleFactoryKitTask()									{ m_KitToBuild = map_id.VehicleFactory;					}
 		public BuildVehicleFactoryKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.VehicleFactory;					}
+	}
+
+	public sealed class BuildStandardLabKitTask : BuildStructureKitTask
+	{
+		public BuildStandardLabKitTask()									{ m_KitToBuild = map_id.StandardLab;					}
+		public BuildStandardLabKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.StandardLab;					}
+	}
+
+	public sealed class BuildAdvancedLabKitTask : BuildStructureKitTask
+	{
+		public BuildAdvancedLabKitTask()									{ m_KitToBuild = map_id.AdvancedLab;					}
+		public BuildAdvancedLabKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.AdvancedLab;					}
+	}
+
+	public sealed class BuildRobotCommandKitTask : BuildStructureKitTask
+	{
+		public BuildRobotCommandKitTask()									{ m_KitToBuild = map_id.RobotCommand;					}
+		public BuildRobotCommandKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.RobotCommand;					}
 	}
 
 	public sealed class BuildSpaceportKitTask : BuildStructureKitTask

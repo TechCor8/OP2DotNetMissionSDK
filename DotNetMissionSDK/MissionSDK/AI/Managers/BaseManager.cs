@@ -98,8 +98,11 @@ namespace DotNetMissionSDK.AI.Managers
 				return goals[MaintainFood_GoalID].task.PerformTaskTree();
 
 			// Grow population
-			if (!goals[MaintainPopulation_GoalID].task.IsTaskComplete())
-				return goals[MaintainPopulation_GoalID].task.PerformTaskTree();
+			MaintainPopulationTask maintainPopulationTask = (MaintainPopulationTask)goals[MaintainPopulation_GoalID].task;
+			maintainPopulationTask.UpdateRequirements();
+
+			if (!maintainPopulationTask.IsTaskComplete())
+				return maintainPopulationTask.PerformTaskTree();
 
 			// Build defenses
 

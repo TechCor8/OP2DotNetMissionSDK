@@ -15,7 +15,7 @@ namespace DotNetMissionSDK
 {
 	public class TethysGame
 	{
-		public static Player GetPlayer(int playerNum)		{ return new PlayerEx(TethysGame_GetPlayer(playerNum), playerNum);	}
+		public static PlayerEx GetPlayer(int playerNum)		{ return new PlayerEx(TethysGame_GetPlayer(playerNum), playerNum);	}
 
 		// Message log
 		// Note: toPlayerNum: -1 = PlayerAll

@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.Triggers;
+﻿using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.Triggers;
 using DotNetMissionSDK.Utility.PlayerState;
 using System;
 
@@ -11,7 +12,7 @@ namespace DotNetMissionSDK.Utility
 	{
 		private SaveData m_SaveData;		// The save data object to store persistent player state
 
-		public Player player					{ get; private set; }
+		public PlayerEx player					{ get; private set; }
 
 		/// <summary>
 		/// Contains lists of player units by type.
@@ -28,7 +29,7 @@ namespace DotNetMissionSDK.Utility
 		/// <param name="triggerManager">The trigger manager for tracking player events.</param>
 		/// <param name="player">The player that will have its state tracked.</param>
 		/// <param name="saveData">The global save object for storing persistent state.</param>
-		public PlayerInfo(TriggerManager triggerManager, Player player, SaveData saveData)
+		public PlayerInfo(TriggerManager triggerManager, PlayerEx player, SaveData saveData)
 		{
 			this.player = player;
 			m_SaveData = saveData;
