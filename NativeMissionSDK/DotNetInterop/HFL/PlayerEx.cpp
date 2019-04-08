@@ -102,4 +102,29 @@ extern "C"
 
 		player->RecalculateValues();
 	}
+
+	extern EXPORT int __stdcall PlayerEx_GetNumAvailableWorkers(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumAvailableWorkers();				}
+	extern EXPORT int __stdcall PlayerEx_GetNumAvailableScientists(int playerID)				{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumAvailableScientists();				}
+	extern EXPORT int __stdcall PlayerEx_GetAmountPowerGenerated(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetAmountPowerGenerated();				}
+	extern EXPORT int __stdcall PlayerEx_GetInactivePowerCapacity(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetInactivePowerCapacity();				}
+	extern EXPORT int __stdcall PlayerEx_GetAmountPowerConsumed(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetAmountPowerConsumed();				}
+	extern EXPORT int __stdcall PlayerEx_GetAmountPowerAvailable(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetAmountPowerAvailable();				}
+	extern EXPORT int __stdcall PlayerEx_GetNumIdleBuildings(int playerID)						{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumIdleBuildings();					}
+	extern EXPORT int __stdcall PlayerEx_GetNumActiveBuildings(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumActiveBuildings();					}
+	extern EXPORT int __stdcall PlayerEx_GetNumBuildings(int playerID)							{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumBuildings();						}
+	extern EXPORT int __stdcall PlayerEx_GetNumUnpoweredStructures(int playerID)				{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumUnpoweredStructures();				}
+	extern EXPORT int __stdcall PlayerEx_GetNumWorkersRequired(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumWorkersRequired();					}
+	extern EXPORT int __stdcall PlayerEx_GetNumScientistsRequired(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumScientistsRequired();				}
+	extern EXPORT int __stdcall PlayerEx_GetNumScientistsAsWorkers(int playerID)				{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumScientistsAsWorkers();				}
+	extern EXPORT int __stdcall PlayerEx_GetNumScientistsAssignedToResearch(int playerID)		{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumScientistsAssignedToResearch();	}
+	extern EXPORT int __stdcall PlayerEx_GetTotalFoodProduction(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetTotalFoodProduction();				}
+	extern EXPORT int __stdcall PlayerEx_GetTotalFoodConsumption(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetTotalFoodConsumption();				}
+	extern EXPORT int __stdcall PlayerEx_GetFoodLacking(int playerID)							{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetFoodLacking();						}
+	extern EXPORT int __stdcall PlayerEx_GetNetFoodProduction(int playerID)						{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNetFoodProduction();					}
+	extern EXPORT int __stdcall PlayerEx_GetNumSolarSatellites(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetNumSolarSatellites();					}
+
+	extern EXPORT int __stdcall PlayerEx_GetTotalRecreationFacilityCapacity(int playerID)		{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetTotalRecreationFacilityCapacity();	}
+	extern EXPORT int __stdcall PlayerEx_GetTotalForumCapacity(int playerID)					{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetTotalForumCapacity();					}
+	extern EXPORT int __stdcall PlayerEx_GetTotalMedCenterCapacity(int playerID)				{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetTotalMedCenterCapacity();				}
+	extern EXPORT int __stdcall PlayerEx_GetTotalResidenceCapacity(int playerID)				{ PlayerEx* player = &ExtPlayer[playerID];	return player->GetTotalResidenceCapacity();				}
 }

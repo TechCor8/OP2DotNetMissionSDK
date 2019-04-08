@@ -19,6 +19,31 @@ public:
 	int GetMaxOre();
 	int GetMaxRareOre();
 	void RecalculateValues();
+
+	int GetNumAvailableWorkers();
+	int GetNumAvailableScientists();
+	int GetAmountPowerGenerated();
+	int GetInactivePowerCapacity();
+	int GetAmountPowerConsumed();
+	int GetAmountPowerAvailable();
+	int GetNumIdleBuildings();
+	int GetNumActiveBuildings();
+	int GetNumBuildings();
+	int GetNumUnpoweredStructures();
+	int GetNumWorkersRequired();		// [assigned workers and scientists]
+	int GetNumScientistsRequired();		// [assigned to buildings, or researching]
+	int GetNumScientistsAsWorkers();
+	int GetNumScientistsAssignedToResearch();
+	int GetTotalFoodProduction();
+	int GetTotalFoodConsumption();
+	int GetFoodLacking();	// [how much food needed to stop people starving ? Note this can be 0 even if there is a food deficit]
+	int GetNetFoodProduction();
+	int GetNumSolarSatellites();	// [copy from bitfield at offset 8]
+
+	int GetTotalRecreationFacilityCapacity();
+	int GetTotalForumCapacity();
+	int GetTotalMedCenterCapacity();
+	int GetTotalResidenceCapacity();
 	// todo: anything else?
 };
 
