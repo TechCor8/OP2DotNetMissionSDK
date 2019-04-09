@@ -86,11 +86,11 @@
 			"CenterView": { "X":27, "Y":38 },
 			
 			"Kids":20,
-			"Workers":30,
-			"Scientists":17,
+			"Workers":50,
+			"Scientists":23,
 			"CommonOre":27000,
 			"RareOre":25000,
-			"Food":6000,
+			"Food":7000,
 			"SolarSatellites":1,
 			
 			"CompletedResearch":

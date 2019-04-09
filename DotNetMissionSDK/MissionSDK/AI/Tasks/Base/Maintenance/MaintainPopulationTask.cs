@@ -86,8 +86,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					return;
 			}
 
-			System.Console.WriteLine(owner.player.TotalPopulation() + " > " + owner.player.GetTotalResidenceCapacity());
-
 			if (owner.player.GetTotalResidenceCapacity() >= owner.player.TotalPopulation())
 				return;
 

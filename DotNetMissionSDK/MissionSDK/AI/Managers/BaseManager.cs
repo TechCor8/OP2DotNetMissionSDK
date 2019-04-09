@@ -15,7 +15,8 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int FixDisconnectedStructures_GoalID	= 4;
 		public const int MaintainFood_GoalID				= 5;
 		public const int MaintainPopulation_GoalID			= 6;
-		public const int LaunchStarship_GoalID				= 7;
+		public const int ExpandRareMining_GoalID			= 7;
+		public const int LaunchStarship_GoalID				= 8;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -40,6 +41,7 @@ namespace DotNetMissionSDK.AI.Managers
 				new Goal(new FixDisconnectedStructures(owner), 1),
 				new Goal(new MaintainFoodTask(owner), 1),
 				new Goal(new MaintainPopulationTask(owner), 1),
+				new Goal(new CreateRareMiningBaseTask(owner, m_MiningBaseState), 1),
 				new Goal(new DeployEvacModuleTask(owner), 1),
 			};
 
@@ -62,7 +64,7 @@ namespace DotNetMissionSDK.AI.Managers
 		public void Update()
 		{
 			m_MiningBaseState.Update();
-
+			
 			UpdateGoal();
 		}
 
@@ -88,7 +90,7 @@ namespace DotNetMissionSDK.AI.Managers
 				truckRoutes.PerformTaskTree();
 
 			truckRoutes.PerformTruckRoutes();
-
+			
 			// Fix disconnected structures
 			if (!goals[FixDisconnectedStructures_GoalID].task.IsTaskComplete())
 				goals[FixDisconnectedStructures_GoalID].task.PerformTaskTree();
@@ -106,6 +108,10 @@ namespace DotNetMissionSDK.AI.Managers
 
 			// Build defenses
 
+			// Expand rare mining
+			if (owner.units.rareOreMines.Count == 0 || owner.units.rareOreSmelters.Count == 0)
+				return goals[ExpandRareMining_GoalID].task.PerformTaskTree();
+			
 			// Aspire to primary goal
 			return goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
 			//return goals[LaunchStarship_GoalID];

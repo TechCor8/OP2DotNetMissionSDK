@@ -10,15 +10,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 	/// Finds beacons outside of a command center's control area and builds a new command center.
 	/// All bases must be fully saturated before a new base is created.
 	/// </summary>
-	public class CreateCommonMiningBaseTask : Task
+	public class CreateRareMiningBaseTask : Task
 	{
 		private MiningBaseState m_MiningBaseState;
 
-		private CreateCommonMineTask m_CreateMineTask;
+		private CreateRareMineTask m_CreateMineTask;
 
 
-		public CreateCommonMiningBaseTask(MiningBaseState miningBaseState)									{ m_MiningBaseState = miningBaseState; }
-		public CreateCommonMiningBaseTask(PlayerInfo owner, MiningBaseState miningBaseState) : base(owner)	{ m_MiningBaseState = miningBaseState; }
+		public CreateRareMiningBaseTask(MiningBaseState miningBaseState)									{ m_MiningBaseState = miningBaseState; }
+		public CreateRareMiningBaseTask(PlayerInfo owner, MiningBaseState miningBaseState) : base(owner)	{ m_MiningBaseState = miningBaseState; }
 
 
 		public override bool IsTaskComplete()
@@ -26,16 +26,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			// Task is not complete until every CC beacon has been occupied and saturated
 			if (!m_CreateMineTask.IsTaskComplete())
 				return false;
-
+			
 			// Task is complete if there are no beacons outside of a command center's control area
 			foreach (UnitEx beacon in new PlayerUnitEnum(6))
 			{
 				if (beacon.GetUnitType() != map_id.MiningBeacon)
 					continue;
-
-				if (beacon.GetOreType() != BeaconType.Common)
+				
+				if (beacon.GetOreType() != BeaconType.Rare)
 					continue;
-
+				
 				// Detect if occupied
 				bool isOccupied = false;
 				for (int i=0; i < TethysGame.NoPlayers(); ++i)
@@ -47,7 +47,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 						break;
 					}
 				}
-
+				
 				if (isOccupied)
 					continue;
 
@@ -59,7 +59,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_CreateMineTask = new CreateCommonMineTask(m_MiningBaseState));
+			AddPrerequisite(m_CreateMineTask = new CreateRareMineTask(m_MiningBaseState));
 			AddPrerequisite(new BuildCommandCenterKitTask());
 		}
 
@@ -67,36 +67,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		{
 			// Get idle convec with CC
 			UnitEx convec = owner.units.convecs.Find((UnitEx unit) => unit.GetCargo() == map_id.CommandCenter && unit.GetCurAction() == ActionType.moDone);
+			
 			if (convec == null)
 				return true;
-
-			// Find unoccupied common beacon
+			
+			// Find unoccupied beacon
 			UnitEx unoccupiedBeacon = GetClosestUnusedBeacon(convec.GetPosition());
 			if (unoccupiedBeacon != null)
 			{
 				LOCATION beaconPosition = unoccupiedBeacon.GetPosition();
-
-				// Move all non-military units if there is no command center. This new site will be the main base.
-				if (owner.units.commandCenters.Count == 0)
-				{
-					foreach (UnitEx unit in new PlayerUnitEnum(owner.player.playerID))
-					{
-						if (!unit.IsVehicle()) continue;
-
-						map_id unitType = unit.GetUnitType();
-
-						// No military units. That is left up to the combat manager
-						if (unitType == map_id.Lynx || unitType == map_id.Panther || unitType == map_id.Tiger ||
-							unitType == map_id.Scorpion || unitType == map_id.Spider)
-							continue;
-
-						unit.DoMove(beaconPosition.x+(TethysGame.GetRand(6)+1), beaconPosition.y+(TethysGame.GetRand(6)+2));
-					}
-				}
-
 				return DeployCC(convec, beaconPosition);
 			}
-
+			
 			return false;
 		}
 
@@ -123,18 +105,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 				return true;
 			};
-
+			
 			// Find open location near beacon
 			LOCATION foundPt;
 			if (!Pathfinder.GetClosestValidTile(targetPosition, BuildStructureTask.GetTileCost, validTileCB, out foundPt))
 				return false;
-
+			
 			// Clear units out of deploy area
 			BuildStructureTask.ClearDeployArea(convec, convec.GetCargo(), foundPt);
-
+			
 			// Build structure
 			convec.DoBuild(convec.GetCargo(), foundPt.x, foundPt.y);
-
+			
 			return true;
 		}
 
@@ -149,7 +131,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				if (beacon.GetUnitType() != map_id.MiningBeacon)
 					continue;
 
-				if (beacon.GetOreType() != BeaconType.Common)
+				if (beacon.GetOreType() != BeaconType.Rare)
 					continue;
 
 				// Detect if occupied

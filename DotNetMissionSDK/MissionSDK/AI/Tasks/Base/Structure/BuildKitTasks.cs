@@ -20,6 +20,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildCommonSmelterKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.CommonOreSmelter;				}
 	}
 
+	public sealed class BuildRareSmelterKitTask : BuildStructureKitTask
+	{
+		public BuildRareSmelterKitTask()									{ m_KitToBuild = map_id.RareOreSmelter;					}
+		public BuildRareSmelterKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.RareOreSmelter;					}
+	}
+
 	public sealed class BuildAgridomeKitTask : BuildStructureKitTask
 	{
 		public BuildAgridomeKitTask()										{ m_KitToBuild = map_id.Agridome;						}

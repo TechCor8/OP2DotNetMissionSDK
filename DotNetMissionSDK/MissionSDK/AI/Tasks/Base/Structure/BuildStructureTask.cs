@@ -34,12 +34,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		protected override bool PerformTask()
 		{
 			// Get idle convec with kit
-			UnitEx convec = owner.units.convecs.Find((UnitEx unit) => unit.GetCargo() == m_KitToBuild && (unit.GetCurAction() == ActionType.moDone || unit.GetCurAction() == ActionType.moObjDocking));
+			UnitEx convec = owner.units.convecs.Find((UnitEx unit) =>
+			{
+				return unit.GetCargo() == m_KitToBuild;
+			});
+
 			if (convec == null)
 				return false;
 
-			// Wait for docking to complete
-			if (convec.GetCurAction() == ActionType.moObjDocking)
+			// Wait for docking or building to complete
+			if (convec.GetCurAction() != ActionType.moDone)
 				return true;
 
 			// If we can build earthworkers or have one, we can deploy disconnected structures

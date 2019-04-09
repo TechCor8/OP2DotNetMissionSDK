@@ -64,7 +64,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				}
 
 				// Get closest convec that isn't doing anything
-				List<UnitEx> emptyConvecs = owner.units.convecs.FindAll((UnitEx unit) => unit.GetCargo() == map_id.None && unit.GetCurAction() != ActionType.moBuild);
+				List<UnitEx> emptyConvecs = owner.units.convecs.FindAll((UnitEx unit) => unit.GetCargo() == map_id.None && (unit.GetCurAction() == ActionType.moDone || unit.GetCurAction() == ActionType.moMove));
 				if (emptyConvecs.Count > 0)
 				{
 					emptyConvecs.Sort((a,b) => a.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition()).CompareTo(b.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition())));
