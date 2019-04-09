@@ -38,25 +38,32 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 		public bool ConnectsTo(LOCATION point)
 		{
+			LOCATION gridPoint;
+
 			point.ClipToMap();
-			if (m_Grid[point.x, point.y] > 0) return true;
+			gridPoint = GetPointInGridSpace(point);
+			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
 
 			point.x -= 1;
 			point.ClipToMap();
-			if (m_Grid[point.x, point.y] > 0) return true;
+			gridPoint = GetPointInGridSpace(point);
+			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
 
 			point.x += 2;
 			point.ClipToMap();
-			if (m_Grid[point.x, point.y] > 0) return true;
+			gridPoint = GetPointInGridSpace(point);
+			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
 
 			point.x -= 1;
 			point.y -= 1;
 			point.ClipToMap();
-			if (m_Grid[point.x, point.y] > 0) return true;
+			gridPoint = GetPointInGridSpace(point);
+			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
 
 			point.y += 2;
 			point.ClipToMap();
-			if (m_Grid[point.x, point.y] > 0) return true;
+			gridPoint = GetPointInGridSpace(point);
+			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
 
 			return false;
 		}
@@ -65,7 +72,9 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		{
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
 			{
-				return m_Grid[x,y] > 0;
+				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
+
+				return m_Grid[gridPoint.x,gridPoint.y] > 0;
 			};
 
 			return Pathfinder.GetClosestValidTile(pt, GetDefaultTileCost, validTileCB, out closestPt, false);
@@ -138,7 +147,9 @@ namespace DotNetMissionSDK.Utility.PlayerState
 				LOCATION ccPos = cc.GetPosition();
 				Pathfinder.GetClosestValidTile(ccPos, GetTileCost, IsValidTile, out temp, false);
 
-				m_Grid[ccPos.x, ccPos.y] = 1;
+				LOCATION gridPoint = GetPointInGridSpace(ccPos);
+
+				m_Grid[gridPoint.x, gridPoint.y] = 1;
 			}
 		}
 
@@ -150,7 +161,9 @@ namespace DotNetMissionSDK.Utility.PlayerState
 				return Pathfinder.Impassable;
 
 			// If tube or structure, mark grid as connected
-			m_Grid[x,y] = 1;
+			LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
+
+			m_Grid[gridPoint.x,gridPoint.y] = 1;
 
 			return 1;
 		}
@@ -174,6 +187,14 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			}
 
 			return false;
+		}
+
+		private LOCATION GetPointInGridSpace(LOCATION pt)
+		{
+			pt.x = pt.x - GameMap.bounds.xMin;
+			pt.y = pt.y - GameMap.bounds.yMin;
+
+			return pt;
 		}
 	}
 }
