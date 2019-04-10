@@ -51,6 +51,9 @@
     <ClInclude Include="GameMapEx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Research.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameMapEx.cpp">
@@ -84,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UnitInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Research.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

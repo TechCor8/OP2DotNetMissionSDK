@@ -29,7 +29,7 @@ public:
 extern TethysGameEx gGame;
 extern void *gameObj;
 
-extern void *researchObj; // TODO: move to research file when research functions are written
+//extern void *researchObj; // TODO: move to research file when research functions are written
 
 extern void *frameObj;
 extern void *statusBarObj;

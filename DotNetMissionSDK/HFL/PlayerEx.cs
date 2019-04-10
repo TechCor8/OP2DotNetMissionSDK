@@ -12,7 +12,7 @@ namespace DotNetMissionSDK.HFL
 		{
 		}
 
-		public string GetPlayerName()									{ return PlayerEx_GetPlayerName(playerID);									}
+		public string GetPlayerName()									{ return Marshal.PtrToStringAnsi(PlayerEx_GetPlayerName(playerID));			}
 		public void SetPlayerName(string newName)						{ PlayerEx_SetPlayerName(playerID, newName);								}
 
 		//public int GetRLVCount()										{ return PlayerEx_GetSatelliteCount(playerID, map_id.RLV);					}
@@ -61,7 +61,7 @@ namespace DotNetMissionSDK.HFL
 		public int GetTotalResidenceCapacity()							{ return PlayerEx_GetTotalResidenceCapacity(playerID);						}
 
 
-		[DllImport("DotNetInterop.dll")] private static extern string PlayerEx_GetPlayerName(int playerID);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerEx_GetPlayerName(int playerID);
 		[DllImport("DotNetInterop.dll")] private static extern void PlayerEx_SetPlayerName(int playerID, string newName);
 
 		[DllImport("DotNetInterop.dll")] private static extern int PlayerEx_GetSatelliteCount(int playerID, map_id objectType);

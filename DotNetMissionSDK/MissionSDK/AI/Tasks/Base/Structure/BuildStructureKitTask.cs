@@ -41,7 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		protected override bool PerformTask()
 		{
 			// Fail Check: Research
-			if (!owner.player.HasTechnology(TechInfo.GetTechID(m_KitToBuild)))
+			if (!owner.player.HasTechnology(TechInfoOld.GetTechID(m_KitToBuild)))
 				return false;
 
 			// Get structure factories with kit

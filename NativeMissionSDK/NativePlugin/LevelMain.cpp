@@ -22,9 +22,22 @@ ExportLevelDetails("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", Colony
 // Set to false to have the DotNetInterop call DotNetMissionSDK.dll (for JSON missions).
 #define USE_CUSTOM_DLL false
 
+static bool CLR_INIT = false;
+static char* moduleFileName;
+
+
+void Attach()
+{
+	CLR_INIT = true;
+
+	DotNetInterop::Attach(moduleFileName, USE_CUSTOM_DLL);
+}
 
 Export void __cdecl GetSaveRegions(struct BufferDesc &bufDesc)
 {
+	if (!CLR_INIT)
+		Attach();
+
 	bufDesc.bufferStart = DotNetInterop::GetSaveBuffer();
 	bufDesc.length = DotNetInterop::GetSaveBufferLength();
 }
@@ -37,6 +50,9 @@ Export void __cdecl GetSaveRegions(struct BufferDesc &bufDesc)
 // Note: Returns true if level loaded successfully and is playable, false to abort
 Export int InitProc()
 {
+	if (!CLR_INIT)
+		Attach();
+
 	return DotNetInterop::Initialize();
 }
 
@@ -48,6 +64,9 @@ Export int InitProc()
 //		 empty and handle all AI controls through triggers.
 Export void AIProc() 
 {
+	if (!CLR_INIT)
+		Attach();
+
 	DotNetInterop::Update();
 }
 
@@ -82,11 +101,15 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			filePath = new char[len];
 		}
 
-		result = DotNetInterop::Attach(filePath, USE_CUSTOM_DLL);
+		//result = DotNetInterop::Attach(filePath, USE_CUSTOM_DLL);
 
-		delete[] filePath;
+		//delete[] filePath;
 
-		return result;
+		//return result;
+
+		moduleFileName = filePath;
+
+		return true;
 
 		break;
 

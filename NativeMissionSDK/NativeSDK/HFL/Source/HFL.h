@@ -16,6 +16,7 @@
 #include "TriggerEx.h"
 #include "GameMapEx.h"
 #include "TethysGameEx.h"
+#include "Research.h"
 #include "PaneGFXSurface.h"
 #include "PaneReport.h"
 #include "PaneButton.h"

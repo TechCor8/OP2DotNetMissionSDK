@@ -22,7 +22,7 @@ int HFLInit()
 
 	unitInfoObj = (void*)(imageBase + 0x15B780);
 	gameObj = (void*)(imageBase + 0x16EA98);
-	researchObj = (void*)(imageBase + 0x16C230);
+	researchObj = (OP2Research*)(imageBase + 0x16C230);
 	frameObj = (void*)(imageBase + 0x1756C0);
 	statusBarObj = (void*)(imageBase + 0x1761B0);
 

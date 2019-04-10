@@ -2,7 +2,7 @@
 
 namespace DotNetMissionSDK.Utility
 {
-	public class TechInfo
+	public class TechInfoOld
 	{
 		// TODO: Pull this info directly from OP2?
 		public static int GetTechID(map_id unitType)

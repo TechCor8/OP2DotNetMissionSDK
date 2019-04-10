@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK.HFL
@@ -141,7 +142,7 @@ namespace DotNetMissionSDK.HFL
 		public int GetPlymDockPos()									{ return UnitInfo_GetPlymDockPos(m_UnitType);							}
 		public void SetPlymDockPos(int value)						{ UnitInfo_SetPlymDockPos(m_UnitType, value);							}
 		
-		public string GetCodeName()									{ return UnitInfo_GetCodeName(m_UnitType);								}
+		public string GetCodeName()									{ return Marshal.PtrToStringAnsi(UnitInfo_GetCodeName(m_UnitType));		}
 		
 		//public int CreateUnit(int tileX, int tileY, int unitID)	{ return UnitInfo_CreateUnit(m_UnitType, tileX, tileY, unitID);			}
 
@@ -300,7 +301,7 @@ namespace DotNetMissionSDK.HFL
 		[DllImport("DotNetInterop.dll")] private static extern int UnitInfo_GetPlymDockPos(map_id unitType);
 		[DllImport("DotNetInterop.dll")] private static extern void UnitInfo_SetPlymDockPos(map_id unitType, int value);
 	
-		[DllImport("DotNetInterop.dll")] private static extern string UnitInfo_GetCodeName(map_id unitType);
+		[DllImport("DotNetInterop.dll")] private static extern IntPtr UnitInfo_GetCodeName(map_id unitType);
 		//[DllImport("DotNetInterop.dll")] private static extern map_id UnitInfo_GetMapID(map_id unitType); // No need to go to C++ for map_id when we have it right in this class!
 	
 		[DllImport("DotNetInterop.dll")] private static extern int UnitInfo_CreateUnit(map_id unitType, int tileX, int tileY, int unitID);

@@ -98,6 +98,9 @@
     <ClCompile Include="HFL\UnitInfo.cpp">
       <Filter>HFL</Filter>
     </ClCompile>
+    <ClCompile Include="HFL\Research.cpp">
+      <Filter>HFL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">

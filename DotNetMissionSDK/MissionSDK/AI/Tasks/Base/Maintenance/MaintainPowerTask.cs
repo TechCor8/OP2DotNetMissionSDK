@@ -42,7 +42,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 			if (owner.player.IsEden())
 			{
-				if (owner.player.HasTechnology(TechInfo.GetTechID(map_id.GeothermalPlant)))
+				if (owner.player.HasTechnology(TechInfoOld.GetTechID(map_id.GeothermalPlant)))
 				{
 					// TODO: Check if vents are near a CC. If yes, build geocon and return
 				}
@@ -79,11 +79,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID)) canAfford = false;
 				if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID)) canAfford = false;
 
-				if (canAfford && owner.player.HasTechnology(TechInfo.GetTechID(map_id.MHDGenerator)))
+				if (canAfford && owner.player.HasTechnology(TechInfoOld.GetTechID(map_id.MHDGenerator)))
 					powerPlantTypeToBuild = map_id.MHDGenerator;
 			}
 
-			if (owner.player.HasTechnology(TechInfo.GetTechID(map_id.SolarPowerArray)))
+			if (owner.player.HasTechnology(TechInfoOld.GetTechID(map_id.SolarPowerArray)))
 			{
 				UnitInfo moduleInfo = new UnitInfo(map_id.SolarPowerArray);
 
