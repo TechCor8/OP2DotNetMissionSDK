@@ -94,12 +94,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			if (owner.player.IsEden())
 			{
-				if (owner.player.HasTechnology(TechInfoOld.GetTechID(map_id.AdvancedResidence)) && owner.units.residences.Count > owner.units.advancedResidences.Count * 2)
+				UnitInfo unitInfo = new UnitInfo(map_id.AdvancedResidence);
+				TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
+
+				if (owner.player.HasTechnology(techInfo.GetTechID()) && owner.units.residences.Count > owner.units.advancedResidences.Count * 2)
 					residenceTypeToBuild = map_id.AdvancedResidence;
 			}
 			else
 			{
-				if (owner.player.HasTechnology(TechInfoOld.GetTechID(map_id.ReinforcedResidence)) && owner.units.residences.Count > owner.units.reinforcedResidences.Count * 2)
+				UnitInfo unitInfo = new UnitInfo(map_id.ReinforcedResidence);
+				TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
+
+				if (owner.player.HasTechnology(techInfo.GetTechID()) && owner.units.residences.Count > owner.units.reinforcedResidences.Count * 2)
 					residenceTypeToBuild = map_id.ReinforcedResidence;
 			}
 
@@ -144,7 +150,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			if (!owner.player.IsEden())
 			{
-				if (owner.player.HasTechnology(TechInfoOld.GetTechID(map_id.Forum)) && owner.units.recreationFacilities.Count > owner.units.forums.Count * 2)
+				UnitInfo unitInfo = new UnitInfo(map_id.Forum);
+				TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
+
+				if (owner.player.HasTechnology(techInfo.GetTechID()) && owner.units.recreationFacilities.Count > owner.units.forums.Count * 2)
 					recreationTypeToBuild = map_id.Forum;
 			}
 

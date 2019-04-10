@@ -42,7 +42,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			map_id rocketToBuild = map_id.SULV;
 
 			// Build an RLV if we have the technology
-			if (owner.player.HasTechnology(TechInfoOld.GetTechID(map_id.RLV)))
+			UnitInfo unitInfo = new UnitInfo(map_id.RLV);
+			TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
+
+			if (owner.player.HasTechnology(techInfo.GetTechID()))
 				rocketToBuild = map_id.RLV;
 
 			UnitInfo moduleInfo = new UnitInfo(rocketToBuild);

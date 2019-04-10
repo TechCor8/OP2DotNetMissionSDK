@@ -20,7 +20,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 		protected override bool PerformTask()
 		{
 			// Fail Check: Research
-			if (!owner.player.HasTechnology(TechInfoOld.GetTechID(m_StarshipModule)))
+			UnitInfo unitInfo = new UnitInfo(m_StarshipModule);
+			TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
+
+			if (!owner.player.HasTechnology(techInfo.GetTechID()))
 				return false;
 			
 			// Get spaceports with rocket
