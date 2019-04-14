@@ -107,10 +107,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				return true;
 
 			UnitInfo moduleInfo = new UnitInfo(m_KitToBuild);
-
+			
 			// Fail Check: Kit cost
 			if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID)) return false;
 			if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID)) return false;
+
+			if (m_KitToBuildCargo != map_id.None)
+			{
+				UnitInfo cargoinfo = new UnitInfo(m_KitToBuildCargo);
+
+				// Fail Check: Kit cost
+				if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID) + cargoinfo.GetOreCost(owner.player.playerID)) return false;
+				if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID) + cargoinfo.GetRareOreCost(owner.player.playerID)) return false;
+			}
 
 			// Build kit
 			factory.DoProduce(m_KitToBuild, m_KitToBuildCargo);

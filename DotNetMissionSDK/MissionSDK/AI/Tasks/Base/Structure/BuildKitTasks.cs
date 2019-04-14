@@ -139,4 +139,59 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildSpaceportKitTask()										{ m_KitToBuild = map_id.Spaceport;						}
 		public BuildSpaceportKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.Spaceport;						}
 	}
+
+	public sealed class BuildObservatoryKitTask : BuildStructureKitTask
+	{
+		public BuildObservatoryKitTask()									{ m_KitToBuild = map_id.Observatory;					}
+		public BuildObservatoryKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.Observatory;					}
+	}
+
+	public sealed class BuildMeteorDefenseKitTask : BuildStructureKitTask
+	{
+		public BuildMeteorDefenseKitTask()									{ m_KitToBuild = map_id.MeteorDefense;					}
+		public BuildMeteorDefenseKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.MeteorDefense;					}
+	}
+
+	public sealed class BuildGuardPostKitTask : BuildStructureKitTask
+	{
+		public BuildGuardPostKitTask()										{ m_KitToBuild = map_id.GuardPost;						}
+		public BuildGuardPostKitTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.GuardPost;						}
+
+		public void SetTurret(map_id turret)								{ m_KitToBuildCargo = turret;							}
+
+		public void RandomizeTurret(bool includeLineOfSight=true, bool includeBombs=false)
+		{
+			if (owner.player.IsEden())
+			{
+				int min = includeLineOfSight ? 0 : 2;
+				int max = includeBombs ? 6 : 5;
+
+				switch (TethysGame.GetRandomRange(min, max))
+				{
+					case 0:		m_KitToBuildCargo = map_id.Laser;		break;
+					case 1:		m_KitToBuildCargo = map_id.RailGun;		break;
+					case 2:		m_KitToBuildCargo = map_id.AcidCloud;	break;
+					case 3:		m_KitToBuildCargo = map_id.EMP;			break;
+					case 4:		m_KitToBuildCargo = map_id.ThorsHammer;	break;
+					case 5:		m_KitToBuildCargo = map_id.Starflare2;	break;
+				}
+			}
+			else
+			{
+				int min = includeLineOfSight ? 0 : 2;
+				int max = includeBombs ? 6 : 5;
+
+				switch (TethysGame.GetRandomRange(min, max))
+				{
+					case 0:		m_KitToBuildCargo = map_id.Microwave;	break;
+					case 1:		m_KitToBuildCargo = map_id.EMP;			break;
+					case 2:		m_KitToBuildCargo = map_id.RPG;			break;
+					case 3:		m_KitToBuildCargo = map_id.ESG;			break;
+					case 4:		m_KitToBuildCargo = map_id.Stickyfoam;	break;
+					case 5:		m_KitToBuildCargo = map_id.Starflare2;	break;
+					case 6:		m_KitToBuildCargo = map_id.Supernova2;	break;
+				}
+			}
+		}
+	}
 }

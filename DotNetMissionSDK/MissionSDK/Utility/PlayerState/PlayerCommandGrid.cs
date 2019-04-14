@@ -189,12 +189,47 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			return false;
 		}
 
+		private UnitEx GetBuildingOnTile(int x, int y)
+		{
+			foreach (UnitEx building in new PlayerAllBuildingEnum(m_PlayerID))
+			{
+				MAP_RECT buildingArea = building.GetUnitInfo().GetRect(building.GetPosition());
+
+				if (buildingArea.Contains(x,y))
+					return building;
+			}
+
+			return null;
+		}
+
 		private LOCATION GetPointInGridSpace(LOCATION pt)
 		{
 			pt.x = pt.x - GameMap.bounds.xMin;
 			pt.y = pt.y - GameMap.bounds.yMin;
 
 			return pt;
+		}
+
+		public List<UnitEx> GetConnectedStructures(LOCATION tile)
+		{
+			List<UnitEx> connectedStructures = new List<UnitEx>();
+
+			Pathfinder.TileCostCallback tileCostCB = (int x, int y) =>
+			{
+				UnitEx building = GetBuildingOnTile(x, y);
+
+				if (GameMap.GetCellType(x, y) != CellType.Tube0 && building == null)
+					return Pathfinder.Impassable;
+				
+				if (building != null)
+					connectedStructures.Add(building);
+
+				return 1;
+			};
+
+			Pathfinder.GetClosestValidTile(tile, tileCostCB, IsValidTile, out _, false);
+
+			return connectedStructures;
 		}
 	}
 }

@@ -79,7 +79,7 @@
 			"TechLevel":12,
 			"MoraleLevel":"Fair",
 			"FreeMorale":true,
-			"IsEden":false,
+			"IsEden":true,
 			"IsHuman":true,
 			"Color":"Blue",
 			"Allies":[1],

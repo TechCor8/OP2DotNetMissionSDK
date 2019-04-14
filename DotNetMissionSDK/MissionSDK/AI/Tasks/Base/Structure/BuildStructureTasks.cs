@@ -233,4 +233,41 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			AddPrerequisite(new BuildSpaceportKitTask());
 		}
 	}
+
+	public sealed class BuildObservatoryTask : BuildStructureTask
+	{
+		public BuildObservatoryTask()										{ m_KitToBuild = map_id.Observatory;	m_DesiredDistance = 1;	}
+		public BuildObservatoryTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.Observatory;	m_DesiredDistance = 1;	}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(new BuildObservatoryKitTask());
+		}
+	}
+
+	public sealed class BuildMeteorDefenseTask : BuildStructureTask
+	{
+		public BuildMeteorDefenseTask()										{ m_KitToBuild = map_id.MeteorDefense;	m_DesiredDistance = 1;	}
+		public BuildMeteorDefenseTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.MeteorDefense;	m_DesiredDistance = 1;	}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(new BuildMeteorDefenseKitTask());
+		}
+	}
+
+	public sealed class BuildGuardPostTask : BuildStructureTask
+	{
+		public BuildGuardPostKitTask kitTask;
+
+		public BuildGuardPostTask()											{ m_KitToBuild = map_id.GuardPost;	m_DesiredDistance = 4;		}
+		public BuildGuardPostTask(PlayerInfo owner) : base(owner)			{ m_KitToBuild = map_id.GuardPost;	m_DesiredDistance = 4;		}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(kitTask = new BuildGuardPostKitTask());
+
+			kitTask.RandomizeTurret();
+		}
+	}
 }

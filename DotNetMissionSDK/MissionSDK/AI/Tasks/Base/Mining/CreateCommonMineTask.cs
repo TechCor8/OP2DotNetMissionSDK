@@ -68,7 +68,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			if (beacon.GetSurveyedBy(owner.player.playerID))
 			{
 				// Deploy miner
-				BuildStructureTask.ClearDeployArea(miner, map_id.CommonOreMine, beacon.GetPosition());
+				BuildStructureTask.ClearDeployArea(miner, map_id.CommonOreMine, beacon.GetPosition(), owner.player);
 
 				if (!miner.GetPosition().Equals(beaconPosition) && miner.GetCurAction() == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
 					miner.DoDeployMiner(beaconPosition.x, beaconPosition.y);

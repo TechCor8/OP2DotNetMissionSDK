@@ -130,7 +130,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				return false;
 
 			// Clear units out of deploy area
-			BuildStructureTask.ClearDeployArea(convec, convec.GetCargo(), foundPt);
+			BuildStructureTask.ClearDeployArea(convec, convec.GetCargo(), foundPt, owner.player);
 
 			// Build structure
 			convec.DoBuild(convec.GetCargo(), foundPt.x, foundPt.y);

@@ -7,6 +7,8 @@ namespace DotNetMissionSDK
 		public int x;
 		public int y;
 
+		public LOCATION normal		{ get { return new LOCATION(-y,x);		} }
+
 		public LOCATION(int x, int y)
 		{
 			this.x = x;

@@ -7,6 +7,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
 	public class FixDisconnectedStructures : Task
 	{
+		private BuildEarthworkerTask m_BuildEarthworkerTask;
+
+
 		public FixDisconnectedStructures() { }
 		public FixDisconnectedStructures(PlayerInfo owner) : base(owner) { }
 
@@ -15,6 +18,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			// Task is complete if all structures are connected
 			foreach (UnitEx building in new PlayerAllBuildingEnum(owner.player.playerID))
 			{
+				if (!BuildStructureTask.NeedsTube(building.GetUnitType()))
+					continue;
+
 				if (!owner.commandGrid.ConnectsTo(building.GetRect()))
 					return false;
 			}
@@ -25,54 +31,58 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new BuildEarthworkerTask());
+			m_BuildEarthworkerTask = new BuildEarthworkerTask(owner);
 		}
 
 		protected override bool PerformTask()
 		{
-			UnitEx unitToFix = null;
-
-			// Find disconnected structure
-			foreach (UnitEx building in new PlayerAllBuildingEnum(owner.player.playerID))
-			{
-				if (!BuildStructureTask.NeedsTube(building.GetUnitType()))
-					continue;
-
-				if (!owner.commandGrid.ConnectsTo(building.GetRect()))
-				{
-					unitToFix = building;
-					break;
-				}
-			}
+			if (!m_BuildEarthworkerTask.IsTaskComplete())
+				m_BuildEarthworkerTask.PerformTaskTree();
 
 			// Fail Check: Not enough ore for tubes
 			if (owner.player.Ore() < 50)
 				return false;
 
-			if (unitToFix == null)
-				return false;
+			int structuresThatNeedTubes = 0;
 
-			// Get earthworker
-			UnitEx earthworker = GetClosestEarthworker(unitToFix.GetPosition());
-
-			if (earthworker.GetCurAction() != ActionType.moDone)
-				return true;
-
-			// Get path from tube network to structure
-			LOCATION[] path = owner.commandGrid.GetPathToClosestConnectedTile(unitToFix.GetRect());
-			if (path == null)
-				return false;
-
-			// Fix disconnected structure
-			for (int i = 0; i < path.Length; ++i)
+			// Find disconnected structures
+			foreach (UnitEx unitToFix in new PlayerAllBuildingEnum(owner.player.playerID))
 			{
-				if (GameMap.GetCellType(path[i].x, path[i].y) == CellType.Tube0)
+				if (!BuildStructureTask.NeedsTube(unitToFix.GetUnitType()))
 					continue;
 
-				BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, path[i]);
+				if (owner.commandGrid.ConnectsTo(unitToFix.GetRect()))
+					continue;
 
-				earthworker.DoBuildWall(map_id.Tube, new MAP_RECT(path[i], new LOCATION(1, 1)));
-				break;
+				++structuresThatNeedTubes;
+
+				// Get earthworker
+				UnitEx earthworker = GetClosestEarthworker(unitToFix.GetPosition());
+
+				if (earthworker == null || earthworker.GetCurAction() != ActionType.moDone)
+					continue;
+
+				// Get path from tube network to structure
+				LOCATION[] path = owner.commandGrid.GetPathToClosestConnectedTile(unitToFix.GetRect());
+				if (path == null)
+					continue;
+
+				// Fix disconnected structure
+				for (int i = 0; i < path.Length; ++i)
+				{
+					if (GameMap.GetCellType(path[i].x, path[i].y) == CellType.Tube0)
+						continue;
+
+					BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, path[i], owner.player);
+
+					earthworker.DoBuildWall(map_id.Tube, new MAP_RECT(path[i], new LOCATION(1, 1)));
+					break;
+				}
 			}
+
+			// If we are overwhelmed, build more earthworkers to meet demand
+			if (structuresThatNeedTubes/4 + 1 > owner.units.earthWorkers.Count)
+				m_BuildEarthworkerTask.targetCountToBuild = structuresThatNeedTubes/4 + 1;
 
 			return true;
 		}

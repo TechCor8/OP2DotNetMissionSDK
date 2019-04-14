@@ -15,8 +15,10 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int FixDisconnectedStructures_GoalID	= 4;
 		public const int MaintainFood_GoalID				= 5;
 		public const int MaintainPopulation_GoalID			= 6;
-		public const int ExpandRareMining_GoalID			= 7;
-		public const int LaunchStarship_GoalID				= 8;
+		public const int MaintainDefenses_GoalID			= 7;
+		public const int MaintainWalls_GoalID				= 8;
+		public const int ExpandRareMining_GoalID			= 9;
+		public const int LaunchStarship_GoalID				= 10;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -41,6 +43,8 @@ namespace DotNetMissionSDK.AI.Managers
 				new Goal(new FixDisconnectedStructures(owner), 1),
 				new Goal(new MaintainFoodTask(owner), 1),
 				new Goal(new MaintainPopulationTask(owner), 1),
+				new Goal(new MaintainDefenseTask(owner), 1),
+				new Goal(new MaintainWallsTask(owner), 1),
 				new Goal(new CreateRareMiningBaseTask(owner, m_MiningBaseState), 1),
 				new Goal(new DeployEvacModuleTask(owner), 1),
 			};
@@ -93,11 +97,13 @@ namespace DotNetMissionSDK.AI.Managers
 			
 			// Fix disconnected structures
 			if (!goals[FixDisconnectedStructures_GoalID].task.IsTaskComplete())
-				goals[FixDisconnectedStructures_GoalID].task.PerformTaskTree();
+				goals[FixDisconnectedStructures_GoalID].task.PerformTaskTree(); // Tubes
+			else if (!goals[MaintainWalls_GoalID].task.IsTaskComplete())
+				goals[MaintainWalls_GoalID].task.PerformTaskTree(); // Walls
 
 			// Keep people fed
 			if (!goals[MaintainFood_GoalID].task.IsTaskComplete())
-				return goals[MaintainFood_GoalID].task.PerformTaskTree();
+				goals[MaintainFood_GoalID].task.PerformTaskTree();
 
 			// Grow population
 			MaintainPopulationTask maintainPopulationTask = (MaintainPopulationTask)goals[MaintainPopulation_GoalID].task;
@@ -107,6 +113,8 @@ namespace DotNetMissionSDK.AI.Managers
 				return maintainPopulationTask.PerformTaskTree();
 
 			// Build defenses
+			if (!goals[MaintainDefenses_GoalID].task.IsTaskComplete())
+				goals[MaintainDefenses_GoalID].task.PerformTaskTree();
 
 			// Expand rare mining
 			if (owner.units.rareOreMines.Count == 0 || owner.units.rareOreSmelters.Count == 0)

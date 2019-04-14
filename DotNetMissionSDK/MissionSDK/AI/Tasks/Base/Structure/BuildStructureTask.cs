@@ -15,6 +15,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		private bool m_CanBuildDisconnected;
 
+		private bool m_OverrideLocation = false;
+		private LOCATION m_TargetLocation;
+
 		public int targetCountToBuild = 1;
 
 		public BuildStructureTask() { }
@@ -26,6 +29,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return units.Count >= targetCountToBuild;
 		}
 
+		public void SetLocation(LOCATION targetPosition)
+		{
+			m_OverrideLocation = true;
+			m_TargetLocation = targetPosition;
+		}
 
 		public override void GeneratePrerequisites()
 		{
@@ -49,25 +57,29 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			// If we can build earthworkers or have one, we can deploy disconnected structures
 			m_CanBuildDisconnected = owner.units.earthWorkers.Count > 0 || owner.units.vehicleFactories.Count > 0 || !NeedsTube(m_KitToBuild);
 
-			// Find closest CC
-			UnitEx closestCC = null;
-			int closestDistance = 900000;
-			foreach (UnitEx cc in owner.units.commandCenters)
+			if (!m_OverrideLocation)
 			{
-				int distance = convec.GetPosition().GetDiagonalDistance(cc.GetPosition());
-				if (distance < closestDistance)
+				// Find closest CC
+				UnitEx closestCC = null;
+				int closestDistance = 900000;
+				foreach (UnitEx cc in owner.units.commandCenters)
 				{
-					closestCC = cc;
-					closestDistance = distance;
+					int distance = convec.GetPosition().GetDiagonalDistance(cc.GetPosition());
+					if (distance < closestDistance)
+					{
+						closestCC = cc;
+						closestDistance = distance;
+					}
 				}
+				m_TargetLocation = closestCC.GetPosition();
 			}
 
 			// Find open location near CC
 			LOCATION foundPt;
-			if (!Pathfinder.GetClosestValidTile(closestCC.GetPosition(), GetTileCost, IsValidTile, out foundPt))
+			if (!Pathfinder.GetClosestValidTile(m_TargetLocation, GetTileCost, IsValidTile, out foundPt))
 				return false;
 
-			ClearDeployArea(convec, convec.GetCargo(), foundPt);
+			ClearDeployArea(convec, convec.GetCargo(), foundPt, owner.player);
 
 			// Build structure
 			convec.DoBuild(m_KitToBuild, foundPt.x, foundPt.y);
@@ -75,7 +87,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return true;
 		}
 
-		public static void ClearDeployArea(UnitEx deployUnit, map_id buildingType, LOCATION deployPt)
+		public static void ClearDeployArea(UnitEx deployUnit, map_id buildingType, LOCATION deployPt, Player owner)
 		{
 			// Get area to deploy structure
 			UnitInfo info = new UnitInfo(buildingType);
@@ -105,6 +117,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 				position += dir;
 
+				LOCATION normal = dir.normal;
+
+				if (!GameMap.IsTilePassable(position) || IsAreaBlocked(new MAP_RECT(position, new LOCATION(1,1)), owner.playerID))
+					position = unit.GetPosition() + normal;
+				if (!GameMap.IsTilePassable(position) || IsAreaBlocked(new MAP_RECT(position, new LOCATION(1,1)), owner.playerID))
+					position = unit.GetPosition() - normal;
+				if (!GameMap.IsTilePassable(position) || IsAreaBlocked(new MAP_RECT(position, new LOCATION(1,1)), owner.playerID))
+					continue;
+
 				unit.DoMove(position.x, position.y);
 			}
 		}
@@ -119,7 +140,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		}
 
 		// Callback for determining if tile is a valid place point
-		private bool IsValidTile(int x, int y)
+		protected bool IsValidTile(int x, int y)
 		{
 			// Get area to deploy structure
 			UnitInfo info = new UnitInfo(m_KitToBuild);
@@ -162,7 +183,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return true;
 		}
 
-		public static bool IsAreaBlocked(MAP_RECT targetArea, int ownerID)
+		public static bool IsAreaBlocked(MAP_RECT targetArea, int ownerID, bool includeBulldozedArea=false)
 		{
 			// Check if area is blocked by structure or enemy
 			for (int i=0; i < TethysGame.NoPlayers(); ++i)
@@ -171,13 +192,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				{
 					if (unit.IsBuilding())
 					{
-						MAP_RECT unitArea = unit.GetUnitInfo().GetRect(unit.GetPosition());
+						MAP_RECT unitArea = unit.GetUnitInfo().GetRect(unit.GetPosition(), includeBulldozedArea);
 						if (targetArea.DoesRectIntersect(unitArea))
 							return true;
 					}
-
-					if (unit.GetOwnerID() != ownerID)
-						return true;
+					else if (unit.IsVehicle())
+					{
+						if (unit.GetOwnerID() != ownerID && targetArea.Contains(unit.GetPosition()))
+							return true;
+					}
 				}
 			}
 
