@@ -77,7 +77,7 @@
 		{
 			"ID":0,
 			"TechLevel":12,
-			"MoraleLevel":"Fair",
+			"MoraleLevel":"Excellent",
 			"FreeMorale":true,
 			"IsEden":true,
 			"IsHuman":true,
@@ -85,9 +85,9 @@
 			"Allies":[1],
 			"CenterView": { "X":27, "Y":38 },
 			
-			"Kids":20,
-			"Workers":50,
-			"Scientists":23,
+			"Kids":10,
+			"Workers":24,
+			"Scientists":13,
 			"CommonOre":27000,
 			"RareOre":25000,
 			"Food":7000,
