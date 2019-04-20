@@ -67,6 +67,7 @@ namespace DotNetMissionSDK.HFL
 		public bool HasPower()														{ return UnitEx_HasPower(m_StubIndex) > 0;														}
 		public bool HasWorkers()													{ return UnitEx_HasWorkers(m_StubIndex) > 0;													}
 		public bool HasScientists()													{ return UnitEx_HasScientists(m_StubIndex) > 0;													}
+		public bool IsInfected()													{ return UnitEx_IsInfected(m_StubIndex) > 0;													}
 
 		public bool GetDoubleFireRate()												{ return UnitEx_GetDoubleFireRate(m_StubIndex) > 0;												}
 		public bool GetInvisible()													{ return UnitEx_GetInvisible(m_StubIndex) > 0;													}
@@ -84,6 +85,11 @@ namespace DotNetMissionSDK.HFL
 		public Variant GetVariant()													{ return (Variant)UnitEx_GetVariant(m_StubIndex);												}
 		public BeaconType GetOreType()												{ return (BeaconType)UnitEx_GetOreType(m_StubIndex);											}
 		public bool GetSurveyedBy(int playerID)										{ return ((1 << playerID) & UnitEx_GetSurveyedBy(m_StubIndex)) != 0;							}
+
+		// Lab
+		public int GetLabCurrentTopic()												{ return UnitEx_GetLabCurrentTopic(m_StubIndex);												}
+		public int GetLabScientistCount()											{ return UnitEx_GetLabScientistCount(m_StubIndex);												}
+		public void SetLabScientistCount(int numScientists)							{ UnitEx_SetLabScientistCount(m_StubIndex, numScientists);										}
 
 		public bool HasEmptyBay()													{ return GetBayWithCargo(map_id.None) >= 0;														}
 		public bool HasBayWithCargo(map_id cargoType)								{ return GetBayWithCargo(cargoType) >= 0;														}
@@ -210,6 +216,7 @@ namespace DotNetMissionSDK.HFL
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_HasPower(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_HasWorkers(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_HasScientists(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_IsInfected(int unitID);
 
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetDoubleFireRate(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetInvisible(int unitID);
@@ -230,6 +237,11 @@ namespace DotNetMissionSDK.HFL
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetVariant(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetOreType(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetSurveyedBy(int unitID);
+
+		// Lab
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetLabCurrentTopic(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetLabScientistCount(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_SetLabScientistCount(int unitID, int numScientists);
 		
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetUnknownValue(int unitID, int index);
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_SetUnknownValue(int unitID, int index, int value);

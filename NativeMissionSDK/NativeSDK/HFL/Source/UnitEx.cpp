@@ -143,17 +143,6 @@ struct cmdSalvage
 	short unitIdGorf;
 };
 
-struct BeaconData
-{
-	int numTruckLoadsSoFar;
-	int barYield;
-	int variant;
-	char oreType; // [0 = common, 1 = rare]
-	char unknown1;
-	char unknown2;
-	char surveyedBy; // [player bit vector]
-};
-
 // todo: 'build' command with waypoints
 
 // OP2Unit
@@ -202,6 +191,28 @@ struct OP2Unit
 	int objectOnPad;
 	int launchPadCargo; // Arklon says this should be an int32. unknown15 would be int16?
 	short unknown15;
+};
+
+struct BeaconData
+{
+	int numTruckLoadsSoFar;
+	int barYield;
+	int variant;
+	char oreType; // [0 = common, 1 = rare]
+	char unknown1;
+	char unknown2;
+	char surveyedBy; // [player bit vector]
+};
+
+struct LabData
+{
+	short nextResearchTime;		// Amount of time until next research increment(research progresses in chunks)
+	short unknown1;
+	int unknown2[5];
+	int researchRemaining;		// Amount of research left to complete tech(intialized to costOfResearch * 256 when research starts)
+	int unknown3[8];
+	int techNum;
+	char numScientists;			// numScientists researching at the lab
 };
 #pragma pack(pop)
 
@@ -913,6 +924,17 @@ int UnitEx::HasScientists()
 	return (*unitArray)[unitID].flags & flagScientists;
 }
 
+int UnitEx::IsInfected()
+{
+	if (!isInited)
+		return HFLNOTINITED;
+
+	if (!IsLive())
+		return -1;
+
+	return (*unitArray)[unitID].flags & flagInfected;
+}
+
 void UnitEx::SetDoubleFireRate(int boolOn)
 {
 	if (!isInited)
@@ -1017,6 +1039,33 @@ int UnitEx::GetSurveyedBy()
 
 	BeaconData* p = (BeaconData*)((int)(*unitArray) + (unitID * 120) + 0x58);
 	return p->surveyedBy;
+}
+
+int UnitEx::GetLabCurrentTopic()
+{
+	if (!isInited)
+		return HFLNOTINITED;
+
+	LabData* p = (LabData*)((int)(*unitArray) + (unitID * 120) + 0x24);
+	return p->techNum;
+}
+
+int UnitEx::GetLabScientistCount()
+{
+	if (!isInited)
+		return HFLNOTINITED;
+
+	LabData* p = (LabData*)((int)(*unitArray) + (unitID * 120) + 0x24);
+	return p->numScientists;
+}
+
+void UnitEx::SetLabScientistCount(int numScientists)
+{
+	if (!isInited)
+		return;
+
+	LabData* p = (LabData*)((int)(*unitArray) + (unitID * 120) + 0x24);
+	p->numScientists = numScientists;
 }
 
 int UnitEx::GetUnknownValue(int index)

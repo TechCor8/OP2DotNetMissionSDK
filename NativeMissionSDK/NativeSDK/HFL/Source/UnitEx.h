@@ -46,6 +46,7 @@ public:
 	int HasPower();
 	int HasWorkers();
 	int HasScientists();
+	int IsInfected();
 	void SetDoubleFireRate(int boolOn);
 	void SetInvisible(int boolOn);
 	LOCATION GetDockLocation();
@@ -59,6 +60,11 @@ public:
 	int GetVariant();
 	int GetOreType(); // [0 = common, 1 = rare]
 	int GetSurveyedBy(); // [player bit vector]
+
+	// Lab
+	int GetLabCurrentTopic();
+	int GetLabScientistCount();
+	void SetLabScientistCount(int numScientists);
 	
 	int GetUnknownValue(int index);
 	void SetUnknownValue(int index, int value);

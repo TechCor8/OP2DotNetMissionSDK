@@ -321,6 +321,13 @@ extern "C"
 
 		return unit.HasScientists();
 	}
+	extern EXPORT int __stdcall UnitEx_IsInfected(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.IsInfected();
+	}
 
 	extern EXPORT void __stdcall UnitEx_SetDoubleFireRate(int unitID, int boolOn)
 	{
@@ -398,6 +405,28 @@ extern "C"
 		unit.unitID = unitID;
 
 		return unit.GetSurveyedBy();
+	}
+
+	extern EXPORT int __stdcall UnitEx_GetLabCurrentTopic(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetLabCurrentTopic();
+	}
+	extern EXPORT int __stdcall UnitEx_GetLabScientistCount(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetLabScientistCount();
+	}
+	extern EXPORT void __stdcall UnitEx_SetLabScientistCount(int unitID, int numScientists)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		unit.SetLabScientistCount(numScientists);
 	}
 
 	extern EXPORT int __stdcall UnitEx_GetUnknownValue(int unitID, int index)
