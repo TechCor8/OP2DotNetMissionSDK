@@ -166,7 +166,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				int min = includeLineOfSight ? 0 : 2;
 				int max = includeBombs ? 6 : 5;
 
-				switch (TethysGame.GetRandomRange(min, max))
+				int rand = TethysGame.GetRandomRange(min, max);
+				switch (rand)
 				{
 					case 0:		m_KitToBuildCargo = map_id.Laser;		break;
 					case 1:		m_KitToBuildCargo = map_id.RailGun;		break;
@@ -181,7 +182,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				int min = includeLineOfSight ? 0 : 2;
 				int max = includeBombs ? 6 : 5;
 
-				switch (TethysGame.GetRandomRange(min, max))
+				int rand = TethysGame.GetRandomRange(min, max);
+				switch (rand)
 				{
 					case 0:		m_KitToBuildCargo = map_id.Microwave;	break;
 					case 1:		m_KitToBuildCargo = map_id.EMP;			break;

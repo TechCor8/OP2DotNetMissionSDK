@@ -112,12 +112,8 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] public static extern void FreeMoraleLevel(int playerNum);      // Let Morale vary according to colony state and events
 
 		// Random number generation
-		private static Random m_Random = new Random();
-		public static void SetSeed(int randNumSeed)		{ m_Random = new Random(randNumSeed);			}
-		public static int GetRand(int range)			{ return m_Random.Next(range);					}
-		
-		//[DllImport("DotNetInterop.dll")] public static extern void SetSeed(uint randNumSeed);			// Set random number seed
-		//[DllImport("DotNetInterop.dll")] public static extern int GetRand(int range);                   // Returns a number from 0..(range-1)
+		[DllImport("DotNetInterop.dll")] public static extern void SetSeed(uint randNumSeed);			// Set random number seed
+		[DllImport("DotNetInterop.dll")] public static extern int GetRand(int range);                   // Returns a number from 0..(range-1)
 
 		// Disaster Creation
 		[DllImport("DotNetInterop.dll")] public static extern void SetMeteor(int tileX, int tileY, int size);
