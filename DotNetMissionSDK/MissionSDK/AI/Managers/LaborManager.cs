@@ -33,6 +33,9 @@ namespace DotNetMissionSDK.AI.Managers
 		private List<UnitEx> m_UselessStructures = new List<UnitEx>();
 		private List<UnitEx> m_CrippledStructures = new List<UnitEx>();
 
+		private int m_AvailableWorkers;
+		private int m_AvailableScientists;
+
 		public PlayerInfo owner { get; private set; }
 
 
@@ -92,11 +95,12 @@ namespace DotNetMissionSDK.AI.Managers
 			AddPriorityBuilding(owner.units.nurseries, 1, true);
 			AddPriorityBuilding(owner.units.universities, 1, true);
 
-			if (m_StructurePriority.Count > 2 &&
-				m_StructurePriority[m_StructurePriority.Count-1].GetUnitType() == map_id.University &&
-				m_StructurePriority[m_StructurePriority.Count-2].GetUnitType() == map_id.Nursery)
+			//if (m_StructurePriority.Count > 2 &&
+			//	m_StructurePriority[m_StructurePriority.Count-1].GetUnitType() == map_id.University &&
+			//	m_StructurePriority[m_StructurePriority.Count-2].GetUnitType() == map_id.Nursery)
+			if (TethysGame.UsesMorale())
 			{
-				// Can grow labor force, include morale structures
+				// Morale fluctuates, include morale structures
 
 				// Residences
 				int neededCapacity = owner.player.TotalPopulation();
@@ -124,16 +128,16 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 			else
 			{
-				// All morale structures are low priority
-				AddPriorityBuilding(owner.units.advancedResidences, 0);
-				AddPriorityBuilding(owner.units.reinforcedResidences, 0);
-				AddPriorityBuilding(owner.units.residences, 0);
+				// All morale structures are useless
+				AddPriorityBuilding(owner.units.advancedResidences, 0, true);
+				AddPriorityBuilding(owner.units.reinforcedResidences, 0, true);
+				AddPriorityBuilding(owner.units.residences, 0, true);
 
-				AddPriorityBuilding(owner.units.medicalCenters, 0);
-				AddPriorityBuilding(owner.units.gorfs, 0);
-				AddPriorityBuilding(owner.units.forums, 0);
-				AddPriorityBuilding(owner.units.recreationFacilities, 0);
-				AddPriorityBuilding(owner.units.dirts, 0);
+				AddPriorityBuilding(owner.units.medicalCenters, 0, true);
+				AddPriorityBuilding(owner.units.gorfs, 0, true);
+				AddPriorityBuilding(owner.units.forums, 0, true);
+				AddPriorityBuilding(owner.units.recreationFacilities, 0, true);
+				AddPriorityBuilding(owner.units.dirts, 0, true);
 			}
 
 			// Labs
@@ -161,10 +165,6 @@ namespace DotNetMissionSDK.AI.Managers
 			AddPriorityBuilding(owner.units.garages, 0, true);
 			AddPriorityBuilding(owner.units.tradeCenters, 0, true);
 			AddPriorityBuilding(owner.units.basicLabs, 0, true);
-
-			// Compile priority list
-			m_StructurePriority.AddRange(m_LowPriorityStructures);
-			m_StructurePriority.AddRange(m_UselessStructures);
 		}
 
 		// Returns remaining capacity
@@ -215,6 +215,14 @@ namespace DotNetMissionSDK.AI.Managers
 			if (building.IsInfected())
 				return false;
 
+			// Must not be under construction
+			switch (building.GetLastCommand())
+			{
+				case CommandType.ctMoDevelop:
+				case CommandType.ctMoUnDevelop:
+					return false;
+			}
+
 			// Cannot have critical damage
 			UnitInfo info = building.GetUnitInfo();
 			float hitPerc = 1 - (building.GetDamage() / (float)info.GetHitPoints(owner.player.playerID));
@@ -223,104 +231,163 @@ namespace DotNetMissionSDK.AI.Managers
 				return false;
 
 			// If doesn't need tube, it's ready to go
-			if (!BuildStructureTask.NeedsTube(building.GetUnitType()))
+			if (!BuildStructureTask.NeedsTube(building.GetUnitType()) || building.GetUnitType() == map_id.GuardPost)
 				return true;
 
 			// Cannot be disconnected from CC
 			return owner.commandGrid.ConnectsTo(building.GetRect());
 		}
 
+		/// <summary>
+		/// Attempts to activate all structures in priority order. Assigns scientists to research and workers to training.
+		/// </summary>
 		private void UpdateActivations()
 		{
 			// Deactivate crippled structures
 			foreach (UnitEx building in m_CrippledStructures)
 				building.DoIdle();
 
-			int lowestPriorityIndex = m_StructurePriority.Count-1;
+			m_AvailableWorkers = owner.player.GetNumAvailableWorkers();
+			m_AvailableScientists = owner.player.GetNumAvailableScientists();
 
-			int availableWorkers = owner.player.GetNumAvailableWorkers();
-			int availableScientists = owner.player.GetNumAvailableScientists();
+			// Pull all scientists off of labs
+			m_AvailableScientists += RemoveScientistsFromLab(owner.units.basicLabs, 9999);
+			m_AvailableScientists += RemoveScientistsFromLab(owner.units.standardLabs, 9999);
+			m_AvailableScientists += RemoveScientistsFromLab(owner.units.advancedLabs, 9999);
 
-			for (int i=0; i < m_StructurePriority.Count; ++i)
+			List<UnitEx> lowPriorityAndUseless = new List<UnitEx>(m_LowPriorityStructures);
+			lowPriorityAndUseless.AddRange(m_UselessStructures);
+
+			// Activate high priority structures
+			ActivateList(m_StructurePriority, lowPriorityAndUseless, true);
+
+			// Assign all spare scientists to research
+			AddScientistsToLabs(owner.units.advancedLabs, lowPriorityAndUseless);
+			AddScientistsToLabs(owner.units.standardLabs, lowPriorityAndUseless);
+			AddScientistsToLabs(owner.units.basicLabs, lowPriorityAndUseless);
+
+			// Assign workers to training, but only if no scientists are assigned as workers
+			if (owner.player.GetNumScientistsAsWorkers() == 0)
+				AddWorkersToTraining();
+
+			// Activate low priority structures
+			ActivateList(m_LowPriorityStructures, m_UselessStructures, false);
+			ActivateList(m_UselessStructures, new List<UnitEx>(), false);
+		}
+
+		private void ActivateList(List<UnitEx> buildingsToActivate, List<UnitEx> buildingsToIdle, bool canUseScientistsAsWorkers)
+		{
+			// When freeing labor, we want to start with buildingsToIdle, and include not yet processed buildingsToActivate
+			List<UnitEx> allBuildings = new List<UnitEx>(buildingsToActivate);
+			allBuildings.AddRange(buildingsToIdle);
+
+			for (int i=0; i < buildingsToActivate.Count; ++i)
 			{
-				UnitEx building = m_StructurePriority[i];
-				UnitInfo info = building.GetUnitInfo();
+				UnitEx building = buildingsToActivate[i];
 
-				int workersReq = info.GetWorkersRequired(owner.player.playerID);
-				int scientistsReq = info.GetScientistsRequired(owner.player.playerID);
-
-				bool hasWorkers = workersReq == 0 || building.HasWorkers();
-				bool hasScientists = scientistsReq == 0 || building.HasScientists();
-
-				// Don't need to do anything if the building has labor
-				if (hasWorkers && hasScientists)
+				// Attempt to activate structure with currently available labor
+				if (!ActivateStructure(building, canUseScientistsAsWorkers))
 				{
-					if (!building.IsEnabled())
-						building.DoUnIdle();
+					// Get needed workers and scientists for building
+					UnitInfo info = building.GetUnitInfo();
+					int workersNeeded = info.GetWorkersRequired(owner.player.playerID);
+					int scientistsNeeded = info.GetScientistsRequired(owner.player.playerID);
 
-					continue;
-				}
+					workersNeeded -= m_AvailableWorkers;
+					scientistsNeeded -= m_AvailableScientists;
 
-				int scientistsAsWorkers = 0;
-
-				// If there are not enough workers, pull from scientists
-				if (availableWorkers < workersReq)
-				{
-					int workersNeeded = workersReq - availableWorkers;
-					if (workersNeeded <= availableScientists)
-						scientistsAsWorkers = workersNeeded;
-				}
-
-				// Not enough labor, find more labor or idle
-				if (availableWorkers+scientistsAsWorkers < workersReq || availableScientists-scientistsAsWorkers < scientistsReq)
-				{
-					int workersAdded;
-					int scientistsAdded;
-
-					bool didFreeLabor = FreeLabor(lowestPriorityIndex, i, workersReq - availableWorkers, scientistsReq - availableScientists, out lowestPriorityIndex, out workersAdded, out scientistsAdded);
-
-					availableWorkers += workersAdded;
-					availableScientists += scientistsAdded;
-
-					if (didFreeLabor)
+					// Attempt to free labor
+					if (FreeLabor(allBuildings, i, workersNeeded, scientistsNeeded, canUseScientistsAsWorkers))
 					{
-						// Try to activate again
+						// Labor freed, try again
 						--i;
 						continue;
 					}
 					else
 					{
-						// Couldn't free up labor
+						// Couldn't free up labor, idle structure
 						if (building.GetLastCommand() != CommandType.ctMoIdle)
 							building.DoIdle();
+					}
+				}
+			}
+		}
 
+		/// <summary>
+		/// Activates a structure if it isn't already.
+		/// </summary>
+		/// <returns>False if there are not enough workers.</returns>
+		private bool ActivateStructure(UnitEx building, bool canUseScientistsAsWorkers)
+		{
+			UnitInfo info = building.GetUnitInfo();
+
+			int workersReq = info.GetWorkersRequired(owner.player.playerID);
+			int scientistsReq = info.GetScientistsRequired(owner.player.playerID);
+
+			// Does building already meet labor requirements?
+			bool hasWorkers = workersReq == 0 || building.HasWorkers();
+			bool hasScientists = scientistsReq == 0 || building.HasScientists();
+
+			// Don't need to do anything if the building has labor
+			if (hasWorkers && hasScientists)
+			{
+				if (!building.IsEnabled())
+					building.DoUnIdle();
+
+				return true;
+			}
+
+			int scientistsAsWorkers = 0;
+
+			// If there are not enough workers, pull from scientists
+			if (m_AvailableWorkers < workersReq && canUseScientistsAsWorkers)
+			{
+				int workersNeeded = workersReq - m_AvailableWorkers;
+				if (workersNeeded <= m_AvailableScientists)
+					scientistsAsWorkers = workersNeeded;
+			}
+
+			// Not enough labor, find more labor or idle
+			if (m_AvailableWorkers+scientistsAsWorkers < workersReq || m_AvailableScientists-scientistsAsWorkers < scientistsReq)
+				return false;
+
+			// Found labor, activate structure
+			building.DoUnIdle();
+
+			m_AvailableWorkers -= (workersReq - scientistsAsWorkers);
+			m_AvailableScientists -= (scientistsReq + scientistsAsWorkers);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Attempts to add scientists to labs until maxed.
+		/// Will use available scientists first and then buildingsToIdle to get the rest.
+		/// </summary>
+		private void AddScientistsToLabs(List<UnitEx> labs, List<UnitEx> buildingsToIdle)
+		{
+			for (int i=0; i < labs.Count; ++i)
+			{
+				UnitEx lab = labs[i];
+
+				if (!AddScientistsToLab(lab))
+				{
+					TechInfo info = Research.GetTechInfo(lab.GetLabCurrentTopic());
+					int maxScientists = info.GetMaxScientists();
+					int assignedScientists = lab.GetLabScientistCount();
+
+					if (FreeLabor(buildingsToIdle, -1, 0, maxScientists-assignedScientists, false))
+					{
+						// Labor freed, try again
+						--i;
 						continue;
 					}
 				}
-
-				// Found labor, activate structure
-				building.DoUnIdle();
-
-				availableWorkers -= (workersReq - scientistsAsWorkers);
-				availableScientists -= (scientistsReq + scientistsAsWorkers);
 			}
-
-			// Assign all spare scientists to research
-			foreach (UnitEx lab in owner.units.advancedLabs)
-				availableScientists -= AddScientistsToLab(lab, availableScientists);
-
-			foreach (UnitEx lab in owner.units.standardLabs)
-				availableScientists -= AddScientistsToLab(lab, availableScientists);
-
-			foreach (UnitEx lab in owner.units.basicLabs)
-				availableScientists -= AddScientistsToLab(lab, availableScientists);
-
-			// Assign to training
-			availableWorkers -= AddWorkersToTraining(availableWorkers);
 		}
 
-		// Returns number of scientists added
-		private int AddScientistsToLab(UnitEx lab, int availableScientists)
+		// Returns true if lab is at max scientists
+		private bool AddScientistsToLab(UnitEx lab)
 		{
 			if (lab.IsEnabled() && lab.IsBusy())
 			{
@@ -330,23 +397,25 @@ namespace DotNetMissionSDK.AI.Managers
 				int scientistsAssigned = lab.GetLabScientistCount();
 
 				int scientistsNeeded = maxScientists - scientistsAssigned;
-				int scientistsToAdd = Math.Min(scientistsNeeded, availableScientists);
+				int scientistsToAdd = Math.Min(scientistsNeeded, m_AvailableScientists);
 
 				lab.SetLabScientistCount(scientistsAssigned + scientistsToAdd);
 
-				return scientistsToAdd;
+				m_AvailableScientists -= scientistsToAdd;
+
+				return scientistsAssigned + scientistsToAdd >= maxScientists;
 			}
 
-			return 0;
+			return true;
 		}
 
-		private int AddWorkersToTraining(int availableWorkers)
+		private int AddWorkersToTraining()
 		{
 			// Assign workers to training (20% of population)
 			int workersToAssign = 0;
 			int neededScientists = (int)(owner.player.TotalPopulation() * 0.2f) - owner.player.Scientists();
 			if (neededScientists > 0)
-				workersToAssign = Math.Min(neededScientists, availableWorkers);
+				workersToAssign = Math.Min(neededScientists, m_AvailableWorkers);
 
 			int assignedWorkers = 0;
 
@@ -372,57 +441,80 @@ namespace DotNetMissionSDK.AI.Managers
 			return assignedWorkers;
 		}
 
-		private bool FreeLabor(int lowestPriorityIndex, int cutoffIndex, int workersNeeded, int scientistsNeeded, out int newLowestPriorityIndex, out int workersAdded, out int scientistsAdded)
+		// Returns true if labor has successfully be freed
+		private bool FreeLabor(List<UnitEx> buildingsForLabor, int cutoffIndex, int workersNeeded, int scientistsNeeded, bool canUseScientistsAsWorkers)
 		{
-			newLowestPriorityIndex = lowestPriorityIndex;
-			workersAdded = 0;
-			scientistsAdded = 0;
+			int workersAdded = 0;
+			int scientistsAdded = 0;
 
-			// Free labor by pulling off research
-			scientistsAdded += RemoveScientistsFromLab(owner.units.basicLabs, scientistsNeeded+workersNeeded);
-			scientistsAdded += RemoveScientistsFromLab(owner.units.standardLabs, scientistsNeeded+workersNeeded - scientistsAdded);
-			scientistsAdded += RemoveScientistsFromLab(owner.units.advancedLabs, scientistsNeeded+workersNeeded - scientistsAdded);
-
-			// If labor needs met, return
-			if (workersAdded+scientistsAdded >= workersNeeded+scientistsNeeded && scientistsAdded >= scientistsNeeded)
-				return true;
+			List<UnitEx> buildingsToIdle = new List<UnitEx>();
 
 			// Free labor by idling low priority structures
-			for (int i=lowestPriorityIndex; i > cutoffIndex; --i)
+			for (int i=buildingsForLabor.Count-1; i > cutoffIndex; --i)
 			{
-				newLowestPriorityIndex = i;
-
-				UnitEx building = m_StructurePriority[i];
+				UnitEx building = buildingsForLabor[i];
 				UnitInfo info = building.GetUnitInfo();
 
-				int workersReq = info.GetWorkersRequired(owner.player.playerID);
-				int scientistsReq = info.GetScientistsRequired(owner.player.playerID);
+				int workersInBuilding = info.GetWorkersRequired(owner.player.playerID);
+				int scientistsInBuilding = info.GetScientistsRequired(owner.player.playerID);
 
 				bool doIdle = false;
 
-				// Can't disable busy structures
+				// Structure does not use labor
+				if (workersInBuilding == 0 && scientistsInBuilding == 0)
+					continue;
+
+				// Can't idle busy structures
 				if (building.IsBusy())
 					continue;
 
-				// Check if building has labor. If it does, idle it and collect the labor.
-				if (building.HasWorkers())
+				// Must not be under construction or idle
+				bool skip = false;
+				switch (building.GetLastCommand())
 				{
-					workersAdded += workersReq;
+					case CommandType.ctMoDevelop:
+					case CommandType.ctMoUnDevelop:
+					case CommandType.ctMoIdle:
+						skip = true;
+						break;
+				}
+
+				if (skip)
+					continue;
+
+				if (!building.HasWorkers())
+					workersInBuilding = 0;
+
+				if (!building.HasScientists())
+					scientistsInBuilding = 0;
+
+				// Check if building has labor. If it does, idle it and collect the labor.
+				if (workersInBuilding > 0 && workersNeeded > workersAdded)
+				{
+					workersAdded += workersInBuilding;
 					doIdle = true;
 				}
 
-				if (building.HasScientists())
+				if (scientistsInBuilding > 0 && (scientistsNeeded > scientistsAdded || canUseScientistsAsWorkers && workersNeeded+scientistsNeeded > workersAdded+scientistsAdded))
 				{
-					scientistsAdded += scientistsReq;
+					scientistsAdded += scientistsInBuilding;
 					doIdle = true;
 				}
 
 				if (doIdle)
-					building.DoIdle();
+					buildingsToIdle.Add(building);
 
 				// If labor needs met, return
 				if (workersAdded+scientistsAdded >= workersNeeded+scientistsNeeded && scientistsAdded >= scientistsNeeded)
+				{
+					m_AvailableWorkers += workersAdded;
+					m_AvailableScientists += scientistsAdded;
+
+					foreach (UnitEx b in buildingsToIdle)
+						b.DoIdle();
+
 					return true;
+				}
 			}
 
 			return false;
@@ -452,7 +544,5 @@ namespace DotNetMissionSDK.AI.Managers
 
 			return scientistsRemoved;
 		}
-
-		// Don't take scientists off research for low priority and useless structures
 	}
 }
