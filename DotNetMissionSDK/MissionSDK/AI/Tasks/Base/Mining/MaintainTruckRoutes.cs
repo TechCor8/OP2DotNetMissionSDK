@@ -80,10 +80,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 							{
 								case TruckCargo.CommonOre:
 								case TruckCargo.RareOre:
-									if (truck.IsOnDock(smelter.smelter))
-										smelter.smelter.DoUnloadCargo();
-									else
-										truck.DoDock(smelter.smelter);
+									truck.DoDock(smelter.smelter);
 									break;
 	
 							case TruckCargo.Empty:
