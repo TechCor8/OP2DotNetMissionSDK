@@ -32,6 +32,7 @@ namespace DotNetMissionSDK.AI
 		*/
 		public BaseManager baseManager				{ get; private set; }
 		public LaborManager laborManager			{ get; private set; }
+		public ResearchManager researchManager		{ get; private set; }
 
 		public bool isActive						{ get; private set; }		// Is the bot controlling the player?
 
@@ -40,6 +41,7 @@ namespace DotNetMissionSDK.AI
 		{
 			baseManager = new BaseManager(botType, playerToControl);
 			laborManager = new LaborManager(playerToControl);
+			researchManager = new ResearchManager(playerToControl);
 		}
 
 		public void Start()
@@ -60,6 +62,7 @@ namespace DotNetMissionSDK.AI
 			// Update managers
 			baseManager.Update();
 			laborManager.Update();
+			researchManager.Update();
 		}
 	}
 }
