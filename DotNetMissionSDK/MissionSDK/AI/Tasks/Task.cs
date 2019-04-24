@@ -30,7 +30,43 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// <returns>True, if the task is complete.</returns>
 		public abstract bool IsTaskComplete();
 
+		/// <summary>
+		/// Creates all prerequisite tasks for this task.
+		/// </summary>
 		public abstract void GeneratePrerequisites();
+
+		/// <summary>
+		/// Checks if this task and any incomplete prerequisites can be performed.
+		/// If this task cannot be performed or any incomplete prerequisites cannot be performed, returns false.
+		/// <para>WARNING: Relies on CanPerformTask() which may not be implemented on all tasks!</para>
+		/// </summary>
+		/// <returns>True, if the task tree can be performed.</returns>
+		public bool CanPerformTaskTree()
+		{
+			if (!CanPerformTask())
+				return false;
+
+			foreach (Task task in m_Prerequisites)
+			{
+				if (task.IsTaskComplete())
+					continue;
+
+				if (!task.CanPerformTaskTree())
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Checks if this task can be performed. Does not check if prerequisites are complete or can be performed.
+		/// <para>WARNING: This method may not be implemented on all tasks!</para>
+		/// </summary>
+		/// <returns>True, if the task can be performed. Otherwise false.</returns>
+		protected virtual bool CanPerformTask()
+		{
+			return true;
+		}
 
 		/// <summary>
 		/// Performs this task and any underlying prerequisite tasks.

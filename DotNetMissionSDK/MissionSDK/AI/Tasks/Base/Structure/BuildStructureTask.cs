@@ -39,6 +39,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 		}
 
+		protected override bool CanPerformTask()
+		{
+			// Get convec with kit
+			return owner.units.convecs.Find((UnitEx unit) => unit.GetCargo() == m_KitToBuild) != null;
+		}
+
 		protected override bool PerformTask()
 		{
 			// Get idle convec with kit

@@ -188,7 +188,8 @@
 					"CargoAmount":1000,
 					"Direction":"East",
 					"Location": { "X":7, "Y":47 }
-				}
+				},
+				{ "TypeID":"Lynx", "CargoType":"RPG", "Direction":"East", "Location": { "X":6, "Y":47 } }
 			],
 		}
 	],

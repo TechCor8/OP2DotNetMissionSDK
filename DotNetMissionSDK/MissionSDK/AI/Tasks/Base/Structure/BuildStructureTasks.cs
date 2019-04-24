@@ -190,6 +190,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		}
 	}
 
+	public sealed class BuildArachnidFactoryTask : BuildStructureTask
+	{
+		public BuildArachnidFactoryTask()									{ m_KitToBuild = map_id.ArachnidFactory;	m_DesiredDistance = 2;	}
+		public BuildArachnidFactoryTask(PlayerInfo owner) : base(owner)		{ m_KitToBuild = map_id.ArachnidFactory;	m_DesiredDistance = 2;	}
+
+		public override void GeneratePrerequisites()
+		{
+			AddPrerequisite(new BuildVehicleFactoryKitTask());
+		}
+	}
+
 	public sealed class BuildStandardLabTask : BuildStructureTask
 	{
 		public BuildStandardLabTask()										{ m_KitToBuild = map_id.StandardLab;	m_DesiredDistance = 2;	}

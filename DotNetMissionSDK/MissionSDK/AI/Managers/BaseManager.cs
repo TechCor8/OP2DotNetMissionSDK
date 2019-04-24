@@ -13,12 +13,13 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int MaintainPower_GoalID				= 2;
 		public const int UnloadSupplies_GoalID				= 3;
 		public const int FixDisconnectedStructures_GoalID	= 4;
-		public const int MaintainFood_GoalID				= 5;
-		public const int MaintainPopulation_GoalID			= 6;
-		public const int MaintainDefenses_GoalID			= 7;
-		public const int MaintainWalls_GoalID				= 8;
-		public const int ExpandRareMining_GoalID			= 9;
-		public const int LaunchStarship_GoalID				= 10;
+		public const int RepairStructures_GoalID			= 5;
+		public const int MaintainFood_GoalID				= 6;
+		public const int MaintainPopulation_GoalID			= 7;
+		public const int MaintainDefenses_GoalID			= 8;
+		public const int MaintainWalls_GoalID				= 9;
+		public const int ExpandRareMining_GoalID			= 10;
+		public const int LaunchStarship_GoalID				= 11;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -41,6 +42,7 @@ namespace DotNetMissionSDK.AI.Managers
 				new Goal(new MaintainPowerTask(owner), 1),
 				new Goal(new UnloadSuppliesTask(owner), 1),
 				new Goal(new FixDisconnectedStructures(owner), 1),
+				new Goal(new RepairStructuresTask(owner), 1),
 				new Goal(new MaintainFoodTask(owner), 1),
 				new Goal(new MaintainPopulationTask(owner), 1),
 				new Goal(new MaintainDefenseTask(owner), 1),
@@ -72,11 +74,14 @@ namespace DotNetMissionSDK.AI.Managers
 			UpdateGoal();
 		}
 
-		private bool UpdateGoal()
+		private void UpdateGoal()
 		{
 			// Top priority is establishing a base with common metals
 			if (owner.units.commandCenters.Count == 0 || owner.units.commonOreMines.Count == 0 || owner.units.commonOreSmelters.Count == 0)
-				return goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
+			{
+				goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
+				return;
+			}
 
 			// Power level is high priority
 			if (!goals[MaintainPower_GoalID].task.IsTaskComplete())
@@ -94,6 +99,13 @@ namespace DotNetMissionSDK.AI.Managers
 				truckRoutes.PerformTaskTree();
 
 			truckRoutes.PerformTruckRoutes();
+
+			// Emergency repairs
+			RepairStructuresTask repairStructureTask = (RepairStructuresTask)goals[RepairStructures_GoalID].task;
+			repairStructureTask.repairCriticalOnly = true;
+
+			if (!repairStructureTask.IsTaskComplete())
+				repairStructureTask.PerformTaskTree();
 			
 			// Fix disconnected structures
 			if (!goals[FixDisconnectedStructures_GoalID].task.IsTaskComplete())
@@ -110,7 +122,11 @@ namespace DotNetMissionSDK.AI.Managers
 			maintainPopulationTask.UpdateRequirements();
 
 			if (!maintainPopulationTask.IsTaskComplete())
-				return maintainPopulationTask.PerformTaskTree();
+			{
+				maintainPopulationTask.PerformTaskTree();
+				PerformFullRepairs();
+				return;
+			}
 
 			// Build defenses
 			if (!goals[MaintainDefenses_GoalID].task.IsTaskComplete())
@@ -118,11 +134,27 @@ namespace DotNetMissionSDK.AI.Managers
 
 			// Expand rare mining
 			if (owner.units.rareOreMines.Count == 0 || owner.units.rareOreSmelters.Count == 0)
-				return goals[ExpandRareMining_GoalID].task.PerformTaskTree();
+			{
+				goals[ExpandRareMining_GoalID].task.PerformTaskTree();
+				PerformFullRepairs();
+				return;
+			}
 			
 			// Aspire to primary goal
-			return goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
+			goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
+			PerformFullRepairs();
 			//return goals[LaunchStarship_GoalID];
+		}
+
+		private bool PerformFullRepairs()
+		{
+			RepairStructuresTask repairStructureTask = (RepairStructuresTask)goals[RepairStructures_GoalID].task;
+			repairStructureTask.repairCriticalOnly = false;
+
+			if (!repairStructureTask.IsTaskComplete())
+				return repairStructureTask.PerformTaskTree();
+
+			return false;
 		}
 	}
 }

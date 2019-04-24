@@ -38,6 +38,61 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			AddPrerequisite(new BuildConvecTask());
 		}
 
+		protected override bool CanPerformTask()
+		{
+			// Fail Check: Research
+			UnitInfo unitInfo = new UnitInfo(m_KitToBuild);
+			TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
+
+			if (!owner.player.HasTechnology(techInfo.GetTechID()))
+				return false;
+
+			// Find enabled factory
+			bool hasFactoryWithCargo = false;
+
+			List<UnitEx> factories = owner.units.structureFactories.FindAll((UnitEx unit) => unit.IsEnabled());
+			foreach (UnitEx factory in factories)
+			{
+				if (factory.HasBayWithCargo(m_KitToBuild))
+				{
+					hasFactoryWithCargo = true;
+					break;
+				}
+			}
+
+			// No factories available, can't build a kit
+			if (factories.Count == 0)
+				return false;
+
+			// No kit in factory, and can't afford kit
+			if (!hasFactoryWithCargo && !CanAffordKit())
+				return false;
+
+			return true;
+		}
+
+		private bool CanAffordKit()
+		{
+			UnitInfo kitInfo = new UnitInfo(m_KitToBuild);
+
+			if (m_KitToBuildCargo == map_id.None)
+			{
+				// Fail Check: Kit cost
+				if (owner.player.Ore() < kitInfo.GetOreCost(owner.player.playerID)) return false;
+				if (owner.player.RareOre() < kitInfo.GetRareOreCost(owner.player.playerID)) return false;
+			}
+			else
+			{
+				UnitInfo cargoinfo = new UnitInfo(m_KitToBuildCargo);
+
+				// Fail Check: Kit cost
+				if (owner.player.Ore() < kitInfo.GetOreCost(owner.player.playerID) + cargoinfo.GetOreCost(owner.player.playerID)) return false;
+				if (owner.player.RareOre() < kitInfo.GetRareOreCost(owner.player.playerID) + cargoinfo.GetRareOreCost(owner.player.playerID)) return false;
+			}
+
+			return true;
+		}
+
 		protected override bool PerformTask()
 		{
 			// Fail Check: Research
@@ -106,20 +161,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (factory.IsBusy())
 				return true;
 
-			UnitInfo moduleInfo = new UnitInfo(m_KitToBuild);
-			
-			// Fail Check: Kit cost
-			if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID)) return false;
-			if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID)) return false;
-
-			if (m_KitToBuildCargo != map_id.None)
-			{
-				UnitInfo cargoinfo = new UnitInfo(m_KitToBuildCargo);
-
-				// Fail Check: Kit cost
-				if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID) + cargoinfo.GetOreCost(owner.player.playerID)) return false;
-				if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID) + cargoinfo.GetRareOreCost(owner.player.playerID)) return false;
-			}
+			if (!CanAffordKit())
+				return false;
 
 			// Build kit
 			factory.DoProduce(m_KitToBuild, m_KitToBuildCargo);

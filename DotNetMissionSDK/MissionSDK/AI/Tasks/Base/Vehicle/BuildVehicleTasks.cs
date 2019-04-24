@@ -39,4 +39,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 		public BuildEarthworkerTask()										{ m_VehicleToBuild = map_id.Earthworker;				}
 		public BuildEarthworkerTask(PlayerInfo owner) : base(owner)			{ m_VehicleToBuild = map_id.Earthworker;				}
 	}
+
+	public class BuildRepairVehicleTask : BuildVehicleTask
+	{
+		public BuildRepairVehicleTask()										{ m_VehicleToBuild = map_id.RepairVehicle;				}
+		public BuildRepairVehicleTask(PlayerInfo owner) : base(owner)		{ m_VehicleToBuild = map_id.RepairVehicle;				}
+	}
+
+	public class BuildSpiderTask : BuildVehicleTask
+	{
+		public BuildSpiderTask()											{ m_VehicleToBuild = map_id.Spider;						}
+		public BuildSpiderTask(PlayerInfo owner) : base(owner)				{ m_VehicleToBuild = map_id.Spider;						}
+	}
+
+	public class BuildScorpionTask : BuildVehicleTask
+	{
+		public BuildScorpionTask()											{ m_VehicleToBuild = map_id.Scorpion;					}
+		public BuildScorpionTask(PlayerInfo owner) : base(owner)			{ m_VehicleToBuild = map_id.Scorpion;					}
+	}
 }

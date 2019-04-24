@@ -116,6 +116,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildVehicleFactoryKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.VehicleFactory;					}
 	}
 
+	public sealed class BuildArachnidFactoryKitTask : BuildStructureKitTask
+	{
+		public BuildArachnidFactoryKitTask()								{ m_KitToBuild = map_id.ArachnidFactory;				}
+		public BuildArachnidFactoryKitTask(PlayerInfo owner) : base(owner)	{ m_KitToBuild = map_id.ArachnidFactory;				}
+	}
+
 	public sealed class BuildStandardLabKitTask : BuildStructureKitTask
 	{
 		public BuildStandardLabKitTask()									{ m_KitToBuild = map_id.StandardLab;					}
