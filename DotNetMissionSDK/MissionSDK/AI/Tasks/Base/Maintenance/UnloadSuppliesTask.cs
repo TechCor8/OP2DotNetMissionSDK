@@ -1,13 +1,21 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
 	public class UnloadSuppliesTask : Task
 	{
+		private class TruckState
+		{
+			public ActionType lastState;
+			public int tickSinceStateChanged;
+		}
+
+		private Dictionary<int, TruckState> m_TruckTickSinceStateChanged = new Dictionary<int, TruckState>(); // <UnitID, TruckState>
+
+
 		public UnloadSuppliesTask() { }
 		public UnloadSuppliesTask(PlayerInfo owner) : base(owner) { }
 
@@ -47,8 +55,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		protected override bool PerformTask()
 		{
+			// Remove unused truck IDs
+			IEnumerable<int> truckUnitIDs = owner.units.cargoTrucks.Select((UnitEx unit) => unit.GetStubIndex());
+			foreach (int unitID in m_TruckTickSinceStateChanged.Keys.Except(truckUnitIDs).ToList())
+				m_TruckTickSinceStateChanged.Remove(unitID);
+
+			// Unload trucks
 			foreach (UnitEx truck in owner.units.cargoTrucks)
 			{
+				// Do nothing if truck is docking
 				if (truck.GetCurAction() == ActionType.moObjDocking)
 					continue;
 
@@ -58,10 +73,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 						UnitEx smelter = GetClosestUnitOfType(map_id.CommonOreSmelter, truck.GetPosition());
 						if (smelter != null)
 						{
-							if (truck.IsOnDock(smelter))
-								smelter.DoUnloadCargo();
-							else
+							if (!truck.IsOnDock(smelter))
 								truck.DoDock(smelter);
+							else
+							{
+								smelter.DoUnloadCargo();
+								FixTruckUnloading(truck);
+							}
 						}
 						break;
 
@@ -69,10 +87,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 						UnitEx rareSmelter = GetClosestUnitOfType(map_id.RareOreSmelter, truck.GetPosition());
 						if (rareSmelter != null)
 						{
-							if (truck.IsOnDock(rareSmelter))
-								rareSmelter.DoUnloadCargo();
-							else
+							if (!truck.IsOnDock(rareSmelter))
 								truck.DoDock(rareSmelter);
+							else
+							{
+								rareSmelter.DoUnloadCargo();
+								FixTruckUnloading(truck);
+							}
 						}
 						break;
 
@@ -80,16 +101,52 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 						UnitEx agridome = GetClosestUnitOfType(map_id.Agridome, truck.GetPosition());
 						if (agridome != null && agridome.IsEnabled())
 						{
-							if (truck.IsOnDock(agridome))
-								agridome.DoUnloadCargo();
-							else
+							if (!truck.IsOnDock(agridome))
 								truck.DoDock(agridome);
+							else
+							{
+								agridome.DoUnloadCargo();
+								FixTruckUnloading(truck);
+							}
 						}
 						break;
 				}
 			}
 
 			return true;
+		}
+
+		private void FixTruckUnloading(UnitEx truck)
+		{
+			if (truck.GetCurAction() != ActionType.moDone)
+				return;
+
+			int stateDuration = TethysGame.Tick() - GetTruckStateTime(truck);
+			if (stateDuration > 8)
+				truck.DoMove(truck.GetTileX(), truck.GetTileY()+1);
+		}
+
+		private int GetTruckStateTime(UnitEx truck)
+		{
+			TruckState truckState;
+			if (!m_TruckTickSinceStateChanged.TryGetValue(truck.GetStubIndex(), out truckState))
+			{
+				// If truck state not found, add a new one
+				truckState = new TruckState();
+				truckState.lastState = truck.GetCurAction();
+				truckState.tickSinceStateChanged = TethysGame.Tick();
+				m_TruckTickSinceStateChanged.Add(truck.GetStubIndex(), truckState);
+			}
+
+			// Update state if it has changed
+			ActionType curAction = truck.GetCurAction();
+			if (truckState.lastState != curAction)
+			{
+				truckState.lastState = curAction;
+				truckState.tickSinceStateChanged = TethysGame.Tick();
+			}
+
+			return truckState.tickSinceStateChanged;
 		}
 
 		private UnitEx GetClosestUnitOfType(map_id type, LOCATION position)

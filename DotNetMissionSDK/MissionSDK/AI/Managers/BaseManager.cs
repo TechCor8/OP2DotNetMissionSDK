@@ -3,6 +3,7 @@ using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.AI.Tasks;
 using DotNetMissionSDK.AI.Tasks.Base.Mining;
 using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
+using DotNetMissionSDK.AI.Tasks.Base.Vehicle;
 
 namespace DotNetMissionSDK.AI.Managers
 {
@@ -20,6 +21,8 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int MaintainWalls_GoalID				= 9;
 		public const int ExpandRareMining_GoalID			= 10;
 		public const int LaunchStarship_GoalID				= 11;
+
+		private ResetVehicleTask m_ResetVehicleTask;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -65,6 +68,8 @@ namespace DotNetMissionSDK.AI.Managers
 				case BotType.Wreckless:
 					break;
 			}
+
+			m_ResetVehicleTask = new ResetVehicleTask(owner);
 		}
 
 		public void Update()
@@ -72,6 +77,9 @@ namespace DotNetMissionSDK.AI.Managers
 			m_MiningBaseState.Update();
 			
 			UpdateGoal();
+
+			// Fix stuck vehicles
+			m_ResetVehicleTask.PerformTaskTree();
 		}
 
 		private void UpdateGoal()
