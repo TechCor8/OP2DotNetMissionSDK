@@ -166,6 +166,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		private void BuildDIRT()
 		{
+			m_BuildDirtTask.targetCountToBuild = 0;
+
 			// Don't build more DIRT if we aren't using all the ones we have
 			foreach (UnitEx dirt in owner.units.dirts)
 			{
@@ -173,10 +175,41 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					return;
 			}
 
-			// TODO: Calculate DIRT required per CC. Force construction at correct base
+			UnitInfo dirtInfo = new UnitInfo(map_id.DIRT);
+			int productionCap = dirtInfo.GetProductionCapacity(owner.player.playerID);
 
-			//if (owner.player.TotalPopulation() < owner.player.GetTotalMedCenterCapacity())
-			//	m_BuildDirtTask.targetCountToBuild = owner.units.dirts.Count+1;
+			bool shouldBuildDIRT = false;
+
+			// Calculate DIRT required per CC. Force construction at correct base
+			foreach (UnitEx cc in owner.units.commandCenters)
+			{
+				// Get needed DIRT count
+				List<UnitEx> connectedStructures = owner.commandGrid.GetConnectedStructures(cc.GetPosition());
+				int neededDIRTs = connectedStructures.Count / productionCap + 1;
+
+				m_BuildDirtTask.targetCountToBuild += neededDIRTs;
+
+				// Get DIRTs connected to this CC
+				int currentDIRTs = 0;
+				foreach (UnitEx building in connectedStructures)
+				{
+					if (building.GetUnitType() != map_id.DIRT)
+						continue;
+
+					++currentDIRTs;
+				}
+
+				// If already planning to build DIRT, don't set a new location
+				if (shouldBuildDIRT)
+					continue;
+
+				if (currentDIRTs >= neededDIRTs)
+					continue;
+
+				// Add DIRT to this CC
+				m_BuildDirtTask.SetLocation(cc.GetPosition());
+				shouldBuildDIRT = true;
+			}
 		}
 	}
 }
