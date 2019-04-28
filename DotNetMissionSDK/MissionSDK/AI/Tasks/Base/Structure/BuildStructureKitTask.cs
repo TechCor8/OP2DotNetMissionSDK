@@ -47,6 +47,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (!owner.player.HasTechnology(techInfo.GetTechID()))
 				return false;
 
+			if (m_KitToBuildCargo != map_id.None)
+			{
+				UnitInfo cargoInfo = new UnitInfo(m_KitToBuildCargo);
+				TechInfo cargoTechInfo = Research.GetTechInfo(cargoInfo.GetResearchTopic());
+
+				if (!owner.player.HasTechnology(cargoTechInfo.GetTechID()))
+					return false;
+			}
+
 			// Find enabled factory
 			bool hasFactoryWithCargo = false;
 
@@ -101,6 +110,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			if (!owner.player.HasTechnology(techInfo.GetTechID()))
 				return false;
+
+			if (m_KitToBuildCargo != map_id.None)
+			{
+				UnitInfo cargoInfo = new UnitInfo(m_KitToBuildCargo);
+				TechInfo cargoTechInfo = Research.GetTechInfo(cargoInfo.GetResearchTopic());
+
+				if (!owner.player.HasTechnology(cargoTechInfo.GetTechID()))
+					return false;
+			}
 
 			// Get structure factories with kit
 			List<UnitEx> factories = owner.units.structureFactories.FindAll((UnitEx unit) => unit.HasBayWithCargo(m_KitToBuild));
