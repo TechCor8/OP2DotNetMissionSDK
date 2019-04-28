@@ -212,7 +212,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 		public List<UnitEx> GetConnectedStructures(LOCATION tile)
 		{
-			List<UnitEx> connectedStructures = new List<UnitEx>();
+			Dictionary<int, UnitEx> connectedStructures = new Dictionary<int, UnitEx>();
 
 			Pathfinder.TileCostCallback tileCostCB = (int x, int y) =>
 			{
@@ -220,16 +220,19 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 				if (GameMap.GetCellType(x, y) != CellType.Tube0 && building == null)
 					return Pathfinder.Impassable;
-				
+
 				if (building != null)
-					connectedStructures.Add(building);
+				{
+					int unitID = building.GetStubIndex();
+					connectedStructures[unitID] = building;
+				}
 
 				return 1;
 			};
 
 			Pathfinder.GetClosestValidTile(tile, tileCostCB, IsValidTile, out _, false);
 
-			return connectedStructures;
+			return new List<UnitEx>(connectedStructures.Values);
 		}
 	}
 }
