@@ -290,6 +290,10 @@ namespace DotNetMissionSDK.AI.Managers
 			// Remove existing smelters from unassigned list
 			unassignedSmelters.Remove(smelter);
 
+			// Inactive smelter cannot have trucks
+			if (!smelter.IsEnabled())
+				trucks.Clear();
+
 			// Trucks are removed from mining routes when dead
 			trucks.RemoveAll((UnitEx truck) => !truck.IsLive());
 
@@ -300,6 +304,10 @@ namespace DotNetMissionSDK.AI.Managers
 
 		public void Update(List<UnitEx> unassignedTrucks)
 		{
+			// Inactive smelter cannot have trucks
+			if (!smelter.IsEnabled())
+				return;
+
 			// Add closest trucks to smelter route until saturated
 			while (trucks.Count < desiredTruckCount && unassignedTrucks.Count > 0)
 			{

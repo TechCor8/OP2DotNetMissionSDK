@@ -73,13 +73,30 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 						foreach (UnitEx truck in smelter.trucks)
 						{
-							if (truck.GetCurAction() == ActionType.moObjDocking)
+							if (truck.GetCurAction() == ActionType.moObjDocking || truck.GetLastCommand() == CommandType.ctMoDumpCargo)
 								continue;
 
 							switch (truck.GetCargoType())
 							{
 								case TruckCargo.CommonOre:
+									if (smelter.smelter.GetUnitType() == map_id.RareOreSmelter)
+									{
+										// Wrong ore type, dump it
+										truck.DoDumpCargo();
+										break;
+									}
+
+									truck.DoDock(smelter.smelter);
+									break;
+
 								case TruckCargo.RareOre:
+									if (smelter.smelter.GetUnitType() == map_id.CommonOreSmelter)
+									{
+										// Wrong ore type, dump it
+										truck.DoDumpCargo();
+										break;
+									}
+
 									truck.DoDock(smelter.smelter);
 									break;
 	
