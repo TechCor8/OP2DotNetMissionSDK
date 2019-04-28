@@ -26,11 +26,11 @@ static bool CLR_INIT = false;
 static char* moduleFileName;
 
 
-void Attach()
+bool Attach()
 {
 	CLR_INIT = true;
 
-	DotNetInterop::Attach(moduleFileName, USE_CUSTOM_DLL);
+	return DotNetInterop::Attach(moduleFileName, USE_CUSTOM_DLL);
 }
 
 Export void __cdecl GetSaveRegions(struct BufferDesc &bufDesc)
@@ -51,7 +51,10 @@ Export void __cdecl GetSaveRegions(struct BufferDesc &bufDesc)
 Export int InitProc()
 {
 	if (!CLR_INIT)
-		Attach();
+	{
+		if (!Attach())
+			return 0;
+	}
 
 	return DotNetInterop::Initialize();
 }
@@ -85,7 +88,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
 	int len;
 	LPSTR filePath;
-	bool result;
+	//bool result;
 
 	switch (fdwReason)
 	{
