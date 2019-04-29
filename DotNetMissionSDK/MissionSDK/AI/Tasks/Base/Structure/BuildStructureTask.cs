@@ -164,7 +164,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				// Force structure to build on connected ground
 				MAP_RECT unbulldozedArea = targetArea;
 				unbulldozedArea.Inflate(-1, -1);
-				owner.commandGrid.ConnectsTo(unbulldozedArea);
+				if (!owner.commandGrid.ConnectsTo(unbulldozedArea))
+					return false;
 			}
 
 			// Check if area is blocked by structure or enemy
