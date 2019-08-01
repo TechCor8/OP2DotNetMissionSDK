@@ -141,6 +141,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			// If geocon exists, use it
 			if (owner.units.geoCons.Count > 0)
 			{
+				m_BuildGeoConTask.targetCountToBuild = 0;
+
+				// Find fumarole to deploy on
 				UnitEx geocon = owner.units.geoCons[0];
 				UnitEx fumarole = GetClosestUnoccupiedFumarole(geocon.GetPosition());
 				if (fumarole == null)

@@ -196,8 +196,11 @@ namespace DotNetMissionSDK.AI.Managers
 					m_CrippledStructures.Add(building);
 				else
 				{
-					if (i < needed)
+					if (needed > 0)
+					{
 						m_StructurePriority.Add(building);
+						--needed;
+					}
 					else if (!markExtrasAsUseless)
 						m_LowPriorityStructures.Add(building);
 					else

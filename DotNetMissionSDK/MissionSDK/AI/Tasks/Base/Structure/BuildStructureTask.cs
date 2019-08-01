@@ -239,6 +239,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				case map_id.Tokamak:
 				case map_id.SolarPowerArray:
 				case map_id.MHDGenerator:
+				case map_id.GeothermalPlant:
 					return false;
 			}
 

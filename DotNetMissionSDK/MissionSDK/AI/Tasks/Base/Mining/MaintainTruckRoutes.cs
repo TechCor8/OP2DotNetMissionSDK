@@ -45,6 +45,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 					foreach (MiningSmelter smelter in site.smelters)
 					{
+						if (!smelter.smelter.IsEnabled())
+							continue;
+
 						assignedTrucks += smelter.trucks.Count;
 						desiredTrucks += smelter.desiredTruckCount;
 					}
