@@ -214,7 +214,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			// Don't allow structure to be built on ground where a mine can be deployed
 			foreach (UnitEx beacon in new PlayerUnitEnum(6))
 			{
-				if (beacon.GetUnitType() != map_id.MiningBeacon)
+				map_id beaconType = beacon.GetUnitType();
+
+				if (beaconType != map_id.MiningBeacon &&
+					beaconType != map_id.Fumarole &&
+					beaconType != map_id.MagmaVent)
 					continue;
 
 				if (targetArea.DoesRectIntersect(new MAP_RECT(beacon.GetTileX()-2, beacon.GetTileY()-1, 5,3)))

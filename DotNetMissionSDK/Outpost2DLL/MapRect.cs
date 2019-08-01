@@ -84,7 +84,7 @@ namespace DotNetMissionSDK
 		}
 
 		/// <summary>
-		/// Checks if point is inside rect. Min and max inclusive.
+		/// Checks if point is inside rect. Min inclusive and max exclusive.
 		/// </summary>
 		/// <param name="x">The point x to check.</param>
 		/// <param name="y">The point y to check.</param>

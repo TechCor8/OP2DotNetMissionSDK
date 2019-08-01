@@ -61,6 +61,9 @@ namespace DotNetMissionSDK
 			TethysGame.SetDaylightEverywhere(root.tethysGame.daylightEverywhere);
 			TethysGame.SetDaylightMoves(root.tethysGame.daylightMoves);
 			GameMap.SetInitialLightLevel(root.tethysGame.initialLightLevel);
+			if (!TethysGame.UsesDayNight())
+				TethysGame.SetDaylightEverywhere(true);
+
 			TethysGame.SetMusicPlayList(root.tethysGame.musicPlayList.songIDs.Length, root.tethysGame.musicPlayList.repeatStartIndex, root.tethysGame.musicPlayList.songIDs);
 
 			// Beacons
@@ -116,14 +119,21 @@ namespace DotNetMissionSDK
 				if ((TethysGame.UsesMorale() || root.levelDetails.missionType == MissionType.Colony) && data.freeMorale)
 					TethysGame.FreeMoraleLevel(data.id);
 
-				if (data.isEden)
-					player.GoEden();
-				else
-					player.GoPlymouth();
+				// Only set player colony type and color if playing single player
+				if (!data.isHuman ||
+					root.levelDetails.missionType == MissionType.Colony ||
+					root.levelDetails.missionType == MissionType.Tutorial ||
+					root.levelDetails.missionType == MissionType.AutoDemo)
+				{
+					if (data.isEden)
+						player.GoEden();
+					else
+						player.GoPlymouth();
+
+					player.SetColorNumber(data.color);
+				}
 
 				// TODO: data.isHuman - If not human, use fancy AI code
-
-				player.SetColorNumber(data.color);
 
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
