@@ -30,6 +30,20 @@
 				"SpawnRect":{ "MinX":23, "MinY":33, "MaxX":23, "MaxY":33 }
 			},
 			{
+				"MapID":"Fumarole",
+				"OreType":"Random",
+				"BarYield":"Random",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":41, "MinY":63, "MaxX":41, "MaxY":63 }
+			},
+			{
+				"MapID":"MagmaVent",
+				"OreType":"Random",
+				"BarYield":"Random",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":18, "MinY":125, "MaxX":18, "MaxY":125 }
+			},
+			{
 				"MapID":"MiningBeacon",
 				"OreType":"Common",
 				"BarYield":"Random",
@@ -76,7 +90,7 @@
 	[
 		{
 			"ID":0,
-			"TechLevel":12,
+			"TechLevel":13,
 			"MoraleLevel":"Excellent",
 			"FreeMorale":true,
 			"IsEden":true,
@@ -86,8 +100,8 @@
 			"CenterView": { "X":27, "Y":38 },
 			
 			"Kids":10,
-			"Workers":24,
-			"Scientists":13,
+			"Workers":44,
+			"Scientists":23,
 			"CommonOre":27000,
 			"RareOre":25000,
 			"Food":7000,
@@ -242,7 +256,7 @@
 			"OneShot":true,
 			
 			"PlayerID":0,
-			"Count":40,
+			"Count":4000,
 			"CompareType":"GreaterEqual",
 			
 			"Actions":[]
@@ -255,7 +269,7 @@
 			"OneShot":true,
 			
 			"TriggerID":3,
-			"Message":"Create 40 vehicles",
+			"Message":"Create 4000 vehicles",
 			
 			"Actions":[]
 		},

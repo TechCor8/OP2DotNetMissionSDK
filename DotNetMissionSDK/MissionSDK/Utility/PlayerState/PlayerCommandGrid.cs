@@ -7,14 +7,20 @@ namespace DotNetMissionSDK.Utility.PlayerState
 {
 	public class PlayerCommandGrid
 	{
-		private byte[,] m_Grid;
+		private struct Tile
+		{
+			public byte hasCommandAccess;			// Command grid. 0 - No command access, 1 - Has command access
+			public UnitEx buildingOnTile;
+		}
+
+		private Tile[,] m_Grid;
 
 		private int m_PlayerID;
 
 
 		public PlayerCommandGrid()
 		{
-			m_Grid = new byte[GameMap.bounds.width, GameMap.bounds.height];
+			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
 		}
 
 		/// <summary>
@@ -42,28 +48,28 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
 
 			point.x -= 1;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
 
 			point.x += 2;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
 
 			point.x -= 1;
 			point.y -= 1;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
 
 			point.y += 2;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y] > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
 
 			return false;
 		}
@@ -74,7 +80,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			{
 				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
 
-				return m_Grid[gridPoint.x,gridPoint.y] > 0;
+				return m_Grid[gridPoint.x,gridPoint.y].hasCommandAccess > 0;
 			};
 
 			return Pathfinder.GetClosestValidTile(pt, GetDefaultTileCost, validTileCB, out closestPt, false);
@@ -139,6 +145,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		{
 			m_PlayerID = playerID;
 
+			// Update command grid with connection status
 			Array.Clear(m_Grid, 0, m_Grid.Length);
 
 			foreach (UnitEx cc in units.commandCenters)
@@ -149,21 +156,44 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 				LOCATION gridPoint = GetPointInGridSpace(ccPos);
 
-				m_Grid[gridPoint.x, gridPoint.y] = 1;
+				m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess = 1;
+			}
+
+			// Update buildings on command grid
+			foreach (UnitEx building in new PlayerAllBuildingEnum(m_PlayerID))
+			{
+				MAP_RECT buildingArea = building.GetUnitInfo().GetRect(building.GetPosition());
+
+				for (int x=buildingArea.xMin; x < buildingArea.xMax; ++x)
+				{
+					for (int y=buildingArea.yMin; y < buildingArea.yMax; ++y)
+					{
+						LOCATION gridPoint = new LOCATION(x, y);
+						gridPoint.ClipToMap();
+
+						gridPoint = GetPointInGridSpace(gridPoint);
+
+						m_Grid[gridPoint.x,gridPoint.y].buildingOnTile = building;
+					}
+				}
 			}
 		}
 
 		// Callback for determining tile cost
 		private int GetTileCost(int x, int y)
 		{
+			// Out of map bounds is impassable
+			if (!GameMap.bounds.Contains(x, y))
+				return Pathfinder.Impassable;
+
+			LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
+
 			// If the tile is not a tube or structure, mark it as impassable
-			if (GameMap.GetCellType(x, y) != CellType.Tube0 && !IsBuildingOnTile(x, y))
+			if (GameMap.GetCellType(x, y) != CellType.Tube0 && m_Grid[gridPoint.x,gridPoint.y].buildingOnTile == null)
 				return Pathfinder.Impassable;
 
 			// If tube or structure, mark grid as connected
-			LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
-
-			m_Grid[gridPoint.x,gridPoint.y] = 1;
+			m_Grid[gridPoint.x,gridPoint.y].hasCommandAccess = 1;
 
 			return 1;
 		}
@@ -174,32 +204,6 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			// We aren't looking for a valid tile.
 			// We want to scan the whole area and get the tile connection state.
 			return false;
-		}
-
-		private bool IsBuildingOnTile(int x, int y)
-		{
-			foreach (UnitEx building in new PlayerAllBuildingEnum(m_PlayerID))
-			{
-				MAP_RECT buildingArea = building.GetUnitInfo().GetRect(building.GetPosition());
-
-				if (buildingArea.Contains(x,y))
-					return true;
-			}
-
-			return false;
-		}
-
-		private UnitEx GetBuildingOnTile(int x, int y)
-		{
-			foreach (UnitEx building in new PlayerAllBuildingEnum(m_PlayerID))
-			{
-				MAP_RECT buildingArea = building.GetUnitInfo().GetRect(building.GetPosition());
-
-				if (buildingArea.Contains(x,y))
-					return building;
-			}
-
-			return null;
 		}
 
 		private LOCATION GetPointInGridSpace(LOCATION pt)
@@ -216,7 +220,13 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 			Pathfinder.TileCostCallback tileCostCB = (int x, int y) =>
 			{
-				UnitEx building = GetBuildingOnTile(x, y);
+				// Out of map bounds is impassable
+				if (!GameMap.bounds.Contains(x,y))
+					return Pathfinder.Impassable;
+
+				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
+
+				UnitEx building = m_Grid[gridPoint.x,gridPoint.y].buildingOnTile;
 
 				if (GameMap.GetCellType(x, y) != CellType.Tube0 && building == null)
 					return Pathfinder.Impassable;
