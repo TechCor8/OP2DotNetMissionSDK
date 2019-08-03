@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
 using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.Utility.Maps;
 using System;
 using System.Collections.Generic;
 
@@ -48,6 +49,9 @@ namespace DotNetMissionSDK
 			// Initialize PlayerInfo triggers
 			for (int i=0; i < m_PlayerInfo.Length; ++i)
 				m_PlayerInfo[i]?.InitializeNewMission();
+
+			PlayerStrengthMap.Initialize();
+			PlayerUnitMap.Initialize();
 
 			MissionRoot root = m_Root;
 
@@ -417,6 +421,9 @@ namespace DotNetMissionSDK
 			// Update PlayerInfo state
 			for (int i=0; i < m_PlayerInfo.Length; ++i)
 				m_PlayerInfo[i]?.Update();
+
+			PlayerStrengthMap.Update(m_PlayerInfo);
+			PlayerUnitMap.Update(m_PlayerInfo);
 
 			// Update disasters
 			foreach (DisasterData disaster in m_Disasters)

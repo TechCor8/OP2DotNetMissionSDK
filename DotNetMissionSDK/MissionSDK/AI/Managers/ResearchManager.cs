@@ -13,11 +13,13 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private int m_CurrentTechLevel = 1;
 
-		public PlayerInfo owner { get; private set; }
+		public BotPlayer botPlayer	{ get; private set; }
+		public PlayerInfo owner		{ get; private set; }
 
 		
-		public ResearchManager(PlayerInfo owner)
+		public ResearchManager(BotPlayer botPlayer, PlayerInfo owner)
 		{
+			this.botPlayer = botPlayer;
 			this.owner = owner;
 
 			// Add all tech to tech levels table

@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Triggers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.Utility.PlayerState
@@ -389,6 +390,53 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		public void Dispose()
 		{
 			m_TriggerManager.onTriggerFired -= OnTriggerFired;
+		}
+
+		public IEnumerable<UnitEx> GetUnits()		{ return new UnitEnumerable(this, UnitEnumerable.EnumType.Units);			}
+		public IEnumerable<UnitEx> GetStructures()	{ return new UnitEnumerable(this, UnitEnumerable.EnumType.Structures);		}
+		public IEnumerable<UnitEx> GetVehicles()	{ return new UnitEnumerable(this, UnitEnumerable.EnumType.Vehicles);		}
+
+		public class UnitEnumerable : IEnumerable<UnitEx>
+		{
+			public enum EnumType { Units, Vehicles, Structures }
+
+			private PlayerUnitList m_List;
+			private EnumType m_EnumType;
+
+			public UnitEnumerable(PlayerUnitList list, EnumType enumType)
+			{
+				m_List = list;
+				m_EnumType = enumType;
+			}
+
+			public IEnumerator<UnitEx> GetEnumerator()
+			{
+				if (m_EnumType == EnumType.Units || m_EnumType == EnumType.Structures)
+				{
+					// Enumerate all structures
+					for (int i=21; i < 59; ++i)
+					{
+						List<UnitEx> structures = m_List.GetListForType((map_id)i);
+						foreach (UnitEx unit in structures)
+							yield return unit;
+					}
+				}
+				if (m_EnumType == EnumType.Units || m_EnumType == EnumType.Vehicles)
+				{
+					// Enumerate all vehicles
+					for (int i=1; i < 16; ++i)
+					{
+						List<UnitEx> vehicles = m_List.GetListForType((map_id)i);
+						foreach (UnitEx unit in vehicles)
+							yield return unit;
+					}
+				}
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
 		}
 	}
 }

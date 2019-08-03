@@ -20,7 +20,9 @@ namespace DotNetMissionSDK.AI
 	}
 
 	public class BotPlayer
-	{/*
+	{
+		public BotType botType						{ get; private set; }
+		/*
 		// Customizable Flags - Can be changed while bot is active.
 		public bool canResearchOptionalStructures = true;   // If true, bot will research recreational/forum, GORF, DIRT, consumer factory and other optional structures.
 		public bool canBuildGuardPosts = true;              // If true, bot will build guard posts.
@@ -33,15 +35,19 @@ namespace DotNetMissionSDK.AI
 		public BaseManager baseManager				{ get; private set; }
 		public LaborManager laborManager			{ get; private set; }
 		public ResearchManager researchManager		{ get; private set; }
+		public CombatManager combatManager			{ get; private set; }
 
 		public bool isActive						{ get; private set; }		// Is the bot controlling the player?
 
 
 		public BotPlayer(BotType botType, PlayerInfo playerToControl)
 		{
-			baseManager = new BaseManager(botType, playerToControl);
-			laborManager = new LaborManager(playerToControl);
-			researchManager = new ResearchManager(playerToControl);
+			this.botType = botType;
+
+			baseManager = new BaseManager(this, playerToControl);
+			laborManager = new LaborManager(this, playerToControl);
+			researchManager = new ResearchManager(this, playerToControl);
+			combatManager = new CombatManager(this, playerToControl);
 		}
 
 		public void Start()
@@ -63,6 +69,7 @@ namespace DotNetMissionSDK.AI
 			baseManager.Update();
 			laborManager.Update();
 			researchManager.Update();
+			combatManager.Update();
 		}
 	}
 }

@@ -4,6 +4,9 @@ using DotNetMissionSDK.AI.Tasks;
 using DotNetMissionSDK.AI.Tasks.Base.Mining;
 using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
 using DotNetMissionSDK.AI.Tasks.Base.Vehicle;
+using System.Collections.Generic;
+using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.AI.CombatGroups;
 
 namespace DotNetMissionSDK.AI.Managers
 {
@@ -26,16 +29,22 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private MiningBaseState m_MiningBaseState;
 
-		public PlayerInfo owner { get; private set; }
+		private BuildVehicleTask[] m_BuildVehicleTasks;
 
-		public Goal[] goals		{ get; private set; }			// This manager's top-level goals.
+		public BotPlayer botPlayer	{ get; private set; }
+		public PlayerInfo owner		{ get; private set; }
+
+		public Goal[] goals			{ get; private set; }			// This manager's top-level goals.
 
 
-		public BaseManager(BotType botType, PlayerInfo owner)
+		public BaseManager(BotPlayer botPlayer, PlayerInfo owner)
 		{
+			this.botPlayer = botPlayer;
 			this.owner = owner;
 
 			m_MiningBaseState = new MiningBaseState(owner);
+
+			m_BuildVehicleTasks = CreateVehicleTasks();
 
 			// Initialize goals
 			goals = new Goal[]
@@ -55,7 +64,7 @@ namespace DotNetMissionSDK.AI.Managers
 			};
 
 			// TODO: Fill out goal weights
-			switch (botType)
+			switch (botPlayer.botType)
 			{
 				case BotType.PopulationGrowth:
 				case BotType.LaunchStarship:
@@ -136,6 +145,10 @@ namespace DotNetMissionSDK.AI.Managers
 				return;
 			}
 
+			// Clear combat unit tasks
+			foreach (BuildVehicleTask vehicleTask in m_BuildVehicleTasks)
+				vehicleTask.targetCountToBuild = 0;
+
 			// Build defenses
 			if (!goals[MaintainDefenses_GoalID].task.IsTaskComplete())
 				goals[MaintainDefenses_GoalID].task.PerformTaskTree();
@@ -148,9 +161,24 @@ namespace DotNetMissionSDK.AI.Managers
 				return;
 			}
 			
-			// Aspire to primary goal
+			// Expand common mining
 			goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
 			PerformFullRepairs();
+
+			// Build combat units
+			if (owner.player.Ore() > 2800)
+			{
+				List<CombatGroup.UnitWithWeapon> desiredCombatUnits = botPlayer.combatManager.GetDesiredUnits();
+				foreach (CombatGroup.UnitWithWeapon unitWithWeapon in desiredCombatUnits)
+					GetVehicleTask(unitWithWeapon).targetCountToBuild += 1;
+
+				foreach (BuildVehicleTask vehicleTask in m_BuildVehicleTasks)
+				{
+					if (!vehicleTask.IsTaskComplete())
+						vehicleTask.PerformTaskTree();
+				}
+			}
+
 			//return goals[LaunchStarship_GoalID];
 		}
 
@@ -163,6 +191,91 @@ namespace DotNetMissionSDK.AI.Managers
 				return repairStructureTask.PerformTaskTree();
 
 			return false;
+		}
+
+
+
+		private BuildVehicleTask[] CreateVehicleTasks()
+		{
+			return new BuildVehicleTask[]
+			{
+				new BuildScoutTask(owner),
+				new BuildSpiderTask(owner),
+				new BuildScorpionTask(owner),
+				new BuildLynxAcidCloudTask(owner),
+				new BuildLynxEMPTask(owner),
+				new BuildLynxLaserTask(owner),
+				new BuildLynxMicrowaveTask(owner),
+				new BuildLynxRailGunTask(owner),
+				new BuildLynxRPGTask(owner),
+				new BuildLynxStarflareTask(owner),
+				new BuildLynxSupernovaTask(owner),
+				new BuildLynxESGTask(owner),
+				new BuildLynxStickyfoamTask(owner),
+				new BuildLynxThorsHammerTask(owner),
+				new BuildPantherAcidCloudTask(owner),
+				new BuildPantherEMPTask(owner),
+				new BuildPantherLaserTask(owner),
+				new BuildPantherMicrowaveTask(owner),
+				new BuildPantherRailGunTask(owner),
+				new BuildPantherRPGTask(owner),
+				new BuildPantherStarflareTask(owner),
+				new BuildPantherSupernovaTask(owner),
+				new BuildPantherESGTask(owner),
+				new BuildPantherStickyfoamTask(owner),
+				new BuildPantherThorsHammerTask(owner),
+				new BuildTigerAcidCloudTask(owner),
+				new BuildTigerEMPTask(owner),
+				new BuildTigerLaserTask(owner),
+				new BuildTigerMicrowaveTask(owner),
+				new BuildTigerRailGunTask(owner),
+				new BuildTigerRPGTask(owner),
+				new BuildTigerStarflareTask(owner),
+				new BuildTigerSupernovaTask(owner),
+				new BuildTigerESGTask(owner),
+				new BuildTigerStickyfoamTask(owner),
+				new BuildTigerThorsHammerTask(owner)
+			};
+		}
+
+		private BuildVehicleTask GetVehicleTask(CombatGroup.UnitWithWeapon unitWithWeapon)
+		{
+			int index = -1;
+
+			switch (unitWithWeapon.unit)
+			{
+				case map_id.Scout:		index = 0;											break;
+				case map_id.Spider:		index = 1;											break;
+				case map_id.Scorpion:	index = 2;											break;
+				case map_id.Lynx:		index = 3 + GetWeaponIndex(unitWithWeapon.weapon);	break;
+				case map_id.Panther:	index = 14 + GetWeaponIndex(unitWithWeapon.weapon);	break;
+				case map_id.Tiger:		index = 25 + GetWeaponIndex(unitWithWeapon.weapon);	break;
+			}
+
+			if (index < 0)
+				return null;
+
+			return m_BuildVehicleTasks[index];
+		}
+
+		private int GetWeaponIndex(map_id weapon)
+		{
+			switch (weapon)
+			{
+				case map_id.AcidCloud:			return 0;
+				case map_id.EMP:				return 1;
+				case map_id.Laser:				return 2;
+				case map_id.Microwave:			return 3;
+				case map_id.RailGun:			return 4;
+				case map_id.RPG:				return 5;
+				case map_id.Starflare:			return 6;
+				case map_id.Supernova:			return 7;
+				case map_id.ESG:				return 8;
+				case map_id.Stickyfoam:			return 9;
+				case map_id.ThorsHammer:		return 10;
+			}
+
+			return -999;
 		}
 	}
 }

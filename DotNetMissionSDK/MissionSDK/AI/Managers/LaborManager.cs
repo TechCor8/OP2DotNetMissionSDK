@@ -36,11 +36,13 @@ namespace DotNetMissionSDK.AI.Managers
 		private int m_AvailableWorkers;
 		private int m_AvailableScientists;
 
-		public PlayerInfo owner { get; private set; }
+		public BotPlayer botPlayer	{ get; private set; }
+		public PlayerInfo owner		{ get; private set; }
 
 
-		public LaborManager(PlayerInfo owner)
+		public LaborManager(BotPlayer botPlayer, PlayerInfo owner)
 		{
+			this.botPlayer = botPlayer;
 			this.owner = owner;
 		}
 
