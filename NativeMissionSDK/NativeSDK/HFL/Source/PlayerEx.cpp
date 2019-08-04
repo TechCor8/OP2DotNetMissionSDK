@@ -55,7 +55,7 @@ struct OP2Player
 	int totalForumCapacity;// 56F010	 0x0F4	 totalForumCapacity
 	int totalMedCenterCapacity;// 56F014	 0x0F8	 totalMedCenterCapacity
 	int totalResidenceCapacity;// 56F018	 0x0FC	 totalResidenceCapacity
-	int unk3[57];
+	int unk3[47];
 	int numBuildingsBuilt;
 	int unk4[662];
 	Unit *buildingList;
