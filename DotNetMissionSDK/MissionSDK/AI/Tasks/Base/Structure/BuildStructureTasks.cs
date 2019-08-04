@@ -197,7 +197,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildVehicleFactoryKitTask());
+			AddPrerequisite(new BuildArachnidFactoryKitTask());
 		}
 	}
 

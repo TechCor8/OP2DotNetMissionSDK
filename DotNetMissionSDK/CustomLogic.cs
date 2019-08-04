@@ -19,7 +19,7 @@ namespace DotNetMissionSDK
 		public const bool useJson = true;
 
 		private BotPlayer m_BotPlayer;
-		//private BotPlayer m_BotPlayer2;
+		private BotPlayer m_BotPlayer2;
 
 		/// <summary>
 		/// Called when the mission is first loaded, regardless of whether it is a new game or saved game.
@@ -29,12 +29,10 @@ namespace DotNetMissionSDK
 		/// <param name="triggerManager">The trigger manager used for the mission.</param>
 		public CustomLogic(MissionRoot root, SaveData saveData, TriggerManager triggerManager) : base(root, saveData, triggerManager)
 		{
-			// *** Add custom init code here ***
-			m_BotPlayer = new BotPlayer(BotType.LaunchStarship, GetPlayerInfo(TethysGame.LocalPlayer()));
-			m_BotPlayer.Start();
+			// Players, units and the map have not been fully initialized at this point.
+			// In most cases, you want to add code to StartMission() instead.
 
-			//m_BotPlayer2 = new BotPlayer(BotType.LaunchStarship, GetPlayerInfo(1));
-			//m_BotPlayer2.Start();
+			// *** Add custom pre-init code here ***
 		}
 
 		/// <summary>
@@ -65,6 +63,21 @@ namespace DotNetMissionSDK
 		}
 
 		/// <summary>
+		/// Called when the mission has finished initializing, regardless of whether it is a new game or saved game.
+		/// </summary>
+		protected override void StartMission()
+		{
+			base.StartMission();
+
+			// *** Add custom start code here ***
+			m_BotPlayer = new BotPlayer(BotType.LaunchStarship, GetPlayerInfo(TethysGame.LocalPlayer()));
+			m_BotPlayer.Start();
+
+			m_BotPlayer2 = new BotPlayer(BotType.LaunchStarship, GetPlayerInfo(1));
+			m_BotPlayer2.Start();
+		}
+
+		/// <summary>
 		/// Called when a trigger has been executed.
 		/// </summary>
 		/// <param name="trigger">The trigger that was executed.</param>
@@ -92,7 +105,7 @@ namespace DotNetMissionSDK
 
 			// *** Add custom update code here ***
 			m_BotPlayer.Update();
-			//m_BotPlayer2.Update();
+			m_BotPlayer2.Update();
 		}
 
 		/// <summary>

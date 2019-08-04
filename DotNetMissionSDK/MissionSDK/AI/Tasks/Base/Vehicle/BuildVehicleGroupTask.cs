@@ -61,6 +61,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 				// Supported unit types are in a prioritized order
 				foreach (VehicleGroup.UnitWithWeaponType unitWithWeaponType in combatSlot.supportedSlotTypes)
 				{
+					// Use correct factory task to build unit
 					BuildSingleVehicleTask vehicleTask;
 					bool hasAvailableFactory;
 					
@@ -80,10 +81,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 							break;
 					}
 
+					// Must set this before the "continue" or AddFactory may break when types are set to "none".
+					vehicleTask.SetVehicle(unitWithWeaponType.unit, unitWithWeaponType.weapon);
+
 					if (!hasAvailableFactory)
 						continue;
-
-					vehicleTask.SetVehicle(unitWithWeaponType.unit, unitWithWeaponType.weapon);
 
 					if (vehicleTask.PerformTaskTree())
 					{

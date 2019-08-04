@@ -66,6 +66,51 @@ namespace DotNetMissionSDK.HFL
 		public int GetTotalMedCenterCapacity()							{ return PlayerEx_GetTotalMedCenterCapacity(playerID);						}
 		public int GetTotalResidenceCapacity()							{ return PlayerEx_GetTotalResidenceCapacity(playerID);						}
 
+		/// <summary>
+		/// Checks if this player is the correct colony type, has completed the required research, and has the required resources to build a unit.
+		/// </summary>
+		public bool CanBuildUnit(map_id unitType, map_id cargoOrWeaponType=map_id.None)
+		{
+			bool isEden = IsEden();
+
+			UnitInfo vehicleInfo = new UnitInfo(unitType);
+
+			// Fail Check: Colony Type
+			if (!vehicleInfo.CanColonyUseUnit(isEden))
+				return false;
+
+			// Fail Check: Research
+			TechInfo techInfo = Research.GetTechInfo(vehicleInfo.GetResearchTopic());
+			if (!HasTechnology(techInfo.GetTechID()))
+				return false;
+
+			if (cargoOrWeaponType != map_id.None)
+			{
+				UnitInfo cargoInfo = new UnitInfo(cargoOrWeaponType);
+
+				// Fail Check: Cargo Colony Type
+				if (!vehicleInfo.CanColonyUseUnit(isEden))
+					return false;
+
+				// Fail Check: Cargo Research
+				TechInfo cargoTechInfo = Research.GetTechInfo(vehicleInfo.GetResearchTopic());
+				if (!HasTechnology(cargoTechInfo.GetTechID()))
+					return false;
+
+				// Fail Check: Vehicle cost
+				if (Ore() < vehicleInfo.GetOreCost(playerID) + cargoInfo.GetOreCost(playerID)) return false;
+				if (RareOre() < vehicleInfo.GetRareOreCost(playerID) + cargoInfo.GetRareOreCost(playerID)) return false;
+			}
+			else
+			{
+				// Fail Check: Vehicle cost
+				if (Ore() < vehicleInfo.GetOreCost(playerID)) return false;
+				if (RareOre() < vehicleInfo.GetRareOreCost(playerID)) return false;
+			}
+
+			return true;
+		}
+
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr PlayerEx_GetPlayerName(int playerID);
 		[DllImport("DotNetInterop.dll")] private static extern void PlayerEx_SetPlayerName(int playerID, string newName);

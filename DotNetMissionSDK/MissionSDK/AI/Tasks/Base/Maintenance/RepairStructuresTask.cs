@@ -47,6 +47,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 			AddPrerequisite(new BuildConvecTask());
 			m_BuildRepairUnitTask = new BuildRepairUnitTask(owner);
+			m_BuildRepairUnitTask.GeneratePrerequisites();
 		}
 
 		protected override bool PerformTask()

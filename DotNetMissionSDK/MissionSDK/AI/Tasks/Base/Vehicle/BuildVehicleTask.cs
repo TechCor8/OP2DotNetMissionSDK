@@ -31,35 +31,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 
 		protected override bool CanPerformTask()
 		{
-			UnitInfo vehicleInfo = new UnitInfo(m_VehicleToBuild);
-
-			// Fail Check: Research
-			TechInfo techInfo = Research.GetTechInfo(vehicleInfo.GetResearchTopic());
-
-			if (!owner.player.HasTechnology(techInfo.GetTechID()))
-				return false;
-
-			if (m_VehicleToBuildCargo != map_id.None)
-			{
-				// Fail Check: Cargo Research
-				UnitInfo cargoInfo = new UnitInfo(m_VehicleToBuildCargo);
-				TechInfo cargoTechInfo = Research.GetTechInfo(vehicleInfo.GetResearchTopic());
-
-				if (!owner.player.HasTechnology(cargoTechInfo.GetTechID()))
-					return false;
-
-				// Fail Check: Vehicle cost
-				if (owner.player.Ore() < vehicleInfo.GetOreCost(owner.player.playerID) + cargoInfo.GetOreCost(owner.player.playerID)) return false;
-				if (owner.player.RareOre() < vehicleInfo.GetRareOreCost(owner.player.playerID) + cargoInfo.GetRareOreCost(owner.player.playerID)) return false;
-			}
-			else
-			{
-				// Fail Check: Vehicle cost
-				if (owner.player.Ore() < vehicleInfo.GetOreCost(owner.player.playerID)) return false;
-				if (owner.player.RareOre() < vehicleInfo.GetRareOreCost(owner.player.playerID)) return false;
-			}
-
-			return true;
+			return owner.player.CanBuildUnit(m_VehicleToBuild, m_VehicleToBuildCargo);
 		}
 
 		protected override bool PerformTask()

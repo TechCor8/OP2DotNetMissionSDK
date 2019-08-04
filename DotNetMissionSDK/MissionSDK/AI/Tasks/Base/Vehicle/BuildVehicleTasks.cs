@@ -70,13 +70,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 		public BuildScoutTask(PlayerInfo owner) : base(owner)				{ m_VehicleToBuild = map_id.Scout;						}
 	}
 
-	public class BuildSpiderTask : BuildVehicleTask
+	public class BuildSpiderTask : BuildArachnidTask
 	{
 		public BuildSpiderTask()											{ m_VehicleToBuild = map_id.Spider;						}
 		public BuildSpiderTask(PlayerInfo owner) : base(owner)				{ m_VehicleToBuild = map_id.Spider;						}
 	}
 
-	public class BuildScorpionTask : BuildVehicleTask
+	public class BuildScorpionTask : BuildArachnidTask
 	{
 		public BuildScorpionTask()											{ m_VehicleToBuild = map_id.Scorpion;					}
 		public BuildScorpionTask(PlayerInfo owner) : base(owner)			{ m_VehicleToBuild = map_id.Scorpion;					}

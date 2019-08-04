@@ -137,8 +137,12 @@ namespace DotNetMissionSDK
 					player.SetColorNumber(data.color);
 				}
 
-				// TODO: data.isHuman - If not human, use fancy AI code
+				// Always human
+				if (data.id == 1)
+					player.GoHuman();
 
+				// TODO: data.isHuman - If not human, use fancy AI code
+				
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
 
@@ -340,6 +344,8 @@ namespace DotNetMissionSDK
 
 			CreateTriggerDataLookupTable();
 
+			StartMission();
+
 			return true;
 		}
 
@@ -352,6 +358,8 @@ namespace DotNetMissionSDK
 
 			InitializeDisasters();
 			CreateTriggerDataLookupTable();
+
+			StartMission();
 		}
 
 		private void InitializeDisasters()
@@ -380,6 +388,13 @@ namespace DotNetMissionSDK
 
 			foreach (TriggerData data in m_Root.triggers)
 				m_TriggerData.Add(data.id, data);
+		}
+
+		/// <summary>
+		/// Called when the mission has finished initializing, regardless of whether it is a new game or saved game.
+		/// </summary>
+		protected virtual void StartMission()
+		{
 		}
 
 		/// <summary>

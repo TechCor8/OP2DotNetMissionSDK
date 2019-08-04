@@ -40,8 +40,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		protected override bool CanPerformTask()
 		{
-			// Fail Check: Research
 			UnitInfo unitInfo = new UnitInfo(m_KitToBuild);
+
+			// Fail Check: Colony Type
+			if (!unitInfo.CanColonyUseUnit(owner.player.IsEden()))
+				return false;
+
+			// Fail Check: Research
 			TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
 
 			if (!owner.player.HasTechnology(techInfo.GetTechID()))
@@ -50,6 +55,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (m_KitToBuildCargo != map_id.None)
 			{
 				UnitInfo cargoInfo = new UnitInfo(m_KitToBuildCargo);
+
+				// Fail Check: Cargo Colony Type
+				if (!cargoInfo.CanColonyUseUnit(owner.player.IsEden()))
+					return false;
+
+				// Fail Check: Cargo Research
 				TechInfo cargoTechInfo = Research.GetTechInfo(cargoInfo.GetResearchTopic());
 
 				if (!owner.player.HasTechnology(cargoTechInfo.GetTechID()))

@@ -18,8 +18,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 		public int targetCountToBuild = 1;
 
 
-		public BuildRepairUnitTask()											{ _GeneratePrerequisites(); }
-		public BuildRepairUnitTask(PlayerInfo owner) : base(owner)				{ _GeneratePrerequisites(); }
+		public BuildRepairUnitTask()											{ Initialize(); }
+		public BuildRepairUnitTask(PlayerInfo owner) : base(owner)				{ Initialize(); }
 
 		public map_id repairUnitType		{ get; private set; }
 
@@ -59,18 +59,21 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 			return m_BuildVehicleTask.IsTaskComplete();
 		}
 
-		private void _GeneratePrerequisites()
+		private void Initialize()
 		{
-			m_BuildRepairVehicleTask = new BuildRepairVehicleTask(owner);
-			m_BuildSpiderTask = new BuildSpiderTask(owner);
-			m_BuildConvecTask = new BuildConvecTask(owner);
-
 			repairUnitType = map_id.ConVec;
 			m_BuildVehicleTask = m_BuildConvecTask;
 		}
 
 		public override void GeneratePrerequisites()
 		{
+			m_BuildRepairVehicleTask = new BuildRepairVehicleTask(owner);
+			m_BuildSpiderTask = new BuildSpiderTask(owner);
+			m_BuildConvecTask = new BuildConvecTask(owner);
+
+			m_BuildRepairVehicleTask.GeneratePrerequisites();
+			m_BuildSpiderTask.GeneratePrerequisites();
+			m_BuildConvecTask.GeneratePrerequisites();
 		}
 
 		protected override bool PerformTask()

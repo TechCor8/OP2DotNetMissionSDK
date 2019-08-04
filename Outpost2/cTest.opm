@@ -347,8 +347,8 @@
 	"Disasters":
 	[
 	],
-	
-	"Triggers":
+	"Triggers":[],
+	"Triggers2":
 	[
 		{
 			"Comment":"Trigger for losing.",

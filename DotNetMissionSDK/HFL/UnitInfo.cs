@@ -106,7 +106,18 @@ namespace DotNetMissionSDK.HFL
 		
 		public int GetXSize()										{ return IsStructure() ? UnitInfo_GetXSize(m_UnitType) : 1;				} // If not a structure, returns 1
 		public void SetXSize(int value)								{ UnitInfo_SetXSize(m_UnitType, value);									}
-		
+
+		public bool CanColonyUseUnit(bool isEden)
+		{
+			switch (GetOwnerFlags())
+			{
+				case OwnerFlags.ownerEden:		return isEden;
+				case OwnerFlags.ownerPlymouth:	return !isEden;
+				case OwnerFlags.ownerBoth:		return true;
+			}
+			return false;
+		}
+
 		// Only valid for weapons
 		public int GetDamageRadius()								{ return UnitInfo_GetDamageRadius(m_UnitType);							}
 		public void SetDamageRadius(int value)						{ UnitInfo_SetDamageRadius(m_UnitType, value);							}
