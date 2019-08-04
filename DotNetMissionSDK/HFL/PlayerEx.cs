@@ -24,7 +24,13 @@ namespace DotNetMissionSDK.HFL
 		public void SetEDWARDSatelliteCount(int count)					{ PlayerEx_SetSatelliteCount(playerID, map_id.EDWARDSatellite, count);		}
 		
 		public int GetColorNumber()										{ return PlayerEx_GetColorNumber(playerID);									}
-		public bool IsAlliedTo(Player ally)								{ return PlayerEx_IsAlliedTo(playerID, ally.playerID) > 0;					}
+		public bool IsAlliedTo(Player ally)
+		{
+			if (ally.playerID == playerID)
+				return true;
+
+			return PlayerEx_IsAlliedTo(playerID, ally.playerID) > 0;
+		}
 		public int GetNumBuildingsBuilt()								{ return PlayerEx_GetNumBuildingsBuilt(playerID);							}
 
 		public void Starve(int numToStarve, bool skipMoraleUpdate)		{ PlayerEx_Starve(playerID, numToStarve, skipMoraleUpdate ? 1 : 0);			}

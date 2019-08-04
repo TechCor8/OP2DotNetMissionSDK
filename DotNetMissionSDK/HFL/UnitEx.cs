@@ -15,6 +15,8 @@ namespace DotNetMissionSDK.HFL
 
 		public UnitEx(int stubIndex) : base(stubIndex) { }
 
+		public PlayerEx GetOwner()													{ return TethysGame.GetPlayer(GetOwnerID());													}
+
 		public void DoAttack(int tileX, int tileY)									{ UnitEx_DoAttack(m_StubIndex, tileX, tileY);													}
 		public void DoDeployMiner(int tileX, int tileY)								{ UnitEx_DoDeployMiner(m_StubIndex, tileX, tileY);												}
 		public void DoDoze(MAP_RECT dozeArea)										{ UnitEx_DoDoze(m_StubIndex, dozeArea.xMin, dozeArea.yMin, dozeArea.xMax, dozeArea.yMax);		}
@@ -76,6 +78,7 @@ namespace DotNetMissionSDK.HFL
 		public void SetInvisible(bool active)										{ UnitEx_SetInvisible(m_StubIndex, active ? 1 : 0);												}
 
 		public UnitInfo GetUnitInfo()												{ return new UnitInfo(GetUnitType());															}
+		public UnitInfo GetWeaponInfo()												{ return new UnitInfo(GetWeapon());																}
 
 		public void SetAnimation(int animIdx, int animDelay, int animStartDelay, bool invisible, bool skipDoDeath)	{ UnitEx_SetAnimation(m_StubIndex, animIdx, animDelay, animStartDelay, invisible ? 1 : 0, skipDoDeath ? 1 : 0);	}
 
@@ -90,6 +93,8 @@ namespace DotNetMissionSDK.HFL
 		public int GetLabCurrentTopic()												{ return UnitEx_GetLabCurrentTopic(m_StubIndex);												}
 		public int GetLabScientistCount()											{ return UnitEx_GetLabScientistCount(m_StubIndex);												}
 		public void SetLabScientistCount(int numScientists)							{ UnitEx_SetLabScientistCount(m_StubIndex, numScientists);										}
+
+		public bool HasWeapon()														{ return GetWeaponInfo().GetWeaponStrength() > 0;												}
 
 		public bool HasEmptyBay()													{ return GetBayWithCargo(map_id.None) >= 0;														}
 		public bool HasBayWithCargo(map_id cargoType)								{ return GetBayWithCargo(cargoType) >= 0;														}

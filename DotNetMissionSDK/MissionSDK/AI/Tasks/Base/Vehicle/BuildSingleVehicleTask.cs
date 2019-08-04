@@ -1,32 +1,35 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
-using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 {
 	/// <summary>
-	/// Abstract class for building units from a vehicle factory.
+	/// Task for building a single unit from a vehicle factory.
 	/// </summary>
-	public abstract class BuildVehicleTask : Task
+	public class BuildSingleVehicleTask : Task
 	{
 		protected map_id m_VehicleToBuild;
 		protected map_id m_VehicleToBuildCargo;
-		public int targetCountToBuild = 1;
+
+		protected BuildStructureTask m_BuildStructureTask;
 
 
-		public BuildVehicleTask() { }
-		public BuildVehicleTask(PlayerInfo owner) : base(owner) { }
+		public BuildSingleVehicleTask() { }
+		public BuildSingleVehicleTask(PlayerInfo owner) : base(owner) { }
 
 		public override bool IsTaskComplete()
 		{
-			List<UnitEx> units = owner.units.GetListForType(m_VehicleToBuild);
-			return units.Count >= targetCountToBuild;
+			// This task never completes, as it is designed to build one unit and forget about it.
+			return false;
 		}
 
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new BuildVehicleFactoryTask());
+
+			// This task is optional and not required. Used for constructing additional factories.
+			m_BuildStructureTask = new BuildVehicleFactoryTask();
 		}
 
 		protected override bool CanPerformTask()
@@ -71,25 +74,45 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 			UnitEx factory = owner.units.vehicleFactories.Find((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy());
 			
 			if (factory == null)
-				return true;
+				return false;
 
 			factory.DoProduce(m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			return true;
 		}
+
+		/// <summary>
+		/// Sets the vehicle to build.
+		/// </summary>
+		public void SetVehicle(map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		{
+			m_VehicleToBuild = vehicleToBuild;
+			m_VehicleToBuildCargo = vehicleToBuildCargo;
+		}
+
+		/// <summary>
+		/// Adds a factory to the base for producing more units.
+		/// </summary>
+		public virtual void AddFactory()
+		{
+			m_BuildStructureTask.targetCountToBuild = owner.units.vehicleFactories.Count+1;
+		}
 	}
 
 	/// <summary>
-	/// Abstract class for building units from an arachnid factory.
+	/// Class for building a single unit from an arachnid factory.
 	/// </summary>
-	public abstract class BuildArachnidTask : BuildVehicleTask
+	public class BuildSingleArachnidTask : BuildSingleVehicleTask
 	{
-		public BuildArachnidTask() { }
-		public BuildArachnidTask(PlayerInfo owner) : base(owner) { }
+		public BuildSingleArachnidTask() { }
+		public BuildSingleArachnidTask(PlayerInfo owner) : base(owner) { }
 
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new BuildArachnidFactoryTask());
+
+			// This task is optional and not required. Used for constructing additional factories.
+			m_BuildStructureTask = new BuildArachnidFactoryTask();
 		}
 
 		protected override bool PerformTask()
@@ -101,11 +124,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 			UnitEx factory = owner.units.arachnidFactories.Find((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy());
 			
 			if (factory == null)
-				return true;
+				return false;
 
 			factory.DoProduce(m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			return true;
+		}
+
+		/// <summary>
+		/// Adds a factory to the base for producing more units.
+		/// </summary>
+		public override void AddFactory()
+		{
+			m_BuildStructureTask.targetCountToBuild = owner.units.arachnidFactories.Count+1;
 		}
 	}
 }

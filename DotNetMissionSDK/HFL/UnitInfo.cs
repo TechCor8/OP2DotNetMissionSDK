@@ -110,6 +110,29 @@ namespace DotNetMissionSDK.HFL
 		// Only valid for weapons
 		public int GetDamageRadius()								{ return UnitInfo_GetDamageRadius(m_UnitType);							}
 		public void SetDamageRadius(int value)						{ UnitInfo_SetDamageRadius(m_UnitType, value);							}
+
+		public int GetWeaponStrength()
+		{
+			switch (m_UnitType)
+			{
+				case map_id.AcidCloud:				return 4;
+				case map_id.EMP:					return 3;
+				case map_id.Laser:					return 2;
+				case map_id.Microwave:				return 2;
+				case map_id.RailGun:				return 4;
+				case map_id.RPG:					return 4;
+				case map_id.Starflare:				return 2;
+				case map_id.Supernova:				return 3;
+				case map_id.Starflare2:				return 1;
+				case map_id.Supernova2:				return 2;
+				case map_id.ESG:					return 5;
+				case map_id.Stickyfoam:				return 3;
+				case map_id.ThorsHammer:			return 6;
+				case map_id.EnergyCannon:			return 1;
+			}
+
+			return 0;
+		}
 		
 		// Only valid for vehicles
 		public VehicleFlags GetVehicleFlags()						{ return (VehicleFlags)UnitInfo_GetVehicleFlags(m_UnitType);			}

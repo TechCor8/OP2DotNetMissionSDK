@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.HFL;
 using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.Utility.Maps
 {
@@ -57,9 +58,34 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// <summary>
 		/// Returns the unit at the specified tile.
 		/// </summary>
-		public static UnitEx GetUnitOnTile(int gridX, int gridY)
+		public static UnitEx GetUnitOnTile(LOCATION tilePosition)
 		{
-			return m_Grid[gridX,gridY].unitOnTile;
+			tilePosition = GetPointInGridSpace(tilePosition);
+
+			return m_Grid[tilePosition.x,tilePosition.y].unitOnTile;
+		}
+
+		/// <summary>
+		/// Returns all units in the specified area.
+		/// </summary>
+		public static List<UnitEx> GetUnitsInArea(MAP_RECT area)
+		{
+			List<UnitEx> units = new List<UnitEx>();
+
+			for (int x=area.xMin; x < area.xMax; ++x)
+			{
+				for (int y=area.yMin; y < area.yMax; ++y)
+				{
+					LOCATION tile = new LOCATION(x,y);
+					tile.ClipToMap();
+
+					UnitEx unit = GetUnitOnTile(tile);
+					if (unit != null)
+						units.Add(unit);
+				}
+			}
+
+			return units;
 		}
 	}
 }

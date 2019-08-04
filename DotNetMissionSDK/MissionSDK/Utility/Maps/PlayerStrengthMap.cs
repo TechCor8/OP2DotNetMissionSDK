@@ -68,7 +68,7 @@ namespace DotNetMissionSDK.Utility.Maps
 			LOCATION position = unit.GetPosition();
 			int weaponRange = weaponInfo.GetWeaponRange(ownerID);
 
-			int weaponStrength = GetWeaponStrength(weaponType);
+			int weaponStrength = weaponInfo.GetWeaponStrength();
 
 			// Apply strength to all tiles in range
 			for (int x=position.x-weaponRange; x < position.x+weaponRange; ++x)
@@ -89,29 +89,6 @@ namespace DotNetMissionSDK.Utility.Maps
 					m_Grid[gridPt.x,gridPt.y].playerStrength[ownerID] += weaponStrength;
 				}
 			}
-		}
-
-		private static int GetWeaponStrength(map_id weaponType)
-		{
-			switch (weaponType)
-			{
-				case map_id.AcidCloud:				return 4;
-				case map_id.EMP:					return 3;
-				case map_id.Laser:					return 2;
-				case map_id.Microwave:				return 2;
-				case map_id.RailGun:				return 4;
-				case map_id.RPG:					return 4;
-				case map_id.Starflare:				return 2;
-				case map_id.Supernova:				return 3;
-				case map_id.Starflare2:				return 1;
-				case map_id.Supernova2:				return 2;
-				case map_id.ESG:					return 5;
-				case map_id.Stickyfoam:				return 3;
-				case map_id.ThorsHammer:			return 6;
-				case map_id.EnergyCannon:			return 1;
-			}
-
-			return 0;
 		}
 
 		private static LOCATION GetPointInGridSpace(LOCATION pt)

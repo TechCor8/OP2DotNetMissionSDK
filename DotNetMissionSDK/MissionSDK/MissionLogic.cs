@@ -420,7 +420,7 @@ namespace DotNetMissionSDK
 
 			// Update PlayerInfo state
 			for (int i=0; i < m_PlayerInfo.Length; ++i)
-				m_PlayerInfo[i]?.Update();
+				m_PlayerInfo[i]?.Update(m_PlayerInfo);
 
 			PlayerStrengthMap.Update(m_PlayerInfo);
 			PlayerUnitMap.Update(m_PlayerInfo);

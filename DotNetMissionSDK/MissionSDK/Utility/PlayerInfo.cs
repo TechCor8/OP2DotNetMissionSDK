@@ -2,6 +2,7 @@
 using DotNetMissionSDK.Triggers;
 using DotNetMissionSDK.Utility.PlayerState;
 using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.Utility
 {
@@ -13,6 +14,8 @@ namespace DotNetMissionSDK.Utility
 		private SaveData m_SaveData;		// The save data object to store persistent player state
 
 		public PlayerEx player					{ get; private set; }
+		public IEnumerable<PlayerInfo> allies	{ get; private set; }
+		public IEnumerable<PlayerInfo> enemies	{ get; private set; }
 
 		/// <summary>
 		/// Contains lists of player units by type.
@@ -53,10 +56,35 @@ namespace DotNetMissionSDK.Utility
 		/// <summary>
 		/// Updates the player state. Call this at the beginning of every frame.
 		/// </summary>
-		public void Update()
+		public void Update(PlayerInfo[] allPlayerInfos)
 		{
 			units.Update();
 			commandGrid.Update(units, player.playerID);
+
+			UpdateAlliances(allPlayerInfos);
+		}
+
+		private void UpdateAlliances(PlayerInfo[] allPlayerInfos)
+		{
+			List<PlayerInfo> allies = new List<PlayerInfo>();
+			List<PlayerInfo> enemies = new List<PlayerInfo>();
+
+			for (int i=0; i < allPlayerInfos.Length; ++i)
+			{
+				PlayerInfo info = allPlayerInfos[i];
+				if (info == null)
+					continue;
+
+				PlayerEx otherPlayer = info.player;
+
+				if (otherPlayer.IsAlliedTo(player))
+					allies.Add(info);
+				else
+					enemies.Add(info);
+			}
+
+			this.allies = allies;
+			this.enemies = enemies;
 		}
 		
 		public void Dispose()
