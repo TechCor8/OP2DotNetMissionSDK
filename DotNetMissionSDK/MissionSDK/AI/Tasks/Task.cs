@@ -7,6 +7,7 @@ namespace DotNetMissionSDK.AI.Tasks
 	{
 		private Task m_Parent;
 		private List<Task> m_Prerequisites = new List<Task>();
+		private bool blockSiblingPrerequisites;
 		
 		protected PlayerInfo owner		{ get; private set; }
 
@@ -107,6 +108,10 @@ namespace DotNetMissionSDK.AI.Tasks
 				// Perform the task. Fail out if it can't be done.
 				if (!m_Prerequisites[i].PerformTaskTree())
 					return false;
+
+				// If task has been set to block, skip remaining prerequisites.
+				if (m_Prerequisites[i].blockSiblingPrerequisites)
+					break;
 			}
 
 			return true;
@@ -119,10 +124,12 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// </para>
 		/// </summary>
 		/// <param name="prerequisite">The task to add as a prerequisite to this task. Should always be new().</param>
-		protected void AddPrerequisite(Task prerequisite)
+		/// <param name="blockSiblingPrerequisites">If true, this task will prevent subsequently added Prerequisites from running in parallel.</param>
+		protected void AddPrerequisite(Task prerequisite, bool blockSiblingPrerequisites=false)
 		{
 			prerequisite.m_Parent = this;
 			prerequisite.owner = owner;
+			prerequisite.blockSiblingPrerequisites = blockSiblingPrerequisites;
 
 			if (prerequisite.IsAncestorTask(prerequisite))
 				return;

@@ -76,7 +76,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 
 			foreach (Task task in m_Prerequisites)
-				AddPrerequisite(task);
+				AddPrerequisite(task, false);
 
 			m_BuildGuardPostTask.targetCountToBuild = 0;
 			m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
