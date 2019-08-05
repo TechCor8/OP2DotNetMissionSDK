@@ -31,6 +31,11 @@ namespace DotNetMissionSDK.HFL
 	public class Research
 	{
 		public static int GetTechCount()							{ return Research_GetTechCount();										}
+		
+		/// <summary>
+		/// Gets tech info by its index in the tech array.
+		/// </summary>
+		/// <param name="index">The index of the tech info in the tech array. NOT the tech ID.</param>
 		public static TechInfo GetTechInfo(int index)				{ return new TechInfo(Research_GetTechInfo(index));						}
 		public static int GetMaxTechID()							{ return Research_GetMaxTechID();										}
 

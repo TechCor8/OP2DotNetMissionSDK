@@ -197,8 +197,11 @@ namespace DotNetMissionSDK.AI.Managers
 					// Get all enemy units of this unit's type
 					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()) && tileUnit.GetUnitType() != unit.GetUnitType());
 
+					UnitInfo starflareInfo = new UnitInfo(map_id.Starflare);
+					TechInfo techInfo = Research.GetTechInfo(starflareInfo.GetResearchTopic());
+
 					// Create zone, prioritizing bombers if they are available
-					if (owner.player.HasTechnology(new UnitInfo(map_id.Starflare).GetResearchTopic()))
+					if (owner.player.HasTechnology(techInfo.GetTechID()))
 						CreateZone(area, enemiesInArea.ToArray(), 1, VehicleGroupType.Bomber);
 					else
 						CreateZone(area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass);
@@ -234,8 +237,11 @@ namespace DotNetMissionSDK.AI.Managers
 					// Get all enemy units of this unit's type
 					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()) && tileUnit.GetUnitType() != unit.GetUnitType());
 
+					UnitInfo spiderInfo = new UnitInfo(map_id.Spider);
+					TechInfo techInfo = Research.GetTechInfo(spiderInfo.GetResearchTopic());
+
 					// Create zone, prioritizing capture groups if they are available
-					if (!owner.player.IsEden() && owner.player.HasTechnology(new UnitInfo(map_id.Spider).GetResearchTopic()))
+					if (!owner.player.IsEden() && owner.player.HasTechnology(techInfo.GetTechID()))
 						CreateZone(area, enemiesInArea.ToArray(), 1, VehicleGroupType.Capture);
 					else
 						CreateZone(area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass);

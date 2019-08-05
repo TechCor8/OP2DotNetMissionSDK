@@ -89,8 +89,12 @@ namespace DotNetMissionSDK.HFL
 		public void SetCargoCapacity(int playerID, int value)		{ UnitInfo_SetCargoCapacity(m_UnitType, playerID, value);				}
 		
 		// *** Global unit type settings ***
+		/// <summary>
+		/// Gets the unit's research topic.
+		/// Returns the TechInfo array index NOT the techID.
+		/// </summary>
 		public int GetResearchTopic()								{ return UnitInfo_GetResearchTopic(m_UnitType);							}
-		public void SetResearchTopic(int techID)					{ UnitInfo_SetResearchTopic(m_UnitType, techID);						}
+		public void SetResearchTopic(int techIndex)					{ UnitInfo_SetResearchTopic(m_UnitType, techIndex);						}
 		
 		public TrackType GetTrackType()								{ return UnitInfo_GetTrackType(m_UnitType);								}
 		public void SetTrackType(TrackType type)					{ UnitInfo_SetTrackType(m_UnitType, type);								}

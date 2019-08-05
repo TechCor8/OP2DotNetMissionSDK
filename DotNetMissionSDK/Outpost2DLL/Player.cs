@@ -51,6 +51,11 @@ namespace DotNetMissionSDK
 		public MoraleLevel MoraleLevel()	{ return Player_MoraleLevel(m_Handle);						}
 		public int GetRLVCount()			{ return Player_GetRLVCount(m_Handle);						}
 		// [Get] Indirect property lookups
+		/// <summary>
+		/// Returns true if the player has the specified technology.
+		/// NOTE: techID is NOT the array index value returned by GetResearchTopic. Use GetTechInfo().GetTechID().
+		/// </summary>
+		/// <param name="techID">The techID of the technology as found in the techInfo.txt files.</param>
 		public bool HasTechnology(int techID){ return Player_HasTechnology(m_Handle, techID) != 0;		}
 		public ScGroup GetDefaultGroup()	{ return new ScGroup(Player_GetDefaultGroup(m_Handle));		}
 		// [Get] Player Strength  [Calculational]
