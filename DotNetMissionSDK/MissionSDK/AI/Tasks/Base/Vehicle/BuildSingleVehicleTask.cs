@@ -29,7 +29,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 			AddPrerequisite(new BuildVehicleFactoryTask());
 
 			// This task is optional and not required. Used for constructing additional factories.
-			m_BuildStructureTask = new BuildVehicleFactoryTask();
+			m_BuildStructureTask = new BuildVehicleFactoryTask(owner);
+			m_BuildStructureTask.GeneratePrerequisites();
 		}
 
 		protected override bool CanPerformTask()
@@ -68,6 +69,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 		public virtual void AddFactory()
 		{
 			m_BuildStructureTask.targetCountToBuild = owner.units.vehicleFactories.Count+1;
+			m_BuildStructureTask.PerformTaskTree();
 		}
 	}
 
@@ -84,7 +86,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 			AddPrerequisite(new BuildArachnidFactoryTask());
 
 			// This task is optional and not required. Used for constructing additional factories.
-			m_BuildStructureTask = new BuildArachnidFactoryTask();
+			m_BuildStructureTask = new BuildArachnidFactoryTask(owner);
+			m_BuildStructureTask.GeneratePrerequisites();
 		}
 
 		protected override bool PerformTask()
@@ -109,6 +112,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 		public override void AddFactory()
 		{
 			m_BuildStructureTask.targetCountToBuild = owner.units.arachnidFactories.Count+1;
+			m_BuildStructureTask.PerformTaskTree();
 		}
 	}
 }

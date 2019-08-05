@@ -93,65 +93,65 @@ namespace DotNetMissionSDK.HFL
 	// Vehicle track types
 	public enum TrackType
 	{
-		trackLegged = 0,	// 'L'
-		trackWheeled,		// 'W'
-		trackMiner,			// miner / geo-con uses this type; 'M' in sheets (not sure if it has a real name)
-		trackTracked,		// 'T'
-		trackHover			// ?? - 'H' in sheets; only allows movement on bulldozed terrain.
+		Legged = 0,			// 'L'
+		Wheeled,			// 'W'
+		Miner,				// miner / geo-con uses this type; 'M' in sheets (not sure if it has a real name)
+		Tracked,			// 'T'
+		Hover				// ?? - 'H' in sheets; only allows movement on bulldozed terrain.
 	};
 
 	// Report button ID's. Use for CommandPane::GetReportButton and PaneReport::GetLinkedButtonId
 	public enum ReportButtonType
 	{
-		rbtnFactories = 1,
-		rbtnLabs,
-		rbtnResources,
-		rbtnCommunications,
-		rbtnSpace,
-		rbtnGameSettings
+		Factories = 1,
+		Labs,
+		Resources,
+		Communications,
+		Space,
+		GameSettings
 	};
 
 	// Armor classes. The names might only be accurate for structures
 	public enum ArmorType
 	{
-		armorNone = 256,			// class 0 in sheets
-		armorVeryLight = 180,		// class 1
-		armorLight = 130,			// class 2
-		armorMediumLight = 90,		// class 3
-		armorMedium = 60,			// class 4
-		armorHeavy = 40				// class 5
+		None = 256,					// class 0 in sheets
+		VeryLight = 180,			// class 1
+		Light = 130,				// class 2
+		MediumLight = 90,			// class 3
+		Medium = 60,				// class 4
+		Heavy = 40					// class 5
 	};
 
 	// Flags to specify who owns what
 	[System.Flags]
 	public enum OwnerFlags
 	{
-		ownerGaia = 0x0,			// 'G' in sheets; No player 'owns' (natural things like beacons, magmavents etc)
-		ownerPlymouth = 0x800,		// 'P'
-		ownerEden = 0x1000,			// 'E'
-		ownerBoth = 0x1800			// 'B'
+		Gaia = 0x0,					// 'G' in sheets; No player 'owns' (natural things like beacons, magmavents etc)
+		Plymouth = 0x800,			// 'P'
+		Eden = 0x1000,				// 'E'
+		Both = 0x1800				// 'B'
 	};
 
 	// Flags that apply to vehicles. They can be combined with the | (bitwise OR) operator.
 	[System.Flags]
 	public enum VehicleFlags
 	{
-		vflagVehicleFactory = 0x1,	// May be produced at VF
-		vflagArachnidFactory = 0x2,	// May be produced at AF
-		vflagWeaponEnabled = 0x4	// Can have a weapon turret
+		VehicleFactory = 0x1,		// May be produced at VF
+		ArachnidFactory = 0x2,		// May be produced at AF
+		WeaponEnabled = 0x4			// Can have a weapon turret
 	};
 
 	// Flags that apply to buildings.
 	[System.Flags]
 	public enum BuildingFlags
 	{
-		bflagTubes = 0x1,				// "Border" in sheets
-		bflagStructureKit = 0x2,		// Can be produced in the SF? (not set for geo con, miners)
-		bflagDockingAll = 0x4,
-		bflagDockingTruck = 0x8,		// allows cargo truck to dock
-		bflagDockingConvec = 0x10,		// allows convec to dock
-		bflagDockingEvac = 0x20,		// ? - allow evac. transport to dock maybe?
-		bflagCanBeAutoTargeted = 0x40	// can be automatically targeted. CC doesn't have this set by default (may affect whether something can be EMP'ed as well)
+		Tubes = 0x1,					// "Border" in sheets
+		StructureKit = 0x2,				// Can be produced in the SF? (not set for geo con, miners)
+		DockingAll = 0x4,
+		DockingTruck = 0x8,				// allows cargo truck to dock
+		DockingConvec = 0x10,			// allows convec to dock
+		DockingEvac = 0x20,				// ? - allow evac. transport to dock maybe?
+		CanBeAutoTargeted = 0x40		// can be automatically targeted. CC doesn't have this set by default (may affect whether something can be EMP'ed as well)
 	};
 
 	// text rendering structures
@@ -180,80 +180,80 @@ namespace DotNetMissionSDK.HFL
 	// common animation IDs
 	public enum AnimId
 	{
-		animGameSettingsBtn = 141,
-		animFactoriesBtn,
-		animCommunicationsBtn,
-		animResourcesBtn,
-		animLabsBtn,
-		animSpaceBtn,
-		animToggleLightsBtn,		// vehicle light toggle button in Command Pane
-		animActiveLight,
-		animDisabledLight,
-		animIdleLight,
-		animBigBtn,					// big blank button
-		animSmallBtn,				// small blank button
-		animEdenBig,				// eden background logo in Command Pane
-		animGlobeBtn,				// minimap globe / flat switch
-		animUnitPicBorder,			// green border around unit pic in Command Pane
-		animMinusBtn,				// minimap zoom out
-		animPlusBtn,				// minimap zoom in
-		animTacticalViewBtn,		// minimap tactical / normal view switch
-		animPageDownBtn = 453,		// list page down button
-		animPageUpBtn,				// list page up button
-		animAttackBtn = 1150,
-		animBuildBtn,				// normal build button
-		animScatterBtn,
-		animGuardBtn,
-		animDemolishBtn,
-		animBulldozeBtn,
-		animDumpBtn,
-		animBuildMineBtn,			// not used in full version. build mine button
-		animPatrolBtn,				// as well as cargo route
-		animReprogramBtn,
-		animRepairBtn,
-		animDestructBtn,			// self destruct button
-		animSpecialWallBtn,			// build special wall button
-		animStandGroundBtn,
-		animStopBtn,
-		animTransferBtn,
-		animTubeBtn,				// build tube button
-		animMoveBtn,
-		animNormalWallBtn,			// build normal wall button
-		animPower = 1201,			// atom storage bay / research icon (power plants)
-		animEmergency,				// red flashing light icon (med center, DIRT)
-		animDisaster,				// icon used with disaster research
-		animSpace,					// space icon (not pertaining to starship)
-		animWeapon,					// weapon research / storage bay
-		animFood,					// Agridome / food related research
-		animVehicle,				// VF / RCC / vehicles related research
-		animColony,					// Morale related icon (residences, forum, rec facility)
-		animStructure,				// SF / durability related icon
-		animMetal,					// Metals processing related icon
-		animLab,					// Lab (storage bay)
-		animEden,					// storage bay Eden icon
-		animPlymouth,				// storage bay Plymouth icon
-		animPlymouthBig = 1344,		// plymouth background logo in Command Pane
-		animSalvageBtn = 1560,
-		animEmptyBay = 1798,		// empty storage bay icon
-		animStarship,				// starship related research / bay icon
-		animCommonBeacon1 = 1850,	// 1 bar common
-		animCommonBeacon2,
-		animCommonBeacon3,
-		animRareBeacon1,			// 1 bar rare
-		animRareBeacon2,
-		animRareBeacon3,
-		animUnknownBeacon,			// un-surveyed beacon (white)
-		animBlueCircle = 1858,		// blue circle, looks somewhat like 'sonar'. not used in game
-		animCheckbox,				// checkbox icon used for toggle buttons
-		animArachnid = 1941			// arachnid bay / research icon
+		GameSettingsBtn = 141,
+		FactoriesBtn,
+		CommunicationsBtn,
+		ResourcesBtn,
+		LabsBtn,
+		SpaceBtn,
+		ToggleLightsBtn,		// vehicle light toggle button in Command Pane
+		ActiveLight,
+		DisabledLight,
+		IdleLight,
+		BigBtn,					// big blank button
+		SmallBtn,				// small blank button
+		EdenBig,				// eden background logo in Command Pane
+		GlobeBtn,				// minimap globe / flat switch
+		UnitPicBorder,			// green border around unit pic in Command Pane
+		MinusBtn,				// minimap zoom out
+		PlusBtn,				// minimap zoom in
+		TacticalViewBtn,		// minimap tactical / normal view switch
+		PageDownBtn = 453,		// list page down button
+		PageUpBtn,				// list page up button
+		AttackBtn = 1150,
+		BuildBtn,				// normal build button
+		ScatterBtn,
+		GuardBtn,
+		DemolishBtn,
+		BulldozeBtn,
+		DumpBtn,
+		BuildMineBtn,			// not used in full version. build mine button
+		PatrolBtn,				// as well as cargo route
+		ReprogramBtn,
+		RepairBtn,
+		DestructBtn,			// self destruct button
+		SpecialWallBtn,			// build special wall button
+		StandGroundBtn,
+		StopBtn,
+		TransferBtn,
+		TubeBtn,				// build tube button
+		MoveBtn,
+		NormalWallBtn,			// build normal wall button
+		Power = 1201,			// atom storage bay / research icon (power plants)
+		Emergency,				// red flashing light icon (med center, DIRT)
+		Disaster,				// icon used with disaster research
+		Space,					// space icon (not pertaining to starship)
+		Weapon,					// weapon research / storage bay
+		Food,					// Agridome / food related research
+		Vehicle,				// VF / RCC / vehicles related research
+		Colony,					// Morale related icon (residences, forum, rec facility)
+		Structure,				// SF / durability related icon
+		Metal,					// Metals processing related icon
+		Lab,					// Lab (storage bay)
+		Eden,					// storage bay Eden icon
+		Plymouth,				// storage bay Plymouth icon
+		PlymouthBig = 1344,		// plymouth background logo in Command Pane
+		SalvageBtn = 1560,
+		EmptyBay = 1798,		// empty storage bay icon
+		Starship,				// starship related research / bay icon
+		CommonBeacon1 = 1850,	// 1 bar common
+		CommonBeacon2,
+		CommonBeacon3,
+		RareBeacon1,			// 1 bar rare
+		RareBeacon2,
+		RareBeacon3,
+		UnknownBeacon,			// un-surveyed beacon (white)
+		BlueCircle = 1858,		// blue circle, looks somewhat like 'sonar'. not used in game
+		Checkbox,				// checkbox icon used for toggle buttons
+		Arachnid = 1941			// arachnid bay / research icon
 	};
 
 	// Standard frame IDs - use unless the button has multiple frames of animation or something else
 	public enum FrameId
 	{
-		frameNormal = 0,
-		frameActive,
-		frameDisabled
+		Normal = 0,
+		Active,
+		Disabled
 	};
 
 	// Extended map tile used in GetTileEx / SetTileEx
@@ -272,9 +272,9 @@ namespace DotNetMissionSDK.HFL
 	// RCC effect state in SetRCCEffect
 	public enum RCCEffectState
 	{
-		rccNormal = 0,	// No special effect
-		rccDisable,		// Disable RCC effect
-		rccForce		// Force enable RCC effect
+		Normal = 0,		// No special effect
+		Disable,		// Disable RCC effect
+		Force			// Force enable RCC effect
 	};
 
 	// Colors for lower status bar

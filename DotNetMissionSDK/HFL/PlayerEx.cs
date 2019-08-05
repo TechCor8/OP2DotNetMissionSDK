@@ -89,11 +89,11 @@ namespace DotNetMissionSDK.HFL
 				UnitInfo cargoInfo = new UnitInfo(cargoOrWeaponType);
 
 				// Fail Check: Cargo Colony Type
-				if (!vehicleInfo.CanColonyUseUnit(isEden))
+				if (!cargoInfo.CanColonyUseUnit(isEden))
 					return false;
 
 				// Fail Check: Cargo Research
-				TechInfo cargoTechInfo = Research.GetTechInfo(vehicleInfo.GetResearchTopic());
+				TechInfo cargoTechInfo = Research.GetTechInfo(cargoInfo.GetResearchTopic());
 				if (!HasTechnology(cargoTechInfo.GetTechID()))
 					return false;
 
