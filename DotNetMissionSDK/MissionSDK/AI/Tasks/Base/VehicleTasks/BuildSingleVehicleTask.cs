@@ -2,7 +2,7 @@
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
 
-namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
+namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
 	/// <summary>
 	/// Task for building a single unit from a vehicle factory.

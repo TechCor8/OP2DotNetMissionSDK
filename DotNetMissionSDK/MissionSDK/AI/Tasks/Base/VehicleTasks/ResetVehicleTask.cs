@@ -2,7 +2,7 @@
 using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 
-namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
+namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
 	/// <summary>
 	/// This task checks for stuck vehicles and resets them.

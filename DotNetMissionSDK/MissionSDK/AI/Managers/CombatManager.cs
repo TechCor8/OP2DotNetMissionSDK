@@ -12,7 +12,7 @@ namespace DotNetMissionSDK.AI.Managers
 	/// </summary>
 	public class CombatManager
 	{
-		private List<ThreatZone> m_ThreatZones = new List<ThreatZone>();
+		private List<VehicleGroup> m_CombatGroups = new List<VehicleGroup>();
 
 		public BotPlayer botPlayer							{ get; private set; }
 		public PlayerInfo owner								{ get; private set; }
@@ -26,7 +26,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 		public void Update()
 		{
-			m_ThreatZones.Clear();
+			m_CombatGroups.Clear();
 
 			// Create threat zones
 			CreateProximityZones();
@@ -38,9 +38,9 @@ namespace DotNetMissionSDK.AI.Managers
 
 			PopulateCombatGroups();
 
-			// Update threat zones
-			foreach (ThreatZone zone in m_ThreatZones)
-				zone.Update();
+			// Update vehicle groups
+			foreach (VehicleGroup group in m_CombatGroups)
+				group.Update();
 		}
 
 		private void PopulateCombatGroups()
@@ -56,11 +56,11 @@ namespace DotNetMissionSDK.AI.Managers
 			{
 				UnitEx unit = unassignedUnits[i];
 
-				foreach (ThreatZone zone in m_ThreatZones)
+				foreach (VehicleGroup group in m_CombatGroups)
 				{
-					if (zone.threatLevel != ThreatLevel.None && zone.Contains(unit))
+					if (group.threatZone.threatLevel != ThreatLevel.None && group.threatZone.Contains(unit))
 					{
-						if (zone.AssignUnit(unit))
+						if (group.AssignUnit(unit))
 						{
 							unassignedUnits.RemoveAt(i--);
 							break;
@@ -69,28 +69,28 @@ namespace DotNetMissionSDK.AI.Managers
 				}
 			}
 
-			// Units are assigned to zones based on the prioritized order, as long as they can fill the group
-			foreach (ThreatZone zone in m_ThreatZones)
+			// Units are assigned to groups based on the prioritized order, as long as they can fill the group
+			foreach (VehicleGroup group in m_CombatGroups)
 			{
 				// If the zone's group can't be filled, skip this zone
-				if (!zone.CanFillGroup(unassignedUnits))
+				if (!group.CanFillGroup(unassignedUnits))
 					continue;
 
 				// Assign units to zone
 				for (int i=0; i < unassignedUnits.Count; ++i)
 				{
-					if (zone.AssignUnit(unassignedUnits[i]))
+					if (group.AssignUnit(unassignedUnits[i]))
 						unassignedUnits.RemoveAt(i--);
 				}
 			}
 
 			// Remaining units are assigned where ever they can be placed
-			foreach (ThreatZone zone in m_ThreatZones)
+			foreach (VehicleGroup group in m_CombatGroups)
 			{
 				// Assign units to zone
 				for (int i=0; i < unassignedUnits.Count; ++i)
 				{
-					if (zone.AssignUnit(unassignedUnits[i]))
+					if (group.AssignUnit(unassignedUnits[i]))
 						unassignedUnits.RemoveAt(i--);
 				}
 			}
@@ -104,8 +104,8 @@ namespace DotNetMissionSDK.AI.Managers
 			List<VehicleGroup.UnitSlot> unassignedSlots = new List<VehicleGroup.UnitSlot>();
 
 			// Get full list of unassigned slots
-			foreach (ThreatZone zone in m_ThreatZones)
-				unassignedSlots.AddRange(zone.assignedGroup.GetUnassignedSlots());
+			foreach (VehicleGroup group in m_CombatGroups)
+				unassignedSlots.AddRange(group.GetUnassignedSlots());
 
 			return unassignedSlots;
 		}
@@ -307,9 +307,9 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private bool DoesOverlapZone(MAP_RECT area)
 		{
-			foreach (ThreatZone zone in m_ThreatZones)
+			foreach (VehicleGroup group in m_CombatGroups)
 			{
-				if (zone.bounds.DoesRectIntersect(area))
+				if (group.threatZone.bounds.DoesRectIntersect(area))
 					return true;
 			}
 
@@ -318,7 +318,18 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private void CreateZone(MAP_RECT area, UnitEx[] enemiesInArea, int additionalStrengthDesired, VehicleGroupType groupType)
 		{
-			m_ThreatZones.Add(new ThreatZone(owner, area, enemiesInArea, additionalStrengthDesired, groupType));
+			ThreatZone zone = new ThreatZone(owner, area, enemiesInArea, additionalStrengthDesired);
+			
+			VehicleGroup zoneGroup;
+
+			// Create group for zone and assign zone to it.
+			switch (groupType)
+			{
+				case VehicleGroupType.Assault:		zoneGroup = new AssaultGroup(owner, zone);		break;
+				case VehicleGroupType.Harass:		zoneGroup = new HarassGroup(owner, zone);		break;
+				case VehicleGroupType.Bomber:		zoneGroup = new BomberGroup(owner, zone);		break;
+				case VehicleGroupType.Capture:		zoneGroup = new CaptureGroup(owner, zone);		break;
+			}
 		}
 	}
 }

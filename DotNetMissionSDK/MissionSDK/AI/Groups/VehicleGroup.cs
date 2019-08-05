@@ -44,9 +44,9 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		}
 
 		protected PlayerInfo m_Owner;
-		protected ThreatZone m_ThreatZone;
-
 		private UnitSlot[] m_UnitSlots = new UnitSlot[0];
+
+		public ThreatZone threatZone	{ get; set;			}
 
 		/// <summary>
 		/// The vehicle group's type represented as an enum.
@@ -72,12 +72,12 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		public VehicleGroup(PlayerInfo owner, ThreatZone zone)
 		{
 			m_Owner = owner;
-			m_ThreatZone = zone;
+			threatZone = zone;
 
-			m_UnitSlots = GetUnitSlots();
+			m_UnitSlots = GetUnitSlots(zone.strengthDesired);
 		}
 
-		protected abstract UnitSlot[] GetUnitSlots();
+		protected abstract UnitSlot[] GetUnitSlots(int combatStrength);
 
 		/// <summary>
 		/// Returns the unassigned slots in this group.
@@ -170,14 +170,38 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// <summary>
 		/// Called to update vehicle group.
 		/// </summary>
-		public abstract void Update();
+		public virtual void Update()
+		{
+			UpdateMovement();
+		}
+
+		protected void UpdateMovement()
+		{
+			MAP_RECT[] targetArea = new MAP_RECT[] { threatZone.bounds };
+
+			// If group is not filled, units will move to the staging area
+			if (HasEmptySlot())
+				targetArea = threatZone.bounds.GetBorder(3);
+
+			for (int i=0; i < targetArea.Length; ++i)
+				targetArea[i].ClipToMap();
+
+			// Move units
+			foreach (UnitSlot slot in m_UnitSlots)
+			{
+				UnitEx unit = slot.unitInSlot;
+
+				// Find closest target (pathfinding)
+			}
+		}
+
 
 		protected UnitWithWeaponType[] GetStandardCombatTypePriority()
 		{
 			return m_StandardCombatUnitPriority;
 		}
 
-		private UnitWithWeaponType[] m_StandardCombatUnitPriority = new UnitWithWeaponType[]
+		private static UnitWithWeaponType[] m_StandardCombatUnitPriority = new UnitWithWeaponType[]
 		{
 			new UnitWithWeaponType(map_id.Tiger, map_id.ThorsHammer),
 			new UnitWithWeaponType(map_id.Tiger, map_id.ESG),

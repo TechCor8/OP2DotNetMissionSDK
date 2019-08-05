@@ -44,7 +44,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		protected override bool PerformTask()
 		{
 			// Get idle convec with smelter
-			UnitEx convec = owner.units.convecs.Find((UnitEx unit) => unit.GetCargo() == map_id.CommonOreSmelter && unit.GetCurAction() == ActionType.moDone);
+			UnitEx convec = owner.units.convecs.Find((unit) => unit.GetCargo() == map_id.CommonOreSmelter && unit.GetCurAction() == ActionType.moDone);
 			if (convec == null)
 				return true;
 

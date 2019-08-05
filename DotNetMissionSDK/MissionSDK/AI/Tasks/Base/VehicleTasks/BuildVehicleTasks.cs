@@ -1,6 +1,6 @@
 ﻿using DotNetMissionSDK.Utility;
 
-namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
+namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
 	public class BuildSurveyorTask : BuildVehicleTask
 	{

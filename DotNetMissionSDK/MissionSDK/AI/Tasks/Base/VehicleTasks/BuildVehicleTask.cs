@@ -3,7 +3,7 @@ using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 
-namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
+namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
 	/// <summary>
 	/// Abstract class for building units from a vehicle factory.
@@ -20,7 +20,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 
 		public override bool IsTaskComplete()
 		{
-			List<UnitEx> units = owner.units.GetListForType(m_VehicleToBuild);
+			IReadOnlyCollection<UnitEx> units = owner.units.GetListForType(m_VehicleToBuild);
 			return units.Count >= targetCountToBuild;
 		}
 

@@ -25,7 +25,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override bool IsTaskComplete()
 		{
-			List<UnitEx> units = owner.units.GetListForType(m_KitToBuild);
+			IReadOnlyCollection<UnitEx> units = owner.units.GetListForType(m_KitToBuild);
 			return units.Count >= targetCountToBuild;
 		}
 
@@ -42,13 +42,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		protected override bool CanPerformTask()
 		{
 			// Get convec with kit
-			return owner.units.convecs.Find((UnitEx unit) => unit.GetCargo() == m_KitToBuild) != null;
+			return owner.units.convecs.Find((unit) => unit.GetCargo() == m_KitToBuild) != null;
 		}
 
 		protected override bool PerformTask()
 		{
 			// Get idle convec with kit
-			UnitEx convec = owner.units.convecs.Find((UnitEx unit) =>
+			UnitEx convec = owner.units.convecs.Find((unit) =>
 			{
 				return unit.GetCargo() == m_KitToBuild;
 			});

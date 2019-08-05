@@ -1,6 +1,6 @@
 ﻿using DotNetMissionSDK.AI.Managers;
 using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.AI.Tasks.Base.Vehicle;
+using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
 

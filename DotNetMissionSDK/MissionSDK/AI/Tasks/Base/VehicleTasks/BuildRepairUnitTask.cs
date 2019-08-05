@@ -1,6 +1,6 @@
 ﻿using DotNetMissionSDK.Utility;
 
-namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
+namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
 	/// <summary>
 	/// Builds a repair vehicle, spider, or convec.

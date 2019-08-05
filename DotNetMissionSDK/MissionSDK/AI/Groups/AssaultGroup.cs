@@ -18,7 +18,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// <summary>
 		/// Gets the units this group needs to reach capacity.
 		/// </summary>
-		protected override UnitSlot[] GetUnitSlots()
+		protected override UnitSlot[] GetUnitSlots(int combatStrength)
 		{
 			UnitWithWeaponType[] repairSupportedTypes = GetRepairSupportedTypes();
 			UnitWithWeaponType[] empSupportedTypes = GetEMPSupportedTypes();
@@ -26,7 +26,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 			List<UnitSlot> unitSlots = new List<UnitSlot>();
 
 			// Fill group with any combat unit
-			for (int i=0; i < m_ThreatZone.strengthDesired; ++i)
+			for (int i=0; i < combatStrength; ++i)
 			{
 				if (i % 10 == 9) // Every 10th slot, create a repair unit.
 					unitSlots.Add(new UnitSlot(repairSupportedTypes));

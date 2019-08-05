@@ -1,5 +1,6 @@
-﻿using DotNetMissionSDK.AI.Tasks.Base.Vehicle;
+﻿using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.Units;
 using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 
@@ -29,7 +30,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override bool IsTaskComplete()
 		{
 			// Task is complete when convec has kit
-			return owner.units.convecs.Find((UnitEx unit) => unit.GetCargo() == m_KitToBuild) != null;
+			return owner.units.convecs.Find((Vehicle unit) => unit.GetCargo() == m_KitToBuild) != null;
 		}
 
 		public override void GeneratePrerequisites()
@@ -139,7 +140,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 					continue;
 
 				// Get convec on dock
-				UnitEx convec = owner.units.convecs.Find((UnitEx unit) => unit.IsOnDock(factoryWithKit) && !UnitContainsKit(unit, m_SkipConvecsWithKits));
+				UnitEx convec = owner.units.convecs.Find((Vehicle unit) => unit.IsOnDock(factoryWithKit) && !UnitContainsKit(unit, m_SkipConvecsWithKits));
 				if (convec != null)
 				{
 					// Wait if docking is in progress
@@ -151,7 +152,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				}
 
 				// Get closest convec that isn't doing anything
-				List<UnitEx> emptyConvecs = owner.units.convecs.FindAll((UnitEx unit) => unit.GetCargo() == map_id.None && (unit.GetCurAction() == ActionType.moDone || unit.GetCurAction() == ActionType.moMove));
+				List<Vehicle> emptyConvecs = owner.units.convecs.FindAll((Vehicle unit) => unit.GetCargo() == map_id.None && (unit.GetCurAction() == ActionType.moDone || unit.GetCurAction() == ActionType.moMove));
 				if (emptyConvecs.Count > 0)
 				{
 					emptyConvecs.Sort((a,b) => a.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition()).CompareTo(b.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition())));
@@ -160,7 +161,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				else
 				{
 					// As a last resort, pull an idle convec that has cargo
-					List<UnitEx> idleConvecs = owner.units.convecs.FindAll((UnitEx unit) => unit.GetCurAction() == ActionType.moDone && !UnitContainsKit(unit, m_SkipConvecsWithKits));
+					List<Vehicle> idleConvecs = owner.units.convecs.FindAll((Vehicle unit) => unit.GetCurAction() == ActionType.moDone && !UnitContainsKit(unit, m_SkipConvecsWithKits));
 					if (idleConvecs.Count > 0)
 					{
 						idleConvecs.Sort((a,b) => a.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition()).CompareTo(b.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition())));
@@ -199,7 +200,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return true;
 		}
 
-		private bool UnitContainsKit(UnitEx unit, map_id[] kits)
+		private bool UnitContainsKit(Vehicle unit, map_id[] kits)
 		{
 			foreach (map_id type in kits)
 			{

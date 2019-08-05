@@ -1,5 +1,4 @@
-﻿using DotNetMissionSDK.Json;
-
+﻿
 namespace DotNetMissionSDK
 {
 	/// <summary>
@@ -260,6 +259,25 @@ namespace DotNetMissionSDK
 				return true;
 
 			return false;
+		}
+
+		/// <summary>
+		/// Gets the border of this rect as four rects, one on each side.
+		/// </summary>
+		/// <param name="borderWidth">The width of the border rects.</param>
+		/// <param name="fillCorners">If true, will fill the corners on the left and right borders.</param>
+		/// <returns></returns>
+		public MAP_RECT[] GetBorder(int borderWidth, bool fillCorners=true)
+		{
+			int cornerWidth = fillCorners ? borderWidth : 0;
+
+			return new MAP_RECT[]
+			{
+				new MAP_RECT(xMin, yMin-borderWidth, width, borderWidth),				// Top border
+				new MAP_RECT(xMax, yMin-cornerWidth, borderWidth, height),				// Right border
+				new MAP_RECT(xMin, yMax, width, borderWidth),							// Bottom border
+				new MAP_RECT(xMin-borderWidth, yMin-cornerWidth, borderWidth, height),	// Left border
+			};
 		}
 
 		public override string ToString()

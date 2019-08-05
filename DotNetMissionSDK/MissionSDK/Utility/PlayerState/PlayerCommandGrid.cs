@@ -119,10 +119,10 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 				if (area.Contains(pt))
 				{
-					if (pt.x != area.xMin && pt.y != area.yMin &&	// Top left
-						pt.x != area.xMax && pt.y != area.yMin &&	// Top right
-						pt.x != area.xMax && pt.y != area.yMax &&	// Bottom right
-						pt.x != area.xMin && pt.y != area.yMax)		// Bottom left
+					if (pt.x != area.xMin && pt.y != area.yMin &&		// Top left
+						pt.x != area.xMax-1 && pt.y != area.yMin &&		// Top right
+						pt.x != area.xMax-1 && pt.y != area.yMax-1 &&	// Bottom right
+						pt.x != area.xMin && pt.y != area.yMax-1)		// Bottom left
 					{
 						++i;
 						cullPath.RemoveRange(i, cullPath.Count-i);

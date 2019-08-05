@@ -1,5 +1,4 @@
-﻿using DotNetMissionSDK.AI.Combat.Groups;
-using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.Utility.Maps;
 using System.Collections.Generic;
@@ -24,9 +23,7 @@ namespace DotNetMissionSDK.AI.Combat
 		public int strengthRequired			{ get; private set; }
 		public int strengthDesired			{ get; private set; }
 		public ThreatLevel threatLevel		{ get; private set; }
-
 		public UnitEx[] priorityTargets		{ get; private set; }
-		public VehicleGroup assignedGroup	{ get; private set; }
 
 
 		/// <summary>
@@ -37,7 +34,7 @@ namespace DotNetMissionSDK.AI.Combat
 		/// <param name="priorityTargets">The primary targets to attack.</param>
 		/// <param name="additionalStrengthDesired">Additional strength beyond what is required to control this zone.</param>
 		/// <param name="groupType">The type of combat group to organize.</param>
-		public ThreatZone(PlayerInfo owner, MAP_RECT bounds, UnitEx[] priorityTargets, int additionalStrengthDesired, VehicleGroupType groupType)
+		public ThreatZone(PlayerInfo owner, MAP_RECT bounds, UnitEx[] priorityTargets, int additionalStrengthDesired)
 		{
 			m_Owner = owner;
 			this.bounds = bounds;
@@ -59,19 +56,6 @@ namespace DotNetMissionSDK.AI.Combat
 
 			strengthDesired = strengthRequired + additionalStrengthDesired;
 			this.priorityTargets = priorityTargets;
-
-			switch (groupType)
-			{
-				case VehicleGroupType.Assault:		assignedGroup = new AssaultGroup(owner, this);		break;
-				case VehicleGroupType.Harass:		assignedGroup = new HarassGroup(owner, this);		break;
-				case VehicleGroupType.Bomber:		assignedGroup = new BomberGroup(owner, this);		break;
-				case VehicleGroupType.Capture:		assignedGroup = new CaptureGroup(owner, this);		break;
-			}
-		}
-
-		public void Update()
-		{
-			assignedGroup.Update();
 		}
 
 		/// <summary>
@@ -80,23 +64,6 @@ namespace DotNetMissionSDK.AI.Combat
 		public bool Contains(Unit unit)
 		{
 			return bounds.Contains(unit.GetPosition());
-		}
-
-		/// <summary>
-		/// Returns true if the unit list can completely fill the group.
-		/// </summary>
-		public bool CanFillGroup(IEnumerable<UnitEx> units)
-		{
-			return assignedGroup.CanFillGroup(units);
-		}
-
-		/// <summary>
-		/// Assigns the unit to the zone's combat group.
-		/// </summary>
-		/// <returns>Returns true, if unit is assigned</returns>
-		public bool AssignUnit(UnitEx unit)
-		{
-			return assignedGroup.AssignUnit(unit);
 		}
 	}
 }

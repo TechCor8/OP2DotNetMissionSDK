@@ -18,12 +18,12 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// <summary>
 		/// Gets the units this group needs to reach capacity.
 		/// </summary>
-		protected override UnitSlot[] GetUnitSlots()
+		protected override UnitSlot[] GetUnitSlots(int combatStrength)
 		{
 			List<UnitSlot> unitSlots = new List<UnitSlot>();
 
 			// Fill group with any combat unit
-			for (int i=0; i < m_ThreatZone.strengthDesired; ++i)
+			for (int i=0; i < combatStrength; ++i)
 				unitSlots.Add(new UnitSlot(GetStandardCombatTypePriority()));
 
 			return unitSlots.ToArray();

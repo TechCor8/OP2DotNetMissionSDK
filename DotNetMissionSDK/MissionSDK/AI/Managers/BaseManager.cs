@@ -3,10 +3,7 @@ using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.AI.Tasks;
 using DotNetMissionSDK.AI.Tasks.Base.Mining;
 using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
-using DotNetMissionSDK.AI.Tasks.Base.Vehicle;
-using System.Collections.Generic;
-using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.AI.Combat.Groups;
+using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 
 namespace DotNetMissionSDK.AI.Managers
 {

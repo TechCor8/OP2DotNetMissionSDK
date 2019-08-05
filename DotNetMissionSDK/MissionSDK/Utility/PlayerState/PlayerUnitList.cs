@@ -1,8 +1,10 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Triggers;
+using DotNetMissionSDK.Units;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DotNetMissionSDK.Utility.PlayerState
 {
@@ -35,21 +37,21 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		public const int TriggerID_ChildrenModule		= 30016;
 
 		// Units
-		public List<UnitEx> cargoTrucks			= new List<UnitEx>();
-		public List<UnitEx> convecs				= new List<UnitEx>();
-		public List<UnitEx> spiders				= new List<UnitEx>();
-		public List<UnitEx> scorpions			= new List<UnitEx>();
-		public List<UnitEx> lynx				= new List<UnitEx>();
-		public List<UnitEx> panthers			= new List<UnitEx>();
-		public List<UnitEx> tigers				= new List<UnitEx>();
-		public List<UnitEx> roboSurveyors		= new List<UnitEx>();
-		public List<UnitEx> roboMiners			= new List<UnitEx>();
-		public List<UnitEx> geoCons				= new List<UnitEx>();
-		public List<UnitEx> scouts				= new List<UnitEx>();
-		public List<UnitEx> roboDozers			= new List<UnitEx>();
-		public List<UnitEx> evacTransports		= new List<UnitEx>();
-		public List<UnitEx> repairVehicles		= new List<UnitEx>();
-		public List<UnitEx> earthWorkers		= new List<UnitEx>();
+		public List<Vehicle> cargoTrucks			= new List<Vehicle>();
+		public List<Vehicle> convecs				= new List<Vehicle>();
+		public List<Vehicle> spiders				= new List<Vehicle>();
+		public List<Vehicle> scorpions				= new List<Vehicle>();
+		public List<Vehicle> lynx					= new List<Vehicle>();
+		public List<Vehicle> panthers				= new List<Vehicle>();
+		public List<Vehicle> tigers					= new List<Vehicle>();
+		public List<Vehicle> roboSurveyors			= new List<Vehicle>();
+		public List<Vehicle> roboMiners				= new List<Vehicle>();
+		public List<Vehicle> geoCons				= new List<Vehicle>();
+		public List<Vehicle> scouts					= new List<Vehicle>();
+		public List<Vehicle> roboDozers				= new List<Vehicle>();
+		public List<Vehicle> evacTransports			= new List<Vehicle>();
+		public List<Vehicle> repairVehicles			= new List<Vehicle>();
+		public List<Vehicle> earthWorkers			= new List<Vehicle>();
 
 		// Structures
 		public List<UnitEx> commonOreMines			= new List<UnitEx>();
@@ -209,21 +211,21 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			{
 				switch (unit.GetUnitType())
 				{
-					case map_id.CargoTruck:				cargoTrucks.Add(unit);			break;
-					case map_id.ConVec:					convecs.Add(unit);				break;
-					case map_id.Spider:					spiders.Add(unit);				break;
-					case map_id.Scorpion:				scorpions.Add(unit);			break;
-					case map_id.Lynx:					lynx.Add(unit);					break;
-					case map_id.Panther:				panthers.Add(unit);				break;
-					case map_id.Tiger:					tigers.Add(unit);				break;
-					case map_id.RoboSurveyor:			roboSurveyors.Add(unit);		break;
-					case map_id.RoboMiner:				roboMiners.Add(unit);			break;
-					case map_id.GeoCon:					geoCons.Add(unit);				break;
-					case map_id.Scout:					scouts.Add(unit);				break;
-					case map_id.RoboDozer:				roboDozers.Add(unit);			break;
-					case map_id.EvacuationTransport:	evacTransports.Add(unit);		break;
-					case map_id.RepairVehicle:			repairVehicles.Add(unit);		break;
-					case map_id.Earthworker:			earthWorkers.Add(unit);			break;
+					case map_id.CargoTruck:				cargoTrucks.Add(new Vehicle(unit));			break;
+					case map_id.ConVec:					convecs.Add(new Vehicle(unit));				break;
+					case map_id.Spider:					spiders.Add(new Vehicle(unit));				break;
+					case map_id.Scorpion:				scorpions.Add(new Vehicle(unit));			break;
+					case map_id.Lynx:					lynx.Add(new Vehicle(unit));				break;
+					case map_id.Panther:				panthers.Add(new Vehicle(unit));			break;
+					case map_id.Tiger:					tigers.Add(new Vehicle(unit));				break;
+					case map_id.RoboSurveyor:			roboSurveyors.Add(new Vehicle(unit));		break;
+					case map_id.RoboMiner:				roboMiners.Add(new Vehicle(unit));			break;
+					case map_id.GeoCon:					geoCons.Add(new Vehicle(unit));				break;
+					case map_id.Scout:					scouts.Add(new Vehicle(unit));				break;
+					case map_id.RoboDozer:				roboDozers.Add(new Vehicle(unit));			break;
+					case map_id.EvacuationTransport:	evacTransports.Add(new Vehicle(unit));		break;
+					case map_id.RepairVehicle:			repairVehicles.Add(new Vehicle(unit));		break;
+					case map_id.Earthworker:			earthWorkers.Add(new Vehicle(unit));		break;
 				}
 			}
 		}
@@ -321,7 +323,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			}
 		}
 
-		public List<UnitEx> GetListForType(map_id type)
+		public IReadOnlyCollection<UnitEx> GetListForType(map_id type)
 		{
 			switch (type)
 			{
@@ -416,7 +418,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 					// Enumerate all structures
 					for (int i=21; i < 59; ++i)
 					{
-						List<UnitEx> structures = m_List.GetListForType((map_id)i);
+						IEnumerable<UnitEx> structures = m_List.GetListForType((map_id)i);
 						foreach (UnitEx unit in structures)
 							yield return unit;
 					}
@@ -426,7 +428,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 					// Enumerate all vehicles
 					for (int i=1; i < 16; ++i)
 					{
-						List<UnitEx> vehicles = m_List.GetListForType((map_id)i);
+						IEnumerable<UnitEx> vehicles = m_List.GetListForType((map_id)i);
 						foreach (UnitEx unit in vehicles)
 							yield return unit;
 					}

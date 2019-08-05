@@ -3,7 +3,7 @@ using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 
-namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
+namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
 	/// <summary>
 	/// Task for building a vehicle group.

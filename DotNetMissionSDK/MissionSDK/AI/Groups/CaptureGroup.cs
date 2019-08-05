@@ -18,7 +18,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// <summary>
 		/// Gets the units this group needs to reach capacity.
 		/// </summary>
-		protected override UnitSlot[] GetUnitSlots()
+		protected override UnitSlot[] GetUnitSlots(int combatStrength)
 		{
 			return new UnitSlot[]
 			{

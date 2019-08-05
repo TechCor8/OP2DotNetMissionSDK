@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.AI.Tasks.Base.Vehicle;
+using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.Units;
 using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 
@@ -104,7 +105,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 
 			// Convecs with loaded power kits get priority
-			UnitEx convec = owner.units.convecs.Find((UnitEx unit) =>
+			UnitEx convec = owner.units.convecs.Find((Vehicle unit) =>
 			{
 				switch (unit.GetCargo())
 				{
