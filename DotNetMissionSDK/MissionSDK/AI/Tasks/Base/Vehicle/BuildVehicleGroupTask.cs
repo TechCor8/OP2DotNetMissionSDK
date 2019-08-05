@@ -104,13 +104,21 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Vehicle
 			// If factories are not available, build more
 			if (shouldBuildVehicleFactory)
 			{
-				m_BuildSingleVehicleTask.AddFactory();
-				m_BuildSingleVehicleTask.PerformTaskTree();
+				// Only build more factories if there aren't any deactivated factories
+				if (owner.units.vehicleFactories.Find((UnitEx unit) => !unit.IsEnabled()) == null)
+				{
+					m_BuildSingleVehicleTask.AddFactory();
+					m_BuildSingleVehicleTask.PerformTaskTree();
+				}
 			}
 			else if (shouldBuildArachnidFactory)
 			{
-				m_BuildSingleArachnidTask.AddFactory();
-				m_BuildSingleArachnidTask.PerformTaskTree();
+				// Only build more factories if there aren't any deactivated factories
+				if (owner.units.arachnidFactories.Find((UnitEx unit) => !unit.IsEnabled()) == null)
+				{
+					m_BuildSingleArachnidTask.AddFactory();
+					m_BuildSingleArachnidTask.PerformTaskTree();
+				}
 			}
 
 			return true;
