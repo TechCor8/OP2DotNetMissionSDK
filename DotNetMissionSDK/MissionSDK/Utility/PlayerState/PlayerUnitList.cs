@@ -4,7 +4,6 @@ using DotNetMissionSDK.Units;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace DotNetMissionSDK.Utility.PlayerState
 {
@@ -16,6 +15,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		private Player m_Player;
 		private PlayerInfoSaveData m_SaveData;
 		private TriggerManager m_TriggerManager;
+		private Dictionary<int, UnitEx> m_StubUnitLookup = new Dictionary<int, UnitEx>();
 
 		public const int TriggerID_EDWARDSatellite		= 30000;
 		public const int TriggerID_SolarSatellite		= 30001;
@@ -159,50 +159,56 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		{
 			Clear();
 
+			// Mark lookup table for deletion
+			Dictionary<int, bool> deleteLookup = new Dictionary<int, bool>(m_StubUnitLookup.Count);
+			foreach (int key in m_StubUnitLookup.Keys)
+				deleteLookup[key] = true;
+
+			// Add units to cleared unit lists
 			for (int i=21; i < 59; ++i)
 			{
 				foreach (UnitEx unit in new PlayerBuildingEnum(m_Player.playerID, (map_id)i))
 				{
 					switch ((map_id)i)
 					{
-						case map_id.CommonOreMine:			commonOreMines.Add(unit);		break;
-						case map_id.RareOreMine:			rareOreMines.Add(unit);			break;
-						case map_id.GuardPost:				guardPosts.Add(unit);			break;
-						case map_id.LightTower:				lightTowers.Add(unit);			break;
-						case map_id.CommonStorage:			commonStorages.Add(unit);		break;
-						case map_id.RareStorage:			rareStorages.Add(unit);			break;
-						case map_id.Forum:					forums.Add(unit);				break;
-						case map_id.CommandCenter:			commandCenters.Add(unit);		break;
-						case map_id.MHDGenerator:			mhdGenerators.Add(unit);		break;
-						case map_id.Residence:				residences.Add(unit);			break;
-						case map_id.RobotCommand:			robotCommands.Add(unit);		break;
-						case map_id.TradeCenter:			tradeCenters.Add(unit);			break;
-						case map_id.BasicLab:				basicLabs.Add(unit);			break;
-						case map_id.MedicalCenter:			medicalCenters.Add(unit);		break;
-						case map_id.Nursery:				nurseries.Add(unit);			break;
-						case map_id.SolarPowerArray:		solarPowerArrays.Add(unit);		break;
-						case map_id.RecreationFacility:		recreationFacilities.Add(unit);	break;
-						case map_id.University:				universities.Add(unit);			break;
-						case map_id.Agridome:				agridomes.Add(unit);			break;
-						case map_id.DIRT:					dirts.Add(unit);				break;
-						case map_id.Garage:					garages.Add(unit);				break;
-						case map_id.MagmaWell:				magmaWells.Add(unit);			break;
-						case map_id.MeteorDefense:			meteorDefenses.Add(unit);		break;
-						case map_id.GeothermalPlant:		geothermalPlants.Add(unit);		break;
-						case map_id.ArachnidFactory:		arachnidFactories.Add(unit);	break;
-						case map_id.ConsumerFactory:		consumerFactories.Add(unit);	break;
-						case map_id.StructureFactory:		structureFactories.Add(unit);	break;
-						case map_id.VehicleFactory:			vehicleFactories.Add(unit);		break;
-						case map_id.StandardLab:			standardLabs.Add(unit);			break;
-						case map_id.AdvancedLab:			advancedLabs.Add(unit);			break;
-						case map_id.Observatory:			observatories.Add(unit);		break;
-						case map_id.ReinforcedResidence:	reinforcedResidences.Add(unit);	break;
-						case map_id.AdvancedResidence:		advancedResidences.Add(unit);	break;
-						case map_id.CommonOreSmelter:		commonOreSmelters.Add(unit);	break;
-						case map_id.Spaceport:				spaceports.Add(unit);			break;
-						case map_id.RareOreSmelter:			rareOreSmelters.Add(unit);		break;
-						case map_id.GORF:					gorfs.Add(unit);				break;
-						case map_id.Tokamak:				tokamaks.Add(unit);				break;
+						case map_id.CommonOreMine:			AddUnitToListOrCopy(deleteLookup, unit, commonOreMines);		break;
+						case map_id.RareOreMine:			AddUnitToListOrCopy(deleteLookup, unit, rareOreMines);			break;
+						case map_id.GuardPost:				AddUnitToListOrCopy(deleteLookup, unit, guardPosts);			break;
+						case map_id.LightTower:				AddUnitToListOrCopy(deleteLookup, unit, lightTowers);			break;
+						case map_id.CommonStorage:			AddUnitToListOrCopy(deleteLookup, unit, commonStorages);		break;
+						case map_id.RareStorage:			AddUnitToListOrCopy(deleteLookup, unit, rareStorages);			break;
+						case map_id.Forum:					AddUnitToListOrCopy(deleteLookup, unit, forums);				break;
+						case map_id.CommandCenter:			AddUnitToListOrCopy(deleteLookup, unit, commandCenters);		break;
+						case map_id.MHDGenerator:			AddUnitToListOrCopy(deleteLookup, unit, mhdGenerators);			break;
+						case map_id.Residence:				AddUnitToListOrCopy(deleteLookup, unit, residences);			break;
+						case map_id.RobotCommand:			AddUnitToListOrCopy(deleteLookup, unit, robotCommands);			break;
+						case map_id.TradeCenter:			AddUnitToListOrCopy(deleteLookup, unit, tradeCenters);			break;
+						case map_id.BasicLab:				AddUnitToListOrCopy(deleteLookup, unit, basicLabs);				break;
+						case map_id.MedicalCenter:			AddUnitToListOrCopy(deleteLookup, unit, medicalCenters);		break;
+						case map_id.Nursery:				AddUnitToListOrCopy(deleteLookup, unit, nurseries);				break;
+						case map_id.SolarPowerArray:		AddUnitToListOrCopy(deleteLookup, unit, solarPowerArrays);		break;
+						case map_id.RecreationFacility:		AddUnitToListOrCopy(deleteLookup, unit, recreationFacilities);	break;
+						case map_id.University:				AddUnitToListOrCopy(deleteLookup, unit, universities);			break;
+						case map_id.Agridome:				AddUnitToListOrCopy(deleteLookup, unit, agridomes);				break;
+						case map_id.DIRT:					AddUnitToListOrCopy(deleteLookup, unit, dirts);					break;
+						case map_id.Garage:					AddUnitToListOrCopy(deleteLookup, unit, garages);				break;
+						case map_id.MagmaWell:				AddUnitToListOrCopy(deleteLookup, unit, magmaWells);			break;
+						case map_id.MeteorDefense:			AddUnitToListOrCopy(deleteLookup, unit, meteorDefenses);		break;
+						case map_id.GeothermalPlant:		AddUnitToListOrCopy(deleteLookup, unit, geothermalPlants);		break;
+						case map_id.ArachnidFactory:		AddUnitToListOrCopy(deleteLookup, unit, arachnidFactories);		break;
+						case map_id.ConsumerFactory:		AddUnitToListOrCopy(deleteLookup, unit, consumerFactories);		break;
+						case map_id.StructureFactory:		AddUnitToListOrCopy(deleteLookup, unit, structureFactories);	break;
+						case map_id.VehicleFactory:			AddUnitToListOrCopy(deleteLookup, unit, vehicleFactories);		break;
+						case map_id.StandardLab:			AddUnitToListOrCopy(deleteLookup, unit, standardLabs);			break;
+						case map_id.AdvancedLab:			AddUnitToListOrCopy(deleteLookup, unit, advancedLabs);			break;
+						case map_id.Observatory:			AddUnitToListOrCopy(deleteLookup, unit, observatories);			break;
+						case map_id.ReinforcedResidence:	AddUnitToListOrCopy(deleteLookup, unit, reinforcedResidences);	break;
+						case map_id.AdvancedResidence:		AddUnitToListOrCopy(deleteLookup, unit, advancedResidences);	break;
+						case map_id.CommonOreSmelter:		AddUnitToListOrCopy(deleteLookup, unit, commonOreSmelters);		break;
+						case map_id.Spaceport:				AddUnitToListOrCopy(deleteLookup, unit, spaceports);			break;
+						case map_id.RareOreSmelter:			AddUnitToListOrCopy(deleteLookup, unit, rareOreSmelters);		break;
+						case map_id.GORF:					AddUnitToListOrCopy(deleteLookup, unit, gorfs);					break;
+						case map_id.Tokamak:				AddUnitToListOrCopy(deleteLookup, unit, tokamaks);				break;
 					}
 				}
 			}
@@ -211,22 +217,48 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			{
 				switch (unit.GetUnitType())
 				{
-					case map_id.CargoTruck:				cargoTrucks.Add(new Vehicle(unit));			break;
-					case map_id.ConVec:					convecs.Add(new Vehicle(unit));				break;
-					case map_id.Spider:					spiders.Add(new Vehicle(unit));				break;
-					case map_id.Scorpion:				scorpions.Add(new Vehicle(unit));			break;
-					case map_id.Lynx:					lynx.Add(new Vehicle(unit));				break;
-					case map_id.Panther:				panthers.Add(new Vehicle(unit));			break;
-					case map_id.Tiger:					tigers.Add(new Vehicle(unit));				break;
-					case map_id.RoboSurveyor:			roboSurveyors.Add(new Vehicle(unit));		break;
-					case map_id.RoboMiner:				roboMiners.Add(new Vehicle(unit));			break;
-					case map_id.GeoCon:					geoCons.Add(new Vehicle(unit));				break;
-					case map_id.Scout:					scouts.Add(new Vehicle(unit));				break;
-					case map_id.RoboDozer:				roboDozers.Add(new Vehicle(unit));			break;
-					case map_id.EvacuationTransport:	evacTransports.Add(new Vehicle(unit));		break;
-					case map_id.RepairVehicle:			repairVehicles.Add(new Vehicle(unit));		break;
-					case map_id.Earthworker:			earthWorkers.Add(new Vehicle(unit));		break;
+					case map_id.CargoTruck:				AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), cargoTrucks);			break;
+					case map_id.ConVec:					AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), convecs);				break;
+					case map_id.Spider:					AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), spiders);				break;
+					case map_id.Scorpion:				AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), scorpions);			break;
+					case map_id.Lynx:					AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), lynx);					break;
+					case map_id.Panther:				AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), panthers);				break;
+					case map_id.Tiger:					AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), tigers);				break;
+					case map_id.RoboSurveyor:			AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), roboSurveyors);		break;
+					case map_id.RoboMiner:				AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), roboMiners);			break;
+					case map_id.GeoCon:					AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), geoCons);				break;
+					case map_id.Scout:					AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), scouts);				break;
+					case map_id.RoboDozer:				AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), roboDozers);			break;
+					case map_id.EvacuationTransport:	AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), evacTransports);		break;
+					case map_id.RepairVehicle:			AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), repairVehicles);		break;
+					case map_id.Earthworker:			AddUnitToListOrCopy(deleteLookup, new Vehicle(unit), earthWorkers);			break;
 				}
+			}
+
+			// Any lookups still marked for deletion should be deleted. The units no longer exist.
+			foreach (KeyValuePair<int, bool> kvDeleteUnit in deleteLookup)
+			{
+				if (kvDeleteUnit.Value)
+					m_StubUnitLookup.Remove(kvDeleteUnit.Key);
+			}
+		}
+
+		// Adds a new unit to the listToAdd. If unit is found in m_StubUnitLookup, the m_StubUnitLookup unit is added instead.
+		// This preserves the unit object between updates.
+		private void AddUnitToListOrCopy<T>(Dictionary<int, bool> deleteLookup, T unit, List<T> listToAdd) where T : UnitEx
+		{
+			UnitEx existingUnit;
+			if (m_StubUnitLookup.TryGetValue(unit.GetStubIndex(), out existingUnit))
+			{
+				// Existing unit
+				listToAdd.Add((T)existingUnit);
+				deleteLookup[unit.GetStubIndex()] = false;
+			}
+			else
+			{
+				// New unit
+				listToAdd.Add(unit);
+				m_StubUnitLookup.Add(unit.GetStubIndex(), unit);
 			}
 		}
 
