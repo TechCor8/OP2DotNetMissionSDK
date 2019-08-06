@@ -36,12 +36,5 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 				new UnitSlot(new UnitWithWeaponType[] { new UnitWithWeaponType(map_id.Lynx, map_id.EMP) })
 			};
 		}
-
-		/// <summary>
-		/// Called to update combat group.
-		/// </summary>
-		public override void Update()
-		{
-		}
 	}
 }

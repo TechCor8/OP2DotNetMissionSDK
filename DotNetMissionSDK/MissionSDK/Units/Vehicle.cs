@@ -12,6 +12,10 @@ namespace DotNetMissionSDK.Units
 		private LOCATION[] m_MovementPath;
 		private int m_CurrentPathIndex;
 
+		public bool hasPath				{ get { return m_MovementPath != null;		}	}
+		public LOCATION destination		{ get; private set; }
+
+		// TODO: Set destination when parent class DoMove is called.
 
 		/// <summary>
 		/// Creates an empty Vehicle stub. Call SetStubIndex with a valid vehicle before using.
@@ -28,6 +32,7 @@ namespace DotNetMissionSDK.Units
 		{
 			m_MovementPath = path;
 			m_CurrentPathIndex = 0;
+			destination = path[path.Length-1];
 
 			DoMove(m_MovementPath[m_CurrentPathIndex].x, m_MovementPath[m_CurrentPathIndex].y);
 		}
@@ -37,7 +42,15 @@ namespace DotNetMissionSDK.Units
 		/// </summary>
 		public void DoMoveWithPathfinder(int tileX, int tileY)
 		{
-			LOCATION[] path = Pathfinder.GetPath(GetPosition(), new LOCATION(tileX, tileY), true, GetTileCost);
+			DoMoveWithPathfinder(new LOCATION(tileX, tileY));
+		}
+
+		/// <summary>
+		/// Generates a path for the unit to navigate through terrain.
+		/// </summary>
+		public void DoMoveWithPathfinder(LOCATION targetPosition)
+		{
+			LOCATION[] path = Pathfinder.GetPath(GetPosition(), targetPosition, true, GetTileCost);
 			if (path == null)
 				return;
 
@@ -74,7 +87,12 @@ namespace DotNetMissionSDK.Units
 			if (GetPosition().Equals(m_MovementPath[m_CurrentPathIndex]))
 			{
 				++m_CurrentPathIndex;
-				DoMove(m_MovementPath[m_CurrentPathIndex].x, m_MovementPath[m_CurrentPathIndex].y);
+				if (m_CurrentPathIndex >= m_MovementPath.Length)
+					m_MovementPath = null; // Path following complete
+				else
+				{
+					DoMove(m_MovementPath[m_CurrentPathIndex].x, m_MovementPath[m_CurrentPathIndex].y);
+				}
 			}
 		}
 	}

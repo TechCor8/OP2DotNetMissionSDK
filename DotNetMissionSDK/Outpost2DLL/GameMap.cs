@@ -69,6 +69,32 @@ namespace DotNetMissionSDK
 			return false;
 		}
 
+		public static int GetTileMovementCost(int x, int y)
+		{
+			return GetTileMovementCost(new LOCATION(x,y));
+		}
+
+		public static int GetTileMovementCost(LOCATION tile)
+		{
+			if (!tile.IsInMapBounds())
+				return 0;
+
+			switch (GetCellType(tile.x,tile.y))
+			{
+				case CellType.FastPassible1:		return 2;
+				case CellType.SlowPassible1:		return 4;
+				case CellType.SlowPassible2:		return 4;
+				case CellType.MediumPassible1:		return 3;
+				case CellType.MediumPassible2:		return 3;
+				case CellType.FastPassible2:		return 2;
+				case CellType.DozedArea:			return 1;
+				case CellType.Rubble:				return 2;
+				case CellType.Tube0:				return 1;
+			}
+
+			return 0;
+		}
+
 		/// <summary>
 		/// Calculates map constants.
 		/// </summary>

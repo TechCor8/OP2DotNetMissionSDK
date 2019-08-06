@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
+using DotNetMissionSDK.Units;
 using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.Utility.Maps;
 using System;
@@ -439,6 +440,16 @@ namespace DotNetMissionSDK
 
 			PlayerStrengthMap.Update(m_PlayerInfo);
 			PlayerUnitMap.Update(m_PlayerInfo);
+
+			// Update units
+			for (int i=0; i < m_PlayerInfo.Length; ++i)
+			{
+				if (m_PlayerInfo[i] == null)
+					continue;
+
+				foreach (Vehicle vehicle in m_PlayerInfo[i].units.GetVehicles())
+					vehicle.Update();
+			}
 
 			// Update disasters
 			foreach (DisasterData disaster in m_Disasters)

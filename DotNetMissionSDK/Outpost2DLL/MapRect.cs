@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace DotNetMissionSDK
 {
 	/// <summary>
@@ -266,7 +268,6 @@ namespace DotNetMissionSDK
 		/// </summary>
 		/// <param name="borderWidth">The width of the border rects.</param>
 		/// <param name="fillCorners">If true, will fill the corners on the left and right borders.</param>
-		/// <returns></returns>
 		public MAP_RECT[] GetBorder(int borderWidth, bool fillCorners=true)
 		{
 			int cornerWidth = fillCorners ? borderWidth : 0;
@@ -278,6 +279,18 @@ namespace DotNetMissionSDK
 				new MAP_RECT(xMin, yMax, width, borderWidth),							// Bottom border
 				new MAP_RECT(xMin-borderWidth, yMin-cornerWidth, borderWidth, height),	// Left border
 			};
+		}
+
+		/// <summary>
+		/// Gets the closest point in the rect to the specified point.
+		/// </summary>
+		public LOCATION GetClosestPointInRect(LOCATION point)
+		{
+			return new LOCATION
+				(
+					Math.Max(Math.Min(point.x, xMax), xMin),
+					Math.Max(Math.Min(point.y, yMax), yMin)
+				);
 		}
 
 		public override string ToString()

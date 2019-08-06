@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.AI.Combat;
 using DotNetMissionSDK.AI.Combat.Groups;
 using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.Units;
 using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.Utility.Maps;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private void PopulateCombatGroups()
 		{
-			List<UnitEx> unassignedUnits = new List<UnitEx>(owner.units.lynx);
+			List<Vehicle> unassignedUnits = new List<Vehicle>(owner.units.lynx);
 			unassignedUnits.AddRange(owner.units.panthers);
 			unassignedUnits.AddRange(owner.units.tigers);
 			unassignedUnits.AddRange(owner.units.spiders);
@@ -54,7 +55,7 @@ namespace DotNetMissionSDK.AI.Managers
 			// Units already in an active threat zone must be assigned to that zone
 			for (int i=0; i < unassignedUnits.Count; ++i)
 			{
-				UnitEx unit = unassignedUnits[i];
+				Vehicle unit = unassignedUnits[i];
 
 				foreach (VehicleGroup group in m_CombatGroups)
 				{
@@ -166,7 +167,7 @@ namespace DotNetMissionSDK.AI.Managers
 			enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()));
 
 			if (enemiesInArea.Count > 0)
-				CreateZone(area, new UnitEx[0], 5, VehicleGroupType.Assault);
+				CreateZone(area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault);
 		}
 
 		/// <summary>
@@ -189,13 +190,14 @@ namespace DotNetMissionSDK.AI.Managers
 						continue;
 
 					List<UnitEx> enemiesInArea = PlayerUnitMap.GetUnitsInArea(area);
+					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()));
 
 					// Skip areas that are defended
 					if (enemiesInArea.Find((UnitEx areaEnemy) => areaEnemy.HasWeapon()) != null)
 						continue;
 
 					// Get all enemy units of this unit's type
-					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()) && tileUnit.GetUnitType() != unit.GetUnitType());
+					enemiesInArea.RemoveAll((UnitEx tileUnit) => tileUnit.GetUnitType() != unit.GetUnitType());
 
 					UnitInfo starflareInfo = new UnitInfo(map_id.Starflare);
 					TechInfo techInfo = Research.GetTechInfo(starflareInfo.GetResearchTopic());
@@ -229,13 +231,14 @@ namespace DotNetMissionSDK.AI.Managers
 						continue;
 
 					List<UnitEx> enemiesInArea = PlayerUnitMap.GetUnitsInArea(area);
+					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()));
 
 					// Skip areas that are defended
 					if (enemiesInArea.Find((UnitEx areaEnemy) => areaEnemy.HasWeapon()) != null)
 						continue;
 
 					// Get all enemy units of this unit's type
-					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()) && tileUnit.GetUnitType() != unit.GetUnitType());
+					enemiesInArea.RemoveAll((UnitEx tileUnit) => tileUnit.GetUnitType() != unit.GetUnitType());
 
 					UnitInfo spiderInfo = new UnitInfo(map_id.Spider);
 					TechInfo techInfo = Research.GetTechInfo(spiderInfo.GetResearchTopic());
@@ -264,7 +267,10 @@ namespace DotNetMissionSDK.AI.Managers
 					if (DoesOverlapZone(area))
 						continue;
 
-					CreateZone(area, new UnitEx[0], 5, VehicleGroupType.Assault);
+					List<UnitEx> enemiesInArea = PlayerUnitMap.GetUnitsInArea(area);
+					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()));
+
+					CreateZone(area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault);
 				}
 			}
 		}
@@ -287,6 +293,10 @@ namespace DotNetMissionSDK.AI.Managers
 
 			foreach (UnitEx unit in owner.units.GetVehicles())
 			{
+				// Don't create defense zones for our own combat units. It will cause confusion.
+				if (unit.HasWeapon())
+					continue;
+
 				MAP_RECT area = new MAP_RECT(unit.GetPosition(), new LOCATION(0,0));
 				area.Inflate(8);
 
@@ -320,7 +330,7 @@ namespace DotNetMissionSDK.AI.Managers
 		{
 			ThreatZone zone = new ThreatZone(owner, area, enemiesInArea, additionalStrengthDesired);
 			
-			VehicleGroup zoneGroup;
+			VehicleGroup zoneGroup = null;
 
 			// Create group for zone and assign zone to it.
 			switch (groupType)
@@ -330,6 +340,9 @@ namespace DotNetMissionSDK.AI.Managers
 				case VehicleGroupType.Bomber:		zoneGroup = new BomberGroup(owner, zone);		break;
 				case VehicleGroupType.Capture:		zoneGroup = new CaptureGroup(owner, zone);		break;
 			}
+
+			if (zoneGroup != null)
+				m_CombatGroups.Add(zoneGroup);
 		}
 	}
 }

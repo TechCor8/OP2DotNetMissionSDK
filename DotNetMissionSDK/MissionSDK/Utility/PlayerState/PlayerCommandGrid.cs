@@ -240,7 +240,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 				return 1;
 			};
 
-			Pathfinder.GetClosestValidTile(tile, tileCostCB, IsValidTile, out _, false);
+			Pathfinder.GetClosestValidTile(tile, tileCostCB, IsValidTile, false);
 
 			return new List<UnitEx>(connectedStructures.Values);
 		}

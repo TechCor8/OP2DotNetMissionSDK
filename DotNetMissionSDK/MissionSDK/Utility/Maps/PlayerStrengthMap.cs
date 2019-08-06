@@ -104,10 +104,12 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// </summary>
 		public static int GetPlayerStrength(int playerID, int gridX, int gridY)
 		{
-			if (m_Grid[gridX,gridY].playerStrength == null)
+			LOCATION pt = GetPointInGridSpace(new LOCATION(gridX, gridY));
+
+			if (m_Grid[pt.x,pt.y].playerStrength == null)
 				return 0;
 
-			return m_Grid[gridX,gridY].playerStrength[playerID];
+			return m_Grid[pt.x,pt.y].playerStrength[playerID];
 		}
 
 		/// <summary>
@@ -115,12 +117,14 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// </summary>
 		public static int GetPlayerStrength(int[] playerIDs, int gridX, int gridY)
 		{
-			if (m_Grid[gridX,gridY].playerStrength == null)
+			LOCATION pt = GetPointInGridSpace(new LOCATION(gridX, gridY));
+
+			if (m_Grid[pt.x,pt.y].playerStrength == null)
 				return 0;
 
 			int totalStrength = 0;
 			for (int i=0; i < playerIDs.Length; ++i)
-				totalStrength += m_Grid[gridX,gridY].playerStrength[playerIDs[i]];
+				totalStrength += m_Grid[pt.x,pt.y].playerStrength[playerIDs[i]];
 
 			return totalStrength;
 		}
@@ -130,12 +134,14 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// </summary>
 		public static int GetTotalStrength(int gridX, int gridY)
 		{
-			if (m_Grid[gridX,gridY].playerStrength == null)
+			LOCATION pt = GetPointInGridSpace(new LOCATION(gridX, gridY));
+
+			if (m_Grid[pt.x,pt.y].playerStrength == null)
 				return 0;
 
 			int totalStrength = 0;
-			for (int i=0; i < m_Grid[gridX,gridY].playerStrength.Length; ++i)
-				totalStrength += m_Grid[gridX,gridY].playerStrength[i];
+			for (int i=0; i < m_Grid[pt.x,pt.y].playerStrength.Length; ++i)
+				totalStrength += m_Grid[pt.x,pt.y].playerStrength[i];
 
 			return totalStrength;
 		}

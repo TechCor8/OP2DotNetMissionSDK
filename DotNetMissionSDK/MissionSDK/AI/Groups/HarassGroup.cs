@@ -28,12 +28,5 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 
 			return unitSlots.ToArray();
 		}
-
-		/// <summary>
-		/// Called to update combat group.
-		/// </summary>
-		public override void Update()
-		{
-		}
 	}
 }

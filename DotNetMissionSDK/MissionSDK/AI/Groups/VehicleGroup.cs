@@ -1,4 +1,4 @@
-﻿using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.Units;
 using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,7 +34,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		{
 			private List<UnitWithWeaponType> m_SupportedSlotTypes = new List<UnitWithWeaponType>();
 
-			public UnitEx unitInSlot											{ get; set; }
+			public Vehicle unitInSlot											{ get; set; }
 			public ReadOnlyCollection<UnitWithWeaponType> supportedSlotTypes	{ get { return m_SupportedSlotTypes.AsReadOnly();	} }
 
 			public UnitSlot(UnitWithWeaponType[] supportedSlotTypes)
@@ -45,8 +45,19 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 
 		protected PlayerInfo m_Owner;
 		private UnitSlot[] m_UnitSlots = new UnitSlot[0];
+		private bool m_IsDataDirty;
 
 		public ThreatZone threatZone	{ get; set;			}
+
+		private int m_CombatStrength;
+		public int combatStrength
+		{
+			get
+			{
+				if (m_IsDataDirty) CalculateData();
+				return m_CombatStrength;
+			}
+		}
 
 		/// <summary>
 		/// The vehicle group's type represented as an enum.
@@ -97,9 +108,9 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// <summary>
 		/// Returns true if the unit list can completely fill the group.
 		/// </summary>
-		public bool CanFillGroup(IEnumerable<UnitEx> units)
+		public bool CanFillGroup(IEnumerable<Vehicle> units)
 		{
-			List<UnitEx> unassignedUnits = new List<UnitEx>(units);
+			List<Vehicle> unassignedUnits = new List<Vehicle>(units);
 
 			for (int i=0; i < m_UnitSlots.Length; ++i)
 			{
@@ -110,7 +121,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 				bool didFillSlot = false;
 				for (int j=0; j < unassignedUnits.Count; ++j)
 				{
-					UnitEx unit = unassignedUnits[j];
+					Vehicle unit = unassignedUnits[j];
 
 					if (FitsInSlot(i, unit.GetUnitType(), unit.GetWeapon()))
 					{
@@ -132,13 +143,14 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// </summary>
 		/// <param name="unit">The unit to assign.</param>
 		/// <returns>True, if the unit was assigned. False, if the unit is the wrong type.</returns>
-		public bool AssignUnit(UnitEx unit)
+		public bool AssignUnit(Vehicle unit)
 		{
 			int index = GetEmptySlot(unit.GetUnitType(), unit.GetWeapon());
 
 			if (index >= 0)
 			{
 				m_UnitSlots[index].unitInSlot = unit;
+				m_IsDataDirty = true;
 				return true;
 			}
 
@@ -167,6 +179,20 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 			return slotTypes.Find((UnitWithWeaponType type) => type.unit == unitType && type.weapon == weapon) != null;
 		}
 
+		private void CalculateData()
+		{
+			m_CombatStrength = 0;
+			foreach (UnitSlot slot in m_UnitSlots)
+			{
+				if (slot.unitInSlot == null)
+					continue;
+
+				m_CombatStrength += slot.unitInSlot.GetWeaponInfo().GetWeaponStrength();
+			}
+
+			m_IsDataDirty = false;
+		}
+
 		/// <summary>
 		/// Called to update vehicle group.
 		/// </summary>
@@ -177,22 +203,73 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 
 		protected void UpdateMovement()
 		{
-			MAP_RECT[] targetArea = new MAP_RECT[] { threatZone.bounds };
+			bool goToThreatZone = false;
 
-			// If group is not filled, units will move to the staging area
-			if (HasEmptySlot())
-				targetArea = threatZone.bounds.GetBorder(3);
-
-			for (int i=0; i < targetArea.Length; ++i)
-				targetArea[i].ClipToMap();
+			// If any unit is in threat zone, or all units are in staging area, send everyone to threat zone
+			// Otherwise, send all units to staging area
+			goToThreatZone = IsAnyUnitInThreatZone() || AreAllUnitsInStagingArea();
 
 			// Move units
 			foreach (UnitSlot slot in m_UnitSlots)
 			{
-				UnitEx unit = slot.unitInSlot;
+				if (slot.unitInSlot == null)
+					continue;
 
-				// Find closest target (pathfinding)
+				Vehicle unit = slot.unitInSlot;
+
+				if (goToThreatZone)
+				{
+					// Attack closest priority target
+					if (threatZone.priorityTargets.Length > 0)
+					{
+						Unit target = threatZone.GetClosestPriorityTarget(unit.GetPosition());
+						unit.DoAttack(target);
+					}
+					else if (!unit.hasPath || !threatZone.bounds.Contains(unit.destination))
+					{
+						// Otherwise, move to random location in zone
+						LOCATION targetPosition = threatZone.bounds.GetRandomPointInRect();
+						unit.DoMoveWithPathfinder(targetPosition);
+					}
+				}
+				else if (!threatZone.IsInStagingArea(unit) && (!unit.hasPath || !threatZone.IsInStagingArea(unit.destination)))
+				{
+					// Head to staging area
+
+					// Get closest staging point
+					 LOCATION[] path = threatZone.GetPathToStagingArea(unit);
+					if (path != null)
+						unit.DoMove(path);
+				}
 			}
+		}
+
+		private bool IsAnyUnitInThreatZone()
+		{
+			foreach (UnitSlot slot in m_UnitSlots)
+			{
+				if (slot.unitInSlot == null)
+					continue;
+
+				if (threatZone.Contains(slot.unitInSlot))
+					return true;
+			}
+
+			return false;
+		}
+
+		private bool AreAllUnitsInStagingArea()
+		{
+			foreach (UnitSlot slot in m_UnitSlots)
+			{
+				if (slot.unitInSlot == null)
+					continue;
+
+				if (!threatZone.IsInStagingArea(slot.unitInSlot))
+					return false;
+			}
+
+			return true;
 		}
 
 

@@ -3,6 +3,7 @@ using DotNetMissionSDK.Triggers;
 using DotNetMissionSDK.Utility.PlayerState;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DotNetMissionSDK.Utility
 {
@@ -13,17 +14,17 @@ namespace DotNetMissionSDK.Utility
 	{
 		private SaveData m_SaveData;		// The save data object to store persistent player state
 
-		public PlayerEx player					{ get; private set; }
-		public IEnumerable<PlayerInfo> allies	{ get; private set; }
-		public IEnumerable<PlayerInfo> enemies	{ get; private set; }
+		public PlayerEx player							{ get; private set; }
+		public ReadOnlyCollection<PlayerInfo> allies	{ get; private set; }
+		public ReadOnlyCollection<PlayerInfo> enemies	{ get; private set; }
 
 		/// <summary>
 		/// Contains lists of player units by type.
 		/// Tracks starship module counts.
 		/// </summary>
-		public PlayerUnitList units				{ get; private set; }
+		public PlayerUnitList units						{ get; private set; }
 
-		public PlayerCommandGrid commandGrid	{ get; private set; }
+		public PlayerCommandGrid commandGrid			{ get; private set; }
 
 
 		/// <summary>
@@ -83,8 +84,8 @@ namespace DotNetMissionSDK.Utility
 					enemies.Add(info);
 			}
 
-			this.allies = allies;
-			this.enemies = enemies;
+			this.allies = allies.AsReadOnly();
+			this.enemies = enemies.AsReadOnly();
 		}
 		
 		public void Dispose()

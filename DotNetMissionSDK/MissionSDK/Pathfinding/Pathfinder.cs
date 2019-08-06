@@ -98,9 +98,9 @@ namespace DotNetMissionSDK.Pathfinding
 
 						// Calculate cost
 						if (allowDiagonal)
-							adjacentNode.cost = Heuristic_Diagonal(node, goal, tileCost);
+							adjacentNode.cost = Heuristic_Diagonal(node.position, goal, tileCost);
 						else
-							adjacentNode.cost = Heuristic_Manhattan(node, goal, tileCost);
+							adjacentNode.cost = Heuristic_Manhattan(node.position, goal, tileCost);
 
 						// Add to open list
 						adjacentNode.parent = node;
@@ -128,7 +128,7 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <param name="goal">The goal to reach.</param>
 		/// <param name="tileCost">The cost scalar.</param>
 		/// <returns>The heuristic cost of the current node.</returns>
-		private static int Heuristic_Manhattan(PathNode current, LOCATION goal, int tileCost)
+		public static int Heuristic_Manhattan(LOCATION current, LOCATION goal, int tileCost)
 		{
 			int dx = Math.Abs(current.x - goal.x);
 			int dy = Math.Abs(current.y - goal.y);
@@ -153,7 +153,7 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <param name="goal">The goal to reach.</param>
 		/// <param name="tileCost">The cost scalar.</param>
 		/// <returns>The heuristic cost of the current node.</returns>
-		private static int Heuristic_Diagonal(PathNode current, LOCATION goal, int tileCost)
+		public static int Heuristic_Diagonal(LOCATION current, LOCATION goal, int tileCost)
 		{
 			int dx = Math.Abs(current.x - goal.x);
 			int dy = Math.Abs(current.y - goal.y);
@@ -189,7 +189,20 @@ namespace DotNetMissionSDK.Pathfinding
 		}
 
 		/// <summary>
-		/// Performs a breadth-first search. When validTileCB returns true, the search ends and the tile location is returned.
+		/// Performs a search using a custom heuristic. When validTileCB returns true, the search ends and the tile location is returned.
+		/// </summary>
+		/// <param name="startPt">The starting point for the search.</param>
+		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
+		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
+		/// <returns>True if a valid tile was found.</returns>
+		public static bool GetClosestValidTile(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB, bool allowDiagonal=true)
+		{
+			LOCATION foundPt;
+			return GetClosestValidTile(new LOCATION[] { startPt }, tileCostCB, validTileCB, out foundPt, allowDiagonal);
+		}
+
+		/// <summary>
+		/// Performs a search using a custom heuristic. When validTileCB returns true, the search ends and the tile location is returned.
 		/// </summary>
 		/// <param name="startPt">The starting point for the search.</param>
 		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
@@ -202,7 +215,20 @@ namespace DotNetMissionSDK.Pathfinding
 		}
 
 		/// <summary>
-		/// Performs a breadth-first search. When validTileCB returns true, the search ends and the tile location is returned.
+		/// Performs a search using a custom heuristic. When validTileCB returns true, the search ends and the tile location is returned.
+		/// </summary>
+		/// <param name="startPts">The starting points for the search.</param>
+		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
+		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
+		/// <returns>True if a valid tile was found.</returns>
+		public static bool GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, bool allowDiagonal=true)
+		{
+			PathNode foundNode;
+			return GetClosestValidTile(startPts, tileCostCB, validTileCB, out foundNode, allowDiagonal);
+		}
+
+		/// <summary>
+		/// Performs a search using a custom heuristic. When validTileCB returns true, the search ends and the tile location is returned.
 		/// </summary>
 		/// <param name="startPts">The starting points for the search.</param>
 		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
@@ -210,6 +236,61 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <param name="foundPt">The closest valid tile point received.</param>
 		/// <returns>True if a valid tile was found.</returns>
 		public static bool GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION foundPt, bool allowDiagonal=true)
+		{
+			PathNode foundNode;
+			if (GetClosestValidTile(startPts, tileCostCB, validTileCB, out foundNode, allowDiagonal))
+			{
+				foundPt = foundNode.position;
+				return true;
+			}
+
+			foundPt = new LOCATION();
+			return false;
+		}
+
+		/// <summary>
+		/// Performs a search using a custom heuristic. When validTileCB returns true, the search ends and the tile location is returned.
+		/// </summary>
+		/// <param name="startPt">The starting point for the search.</param>
+		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
+		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
+		/// <param name="foundPath">The closest path to the valid tile point received.</param>
+		/// <returns>True if a valid tile was found.</returns>
+		public static bool GetClosestValidTile(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION[] foundPath, bool allowDiagonal=true)
+		{
+			return GetClosestValidTile(new LOCATION[] { startPt }, tileCostCB, validTileCB, out foundPath, allowDiagonal);
+		}
+
+		/// <summary>
+		/// Performs a search using a custom heuristic. When validTileCB returns true, the search ends and the tile location is returned.
+		/// </summary>
+		/// <param name="startPts">The starting points for the search.</param>
+		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
+		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
+		/// <param name="foundPath">The closest path to the valid tile point received.</param>
+		/// <returns>True if a valid tile was found.</returns>
+		public static bool GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out LOCATION[] foundPath, bool allowDiagonal=true)
+		{
+			PathNode foundNode;
+			if (GetClosestValidTile(startPts, tileCostCB, validTileCB, out foundNode, allowDiagonal))
+			{
+				foundPath = foundNode.ToArray();
+				return true;
+			}
+
+			foundPath = null;
+			return false;
+		}
+
+		/// <summary>
+		/// Performs a search using a custom heuristic. When validTileCB returns true, the search ends and the tile location is returned.
+		/// </summary>
+		/// <param name="startPts">The starting points for the search.</param>
+		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
+		/// <param name="validTileCB">A callback for determining if the tile completes the search.</param>
+		/// <param name="foundNode">The closest valid tile node received.</param>
+		/// <returns>True if a valid tile was found.</returns>
+		private static bool GetClosestValidTile(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, out PathNode foundNode, bool allowDiagonal=true)
 		{
 			List<PathNode> openSet = new List<PathNode>();
 			Dictionary<int, PathNode> closedSet = new Dictionary<int, PathNode>();
@@ -235,7 +316,7 @@ namespace DotNetMissionSDK.Pathfinding
 				// If adjacent tile is goal, return it
 				if (validTileCB(node.x, node.y))
 				{
-					foundPt = new LOCATION(node.x, node.y);
+					foundNode = node;
 					return true;
 				}
 				else
@@ -289,7 +370,7 @@ namespace DotNetMissionSDK.Pathfinding
 			}
 
 			// Unreachable / Path not found
-			foundPt = new LOCATION();
+			foundNode = null;
 			return false;
 		}
 	}

@@ -9,26 +9,22 @@ namespace DotNetMissionSDK.Pathfinding.Internal
 	public class PathNode
 	{
 		public PathNode parent;
-		public int x;
-		public int y;
-
+		public LOCATION position;
 		public int cost;
+
+		public int x		{ get { return position.x; } }
+		public int y		{ get { return position.y; } }
 
 		public PathNode(LOCATION pt)
 		{
-			pt.ClipToMap();
-
-			x = pt.x;
-			y = pt.y;
+			position = pt;
+			position.ClipToMap();
 		}
 
 		public PathNode(int x, int y)
 		{
-			LOCATION pos = new LOCATION(x, y);
-			pos.ClipToMap();
-
-			this.x = pos.x;
-			this.y = pos.y;
+			position = new LOCATION(x, y);
+			position.ClipToMap();
 		}
 
 		/// <summary>
@@ -43,7 +39,7 @@ namespace DotNetMissionSDK.Pathfinding.Internal
 
 			while (cur != null)
 			{
-				path.Push(new LOCATION(cur.x, cur.y));
+				path.Push(cur.position);
 				cur = cur.parent;
 			}
 
@@ -56,12 +52,12 @@ namespace DotNetMissionSDK.Pathfinding.Internal
 			if (t == null)
 				return false;
 
-			return x == t.x && y == t.y;
+			return position.x == t.position.x && position.y == t.position.y;
 		}
 
 		public override int GetHashCode()
 		{
-			return x * 1000000 + y;
+			return position.x * 1000000 + position.y;
 		}
 	}
 
