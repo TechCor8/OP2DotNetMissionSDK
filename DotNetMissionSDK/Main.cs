@@ -39,7 +39,7 @@ namespace DotNetMissionSDK
 			// Put code that must be called from DLLMain.ProcessAttach here.
 			// There should not be much need to put code here in most cases.
 			// DO NOT PUT MISSION INIT CODE HERE.
-
+			
 			InitializeLog();
 
 			m_MissionDLLName = Path.GetFileNameWithoutExtension(dllPath);
@@ -107,6 +107,8 @@ namespace DotNetMissionSDK
 
 		private void InitializeSystems()
 		{
+			Console.WriteLine("Creating overlay window...");
+			
 			// Prepare save buffer
 			m_SaveBuffer.Load();
 
@@ -169,7 +171,7 @@ namespace DotNetMissionSDK
 			m_MissionLogic.Dispose();
 			
 			m_SaveBuffer.Dispose();
-			
+
 			// Dispose log file
 			if (m_LogFileStream != null)
 			{
