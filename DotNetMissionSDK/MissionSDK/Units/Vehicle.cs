@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
+using DotNetMissionSDK.Utility.Maps;
 
 namespace DotNetMissionSDK.Units
 {
@@ -8,9 +9,12 @@ namespace DotNetMissionSDK.Units
 	/// </summary>
 	public class Vehicle : UnitEx
 	{
+		private Unit m_DebugMarker;
+
 		// Movement variables
 		private LOCATION[] m_MovementPath;
 		private int m_CurrentPathIndex;
+		private int m_IdleTimer;
 
 		public bool hasPath				{ get { return m_MovementPath != null;		}	}
 		public LOCATION destination		{ get; private set; }
@@ -33,8 +37,11 @@ namespace DotNetMissionSDK.Units
 			m_MovementPath = path;
 			m_CurrentPathIndex = 0;
 			destination = path[path.Length-1];
+			m_IdleTimer = 0;
 
 			DoMove(m_MovementPath[m_CurrentPathIndex].x, m_MovementPath[m_CurrentPathIndex].y);
+
+			SetDebugMarker(m_MovementPath[m_MovementPath.Length-1]);
 		}
 
 		/// <summary>
@@ -63,14 +70,29 @@ namespace DotNetMissionSDK.Units
 			if (!GameMap.IsTilePassable(x,y))
 				return Pathfinder.Impassable;
 
+			// Buildings and units are impassable
+			if (PlayerUnitMap.GetUnitOnTile(new LOCATION(x,y)) != null)
+				return Pathfinder.Impassable;
+
 			return 1;
+		}
+
+		private void SetDebugMarker(LOCATION position)
+		{
+			if (GetOwnerID() != TethysGame.LocalPlayer())
+				return;
+
+			// Debug marker
+			if (m_DebugMarker != null)
+				m_DebugMarker.DoDeath();
+			m_DebugMarker = TethysGame.PlaceMarker(position.x, position.y, MarkerType.DNA);
 		}
 
 		/// <summary>
 		/// Updates this vehicle.
 		/// Call every frame.
 		/// </summary>
-		public void Update()
+		public override void Update()
 		{
 			UpdateMovement();
 		}
@@ -80,8 +102,22 @@ namespace DotNetMissionSDK.Units
 			if (m_MovementPath == null)
 				return;
 
-			//if (GetCurAction() != ActionType.moDone)
-			//	return;
+			if (GetCurAction() == ActionType.moDone)
+			{
+				// Unit lost path
+				if (m_IdleTimer < 10)
+					m_IdleTimer += TethysGame.Tick();
+				else
+				{
+					m_MovementPath = null;
+					return;
+				}
+			}
+			else
+			{
+				// Unit not idle
+				m_IdleTimer = 0;
+			}
 
 			// If we reached destination, move to the next path node
 			if (GetPosition().Equals(m_MovementPath[m_CurrentPathIndex]))
@@ -93,6 +129,18 @@ namespace DotNetMissionSDK.Units
 				{
 					DoMove(m_MovementPath[m_CurrentPathIndex].x, m_MovementPath[m_CurrentPathIndex].y);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Called when unit ceases to exist.
+		/// </summary>
+		public override void OnDestroy()
+		{
+			if (m_DebugMarker != null)
+			{
+				// Remove marker
+				m_DebugMarker.DoDeath();
 			}
 		}
 	}

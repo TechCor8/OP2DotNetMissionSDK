@@ -41,8 +41,29 @@ namespace DotNetMissionSDK.Utility.Maps
 				foreach (UnitEx unit in info.units.GetUnits())
 				{
 					// Place unit on grid
-					LOCATION gridPt = GetPointInGridSpace(unit.GetPosition());
-					m_Grid[gridPt.x,gridPt.y].unitOnTile = unit;
+					if (!unit.IsBuilding())
+					{
+						LOCATION gridPt = GetPointInGridSpace(unit.GetPosition());
+						m_Grid[gridPt.x, gridPt.y].unitOnTile = unit;
+					}
+					else
+					{
+						// Place complete building area on grid
+						MAP_RECT buildingArea = unit.GetUnitInfo().GetRect(unit.GetPosition());
+
+						for (int x=buildingArea.xMin; x < buildingArea.xMax; ++x)
+						{
+							for (int y=buildingArea.yMin; y < buildingArea.yMax; ++y)
+							{
+								LOCATION gridPoint = new LOCATION(x, y);
+								gridPoint.ClipToMap();
+
+								gridPoint = GetPointInGridSpace(gridPoint);
+
+								m_Grid[gridPoint.x,gridPoint.y].unitOnTile = unit;
+							}
+						}
+					}
 				}
 			}
 		}

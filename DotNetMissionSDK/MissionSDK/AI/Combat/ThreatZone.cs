@@ -132,6 +132,10 @@ namespace DotNetMissionSDK.AI.Combat
 			if (!GameMap.IsTilePassable(x,y))
 				return Pathfinder.Impassable;
 
+			// Buildings and units are impassable
+			if (PlayerUnitMap.GetUnitOnTile(new LOCATION(x,y)) != null)
+				return Pathfinder.Impassable;
+
 			// Get tile movement speed cost
 			int moveCost = GameMap.GetTileMovementCost(x,y);
 

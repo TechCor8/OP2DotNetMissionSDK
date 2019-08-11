@@ -15,6 +15,9 @@ namespace DotNetMissionSDK.AI.Managers
 	{
 		private List<VehicleGroup> m_CombatGroups = new List<VehicleGroup>();
 
+		// Debugging
+		private List<Unit> m_DebugMarkers = new List<Unit>();
+
 		public BotPlayer botPlayer							{ get; private set; }
 		public PlayerInfo owner								{ get; private set; }
 
@@ -36,6 +39,22 @@ namespace DotNetMissionSDK.AI.Managers
 			CreateEnemyBaseZones();
 			CreateDefenseZones();
 			CreateMiningZones();
+
+			// Update debug markers
+			if (owner.player.playerID == TethysGame.LocalPlayer())
+			{
+				foreach (Unit unit in m_DebugMarkers)
+					unit.DoDeath();
+
+				m_DebugMarkers.Clear();
+
+				for (int i=0; i < m_CombatGroups.Count; ++i)
+				{
+					LOCATION position = m_CombatGroups[i].threatZone.bounds.position;
+					position += m_CombatGroups[i].threatZone.bounds.size / 2;
+					m_DebugMarkers.Add(TethysGame.PlaceMarker(position.x, position.y, MarkerType.Circle));
+				}
+			}
 
 			PopulateCombatGroups();
 

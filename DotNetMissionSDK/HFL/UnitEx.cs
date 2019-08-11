@@ -169,6 +169,21 @@ namespace DotNetMissionSDK.HFL
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Updates this vehicle.
+		/// Call every frame.
+		/// </summary>
+		public virtual void Update()
+		{
+		}
+
+		/// <summary>
+		/// Called when unit ceases to exist.
+		/// </summary>
+		public virtual void OnDestroy()
+		{
+		}
+
 
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoAttack(int unitID, int tileX, int tileY);
 		[DllImport("DotNetInterop.dll")] private static extern void UnitEx_DoDeployMiner(int unitID, int tileX, int tileY);

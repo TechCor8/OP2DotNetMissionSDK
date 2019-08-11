@@ -239,8 +239,15 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			foreach (KeyValuePair<int, bool> kvDeleteUnit in deleteLookup)
 			{
 				if (kvDeleteUnit.Value)
+				{
+					m_StubUnitLookup[kvDeleteUnit.Key].OnDestroy();
 					m_StubUnitLookup.Remove(kvDeleteUnit.Key);
+				}
 			}
+
+			// Update all units
+			foreach (UnitEx unit in GetUnits())
+				unit.Update();
 		}
 
 		// Adds a new unit to the listToAdd. If unit is found in m_StubUnitLookup, the m_StubUnitLookup unit is added instead.

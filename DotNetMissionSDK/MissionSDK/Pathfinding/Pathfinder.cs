@@ -42,19 +42,23 @@ namespace DotNetMissionSDK.Pathfinding
 
 			List<PathNode> openSet = new List<PathNode>();
 			Dictionary<int, PathNode> closedSet = new Dictionary<int, PathNode>();
+			Dictionary<int, PathNode> openSetHash = new Dictionary<int, PathNode>();
 
 			int adjacentCount = 4;
 			if (allowDiagonal)
 				adjacentCount = 8;
 
 			// Add start point
-			openSet.Add(new PathNode(startPt));
+			PathNode startNode = new PathNode(startPt);
+			openSet.Add(startNode);
+			openSetHash.Add(startNode.GetHashCode(), startNode);
 
 			while (openSet.Count > 0)
 			{
 				// Get lowest cost node in open list
 				PathNode node = openSet[openSet.Count-1];
 				openSet.RemoveAt(openSet.Count-1);
+				openSetHash.Remove(node.GetHashCode());
 
 				// If goal reached, return path from current node
 				if (node.x == goal.x && node.y == goal.y)
@@ -87,8 +91,10 @@ namespace DotNetMissionSDK.Pathfinding
 							continue;
 
 						// If adjacent is on open list, skip it
-						if (openSet.Contains(adjacentNode))
+						if (openSetHash.ContainsKey(adjacentNode.GetHashCode()))
 							continue;
+						//if (openSet.Contains(adjacentNode))
+						//	continue;
 
 						int tileCost = tileCostCB(adjacentNode.x, adjacentNode.y);
 						
@@ -110,6 +116,8 @@ namespace DotNetMissionSDK.Pathfinding
 							openSet.Insert(0, adjacentNode);
 						else
 							openSet.Insert(index + 1, adjacentNode);
+
+						openSetHash.Add(adjacentNode.GetHashCode(), adjacentNode);
 					}
 				}
 			}
@@ -294,6 +302,7 @@ namespace DotNetMissionSDK.Pathfinding
 		{
 			List<PathNode> openSet = new List<PathNode>();
 			Dictionary<int, PathNode> closedSet = new Dictionary<int, PathNode>();
+			Dictionary<int, PathNode> openSetHash = new Dictionary<int, PathNode>();
 
 			int adjacentCount = 4;
 			if (allowDiagonal)
@@ -303,8 +312,11 @@ namespace DotNetMissionSDK.Pathfinding
 			foreach (LOCATION startPt in startPts)
 			{
 				PathNode node = new PathNode(startPt);
-				if (!openSet.Contains(node))
+				if (!openSetHash.ContainsKey(node.GetHashCode()))
+				{
 					openSet.Add(node);
+					openSetHash.Add(node.GetHashCode(), node);
+				}
 			}
 
 			while (openSet.Count > 0)
@@ -312,6 +324,7 @@ namespace DotNetMissionSDK.Pathfinding
 				// Get lowest cost node in open list
 				PathNode node = openSet[openSet.Count-1];
 				openSet.RemoveAt(openSet.Count-1);
+				openSetHash.Remove(node.GetHashCode());
 
 				// If adjacent tile is goal, return it
 				if (validTileCB(node.x, node.y))
@@ -345,8 +358,10 @@ namespace DotNetMissionSDK.Pathfinding
 							continue;
 
 						// If adjacent is on open list, skip it
-						if (openSet.Contains(adjacentNode))
+						if (openSetHash.ContainsKey(adjacentNode.GetHashCode()))
 							continue;
+						//if (openSet.Contains(adjacentNode))
+						//	continue;
 
 						int tileCost = tileCostCB(adjacentNode.x, adjacentNode.y);
 
@@ -365,6 +380,8 @@ namespace DotNetMissionSDK.Pathfinding
 							openSet.Insert(0, adjacentNode);
 						else
 							openSet.Insert(index + 1, adjacentNode);
+
+						openSetHash.Add(adjacentNode.GetHashCode(), adjacentNode);
 					}
 				}
 			}
