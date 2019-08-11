@@ -63,7 +63,7 @@ namespace DotNetMissionSDK
 		// Combat Units
 		public map_id GetWeapon()							{ return Unit_GetWeapon(m_StubIndex);						}
 		public void SetWeapon(map_id weaponType)			{ Unit_SetWeapon(m_StubIndex, weaponType);					}
-		public void DoAttack(Unit targetUnit)				{ Unit_DoAttack(m_StubIndex, targetUnit.m_StubIndex);		}		// Order Unit to Attack target Unit
+		public virtual void DoAttack(Unit targetUnit)		{ Unit_DoAttack(m_StubIndex, targetUnit.m_StubIndex);		}		// Order Unit to Attack target Unit
 
 		// Vehicles
 		public void DoSetLights(bool isOn)					{ Unit_DoSetLights(m_StubIndex, isOn ? 1 : 0);				}		// Order Unit to SetLights

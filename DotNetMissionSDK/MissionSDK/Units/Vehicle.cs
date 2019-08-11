@@ -16,6 +16,8 @@ namespace DotNetMissionSDK.Units
 		private int m_CurrentPathIndex;
 		private int m_IdleTimer;
 
+		private Unit m_AttackTarget;
+
 		public bool hasPath				{ get { return m_MovementPath != null;		}	}
 		public LOCATION destination		{ get; private set; }
 
@@ -88,28 +90,31 @@ namespace DotNetMissionSDK.Units
 			m_DebugMarker = TethysGame.PlaceMarker(position.x, position.y, MarkerType.DNA);
 		}
 
+		public override void DoAttack(Unit targetUnit)
+		{
+			if (targetUnit != m_AttackTarget)
+			{
+				base.DoAttack(targetUnit);
+				m_AttackTarget = targetUnit;
+				m_IdleTimer = 0;
+			}
+		}
+
 		/// <summary>
 		/// Updates this vehicle.
 		/// Call every frame.
 		/// </summary>
 		public override void Update()
 		{
-			UpdateMovement();
-		}
-
-		private void UpdateMovement()
-		{
-			if (m_MovementPath == null)
-				return;
-
 			if (GetCurAction() == ActionType.moDone)
 			{
-				// Unit lost path
 				if (m_IdleTimer < 10)
 					m_IdleTimer += TethysGame.Tick();
 				else
 				{
+					// Unit lost path or target
 					m_MovementPath = null;
+					m_AttackTarget = null;
 					return;
 				}
 			}
@@ -118,6 +123,14 @@ namespace DotNetMissionSDK.Units
 				// Unit not idle
 				m_IdleTimer = 0;
 			}
+
+			UpdateMovement();
+		}
+
+		private void UpdateMovement()
+		{
+			if (m_MovementPath == null)
+				return;
 
 			// If we reached destination, move to the next path node
 			if (GetPosition().Equals(m_MovementPath[m_CurrentPathIndex]))

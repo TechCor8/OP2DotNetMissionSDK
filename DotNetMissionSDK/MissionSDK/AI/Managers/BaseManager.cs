@@ -137,7 +137,7 @@ namespace DotNetMissionSDK.AI.Managers
 			{
 				maintainPopulationTask.PerformTaskTree();
 				PerformFullRepairs();
-				return;
+				//return;
 			}
 
 			// Build defenses
@@ -147,15 +147,17 @@ namespace DotNetMissionSDK.AI.Managers
 			// Expand rare mining
 			if (owner.units.rareOreMines.Count == 0 || owner.units.rareOreSmelters.Count == 0)
 			{
-				goals[ExpandRareMining_GoalID].task.PerformTaskTree();
-				PerformFullRepairs();
+				if (owner.units.rareOreSmelters.Find((smelter) => !smelter.IsEnabled()) == null)
+					goals[ExpandRareMining_GoalID].task.PerformTaskTree();
 			}
 			else
 			{
 				// Expand common mining
-				goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
-				PerformFullRepairs();
+				if (owner.units.commonOreSmelters.Find((smelter) => !smelter.IsEnabled()) == null)
+					goals[ExpandCommonMining_GoalID].task.PerformTaskTree();
 			}
+
+			PerformFullRepairs();
 
 			// Build combat units
 			if (owner.player.Ore() > 2800)
