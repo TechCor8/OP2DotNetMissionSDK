@@ -15,6 +15,8 @@ namespace DotNetMissionSDK.Utility.Maps
 
 		private const int PlayerCount = 8;
 
+		private static readonly object m_SyncObject = new object();
+
 		private static Tile[,] m_Grid;
 
 
@@ -23,7 +25,8 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// </summary>
 		public static void Initialize()
 		{
-			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
+			lock (m_SyncObject)
+				m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
 		}
 
 		/// <summary>
@@ -31,10 +34,13 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// </summary>
 		public static void Update(PlayerInfo[] playerInfos)
 		{
-			Array.Clear(m_Grid, 0, m_Grid.Length);
+			lock (m_SyncObject)
+			{
+				Array.Clear(m_Grid, 0, m_Grid.Length);
 
-			foreach (PlayerInfo info in playerInfos)
-				UpdatePlayerStrength(info);
+				foreach (PlayerInfo info in playerInfos)
+					UpdatePlayerStrength(info);
+			}
 		}
 
 		private static void UpdatePlayerStrength(PlayerInfo info)
@@ -106,10 +112,13 @@ namespace DotNetMissionSDK.Utility.Maps
 		{
 			LOCATION pt = GetPointInGridSpace(new LOCATION(gridX, gridY));
 
-			if (m_Grid[pt.x,pt.y].playerStrength == null)
-				return 0;
+			lock (m_SyncObject)
+			{
+				if (m_Grid[pt.x,pt.y].playerStrength == null)
+					return 0;
 
-			return m_Grid[pt.x,pt.y].playerStrength[playerID];
+				return m_Grid[pt.x,pt.y].playerStrength[playerID];
+			}
 		}
 
 		/// <summary>
@@ -119,14 +128,17 @@ namespace DotNetMissionSDK.Utility.Maps
 		{
 			LOCATION pt = GetPointInGridSpace(new LOCATION(gridX, gridY));
 
-			if (m_Grid[pt.x,pt.y].playerStrength == null)
-				return 0;
+			lock (m_SyncObject)
+			{
+				if (m_Grid[pt.x,pt.y].playerStrength == null)
+					return 0;
 
-			int totalStrength = 0;
-			for (int i=0; i < playerIDs.Length; ++i)
-				totalStrength += m_Grid[pt.x,pt.y].playerStrength[playerIDs[i]];
+				int totalStrength = 0;
+				for (int i=0; i < playerIDs.Length; ++i)
+					totalStrength += m_Grid[pt.x,pt.y].playerStrength[playerIDs[i]];
 
-			return totalStrength;
+				return totalStrength;
+			}
 		}
 
 		/// <summary>
@@ -136,14 +148,17 @@ namespace DotNetMissionSDK.Utility.Maps
 		{
 			LOCATION pt = GetPointInGridSpace(new LOCATION(gridX, gridY));
 
-			if (m_Grid[pt.x,pt.y].playerStrength == null)
-				return 0;
+			lock (m_SyncObject)
+			{
+				if (m_Grid[pt.x,pt.y].playerStrength == null)
+					return 0;
 
-			int totalStrength = 0;
-			for (int i=0; i < m_Grid[pt.x,pt.y].playerStrength.Length; ++i)
-				totalStrength += m_Grid[pt.x,pt.y].playerStrength[i];
+				int totalStrength = 0;
+				for (int i=0; i < m_Grid[pt.x,pt.y].playerStrength.Length; ++i)
+					totalStrength += m_Grid[pt.x,pt.y].playerStrength[i];
 
-			return totalStrength;
+				return totalStrength;
+			}
 		}
 	}
 }

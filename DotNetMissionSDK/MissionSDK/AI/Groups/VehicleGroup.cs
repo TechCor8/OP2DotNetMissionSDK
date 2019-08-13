@@ -225,21 +225,17 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 						Unit target = threatZone.GetClosestPriorityTarget(unit.GetPosition());
 						unit.DoAttack(target);
 					}
-					else if (!unit.hasPath || !threatZone.bounds.Contains(unit.destination))
+					else if (!unit.isSearchingOrHasPath || !threatZone.bounds.Contains(unit.destination))
 					{
 						// Otherwise, move to random location in zone
 						LOCATION targetPosition = threatZone.bounds.GetRandomPointInRect();
 						unit.DoMoveWithPathfinder(targetPosition);
 					}
 				}
-				else if (!threatZone.IsInStagingArea(unit) && (!unit.hasPath || !threatZone.IsInStagingArea(unit.destination)))
+				else if (!threatZone.IsInStagingArea(unit) && (!unit.isSearchingOrHasPath || !threatZone.IsInStagingArea(unit.destination)))
 				{
 					// Head to staging area
-
-					// Get closest staging point
-					 LOCATION[] path = threatZone.GetPathToStagingArea(unit);
-					if (path != null)
-						unit.DoMove(path);
+					threatZone.SendUnitToStagingArea(unit);
 				}
 			}
 		}

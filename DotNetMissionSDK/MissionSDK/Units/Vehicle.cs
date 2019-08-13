@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
+using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.Utility.Maps;
 
 namespace DotNetMissionSDK.Units
@@ -18,8 +19,10 @@ namespace DotNetMissionSDK.Units
 
 		private Unit m_AttackTarget;
 
-		public bool hasPath				{ get { return m_MovementPath != null;		}	}
-		public LOCATION destination		{ get; private set; }
+		public bool isSearchingForPath		{ get; private set; }
+		public bool hasPath					{ get { return m_MovementPath != null;							}	}
+		public bool isSearchingOrHasPath	{ get { return isSearchingForPath || m_MovementPath != null;	}	}
+		public LOCATION destination			{ get; private set; }
 
 		// TODO: Set destination when parent class DoMove is called.
 
@@ -36,6 +39,10 @@ namespace DotNetMissionSDK.Units
 		/// <param name="path">The path to move the unit on.</param>
 		public void DoMove(LOCATION[] path)
 		{
+			// If unit has been destroyed since we started pathfinding, cancel
+			if (!IsLive())
+				return;
+
 			m_MovementPath = path;
 			m_CurrentPathIndex = 0;
 			destination = path[path.Length-1];
@@ -59,11 +66,43 @@ namespace DotNetMissionSDK.Units
 		/// </summary>
 		public void DoMoveWithPathfinder(LOCATION targetPosition)
 		{
-			LOCATION[] path = Pathfinder.GetPath(GetPosition(), targetPosition, true, GetTileCost);
-			if (path == null)
-				return;
+			DoMoveWithPathfinder(targetPosition, GetTileCost);
+		}
 
-			DoMove(path);
+		/// <summary>
+		/// Generates a path for the unit to navigate through terrain with custom tile cost.
+		/// </summary>
+		public void DoMoveWithPathfinder(LOCATION targetPosition, Pathfinder.TileCostCallback tileCostCB)
+		{
+			isSearchingForPath = true;
+
+			Pathfinder.GetPathAsync(GetPosition(), targetPosition, true, tileCostCB, (LOCATION[] path) =>
+			{
+				isSearchingForPath = false;
+
+				if (path == null)
+					return;
+
+				DoMove(path);
+			});
+		}
+
+		/// <summary>
+		/// Generates a path for the unit to navigate based on custom parameters.
+		/// </summary>
+		public void DoMoveWithPathfinder(Pathfinder.TileCostCallback tileCostCB, Pathfinder.ValidTileCallback validTileCB)
+		{
+			isSearchingForPath = true;
+
+			Pathfinder.GetClosestValidTileAsync(GetPosition(), tileCostCB, validTileCB, (LOCATION[] path) =>
+			{
+				isSearchingForPath = false;
+
+				if (path == null)
+					return;
+
+				DoMove(path);
+			});
 		}
 
 		// Callback for determining tile cost
@@ -72,8 +111,9 @@ namespace DotNetMissionSDK.Units
 			if (!GameMap.IsTilePassable(x,y))
 				return Pathfinder.Impassable;
 
-			// Buildings and units are impassable
-			if (PlayerUnitMap.GetUnitOnTile(new LOCATION(x,y)) != null)
+			// Buildings, and units that aren't our own, are impassable
+			UnitEx blockingUnit = PlayerUnitMap.GetUnitOnTile(new LOCATION(x,y));
+			if (blockingUnit != null && (!blockingUnit.IsVehicle() || blockingUnit.GetOwnerID() != GetOwnerID()))
 				return Pathfinder.Impassable;
 
 			return 1;

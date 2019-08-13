@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
+using DotNetMissionSDK.Units;
 using DotNetMissionSDK.Utility;
 using DotNetMissionSDK.Utility.Maps;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace DotNetMissionSDK.AI.Combat
 
 		private PlayerInfo m_Owner;
 
-		public MAP_RECT bounds				{ get; private set; }
+		public MAP_RECT bounds				{ get; private set; } // *See Sync Notes
 		public int strengthRequired			{ get; private set; }
 		public int strengthDesired			{ get; private set; }
 		public ThreatLevel threatLevel		{ get; private set; }
@@ -30,7 +31,12 @@ namespace DotNetMissionSDK.AI.Combat
 		public MAP_RECT[] stagingAreas		{ get; private set; }
 
 		// Optimization variables
-		MAP_RECT m_StagingBounds;
+		private MAP_RECT m_StagingBounds; // *See Sync Notes
+
+		// *Sync Notes:
+		// Variables marked with this notice should not be modified outside of the constructor.
+		// These variables are not locked and the pathfinder thread will read these at unknown times.
+		// If these variables need to be changed, a new ThreatZone should be created.
 
 
 		/// <summary>
@@ -116,15 +122,13 @@ namespace DotNetMissionSDK.AI.Combat
 		}
 
 		/// <summary>
-		/// Gets the quickest path the zone's staging area.
+		/// Sends the unit to the zone's staging area.
 		/// </summary>
-		public LOCATION[] GetPathToStagingArea(UnitEx unitForPath)
+		public void SendUnitToStagingArea(Vehicle unitForPath)
 		{
 			int unitStrength = unitForPath.GetUnitInfo().GetWeaponStrength();
 
-			LOCATION[] path;
-			Pathfinder.GetClosestValidTile(unitForPath.GetPosition(), (x,y) => GetTileCost(x,y,unitStrength), IsTileInStagingArea, out path);
-			return path;
+			unitForPath.DoMoveWithPathfinder((x,y) => GetTileCost(x,y,unitStrength), IsTileInStagingArea);
 		}
 
 		private int GetTileCost(int x, int y, int unitStrength)

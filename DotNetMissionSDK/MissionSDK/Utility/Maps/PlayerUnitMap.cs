@@ -14,6 +14,8 @@ namespace DotNetMissionSDK.Utility.Maps
 			public UnitEx unitOnTile;
 		}
 
+		private static readonly object m_SyncObject = new object();
+
 		private static Tile[,] m_Grid;
 
 
@@ -22,7 +24,8 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// </summary>
 		public static void Initialize()
 		{
-			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
+			lock (m_SyncObject)
+				m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
 		}
 
 		/// <summary>
@@ -30,42 +33,45 @@ namespace DotNetMissionSDK.Utility.Maps
 		/// </summary>
 		public static void Update(PlayerInfo[] playerInfos)
 		{
-			Array.Clear(m_Grid, 0, m_Grid.Length);
-
-			// Loop through every unit in every player
-			foreach (PlayerInfo info in playerInfos)
+			lock (m_SyncObject)
 			{
-				if (info == null)
-					continue;
+				Array.Clear(m_Grid, 0, m_Grid.Length);
 
-				foreach (UnitEx unit in info.units.GetUnits())
+				// Loop through every unit in every player
+				foreach (PlayerInfo info in playerInfos)
 				{
-					// Place unit on grid
-					if (!unit.IsBuilding())
-					{
-						LOCATION gridPt = GetPointInGridSpace(unit.GetPosition());
-						m_Grid[gridPt.x, gridPt.y].unitOnTile = unit;
-					}
-					else
-					{
-						// Place complete building area on grid
-						MAP_RECT buildingArea = unit.GetUnitInfo().GetRect(unit.GetPosition());
+					if (info == null)
+						continue;
 
-						for (int x=buildingArea.xMin; x < buildingArea.xMax; ++x)
+					foreach (UnitEx unit in info.units.GetUnits())
+					{
+						// Place unit on grid
+						if (!unit.IsBuilding())
 						{
-							for (int y=buildingArea.yMin; y < buildingArea.yMax; ++y)
+							LOCATION gridPt = GetPointInGridSpace(unit.GetPosition());
+							m_Grid[gridPt.x, gridPt.y].unitOnTile = unit;
+						}
+						else
+						{
+							// Place complete building area on grid
+							MAP_RECT buildingArea = unit.GetUnitInfo().GetRect(unit.GetPosition());
+
+							for (int x=buildingArea.xMin; x < buildingArea.xMax; ++x)
 							{
-								LOCATION gridPoint = new LOCATION(x, y);
-								gridPoint.ClipToMap();
+								for (int y=buildingArea.yMin; y < buildingArea.yMax; ++y)
+								{
+									LOCATION gridPoint = new LOCATION(x, y);
+									gridPoint.ClipToMap();
 
-								gridPoint = GetPointInGridSpace(gridPoint);
+									gridPoint = GetPointInGridSpace(gridPoint);
 
-								m_Grid[gridPoint.x,gridPoint.y].unitOnTile = unit;
+									m_Grid[gridPoint.x,gridPoint.y].unitOnTile = unit;
+								}
 							}
 						}
 					}
-				}
-			}
+				} // foreach playerInfo
+			} // lock
 		}
 
 		private static LOCATION GetPointInGridSpace(LOCATION pt)
@@ -83,7 +89,8 @@ namespace DotNetMissionSDK.Utility.Maps
 		{
 			tilePosition = GetPointInGridSpace(tilePosition);
 
-			return m_Grid[tilePosition.x,tilePosition.y].unitOnTile;
+			lock (m_SyncObject)
+				return m_Grid[tilePosition.x, tilePosition.y].unitOnTile;
 		}
 
 		/// <summary>

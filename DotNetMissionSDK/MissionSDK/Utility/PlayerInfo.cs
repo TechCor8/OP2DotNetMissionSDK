@@ -12,19 +12,24 @@ namespace DotNetMissionSDK.Utility
 	/// </summary>
 	public class PlayerInfo : IDisposable
 	{
-		private SaveData m_SaveData;		// The save data object to store persistent player state
+		private SaveData m_SaveData;        // The save data object to store persistent player state
+
+		private readonly object m_SyncObject = new object();
+
+		private ReadOnlyCollection<PlayerInfo> m_Allies		= new ReadOnlyCollection<PlayerInfo>(new List<PlayerInfo>());
+		private ReadOnlyCollection<PlayerInfo> m_Enemies	= new ReadOnlyCollection<PlayerInfo>(new List<PlayerInfo>());
 
 		public PlayerEx player							{ get; private set; }
-		public ReadOnlyCollection<PlayerInfo> allies	{ get; private set; }
-		public ReadOnlyCollection<PlayerInfo> enemies	{ get; private set; }
+		public ReadOnlyCollection<PlayerInfo> allies	{ get { lock (m_SyncObject) return m_Allies;	}	}
+		public ReadOnlyCollection<PlayerInfo> enemies	{ get { lock (m_SyncObject) return m_Enemies;	}	}
 
 		/// <summary>
 		/// Contains lists of player units by type.
 		/// Tracks starship module counts.
 		/// </summary>
-		public PlayerUnitList units						{ get; private set; }
+		public PlayerUnitList units						{ get; private set; } // PlayerUnitList IS NOT THREAD SAFE
 
-		public PlayerCommandGrid commandGrid			{ get; private set; }
+		public PlayerCommandGrid commandGrid			{ get; private set; } // PlayerCommandGrid IS NOT THREAD SAFE
 
 
 		/// <summary>
@@ -84,8 +89,11 @@ namespace DotNetMissionSDK.Utility
 					enemies.Add(info);
 			}
 
-			this.allies = allies.AsReadOnly();
-			this.enemies = enemies.AsReadOnly();
+			lock (m_SyncObject)
+			{
+				m_Allies = allies.AsReadOnly();
+				m_Enemies = enemies.AsReadOnly();
+			}
 		}
 		
 		public void Dispose()

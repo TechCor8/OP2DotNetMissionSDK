@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
+using DotNetMissionSDK.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -137,6 +138,7 @@ namespace DotNetMissionSDK
 
 			// Update essential systems
 			m_Triggers.Update();
+			AsyncPump.Update();
 
 			// Update mission logic
 			m_MissionLogic.Update();

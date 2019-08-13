@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.Pathfinding.Internal;
+using DotNetMissionSDK.Utility;
 using System;
 using System.Collections.Generic;
 
@@ -389,6 +390,64 @@ namespace DotNetMissionSDK.Pathfinding
 			// Unreachable / Path not found
 			foundNode = null;
 			return false;
+		}
+
+		public delegate void OnGetPathCompleteCallback(LOCATION[] path);
+		public delegate void OnGetPointCompleteCallback(bool didFindTile, LOCATION foundPt);
+
+		/// <summary>
+		/// Gets an optimal path from a start point to an end point.
+		/// </summary>
+		/// <param name="startPt">The starting point for the path.</param>
+		/// <param name="goal">The target point to reach.</param>
+		/// <param name="allowDiagonal">Can the path move diagonally?</param>
+		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
+		public static void GetPathAsync(LOCATION startPt, LOCATION goal, bool allowDiagonal, TileCostCallback tileCostCB, OnGetPathCompleteCallback onGetPathCompleteCB)
+		{
+			AsyncPump.Run(() => GetPath(startPt, goal, allowDiagonal, tileCostCB), (object result) => onGetPathCompleteCB(result as LOCATION[]));
+		}
+
+		public static void GetClosestValidTileAsync(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB, OnGetPointCompleteCallback onGetPointCompleteCB, bool allowDiagonal=true)
+		{
+			GetClosestValidTileAsync(new LOCATION[] { startPt }, tileCostCB, validTileCB, onGetPointCompleteCB, allowDiagonal);
+		}
+
+		public static void GetClosestValidTileAsync(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, OnGetPointCompleteCallback onGetPointCompleteCB, bool allowDiagonal=true)
+		{
+			AsyncPump.Run(() =>
+			{
+				PathNode foundNode;
+				if (GetClosestValidTile(startPts, tileCostCB, validTileCB, out foundNode, allowDiagonal))
+					return foundNode;
+
+				return null;
+			},
+			(object result) =>
+			{
+				PathNode node = result as PathNode;
+				if (node != null)
+					onGetPointCompleteCB(true, node.position);
+				else
+					onGetPointCompleteCB(false, new LOCATION());
+			});
+		}
+
+		public static void GetClosestValidTileAsync(LOCATION startPt, TileCostCallback tileCostCB, ValidTileCallback validTileCB, OnGetPathCompleteCallback onGetPathCompleteCB, bool allowDiagonal=true)
+		{
+			GetClosestValidTileAsync(new LOCATION[] { startPt }, tileCostCB, validTileCB, onGetPathCompleteCB, allowDiagonal);
+		}
+
+		public static void GetClosestValidTileAsync(IEnumerable<LOCATION> startPts, TileCostCallback tileCostCB, ValidTileCallback validTileCB, OnGetPathCompleteCallback onGetPathCompleteCB, bool allowDiagonal=true)
+		{
+			AsyncPump.Run(() =>
+			{
+				LOCATION[] foundPath;
+				if (GetClosestValidTile(startPts, tileCostCB, validTileCB, out foundPath, allowDiagonal))
+					return foundPath;
+
+				return null;
+			},
+				(object result) => onGetPathCompleteCB(result as LOCATION[]));
 		}
 	}
 }
