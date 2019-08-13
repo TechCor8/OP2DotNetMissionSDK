@@ -18,9 +18,6 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public const bool useJson = true;
 
-		private BotPlayer m_BotPlayer;
-		private BotPlayer m_BotPlayer2;
-
 		/// <summary>
 		/// Called when the mission is first loaded, regardless of whether it is a new game or saved game.
 		/// </summary>
@@ -70,11 +67,6 @@ namespace DotNetMissionSDK
 			base.StartMission();
 
 			// *** Add custom start code here ***
-			m_BotPlayer = new BotPlayer(BotType.LaunchStarship, GetPlayerInfo(TethysGame.LocalPlayer()));
-			m_BotPlayer.Start();
-
-			m_BotPlayer2 = new BotPlayer(BotType.LaunchStarship, GetPlayerInfo(1));
-			m_BotPlayer2.Start();
 		}
 
 		/// <summary>
@@ -104,8 +96,6 @@ namespace DotNetMissionSDK
 			base.Update();
 
 			// *** Add custom update code here ***
-			m_BotPlayer.Update();
-			m_BotPlayer2.Update();
 		}
 
 		/// <summary>

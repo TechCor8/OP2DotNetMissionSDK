@@ -8,6 +8,7 @@ namespace DotNetMissionSDK.AI
 	/// </summary>
 	public enum BotType
 	{
+		None,					// Bot does nothing.
 		PopulationGrowth,		// Bot focuses on growing population. Keeps enough defense to avoid being killed. Will build Recreation, DIRT and other optional structures.
 		LaunchStarship,			// Bot focuses on launching starship. Keeps enough defense to avoid being killed.
 		EconomicGrowth,			// Bot focuses on resource acquisition. Keeps enough defense to avoid being killed.

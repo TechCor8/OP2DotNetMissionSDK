@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.Json;
+﻿using DotNetMissionSDK.AI;
+using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
 using DotNetMissionSDK.Units;
 using DotNetMissionSDK.Utility;
@@ -13,7 +14,8 @@ namespace DotNetMissionSDK
 		private MissionRoot m_Root;
 		private SaveData m_SaveData;
 		private PlayerInfo[] m_PlayerInfo = new PlayerInfo[8];
-		
+		private BotPlayer[] m_BotPlayer = new BotPlayer[8];
+
 		private TriggerManager m_TriggerManager;
 
 		private List<DisasterData> m_Disasters = new List<DisasterData>();
@@ -138,11 +140,10 @@ namespace DotNetMissionSDK
 					player.SetColorNumber(data.color);
 				}
 
-				// Always human
-				if (data.id == 1)
+				if (data.isHuman)
 					player.GoHuman();
-
-				// TODO: data.isHuman - If not human, use fancy AI code
+				else
+					player.GoAI();
 				
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
@@ -396,6 +397,16 @@ namespace DotNetMissionSDK
 		/// </summary>
 		protected virtual void StartMission()
 		{
+			MissionRoot root = m_Root;
+
+			for (int i=0; i < root.players.Length; ++i)
+			{
+				if (root.players[i].botType == BotType.None)
+					continue;
+
+				m_BotPlayer[i] = new BotPlayer(root.players[i].botType, GetPlayerInfo(i));
+				m_BotPlayer[i].Start();
+			}
 		}
 
 		/// <summary>
@@ -455,6 +466,10 @@ namespace DotNetMissionSDK
 					FireDisaster(disaster);
 				}
 			}
+
+			// Update bots
+			for (int i=0; i < m_BotPlayer.Length; ++i)
+				m_BotPlayer[i]?.Update();
 		}
 
 		private void FireDisaster(DisasterData disaster)

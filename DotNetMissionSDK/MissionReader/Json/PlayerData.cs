@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using DotNetMissionSDK.AI;
+using System.Runtime.Serialization;
 
 namespace DotNetMissionSDK.Json
 {
@@ -11,6 +12,7 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "FreeMorale")]		public bool freeMorale				{ get; private set; }
 		[DataMember(Name = "IsEden")]			public bool isEden					{ get; private set; }
 		[DataMember(Name = "IsHuman")]			public bool isHuman					{ get; private set; }
+		[DataMember(Name = "BotType")]			private string m_BotType			{ get; set; }
 		[DataMember(Name = "Color")]			private string m_Color				{ get; set; }
 		[DataMember(Name = "Allies")]			public int[] allies					{ get; private set; }
 		[DataMember(Name = "CenterView")]		public DataLocation centerView		{ get; private set; }
@@ -28,6 +30,7 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "Units")]			public UnitData[] units				{ get; private set; }
 
 		public MoraleLevel moraleLevel			{ get { return GetEnum<MoraleLevel>(m_MoraleLevel);	} }
+		public BotType botType					{ get { return GetEnum<BotType>(m_BotType);			} }
 		public PlayerColor color				{ get { return GetEnum<PlayerColor>(m_Color);		} }
 		
 

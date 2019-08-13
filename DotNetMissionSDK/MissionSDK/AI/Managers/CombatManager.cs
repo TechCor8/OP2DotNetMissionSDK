@@ -13,6 +13,10 @@ namespace DotNetMissionSDK.AI.Managers
 	/// </summary>
 	public class CombatManager
 	{
+		private List<ThreatZone> m_DefenseZones = new List<ThreatZone>();		// Proximity, Defense, Mining
+		private List<ThreatZone> m_EnemyBaseZones = new List<ThreatZone>();		// Enemy bases
+		private List<ThreatZone> m_VulnerableZones = new List<ThreatZone>();	// Vulnerable Structure, Vulnerable Vehicle
+
 		private List<VehicleGroup> m_CombatGroups = new List<VehicleGroup>();
 
 		// Debugging
@@ -30,6 +34,10 @@ namespace DotNetMissionSDK.AI.Managers
 
 		public void Update()
 		{
+			m_DefenseZones.Clear();
+			m_EnemyBaseZones.Clear();
+			m_VulnerableZones.Clear();
+
 			m_CombatGroups.Clear();
 
 			// Create threat zones
@@ -132,7 +140,6 @@ namespace DotNetMissionSDK.AI.Managers
 
 		// TODO:
 		// PopulateCombatGroup - Units to populate must be able to reach zone without engaging in combat
-		// Unit pathfinding
 
 		/// <summary>
 		/// Creates threat zones for enemy combat units in close proximity to allied civilian units.
@@ -179,14 +186,14 @@ namespace DotNetMissionSDK.AI.Managers
 			MAP_RECT area = new MAP_RECT(unit.GetPosition(), new LOCATION(0,0));
 			area.Inflate(8);
 
-			if (DoesOverlapZone(area))
+			if (DoesOverlapZone(area, m_DefenseZones))
 				return;
 
 			List<UnitEx> enemiesInArea = PlayerUnitMap.GetUnitsInArea(area);
 			enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()));
 
 			if (enemiesInArea.Count > 0)
-				CreateZone(area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault);
+				m_DefenseZones.Add(CreateZone(area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault));
 		}
 
 		/// <summary>
@@ -205,7 +212,7 @@ namespace DotNetMissionSDK.AI.Managers
 					MAP_RECT area = new MAP_RECT(unit.GetPosition(), new LOCATION(0,0));
 					area.Inflate(8);
 
-					if (DoesOverlapZone(area))
+					if (DoesOverlapZone(area, m_VulnerableZones))
 						continue;
 
 					List<UnitEx> enemiesInArea = PlayerUnitMap.GetUnitsInArea(area);
@@ -223,9 +230,9 @@ namespace DotNetMissionSDK.AI.Managers
 
 					// Create zone, prioritizing bombers if they are available
 					if (owner.player.HasTechnology(techInfo.GetTechID()))
-						CreateZone(area, enemiesInArea.ToArray(), 1, VehicleGroupType.Bomber);
+						m_VulnerableZones.Add(CreateZone(area, enemiesInArea.ToArray(), 1, VehicleGroupType.Bomber));
 					else
-						CreateZone(area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass);
+						m_VulnerableZones.Add(CreateZone(area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass));
 				}
 			}
 		}
@@ -246,7 +253,7 @@ namespace DotNetMissionSDK.AI.Managers
 					MAP_RECT area = new MAP_RECT(unit.GetPosition(), new LOCATION(0,0));
 					area.Inflate(8);
 
-					if (DoesOverlapZone(area))
+					if (DoesOverlapZone(area, m_VulnerableZones))
 						continue;
 
 					List<UnitEx> enemiesInArea = PlayerUnitMap.GetUnitsInArea(area);
@@ -264,9 +271,9 @@ namespace DotNetMissionSDK.AI.Managers
 
 					// Create zone, prioritizing capture groups if they are available
 					if (!owner.player.IsEden() && owner.player.HasTechnology(techInfo.GetTechID()))
-						CreateZone(area, enemiesInArea.ToArray(), 1, VehicleGroupType.Capture);
+						m_VulnerableZones.Add(CreateZone(area, enemiesInArea.ToArray(), 1, VehicleGroupType.Capture));
 					else
-						CreateZone(area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass);
+						m_VulnerableZones.Add(CreateZone(area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass));
 				}
 			}
 		}
@@ -283,13 +290,13 @@ namespace DotNetMissionSDK.AI.Managers
 					MAP_RECT area = new MAP_RECT(unit.GetPosition(), new LOCATION(0,0));
 					area.Inflate(8);
 
-					if (DoesOverlapZone(area))
+					if (DoesOverlapZone(area, m_EnemyBaseZones))
 						continue;
 
 					List<UnitEx> enemiesInArea = PlayerUnitMap.GetUnitsInArea(area);
 					enemiesInArea.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()));
 
-					CreateZone(area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault);
+					m_EnemyBaseZones.Add(CreateZone(area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault));
 				}
 			}
 		}
@@ -304,10 +311,10 @@ namespace DotNetMissionSDK.AI.Managers
 				MAP_RECT area = new MAP_RECT(unit.GetPosition(), new LOCATION(0,0));
 				area.Inflate(8);
 
-				if (DoesOverlapZone(area))
+				if (DoesOverlapZone(area, m_DefenseZones))
 					continue;
 
-				CreateZone(area, new UnitEx[0], 3, VehicleGroupType.Assault);
+				m_DefenseZones.Add(CreateZone(area, new UnitEx[0], 3, VehicleGroupType.Assault));
 			}
 
 			foreach (UnitEx unit in owner.units.GetVehicles())
@@ -319,10 +326,10 @@ namespace DotNetMissionSDK.AI.Managers
 				MAP_RECT area = new MAP_RECT(unit.GetPosition(), new LOCATION(0,0));
 				area.Inflate(8);
 
-				if (DoesOverlapZone(area))
+				if (DoesOverlapZone(area, m_DefenseZones))
 					continue;
 
-				CreateZone(area, new UnitEx[0], 4, VehicleGroupType.Assault);
+				m_DefenseZones.Add(CreateZone(area, new UnitEx[0], 4, VehicleGroupType.Assault));
 			}
 		}
 
@@ -334,18 +341,18 @@ namespace DotNetMissionSDK.AI.Managers
 			// TODO: Implement
 		}
 
-		private bool DoesOverlapZone(MAP_RECT area)
+		private bool DoesOverlapZone(MAP_RECT area, IEnumerable<ThreatZone> zones)
 		{
-			foreach (VehicleGroup group in m_CombatGroups)
+			foreach (ThreatZone zone in zones)
 			{
-				if (group.threatZone.bounds.DoesRectIntersect(area))
+				if (zone.bounds.DoesRectIntersect(area))
 					return true;
 			}
 
 			return false;
 		}
 
-		private void CreateZone(MAP_RECT area, UnitEx[] enemiesInArea, int additionalStrengthDesired, VehicleGroupType groupType)
+		private ThreatZone CreateZone(MAP_RECT area, UnitEx[] enemiesInArea, int additionalStrengthDesired, VehicleGroupType groupType)
 		{
 			ThreatZone zone = new ThreatZone(owner, area, enemiesInArea, additionalStrengthDesired);
 			
@@ -361,7 +368,12 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 
 			if (zoneGroup != null)
+			{
 				m_CombatGroups.Add(zoneGroup);
+				return zone;
+			}
+
+			return null;
 		}
 	}
 }

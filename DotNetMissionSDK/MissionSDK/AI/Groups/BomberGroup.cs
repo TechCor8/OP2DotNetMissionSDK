@@ -27,13 +27,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 
 			return new UnitSlot[]
 			{
-				new UnitSlot(bombSupportedTypes),
-				new UnitSlot(bombSupportedTypes),
-				new UnitSlot(bombSupportedTypes),
-				new UnitSlot(new UnitWithWeaponType[] { new UnitWithWeaponType(map_id.Lynx, map_id.EMP) }),
-				new UnitSlot(new UnitWithWeaponType[] { new UnitWithWeaponType(map_id.Lynx, map_id.EMP) }),
-				new UnitSlot(new UnitWithWeaponType[] { new UnitWithWeaponType(map_id.Lynx, map_id.EMP) }),
-				new UnitSlot(new UnitWithWeaponType[] { new UnitWithWeaponType(map_id.Lynx, map_id.EMP) })
+				new UnitSlot(bombSupportedTypes)
 			};
 		}
 	}

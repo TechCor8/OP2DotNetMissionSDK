@@ -59,8 +59,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			foreach (VehicleGroup.UnitSlot combatSlot in m_UnitSlotsToBuild)
 			{
 				// Supported unit types are in a prioritized order
-				foreach (VehicleGroup.UnitWithWeaponType unitWithWeaponType in combatSlot.supportedSlotTypes)
+				//foreach (VehicleGroup.UnitWithWeaponType unitWithWeaponType in combatSlot.supportedSlotTypes)
+
+				for (int i=0; i < 4; ++i) // Attempt up to X passes to find slot
 				{
+					// Randomly select a unit from supported slot types
+					int index = TethysGame.GetRandomRange(0, combatSlot.supportedSlotTypes.Count);
+					VehicleGroup.UnitWithWeaponType unitWithWeaponType = combatSlot.supportedSlotTypes[index];
+
 					// Use correct factory task to build unit
 					BuildSingleVehicleTask vehicleTask;
 					bool hasAvailableFactory;
