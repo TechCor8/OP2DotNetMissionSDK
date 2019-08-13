@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
 using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.Utility.Maps;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
@@ -14,6 +15,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		protected int m_DesiredDistance = 0;                // Desired minimum distance to nearest structure
 
 		private bool m_CanBuildDisconnected;
+		//private bool m_IsSearchingForDeployLocation;
 
 		private bool m_OverrideLocation = false;
 		private LOCATION m_TargetLocation;
@@ -80,9 +82,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				m_TargetLocation = closestCC.GetPosition();
 			}
 
+			// Wait for search to complete
+			//if (m_IsSearchingForDeployLocation)
+			//	return true;
+
 			// Find open location near CC
 			LOCATION foundPt;
-			if (!Pathfinder.GetClosestValidTile(m_TargetLocation, GetTileCost, IsValidTile, out foundPt))
+			if (!Pathfinder.GetClosestValidTile(m_TargetLocation, GetTileCost, IsValidTile, out foundPt)) // TODO: Make Async (IsValidTile needs to be threadsafe)
 				return false;
 
 			ClearDeployArea(convec, convec.GetCargo(), foundPt, owner.player);
@@ -193,21 +199,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public static bool IsAreaBlocked(MAP_RECT targetArea, int ownerID, bool includeBulldozedArea=false)
 		{
 			// Check if area is blocked by structure or enemy
-			for (int i=0; i < TethysGame.NoPlayers(); ++i)
+			foreach (UnitEx unit in PlayerUnitMap.GetUnitsInArea(targetArea))
 			{
-				foreach (UnitEx unit in new PlayerAllBuildingEnum(i))
+				if (unit.IsBuilding())
 				{
-					if (unit.IsBuilding())
-					{
-						MAP_RECT unitArea = unit.GetUnitInfo().GetRect(unit.GetPosition(), includeBulldozedArea);
-						if (targetArea.DoesRectIntersect(unitArea))
-							return true;
-					}
-					else if (unit.IsVehicle())
-					{
-						if (unit.GetOwnerID() != ownerID && targetArea.Contains(unit.GetPosition()))
-							return true;
-					}
+					MAP_RECT unitArea = unit.GetUnitInfo().GetRect(unit.GetPosition(), includeBulldozedArea);
+					if (targetArea.DoesRectIntersect(unitArea))
+						return true;
+				}
+				else if (unit.IsVehicle())
+				{
+					if (unit.GetOwnerID() != ownerID && targetArea.Contains(unit.GetPosition()))
+						return true;
 				}
 			}
 
