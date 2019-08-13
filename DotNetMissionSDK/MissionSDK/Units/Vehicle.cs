@@ -130,6 +130,12 @@ namespace DotNetMissionSDK.Units
 			m_DebugMarker = TethysGame.PlaceMarker(position.x, position.y, MarkerType.DNA);
 		}
 
+		private void ClearDebugMarker()
+		{
+			if (m_DebugMarker != null)
+				m_DebugMarker.DoDeath();
+		}
+
 		public override void DoAttack(Unit targetUnit)
 		{
 			if (targetUnit != m_AttackTarget)
@@ -155,6 +161,7 @@ namespace DotNetMissionSDK.Units
 					// Unit lost path or target
 					m_MovementPath = null;
 					m_AttackTarget = null;
+					ClearDebugMarker();
 					return;
 				}
 			}
@@ -177,7 +184,11 @@ namespace DotNetMissionSDK.Units
 			{
 				++m_CurrentPathIndex;
 				if (m_CurrentPathIndex >= m_MovementPath.Length)
-					m_MovementPath = null; // Path following complete
+				{
+					// Path following complete
+					m_MovementPath = null;
+					ClearDebugMarker();
+				}
 				else
 				{
 					DoMove(m_MovementPath[m_CurrentPathIndex].x, m_MovementPath[m_CurrentPathIndex].y);
