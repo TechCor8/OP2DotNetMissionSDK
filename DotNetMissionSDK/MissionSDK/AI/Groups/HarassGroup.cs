@@ -1,5 +1,4 @@
-﻿using DotNetMissionSDK.Utility;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Combat.Groups
 {
@@ -11,7 +10,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		public override VehicleGroupType groupType		{ get { return VehicleGroupType.Harass;		}	}
 
 
-		public HarassGroup(PlayerInfo owner, ThreatZone zone) : base(owner, zone)
+		public HarassGroup(int ownerID, ThreatZone zone) : base(ownerID, zone)
 		{
 		}
 

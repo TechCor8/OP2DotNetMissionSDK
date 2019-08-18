@@ -1,8 +1,8 @@
-﻿using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.Async;
 using DotNetMissionSDK.Pathfinding;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.Units;
-using DotNetMissionSDK.Utility;
-using DotNetMissionSDK.Utility.Maps;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Combat
@@ -16,49 +16,49 @@ namespace DotNetMissionSDK.AI.Combat
 
 	/// <summary>
 	/// Represents an area on the map that needs military intervention.
+	/// NOTE: ThreatZone is immutable and safe for async operations.
 	/// </summary>
 	public class ThreatZone
 	{
 		private const int StagingAreaBorderWidth		= 3;
 
-		private PlayerInfo m_Owner;
+		private PlayerState m_Owner;
 
-		public MAP_RECT bounds				{ get; private set; } // *See Sync Notes
+		public MAP_RECT bounds				{ get; private set; }
 		public int strengthRequired			{ get; private set; }
 		public int strengthDesired			{ get; private set; }
 		public ThreatLevel threatLevel		{ get; private set; }
-		public UnitEx[] priorityTargets		{ get; private set; }
+		public UnitState[] priorityTargets	{ get; private set; }
 		public MAP_RECT[] stagingAreas		{ get; private set; }
 
 		// Optimization variables
-		private MAP_RECT m_StagingBounds; // *See Sync Notes
-
-		// *Sync Notes:
-		// Variables marked with this notice should not be modified outside of the constructor.
-		// These variables are not locked and the pathfinder thread will read these at unknown times.
-		// If these variables need to be changed, a new ThreatZone should be created.
+		private MAP_RECT m_StagingBounds;
 
 
 		/// <summary>
 		/// Constructor for ThreatZone.
 		/// </summary>
-		/// <param name="owner">The bot player that owns this zone.</param>
+		/// <param name="state">The snapshot to use to generate the zone.</param>
+		/// <param name="ownerID">The bot player that owns this zone.</param>
 		/// <param name="bounds">The map area of the zone.</param>
 		/// <param name="priorityTargets">The primary targets to attack.</param>
 		/// <param name="additionalStrengthDesired">Additional strength beyond what is required to control this zone.</param>
 		/// <param name="groupType">The type of combat group to organize.</param>
-		public ThreatZone(PlayerInfo owner, MAP_RECT bounds, UnitEx[] priorityTargets, int additionalStrengthDesired)
+		public ThreatZone(StateSnapshot state, int ownerID, MAP_RECT bounds, UnitState[] priorityTargets, int additionalStrengthDesired)
 		{
-			m_Owner = owner;
+			m_Owner = state.players[ownerID];
 			this.bounds = bounds;
 
 			// Get enemies in zone
-			List<UnitEx> enemies = PlayerUnitMap.GetUnitsInArea(bounds);
-			enemies.RemoveAll((UnitEx tileUnit) => owner.player.IsAlliedTo(tileUnit.GetOwner()));
+			List<UnitState> enemies = state.unitMap.GetUnitsInArea(bounds);
+			enemies.RemoveAll((UnitState tileUnit) => m_Owner.allyPlayerIDs.Contains(tileUnit.ownerID));
 
 			// Calculate enemy strength
-			foreach (UnitEx unit in enemies)
-				strengthRequired += unit.GetWeaponInfo().GetWeaponStrength();
+			foreach (UnitState unit in enemies)
+			{
+				if (unit.hasWeapon)
+					strengthRequired += state.weaponInfo[unit.weapon].weaponStrength;
+			}
 
 			if (strengthRequired > 0)
 				threatLevel = ThreatLevel.Armed;
@@ -80,21 +80,16 @@ namespace DotNetMissionSDK.AI.Combat
 		}
 
 		/// <summary>
-		/// Returns true if the zone contains the unit.
+		/// Returns true if the zone contains the position.
 		/// </summary>
-		public bool Contains(Unit unit)
+		public bool Contains(LOCATION position)
 		{
-			return bounds.Contains(unit.GetPosition());
+			return bounds.Contains(position);
 		}
 
 		/// <summary>
-		/// Is the unit in the staging area, but not in the threat zone?
+		/// Is the position in the staging area, but not in the threat zone?
 		/// </summary>
-		public bool IsInStagingArea(Unit unit)
-		{
-			return m_StagingBounds.Contains(unit.GetPosition()) && !Contains(unit);
-		}
-
 		public bool IsInStagingArea(LOCATION position)
 		{
 			return m_StagingBounds.Contains(position) && !bounds.Contains(position);
@@ -103,14 +98,14 @@ namespace DotNetMissionSDK.AI.Combat
 		/// <summary>
 		/// Returns the closest priority target to the specified position.
 		/// </summary>
-		public UnitEx GetClosestPriorityTarget(LOCATION position)
+		public UnitState GetClosestPriorityTarget(LOCATION position)
 		{
-			UnitEx closestTarget = null;
+			UnitState closestTarget = null;
 			int closestDistance = int.MaxValue;
 
-			foreach (UnitEx target in priorityTargets)
+			foreach (UnitState target in priorityTargets)
 			{
-				int distance = target.GetPosition().GetDiagonalDistance(position);
+				int distance = target.position.GetDiagonalDistance(position);
 				if (distance < closestDistance)
 				{
 					closestTarget = target;
@@ -123,30 +118,33 @@ namespace DotNetMissionSDK.AI.Combat
 
 		/// <summary>
 		/// Sends the unit to the zone's staging area.
+		/// NOTE: Requires main thread.
 		/// </summary>
-		public void SendUnitToStagingArea(Vehicle unitForPath)
+		public void SendUnitToStagingArea(StateSnapshot stateSnapshot, Vehicle unitForPath)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int unitStrength = unitForPath.GetUnitInfo().GetWeaponStrength();
 
-			unitForPath.DoMoveWithPathfinder((x,y) => GetTileCost(x,y,unitStrength), IsTileInStagingArea);
+			unitForPath.DoMoveWithPathfinder((x,y) => GetTileCost(x,y, unitStrength, stateSnapshot), IsTileInStagingArea);
 		}
 
-		private int GetTileCost(int x, int y, int unitStrength)
+		private int GetTileCost(int x, int y, int unitStrength, StateSnapshot state)
 		{
-			if (!GameMap.IsTilePassable(x,y))
+			if (!state.tileMap.IsTilePassable(x,y))
 				return Pathfinder.Impassable;
 
 			// Buildings and units are impassable
-			if (PlayerUnitMap.GetUnitOnTile(new LOCATION(x,y)) != null)
+			if (state.unitMap.GetUnitOnTile(new LOCATION(x,y)) != null)
 				return Pathfinder.Impassable;
 
 			// Get tile movement speed cost
-			int moveCost = GameMap.GetTileMovementCost(x,y);
+			int moveCost = state.tileMap.GetTileMovementCost(x,y);
 
 			// Get enemy strength at tile
 			int enemyStrength = 0;
-			foreach (PlayerInfo info in m_Owner.enemies)
-				enemyStrength += PlayerStrengthMap.GetPlayerStrength(info.player.playerID, x,y);
+			foreach (int enemyID in m_Owner.enemyPlayerIDs)
+				enemyStrength += state.strengthMap.GetPlayerStrength(enemyID, x,y);
 
 			// If tile has enemy strength greater than our own, avoid it.
 			if (enemyStrength > unitStrength)

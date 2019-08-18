@@ -1,9 +1,10 @@
-﻿using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Json;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.Triggers;
-using DotNetMissionSDK.Utility;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 
@@ -108,17 +109,19 @@ namespace DotNetMissionSDK
 
 		private void InitializeSystems()
 		{
-			Console.WriteLine("Creating overlay window...");
-			
 			// Prepare save buffer
 			m_SaveBuffer.Load();
+
+			// Initialize core
+			ThreadAssert.Initialize();
+			AsyncRandom.Initialize(TethysGame.GetRand(int.MaxValue));
 
 			if (!HFLCore.Init())
 				Console.WriteLine("Could not initialize HFL!");
 
 			GameMap.Initialize();
 
-			// Init essential systems
+			// Initialize mission systems
 			m_Triggers = new TriggerManager(m_SaveBuffer.saveData);
 			
 			m_MissionLogic = new CustomLogic(m_MissionData, m_SaveBuffer.saveData, m_Triggers);
@@ -139,9 +142,11 @@ namespace DotNetMissionSDK
 			// Update essential systems
 			m_Triggers.Update();
 			AsyncPump.Update();
+			GameState.Update();
+			StateSnapshot stateSnapshot = new StateSnapshot();
 
 			// Update mission logic
-			m_MissionLogic.Update();
+			m_MissionLogic.Update(stateSnapshot);
 
 			// Update save buffer
 			m_SaveBuffer.Save();

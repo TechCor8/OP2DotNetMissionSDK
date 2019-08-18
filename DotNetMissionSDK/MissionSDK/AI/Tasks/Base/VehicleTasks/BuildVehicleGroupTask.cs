@@ -1,7 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Combat.Groups;
+using DotNetMissionSDK.Async;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
@@ -16,15 +20,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		private IEnumerable<VehicleGroup.UnitSlot> m_UnitSlotsToBuild;
 
 
-		public BuildVehicleGroupTask() { }
-		public BuildVehicleGroupTask(PlayerInfo owner) : base(owner) { }
+		public BuildVehicleGroupTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			// Task is complete when all vehicle slots are filled.
 			foreach (VehicleGroup.UnitSlot slot in m_UnitSlotsToBuild)
 			{
-				if (slot.unitInSlot == null)
+				if (slot.unitInSlot == -1)
 					return false;
 			}
 
@@ -33,24 +36,26 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		public override void GeneratePrerequisites()
 		{
-			m_BuildSingleVehicleTask = new BuildSingleVehicleTask(owner);
-			m_BuildSingleArachnidTask = new BuildSingleArachnidTask(owner);
+			m_BuildSingleVehicleTask = new BuildSingleVehicleTask(ownerID);
+			m_BuildSingleArachnidTask = new BuildSingleArachnidTask(ownerID);
 
 			m_BuildSingleVehicleTask.GeneratePrerequisites();
 			m_BuildSingleArachnidTask.GeneratePrerequisites();
 		}
 
-		protected override bool CanPerformTask()
+		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
 		{
 			// Task is "best effort" and so can always be performed.
 			return true;
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get number of available factories
-			int vehicleFactoryCount = owner.units.vehicleFactories.FindAll((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy()).Count;
-			int arachnidFactoryCount = owner.units.arachnidFactories.FindAll((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy()).Count;
+			int vehicleFactoryCount = owner.units.vehicleFactories.Count((FactoryState unit) => unit.isEnabled && !unit.isBusy);
+			int arachnidFactoryCount = owner.units.arachnidFactories.Count((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 
 			bool shouldBuildVehicleFactory = false;
 			bool shouldBuildArachnidFactory = false;
@@ -64,7 +69,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 				for (int i=0; i < 4; ++i) // Attempt up to X passes to find slot
 				{
 					// Randomly select a unit from supported slot types
-					int index = TethysGame.GetRandomRange(0, combatSlot.supportedSlotTypes.Count);
+					int index = AsyncRandom.GetRange(0, combatSlot.supportedSlotTypes.Count);
 					VehicleGroup.UnitWithWeaponType unitWithWeaponType = combatSlot.supportedSlotTypes[index];
 
 					// Use correct factory task to build unit
@@ -93,7 +98,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 					if (!hasAvailableFactory)
 						continue;
 
-					if (vehicleTask.PerformTaskTree())
+					if (vehicleTask.PerformTaskTree(stateSnapshot, unitActions))
 					{
 						// If we successfully performed the task, remove the factory from the available count
 						if (vehicleTask == m_BuildSingleVehicleTask)
@@ -111,19 +116,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			if (shouldBuildVehicleFactory)
 			{
 				// Only build more factories if there aren't any deactivated factories
-				if (owner.units.vehicleFactories.Find((UnitEx unit) => !unit.IsEnabled()) == null)
+				if (owner.units.vehicleFactories.FirstOrDefault((FactoryState unit) => !unit.isEnabled) == null)
 				{
-					m_BuildSingleVehicleTask.AddFactory();
-					m_BuildSingleVehicleTask.PerformTaskTree();
+					m_BuildSingleVehicleTask.AddFactory(stateSnapshot, unitActions);
+					m_BuildSingleVehicleTask.PerformTaskTree(stateSnapshot, unitActions);
 				}
 			}
 			else if (shouldBuildArachnidFactory)
 			{
 				// Only build more factories if there aren't any deactivated factories
-				if (owner.units.arachnidFactories.Find((UnitEx unit) => !unit.IsEnabled()) == null)
+				if (owner.units.arachnidFactories.FirstOrDefault((FactoryState unit) => !unit.isEnabled) == null)
 				{
-					m_BuildSingleArachnidTask.AddFactory();
-					m_BuildSingleArachnidTask.PerformTaskTree();
+					m_BuildSingleArachnidTask.AddFactory(stateSnapshot, unitActions);
+					m_BuildSingleArachnidTask.PerformTaskTree(stateSnapshot, unitActions);
 				}
 			}
 

@@ -1,6 +1,8 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
+using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
@@ -18,14 +20,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private BuildDIRTTask m_BuildDirtTask;
 		
 
-		public MaintainPopulationTask() { }
-		public MaintainPopulationTask(PlayerInfo owner) : base(owner) { }
-
-		public override bool IsTaskComplete()
+		public MaintainPopulationTask(int ownerID) : base(ownerID) { }
+		
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			foreach (Task task in m_Prerequisites)
 			{
-				if (!task.IsTaskComplete())
+				if (!task.IsTaskComplete(stateSnapshot))
 					return false;
 			}
 
@@ -34,19 +35,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			m_Prerequisites.Add(new BuildNurseryTask());
-			m_Prerequisites.Add(new BuildUniversityTask());
-			m_Prerequisites.Add(m_BuildResidenceTask = new BuildResidenceTask());
-			m_Prerequisites.Add(m_BuildEdenResidenceTask = new BuildAdvancedResidenceTask());
-			m_Prerequisites.Add(m_BuildPlymouthResidenceTask = new BuildReinforcedResidenceTask());
-			m_Prerequisites.Add(m_BuildMedicalCenterTask = new BuildMedicalCenterTask());
-			m_Prerequisites.Add(new BuildStandardLabTask());
-			m_Prerequisites.Add(new BuildAdvancedLabTask());
-			m_Prerequisites.Add(new BuildRobotCommandTask());
-			m_Prerequisites.Add(m_BuildRecreationTask = new BuildRecreationTask());
-			m_Prerequisites.Add(m_BuildForumTask = new BuildForumTask());
-			m_Prerequisites.Add(m_BuildDirtTask = new BuildDIRTTask());
-			m_Prerequisites.Add(new BuildGORFTask());
+			m_Prerequisites.Add(new BuildNurseryTask(ownerID));
+			m_Prerequisites.Add(new BuildUniversityTask(ownerID));
+			m_Prerequisites.Add(m_BuildResidenceTask = new BuildResidenceTask(ownerID));
+			m_Prerequisites.Add(m_BuildEdenResidenceTask = new BuildAdvancedResidenceTask(ownerID));
+			m_Prerequisites.Add(m_BuildPlymouthResidenceTask = new BuildReinforcedResidenceTask(ownerID));
+			m_Prerequisites.Add(m_BuildMedicalCenterTask = new BuildMedicalCenterTask(ownerID));
+			m_Prerequisites.Add(new BuildStandardLabTask(ownerID));
+			m_Prerequisites.Add(new BuildAdvancedLabTask(ownerID));
+			m_Prerequisites.Add(new BuildRobotCommandTask(ownerID));
+			m_Prerequisites.Add(m_BuildRecreationTask = new BuildRecreationTask(ownerID));
+			m_Prerequisites.Add(m_BuildForumTask = new BuildForumTask(ownerID));
+			m_Prerequisites.Add(m_BuildDirtTask = new BuildDIRTTask(ownerID));
+			m_Prerequisites.Add(new BuildGORFTask(ownerID));
 
 			m_BuildResidenceTask.targetCountToBuild = 0;
 			m_BuildEdenResidenceTask.targetCountToBuild = 0;
@@ -60,52 +61,48 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				AddPrerequisite(task);
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
 			return true;
 		}
 
-		public void UpdateRequirements()
+		public void UpdateRequirements(StateSnapshot stateSnapshot)
 		{
-			BuildResidence();
-			BuildMedicalCenter();
-			BuildRecreation();
-			BuildDIRT();
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			BuildResidence(stateSnapshot, owner);
+			BuildMedicalCenter(owner);
+			BuildRecreation(stateSnapshot, owner);
+			BuildDIRT(stateSnapshot, owner);
 		}
 
-		private void BuildResidence()
+		private void BuildResidence(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			// Don't build more residences if we aren't using all the ones we have
-			List<UnitEx> residences = new List<UnitEx>(owner.units.residences);
+			List<StructureState> residences = new List<StructureState>(owner.units.residences);
 			residences.AddRange(owner.units.advancedResidences);
 			residences.AddRange(owner.units.reinforcedResidences);
 
-			foreach (UnitEx residence in residences)
+			foreach (StructureState residence in residences)
 			{
-				if (!residence.IsEnabled())
+				if (!residence.isEnabled)
 					return;
 			}
 
-			if (owner.player.GetTotalResidenceCapacity() >= owner.player.TotalPopulation())
+			if (owner.totalResidenceCapacity >= owner.totalPopulation)
 				return;
 
 			// Determine residence type to build
 			map_id residenceTypeToBuild = map_id.Residence;
 
-			if (owner.player.IsEden())
+			if (owner.isEden)
 			{
-				UnitInfo unitInfo = new UnitInfo(map_id.AdvancedResidence);
-				TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
-
-				if (owner.player.HasTechnology(techInfo.GetTechID()) && owner.units.residences.Count > owner.units.advancedResidences.Count * 2)
+				if (owner.HasTechnologyForUnit(stateSnapshot, map_id.AdvancedResidence) && owner.units.residences.Count > owner.units.advancedResidences.Count * 2)
 					residenceTypeToBuild = map_id.AdvancedResidence;
 			}
 			else
 			{
-				UnitInfo unitInfo = new UnitInfo(map_id.ReinforcedResidence);
-				TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
-
-				if (owner.player.HasTechnology(techInfo.GetTechID()) && owner.units.residences.Count > owner.units.reinforcedResidences.Count * 2)
+				if (owner.HasTechnologyForUnit(stateSnapshot, map_id.ReinforcedResidence) && owner.units.residences.Count > owner.units.reinforcedResidences.Count * 2)
 					residenceTypeToBuild = map_id.ReinforcedResidence;
 			}
 
@@ -117,43 +114,40 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 		}
 
-		private void BuildMedicalCenter()
+		private void BuildMedicalCenter(PlayerState owner)
 		{
 			// Don't build more medical centers if we aren't using all the ones we have
-			foreach (UnitEx medicalCenter in owner.units.medicalCenters)
+			foreach (StructureState medicalCenter in owner.units.medicalCenters)
 			{
-				if (!medicalCenter.IsEnabled())
+				if (!medicalCenter.isEnabled)
 					return;
 			}
 
-			if (owner.player.GetTotalMedCenterCapacity() < owner.player.TotalPopulation())
+			if (owner.totalMedCenterCapacity < owner.totalPopulation)
 				m_BuildMedicalCenterTask.targetCountToBuild = owner.units.medicalCenters.Count+1;
 		}
 
-		private void BuildRecreation()
+		private void BuildRecreation(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			// Don't build more recreation facilities if we aren't using all the ones we have
-			List<UnitEx> recreations = new List<UnitEx>(owner.units.recreationFacilities);
+			List<StructureState> recreations = new List<StructureState>(owner.units.recreationFacilities);
 			recreations.AddRange(owner.units.forums);
 
-			foreach (UnitEx recreation in recreations)
+			foreach (StructureState recreation in recreations)
 			{
-				if (!recreation.IsEnabled())
+				if (!recreation.isEnabled)
 					return;
 			}
 
-			if (owner.player.GetTotalRecreationFacilityCapacity() + owner.player.GetTotalForumCapacity() >= owner.player.TotalPopulation())
+			if (owner.totalRecreationFacilityCapacity + owner.totalForumCapacity >= owner.totalPopulation)
 				return;
 
 			// Determine recreation type to build
 			map_id recreationTypeToBuild = map_id.RecreationFacility;
 
-			if (!owner.player.IsEden())
+			if (!owner.isEden)
 			{
-				UnitInfo unitInfo = new UnitInfo(map_id.Forum);
-				TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
-
-				if (owner.player.HasTechnology(techInfo.GetTechID()) && owner.units.recreationFacilities.Count > owner.units.forums.Count * 2)
+				if (owner.HasTechnologyForUnit(stateSnapshot, map_id.Forum) && owner.units.recreationFacilities.Count > owner.units.forums.Count * 2)
 					recreationTypeToBuild = map_id.Forum;
 			}
 
@@ -164,36 +158,36 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 		}
 
-		private void BuildDIRT()
+		private void BuildDIRT(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			m_BuildDirtTask.targetCountToBuild = 0;
 
 			// Don't build more DIRT if we aren't using all the ones we have
-			foreach (UnitEx dirt in owner.units.dirts)
+			foreach (StructureState dirt in owner.units.dirts)
 			{
-				if (!dirt.IsEnabled())
+				if (!dirt.isEnabled)
 					return;
 			}
 
-			UnitInfo dirtInfo = new UnitInfo(map_id.DIRT);
-			int productionCap = dirtInfo.GetProductionCapacity(owner.player.playerID);
+			StructureInfo dirtInfo = owner.structureInfo[map_id.DIRT];
+			int productionCap = dirtInfo.productionCapacity;
 
 			bool shouldBuildDIRT = false;
 
 			// Calculate DIRT required per CC. Force construction at correct base
-			foreach (UnitEx cc in owner.units.commandCenters)
+			foreach (StructureState cc in owner.units.commandCenters)
 			{
 				// Get needed DIRT count
-				List<UnitEx> connectedStructures = owner.commandGrid.GetConnectedStructures(cc.GetPosition());
+				List<StructureState> connectedStructures = owner.commandMap.GetConnectedStructures(cc.position);
 				int neededDIRTs = connectedStructures.Count / productionCap + 1;
 
 				m_BuildDirtTask.targetCountToBuild += neededDIRTs;
 
 				// Get DIRTs connected to this CC
 				int currentDIRTs = 0;
-				foreach (UnitEx building in connectedStructures)
+				foreach (StructureState building in connectedStructures)
 				{
-					if (building.GetUnitType() != map_id.DIRT)
+					if (building.unitType != map_id.DIRT)
 						continue;
 
 					++currentDIRTs;
@@ -207,7 +201,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					continue;
 
 				// Add DIRT to this CC
-				m_BuildDirtTask.SetLocation(cc.GetPosition());
+				m_BuildDirtTask.SetLocation(cc.position);
 				shouldBuildDIRT = true;
 			}
 		}

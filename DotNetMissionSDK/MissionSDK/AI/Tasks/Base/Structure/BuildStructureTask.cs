@@ -1,8 +1,12 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.Utility;
-using DotNetMissionSDK.Utility.Maps;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
@@ -22,12 +26,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public int targetCountToBuild = 1;
 
-		public BuildStructureTask() { }
-		public BuildStructureTask(PlayerInfo owner) : base(owner) { }
+		public BuildStructureTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			IReadOnlyCollection<UnitEx> units = owner.units.GetListForType(m_KitToBuild);
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_KitToBuild);
 			return units.Count >= targetCountToBuild;
 		}
 
@@ -41,25 +46,29 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 		}
 
-		protected override bool CanPerformTask()
+		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get convec with kit
-			return owner.units.convecs.Find((unit) => unit.GetCargo() == m_KitToBuild) != null;
+			return owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_KitToBuild) != null;
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get idle convec with kit
-			UnitEx convec = owner.units.convecs.Find((unit) =>
+			ConvecState convec = owner.units.convecs.FirstOrDefault((unit) =>
 			{
-				return unit.GetCargo() == m_KitToBuild;
+				return unit.cargoType == m_KitToBuild;
 			});
 
 			if (convec == null)
 				return false;
 
 			// Wait for docking or building to complete
-			if (convec.GetCurAction() != ActionType.moDone)
+			if (convec.curAction != ActionType.moDone)
 				return true;
 
 			// If we can build earthworkers or have one, we can deploy disconnected structures
@@ -68,18 +77,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (!m_OverrideLocation)
 			{
 				// Find closest CC
-				UnitEx closestCC = null;
-				int closestDistance = 900000;
-				foreach (UnitEx cc in owner.units.commandCenters)
-				{
-					int distance = convec.GetPosition().GetDiagonalDistance(cc.GetPosition());
-					if (distance < closestDistance)
-					{
-						closestCC = cc;
-						closestDistance = distance;
-					}
-				}
-				m_TargetLocation = closestCC.GetPosition();
+				UnitState closestCC = owner.units.GetClosestUnitOfType(map_id.CommandCenter, convec.position);
+				if (closestCC != null)
+					m_TargetLocation = closestCC.position;
 			}
 
 			// Wait for search to complete
@@ -88,34 +88,37 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			// Find open location near CC
 			LOCATION foundPt;
-			if (!Pathfinder.GetClosestValidTile(m_TargetLocation, GetTileCost, IsValidTile, out foundPt)) // TODO: Make Async (IsValidTile needs to be threadsafe)
+			if (!Pathfinder.GetClosestValidTile(m_TargetLocation, (x,y) => GetTileCost(stateSnapshot, x,y), (x,y) => IsValidTile(stateSnapshot, x,y), out foundPt))
 				return false;
 
-			ClearDeployArea(convec, convec.GetCargo(), foundPt, owner.player);
+			// TODO: Run GetClosestValidTile asynchronously? ^^^
+
+			ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
 
 			// Build structure
-			convec.DoBuild(m_KitToBuild, foundPt.x, foundPt.y);
+			unitActions.Add(() => GameState.GetUnit(convec.unitID)?.DoBuild(m_KitToBuild, foundPt.x, foundPt.y));
 
 			return true;
 		}
 
-		public static void ClearDeployArea(UnitEx deployUnit, map_id buildingType, LOCATION deployPt, Player owner)
+		public static void ClearDeployArea(UnitState deployUnit, map_id buildingType, LOCATION deployPt, StateSnapshot stateSnapshot, int ownerID, List<Action> unitActions)
 		{
 			// Get area to deploy structure
-			UnitInfo info = new UnitInfo(buildingType);
+			GlobalStructureInfo info = stateSnapshot.structureInfo[buildingType];
+
 			LOCATION size = info.GetSize(true);
 			MAP_RECT targetArea = new MAP_RECT(deployPt.x-size.x+1, deployPt.y-size.y+1, size.x,size.y);
 
 			// Order all units except this convec to clear the area
-			foreach (UnitEx unit in new InRectEnumerator(targetArea))
+			foreach (UnitState unit in stateSnapshot.unitMap.GetUnitsInArea(targetArea))
 			{
-				if (!unit.IsVehicle())
+				if (!unit.isVehicle)
 					continue;
 
-				if (unit.GetStubIndex() == deployUnit.GetStubIndex())
+				if (unit.unitID == deployUnit.unitID)
 					continue;
 
-				LOCATION position = unit.GetPosition();
+				LOCATION position = unit.position;
 
 				// Move units away from center
 				LOCATION dir = position - deployPt;
@@ -131,35 +134,38 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 				LOCATION normal = dir.normal;
 
-				if (!GameMap.IsTilePassable(position) || IsAreaBlocked(new MAP_RECT(position, new LOCATION(1,1)), owner.playerID))
-					position = unit.GetPosition() + normal;
-				if (!GameMap.IsTilePassable(position) || IsAreaBlocked(new MAP_RECT(position, new LOCATION(1,1)), owner.playerID))
-					position = unit.GetPosition() - normal;
-				if (!GameMap.IsTilePassable(position) || IsAreaBlocked(new MAP_RECT(position, new LOCATION(1,1)), owner.playerID))
+				if (!stateSnapshot.tileMap.IsTilePassable(position) || IsAreaBlocked(stateSnapshot, new MAP_RECT(position, new LOCATION(1,1)), ownerID))
+					position = unit.position + normal;
+				if (!stateSnapshot.tileMap.IsTilePassable(position) || IsAreaBlocked(stateSnapshot, new MAP_RECT(position, new LOCATION(1,1)), ownerID))
+					position = unit.position - normal;
+				if (!stateSnapshot.tileMap.IsTilePassable(position) || IsAreaBlocked(stateSnapshot, new MAP_RECT(position, new LOCATION(1,1)), ownerID))
 					continue;
 
-				unit.DoMove(position.x, position.y);
+				unitActions.Add(() => GameState.GetUnit(unit.unitID)?.DoMove(position.x, position.y));
 			}
 		}
 
 		// Callback for determining tile cost
-		public static int GetTileCost(int x, int y)
+		public static int GetTileCost(StateSnapshot stateSnapshot, int x, int y)
 		{
-			if (!GameMap.IsTilePassable(x,y))
+			if (!stateSnapshot.tileMap.IsTilePassable(x,y))
 				return Pathfinder.Impassable;
 
 			return 1;
 		}
 
 		// Callback for determining if tile is a valid place point
-		protected bool IsValidTile(int x, int y)
+		protected bool IsValidTile(StateSnapshot stateSnapshot, int x, int y)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			GlobalStructureInfo info = stateSnapshot.structureInfo[m_KitToBuild];
+
 			// Get area to deploy structure
-			UnitInfo info = new UnitInfo(m_KitToBuild);
 			LOCATION size = info.GetSize(true);
 			MAP_RECT targetArea = new MAP_RECT(x-size.x+1, y-size.y+1, size.x,size.y);
 
-			if (!AreTilesPassable(targetArea, x, y))
+			if (!AreTilesPassable(stateSnapshot, targetArea, x, y))
 				return false;
 
 			// Apply minimum distance if we can build this disconnected
@@ -170,25 +176,25 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				// Force structure to build on connected ground
 				MAP_RECT unbulldozedArea = targetArea;
 				unbulldozedArea.Inflate(-1, -1);
-				if (!owner.commandGrid.ConnectsTo(unbulldozedArea))
+				if (!owner.commandMap.ConnectsTo(unbulldozedArea))
 					return false;
 			}
 
 			// Check if area is blocked by structure or enemy
-			if (IsAreaBlocked(targetArea, owner.player.playerID))
+			if (IsAreaBlocked(stateSnapshot, targetArea, owner.playerID))
 				return false;
 
 			return true;
 		}
 
-		public static bool AreTilesPassable(MAP_RECT targetArea, int x, int y)
+		public static bool AreTilesPassable(StateSnapshot stateSnapshot, MAP_RECT targetArea, int x, int y)
 		{
 			// Check if target tiles are impassable
 			for (int tx=targetArea.xMin; tx < targetArea.xMax; ++tx)
 			{
 				for (int ty=targetArea.yMin; ty < targetArea.yMax; ++ty)
 				{
-					if (!GameMap.IsTilePassable(tx, ty))
+					if (!stateSnapshot.tileMap.IsTilePassable(tx, ty))
 						return false;
 				}
 			}
@@ -196,35 +202,35 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return true;
 		}
 
-		public static bool IsAreaBlocked(MAP_RECT targetArea, int ownerID, bool includeBulldozedArea=false)
+		public static bool IsAreaBlocked(StateSnapshot stateSnapshot, MAP_RECT targetArea, int ownerID, bool includeBulldozedArea=false)
 		{
 			// Check if area is blocked by structure or enemy
-			foreach (UnitEx unit in PlayerUnitMap.GetUnitsInArea(targetArea))
+			foreach (UnitState unit in stateSnapshot.unitMap.GetUnitsInArea(targetArea))
 			{
-				if (unit.IsBuilding())
+				if (unit.isBuilding)
 				{
-					MAP_RECT unitArea = unit.GetUnitInfo().GetRect(unit.GetPosition(), includeBulldozedArea);
+					MAP_RECT unitArea = ((StructureState)unit).GetRect(includeBulldozedArea);
 					if (targetArea.DoesRectIntersect(unitArea))
 						return true;
 				}
-				else if (unit.IsVehicle())
+				else if (unit.isVehicle)
 				{
-					if (unit.GetOwnerID() != ownerID && targetArea.Contains(unit.GetPosition()))
+					if (unit.ownerID != ownerID && targetArea.Contains(unit.position))
 						return true;
 				}
 			}
 
 			// Don't allow structure to be built on ground where a mine can be deployed
-			foreach (UnitEx beacon in new PlayerUnitEnum(6))
+			foreach (GaiaUnitState beacon in stateSnapshot.gaia)
 			{
-				map_id beaconType = beacon.GetUnitType();
+				map_id beaconType = beacon.unitType;
 
 				if (beaconType != map_id.MiningBeacon &&
 					beaconType != map_id.Fumarole &&
 					beaconType != map_id.MagmaVent)
 					continue;
 
-				if (targetArea.DoesRectIntersect(new MAP_RECT(beacon.GetTileX()-2, beacon.GetTileY()-1, 5,3)))
+				if (targetArea.DoesRectIntersect(new MAP_RECT(beacon.position.x-2, beacon.position.y-1, 5,3)))
 					return true;
 			}
 

@@ -1,6 +1,5 @@
-﻿using DotNetMissionSDK.AI;
-using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Json;
+﻿using DotNetMissionSDK.Json;
+using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.Triggers;
 using System;
 
@@ -91,9 +90,10 @@ namespace DotNetMissionSDK
 		/// <summary>
 		/// Called every game cycle.
 		/// </summary>
-		public override void Update()
+		/// <param name="stateSnapshot">The current immutable state of the game.</param>
+		public override void Update(StateSnapshot stateSnapshot)
 		{
-			base.Update();
+			base.Update(stateSnapshot);
 
 			// *** Add custom update code here ***
 		}

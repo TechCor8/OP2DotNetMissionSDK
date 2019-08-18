@@ -284,7 +284,7 @@ extern "C"
 	}
 
 	// Wreckage
-	extern EXPORT int __stdcall Unit_isDiscovered(int stubIndex)
+	extern EXPORT int __stdcall Unit_IsDiscovered(int stubIndex)
 	{
 		Unit unit;
 		unit.unitID = stubIndex;

@@ -1,5 +1,8 @@
 ﻿using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
@@ -12,16 +15,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		private class VehicleState
 		{
 			public LOCATION position;
-			public int tickStartedSpinningWheels;
+			public int timeStartedSpinningWheels;
 		}
 
 		private Dictionary<int, VehicleState> m_VehicleStates = new Dictionary<int, VehicleState>(); // <UnitID, VehicleState>
 
 
-		public ResetVehicleTask() { }
-		public ResetVehicleTask(PlayerInfo owner) : base(owner) { }
+		public ResetVehicleTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			return false;
 		}
@@ -30,14 +32,20 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		{
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			foreach (UnitEx vehicle in new PlayerVehicleEnum(owner.player.playerID))
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			foreach (UnitState vehicle in owner.units.GetVehicles())
 			{
-				if (GetVehicleStuckDuration(vehicle) > 200)
+				if (GetVehicleStuckDuration(vehicle, stateSnapshot.time) > 50)
 				{
-					vehicle.DoStop();
-					TethysGame.AddMessage(vehicle, "Destination unreachable", owner.player.playerID, 0);
+					unitActions.Add(() =>
+					{
+						UnitEx unit = GameState.GetUnit(vehicle.unitID);
+						unit.DoStop();
+						TethysGame.AddMessage(unit, "Destination unreachable", ownerID, 0);
+					});
 				}
 			}
 
@@ -47,27 +55,27 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return true;
 		}
 
-		private int GetVehicleStuckDuration(UnitEx vehicle)
+		private int GetVehicleStuckDuration(UnitState vehicle, int time)
 		{
 			VehicleState vehicleState;
-			if (!m_VehicleStates.TryGetValue(vehicle.GetStubIndex(), out vehicleState))
+			if (!m_VehicleStates.TryGetValue(vehicle.unitID, out vehicleState))
 			{
 				// If state not found, add a new one
 				vehicleState = new VehicleState();
-				vehicleState.tickStartedSpinningWheels = TethysGame.Tick();
-				vehicleState.position = vehicle.GetPosition();
-				m_VehicleStates.Add(vehicle.GetStubIndex(), vehicleState);
+				vehicleState.timeStartedSpinningWheels = time;
+				vehicleState.position = vehicle.position;
+				m_VehicleStates.Add(vehicle.unitID, vehicleState);
 			}
 
 			// Reset "spinning wheels" time if not in the move state or vehicle is actually moving
-			ActionType curAction = vehicle.GetCurAction();
-			if (curAction != ActionType.moMove || !vehicleState.position.Equals(vehicle.GetPosition()))
+			ActionType curAction = vehicle.curAction;
+			if (curAction != ActionType.moMove || !vehicleState.position.Equals(vehicle.position))
 			{
-				vehicleState.tickStartedSpinningWheels = TethysGame.Tick();
-				vehicleState.position = vehicle.GetPosition();
+				vehicleState.timeStartedSpinningWheels = time;
+				vehicleState.position = vehicle.position;
 			}
 
-			return TethysGame.Tick() - vehicleState.tickStartedSpinningWheels;
+			return time - vehicleState.timeStartedSpinningWheels;
 		}
 	}
 }

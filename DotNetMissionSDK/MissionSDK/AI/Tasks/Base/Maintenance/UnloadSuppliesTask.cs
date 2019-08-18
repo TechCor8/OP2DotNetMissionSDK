@@ -1,5 +1,8 @@
 ﻿using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,21 +13,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private class TruckState
 		{
 			public ActionType lastState;
-			public int tickSinceStateChanged;
+			public int timeSinceStateChanged;
 		}
 
-		private Dictionary<int, TruckState> m_TruckTickSinceStateChanged = new Dictionary<int, TruckState>(); // <UnitID, TruckState>
+		private Dictionary<int, TruckState> m_TruckTimeSinceStateChanged = new Dictionary<int, TruckState>(); // <UnitID, TruckState>
 
 
-		public UnloadSuppliesTask() { }
-		public UnloadSuppliesTask(PlayerInfo owner) : base(owner) { }
+		public UnloadSuppliesTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Task is complete when all trucks have unloaded metals and food
-			foreach (UnitEx truck in owner.units.cargoTrucks)
+			foreach (CargoTruckState truck in owner.units.cargoTrucks)
 			{
-				switch (truck.GetCargoType())
+				switch (truck.cargoType)
 				{
 					case TruckCargo.CommonMetal:
 						if (owner.units.commonOreSmelters.Count > 0)
@@ -53,60 +57,81 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Remove unused truck IDs
-			IEnumerable<int> truckUnitIDs = owner.units.cargoTrucks.Select((UnitEx unit) => unit.GetStubIndex());
-			foreach (int unitID in m_TruckTickSinceStateChanged.Keys.Except(truckUnitIDs).ToList())
-				m_TruckTickSinceStateChanged.Remove(unitID);
+			IEnumerable<int> truckUnitIDs = owner.units.cargoTrucks.Select((CargoTruckState unit) => unit.unitID);
+			foreach (int unitID in m_TruckTimeSinceStateChanged.Keys.Except(truckUnitIDs).ToList())
+				m_TruckTimeSinceStateChanged.Remove(unitID);
 
 			// Unload trucks
-			foreach (UnitEx truck in owner.units.cargoTrucks)
+			foreach (CargoTruckState truck in owner.units.cargoTrucks)
 			{
 				// Do nothing if truck is docking
-				if (truck.GetCurAction() == ActionType.moObjDocking)
+				if (truck.curAction == ActionType.moObjDocking)
 					continue;
 
-				switch (truck.GetCargoType())
+				switch (truck.cargoType)
 				{
 					case TruckCargo.CommonMetal:
-						UnitEx smelter = GetClosestUnitOfType(map_id.CommonOreSmelter, truck.GetPosition());
+						StructureState smelter = (StructureState)owner.units.GetClosestUnitOfType(map_id.CommonOreSmelter, truck.position);
 						if (smelter != null)
 						{
 							if (!truck.IsOnDock(smelter))
-								truck.DoDock(smelter);
+								unitActions.Add(() =>
+								{
+									UnitEx liveSmelter = GameState.GetUnit(smelter.unitID);
+									if (liveSmelter != null)
+										GameState.GetUnit(truck.unitID)?.DoDock(liveSmelter);
+								});
 							else
 							{
-								smelter.DoUnloadCargo();
-								FixTruckUnloading(truck);
+								unitActions.Add(() => GameState.GetUnit(smelter.unitID)?.DoUnloadCargo());
+								FixTruckUnloading(stateSnapshot, unitActions, truck);
 							}
 						}
 						break;
 
 					case TruckCargo.RareMetal:
-						UnitEx rareSmelter = GetClosestUnitOfType(map_id.RareOreSmelter, truck.GetPosition());
+						StructureState rareSmelter = (StructureState)owner.units.GetClosestUnitOfType(map_id.RareOreSmelter, truck.position);
 						if (rareSmelter != null)
 						{
 							if (!truck.IsOnDock(rareSmelter))
-								truck.DoDock(rareSmelter);
+							{
+								unitActions.Add(() =>
+								{
+									UnitEx liveSmelter = GameState.GetUnit(rareSmelter.unitID);
+									if (liveSmelter != null)
+										GameState.GetUnit(truck.unitID)?.DoDock(liveSmelter);
+								});
+							}
 							else
 							{
-								rareSmelter.DoUnloadCargo();
-								FixTruckUnloading(truck);
+								unitActions.Add(() => GameState.GetUnit(rareSmelter.unitID)?.DoUnloadCargo());
+								FixTruckUnloading(stateSnapshot, unitActions, truck);
 							}
 						}
 						break;
 
 					case TruckCargo.Food:
-						UnitEx agridome = GetClosestUnitOfType(map_id.Agridome, truck.GetPosition());
-						if (agridome != null && agridome.IsEnabled())
+						StructureState agridome = (StructureState)owner.units.GetClosestUnitOfType(map_id.Agridome, truck.position);
+						if (agridome != null && agridome.isEnabled)
 						{
 							if (!truck.IsOnDock(agridome))
-								truck.DoDock(agridome);
+							{
+								unitActions.Add(() =>
+								{
+									UnitEx liveAgridome = GameState.GetUnit(agridome.unitID);
+									if (liveAgridome != null)
+										GameState.GetUnit(truck.unitID)?.DoDock(liveAgridome);
+								});
+							}
 							else
 							{
-								agridome.DoUnloadCargo();
-								FixTruckUnloading(truck);
+								unitActions.Add(() => GameState.GetUnit(agridome.unitID)?.DoUnloadCargo());
+								FixTruckUnloading(stateSnapshot, unitActions, truck);
 							}
 						}
 						break;
@@ -116,55 +141,37 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			return true;
 		}
 
-		private void FixTruckUnloading(UnitEx truck)
+		private void FixTruckUnloading(StateSnapshot stateSnapshot, List<Action> unitActions, CargoTruckState truck)
 		{
-			if (truck.GetCurAction() != ActionType.moDone)
+			if (truck.curAction != ActionType.moDone)
 				return;
 
-			int stateDuration = TethysGame.Tick() - GetTruckStateTime(truck);
+			int stateDuration = stateSnapshot.time - GetTruckStateTime(stateSnapshot, truck);
 			if (stateDuration > 8)
-				truck.DoMove(truck.GetTileX(), truck.GetTileY()+1);
+				unitActions.Add(() => GameState.GetUnit(truck.unitID)?.DoMove(truck.position.x, truck.position.y+1));
 		}
 
-		private int GetTruckStateTime(UnitEx truck)
+		private int GetTruckStateTime(StateSnapshot stateSnapshot, CargoTruckState truck)
 		{
 			TruckState truckState;
-			if (!m_TruckTickSinceStateChanged.TryGetValue(truck.GetStubIndex(), out truckState))
+			if (!m_TruckTimeSinceStateChanged.TryGetValue(truck.unitID, out truckState))
 			{
 				// If truck state not found, add a new one
 				truckState = new TruckState();
-				truckState.lastState = truck.GetCurAction();
-				truckState.tickSinceStateChanged = TethysGame.Tick();
-				m_TruckTickSinceStateChanged.Add(truck.GetStubIndex(), truckState);
+				truckState.lastState = truck.curAction;
+				truckState.timeSinceStateChanged = stateSnapshot.time;
+				m_TruckTimeSinceStateChanged.Add(truck.unitID, truckState);
 			}
 
 			// Update state if it has changed
-			ActionType curAction = truck.GetCurAction();
+			ActionType curAction = truck.curAction;
 			if (truckState.lastState != curAction)
 			{
 				truckState.lastState = curAction;
-				truckState.tickSinceStateChanged = TethysGame.Tick();
+				truckState.timeSinceStateChanged = stateSnapshot.time;
 			}
 
-			return truckState.tickSinceStateChanged;
-		}
-
-		private UnitEx GetClosestUnitOfType(map_id type, LOCATION position)
-		{
-			UnitEx closestUnit = null;
-			int closestDistance = 999999;
-
-			foreach (UnitEx unit in owner.units.GetListForType(type))
-			{
-				int distance = unit.GetPosition().GetDiagonalDistance(position);
-				if (distance < closestDistance)
-				{
-					closestUnit = unit;
-					closestDistance = distance;
-				}
-			}
-
-			return closestUnit;
+			return truckState.timeSinceStateChanged;
 		}
 	}
 }

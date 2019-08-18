@@ -1,5 +1,4 @@
-﻿using DotNetMissionSDK.Utility;
-
+﻿
 namespace DotNetMissionSDK.AI.Combat.Groups
 {
 	/// <summary>
@@ -10,7 +9,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		public override VehicleGroupType groupType		{ get { return VehicleGroupType.Bomber;		}	}
 
 
-		public BomberGroup(PlayerInfo owner, ThreatZone zone) : base(owner, zone)
+		public BomberGroup(int ownerID, ThreatZone zone) : base(ownerID, zone)
 		{
 		}
 

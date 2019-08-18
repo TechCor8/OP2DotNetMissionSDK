@@ -1,5 +1,5 @@
-﻿using DotNetMissionSDK.Pathfinding.Internal;
-using DotNetMissionSDK.Utility;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.Pathfinding.Internal;
 using System;
 using System.Collections.Generic;
 

@@ -1,7 +1,8 @@
-﻿using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.Utility;
-using DotNetMissionSDK.Utility.Maps;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
 
 namespace DotNetMissionSDK.Units
 {
@@ -39,6 +40,8 @@ namespace DotNetMissionSDK.Units
 		/// <param name="path">The path to move the unit on.</param>
 		public void DoMove(LOCATION[] path)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			// If unit has been destroyed since we started pathfinding, cancel
 			if (!IsLive())
 				return;
@@ -56,17 +59,23 @@ namespace DotNetMissionSDK.Units
 		/// <summary>
 		/// Generates a path for the unit to navigate through terrain.
 		/// </summary>
-		public void DoMoveWithPathfinder(int tileX, int tileY)
+		public void DoMoveWithPathfinder(StateSnapshot stateSnapshot, int tileX, int tileY)
 		{
-			DoMoveWithPathfinder(new LOCATION(tileX, tileY));
+			ThreadAssert.MainThreadRequired();
+
+			DoMoveWithPathfinder(stateSnapshot, new LOCATION(tileX, tileY));
 		}
 
 		/// <summary>
 		/// Generates a path for the unit to navigate through terrain.
 		/// </summary>
-		public void DoMoveWithPathfinder(LOCATION targetPosition)
+		public void DoMoveWithPathfinder(StateSnapshot stateSnapshot, LOCATION targetPosition)
 		{
-			DoMoveWithPathfinder(targetPosition, GetTileCost);
+			ThreadAssert.MainThreadRequired();
+
+			int ownerID = GetOwnerID();
+
+			DoMoveWithPathfinder(targetPosition, (x,y) => GetTileCost(stateSnapshot, ownerID, x,y));
 		}
 
 		/// <summary>
@@ -74,6 +83,8 @@ namespace DotNetMissionSDK.Units
 		/// </summary>
 		public void DoMoveWithPathfinder(LOCATION targetPosition, Pathfinder.TileCostCallback tileCostCB)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			isSearchingForPath = true;
 
 			Pathfinder.GetPathAsync(GetPosition(), targetPosition, true, tileCostCB, (LOCATION[] path) =>
@@ -92,6 +103,8 @@ namespace DotNetMissionSDK.Units
 		/// </summary>
 		public void DoMoveWithPathfinder(Pathfinder.TileCostCallback tileCostCB, Pathfinder.ValidTileCallback validTileCB)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			isSearchingForPath = true;
 
 			Pathfinder.GetClosestValidTileAsync(GetPosition(), tileCostCB, validTileCB, (LOCATION[] path) =>
@@ -106,14 +119,14 @@ namespace DotNetMissionSDK.Units
 		}
 
 		// Callback for determining tile cost
-		private int GetTileCost(int x, int y)
+		private static int GetTileCost(StateSnapshot state, int ownerID, int x, int y)
 		{
-			if (!GameMap.IsTilePassable(x,y))
+			if (!state.tileMap.IsTilePassable(x,y))
 				return Pathfinder.Impassable;
 
 			// Buildings, and units that aren't our own, are impassable
-			UnitEx blockingUnit = PlayerUnitMap.GetUnitOnTile(new LOCATION(x,y));
-			if (blockingUnit != null && (!blockingUnit.IsVehicle() || blockingUnit.GetOwnerID() != GetOwnerID()))
+			UnitState blockingUnit = state.unitMap.GetUnitOnTile(new LOCATION(x,y));
+			if (blockingUnit != null && (!blockingUnit.isVehicle || blockingUnit.ownerID != ownerID))
 				return Pathfinder.Impassable;
 
 			return 1;

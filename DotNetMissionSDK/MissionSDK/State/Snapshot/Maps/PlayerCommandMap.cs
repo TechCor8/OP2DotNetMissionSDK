@@ -1,16 +1,20 @@
-﻿using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Pathfinding;
+﻿using DotNetMissionSDK.Pathfinding;
+using DotNetMissionSDK.State.Snapshot.Units;
 using System;
 using System.Collections.Generic;
 
-namespace DotNetMissionSDK.Utility.PlayerState
+namespace DotNetMissionSDK.State.Snapshot.Maps
 {
-	public class PlayerCommandGrid
+	/// <summary>
+	/// Represents a map of a player's command tube access.
+	/// NOTE: Recommended way to access this class is through StateSnapshot.
+	/// </summary>
+	public class PlayerCommandMap
 	{
 		private struct Tile
 		{
 			public byte hasCommandAccess;			// Command grid. 0 - No command access, 1 - Has command access
-			public UnitEx buildingOnTile;
+			public StructureState buildingOnTile;
 		}
 
 		private Tile[,] m_Grid;
@@ -18,9 +22,42 @@ namespace DotNetMissionSDK.Utility.PlayerState
 		private int m_PlayerID;
 
 
-		public PlayerCommandGrid()
+		public PlayerCommandMap(PlayerUnitState units, int playerID)
 		{
 			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
+
+			m_PlayerID = playerID;
+
+			// Update command grid with connection status
+			Array.Clear(m_Grid, 0, m_Grid.Length);
+
+			foreach (StructureState cc in units.commandCenters)
+			{
+				Pathfinder.GetClosestValidTile(cc.position, GetTileCost, IsValidTile, false);
+
+				LOCATION gridPoint = GetPointInGridSpace(cc.position);
+
+				m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess = 1;
+			}
+
+			// Update buildings on command grid
+			foreach (StructureState building in units.GetStructures())
+			{
+				MAP_RECT buildingArea = building.GetRect();
+
+				for (int x=buildingArea.xMin; x < buildingArea.xMax; ++x)
+				{
+					for (int y=buildingArea.yMin; y < buildingArea.yMax; ++y)
+					{
+						LOCATION gridPoint = new LOCATION(x, y);
+						gridPoint.ClipToMap();
+
+						gridPoint = GetPointInGridSpace(gridPoint);
+
+						m_Grid[gridPoint.x,gridPoint.y].buildingOnTile = building;
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -141,44 +178,6 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			return 1;
 		}
 
-		public void Update(PlayerUnitList units, int playerID)
-		{
-			m_PlayerID = playerID;
-
-			// Update command grid with connection status
-			Array.Clear(m_Grid, 0, m_Grid.Length);
-
-			foreach (UnitEx cc in units.commandCenters)
-			{
-				LOCATION temp;
-				LOCATION ccPos = cc.GetPosition();
-				Pathfinder.GetClosestValidTile(ccPos, GetTileCost, IsValidTile, out temp, false);
-
-				LOCATION gridPoint = GetPointInGridSpace(ccPos);
-
-				m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess = 1;
-			}
-
-			// Update buildings on command grid
-			foreach (UnitEx building in new PlayerAllBuildingEnum(m_PlayerID))
-			{
-				MAP_RECT buildingArea = building.GetUnitInfo().GetRect(building.GetPosition());
-
-				for (int x=buildingArea.xMin; x < buildingArea.xMax; ++x)
-				{
-					for (int y=buildingArea.yMin; y < buildingArea.yMax; ++y)
-					{
-						LOCATION gridPoint = new LOCATION(x, y);
-						gridPoint.ClipToMap();
-
-						gridPoint = GetPointInGridSpace(gridPoint);
-
-						m_Grid[gridPoint.x,gridPoint.y].buildingOnTile = building;
-					}
-				}
-			}
-		}
-
 		// Callback for determining tile cost
 		private int GetTileCost(int x, int y)
 		{
@@ -214,9 +213,9 @@ namespace DotNetMissionSDK.Utility.PlayerState
 			return pt;
 		}
 
-		public List<UnitEx> GetConnectedStructures(LOCATION tile)
+		public List<StructureState> GetConnectedStructures(LOCATION tile)
 		{
-			Dictionary<int, UnitEx> connectedStructures = new Dictionary<int, UnitEx>();
+			Dictionary<int, StructureState> connectedStructures = new Dictionary<int, StructureState>();
 
 			Pathfinder.TileCostCallback tileCostCB = (int x, int y) =>
 			{
@@ -226,14 +225,14 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
 
-				UnitEx building = m_Grid[gridPoint.x,gridPoint.y].buildingOnTile;
+				StructureState building = m_Grid[gridPoint.x,gridPoint.y].buildingOnTile;
 
 				if (GameMap.GetCellType(x, y) != CellType.Tube0 && building == null)
 					return Pathfinder.Impassable;
 
 				if (building != null)
 				{
-					int unitID = building.GetStubIndex();
+					int unitID = building.unitID;
 					connectedStructures[unitID] = building;
 				}
 
@@ -242,7 +241,7 @@ namespace DotNetMissionSDK.Utility.PlayerState
 
 			Pathfinder.GetClosestValidTile(tile, tileCostCB, IsValidTile, false);
 
-			return new List<UnitEx>(connectedStructures.Values);
+			return new List<StructureState>(connectedStructures.Values);
 		}
 	}
 }

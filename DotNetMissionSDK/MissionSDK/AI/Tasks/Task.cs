@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.Utility;
+﻿using DotNetMissionSDK.State.Snapshot;
+using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks
@@ -9,27 +10,24 @@ namespace DotNetMissionSDK.AI.Tasks
 		private List<Task> m_Prerequisites = new List<Task>();
 		private bool blockSiblingPrerequisites;
 		
-		protected PlayerInfo owner		{ get; private set; }
+		protected int ownerID		{ get; private set; }
 
-
-		// Constructor used by derived classes to avoid passing parameters that will be assigned by parent task
-		protected Task() { }
 
 		/// <summary>
 		/// Creates a top-level task (goal).
 		/// Derived classes will generate the necessary prerequisite tasks.
 		/// </summary>
-		/// <param name="owner">The player that performs this task.</param>
-		public Task(PlayerInfo owner)
+		/// <param name="ownerID">The player that performs this task.</param>
+		public Task(int ownerID)
 		{
-			this.owner = owner;
+			this.ownerID = ownerID;
 		}
 
 		/// <summary>
 		/// Checks if this task is complete.
 		/// </summary>
 		/// <returns>True, if the task is complete.</returns>
-		public abstract bool IsTaskComplete();
+		public abstract bool IsTaskComplete(StateSnapshot stateSnapshot);
 
 		/// <summary>
 		/// Creates all prerequisite tasks for this task.
@@ -42,17 +40,17 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// <para>WARNING: Relies on CanPerformTask() which may not be implemented on all tasks!</para>
 		/// </summary>
 		/// <returns>True, if the task tree can be performed.</returns>
-		public bool CanPerformTaskTree()
+		public bool CanPerformTaskTree(StateSnapshot stateSnapshot)
 		{
-			if (!CanPerformTask())
+			if (!CanPerformTask(stateSnapshot))
 				return false;
 
 			foreach (Task task in m_Prerequisites)
 			{
-				if (task.IsTaskComplete())
+				if (task.IsTaskComplete(stateSnapshot))
 					continue;
 
-				if (!task.CanPerformTaskTree())
+				if (!task.CanPerformTaskTree(stateSnapshot))
 					return false;
 			}
 
@@ -64,7 +62,7 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// <para>WARNING: This method may not be implemented on all tasks!</para>
 		/// </summary>
 		/// <returns>True, if the task can be performed. Otherwise false.</returns>
-		protected virtual bool CanPerformTask()
+		protected virtual bool CanPerformTask(StateSnapshot stateSnapshot)
 		{
 			return true;
 		}
@@ -73,40 +71,42 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// Performs this task and any underlying prerequisite tasks.
 		/// You must call this method every update until the task is complete or no longer needed.
 		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="unitActions">Actions to be performed by units are added to this list rather than executed directly.</param>
 		/// <returns>True, if task is running. False, if task cannot be performed.</returns>
-		public bool PerformTaskTree()
+		public bool PerformTaskTree(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
 			bool prerequisitesComplete = false;
 
-			if (!PerformPrerequisites(out prerequisitesComplete))
+			if (!PerformPrerequisites(stateSnapshot, unitActions, out prerequisitesComplete))
 				return false;
 
 			if (prerequisitesComplete)
-				return PerformTask();
+				return PerformTask(stateSnapshot, unitActions);
 
 			return true;
 		}
 
-		protected abstract bool PerformTask();
+		protected abstract bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions);
 
 		/// <summary>
 		/// Performs prerequisite tasks. If a task cannot be performed, returns false.
 		/// </summary>
 		/// <returns>False, if the task cannot be performed.</returns>
-		private bool PerformPrerequisites(out bool prerequisitesComplete)
+		private bool PerformPrerequisites(StateSnapshot stateSnapshot, List<Action> unitActions, out bool prerequisitesComplete)
 		{
 			prerequisitesComplete = true;
 
 			for (int i=0; i < m_Prerequisites.Count; ++i)
 			{
 				// Skip completed tasks
-				if (m_Prerequisites[i].IsTaskComplete())
+				if (m_Prerequisites[i].IsTaskComplete(stateSnapshot))
 					continue;
 
 				prerequisitesComplete = false;
 
 				// Perform the task. Fail out if it can't be done.
-				if (!m_Prerequisites[i].PerformTaskTree())
+				if (!m_Prerequisites[i].PerformTaskTree(stateSnapshot, unitActions))
 					return false;
 
 				// If task has been set to block, skip remaining prerequisites.
@@ -128,7 +128,7 @@ namespace DotNetMissionSDK.AI.Tasks
 		protected void AddPrerequisite(Task prerequisite, bool blockSiblingPrerequisites=false)
 		{
 			prerequisite.m_Parent = this;
-			prerequisite.owner = owner;
+			prerequisite.ownerID = ownerID;
 			prerequisite.blockSiblingPrerequisites = blockSiblingPrerequisites;
 
 			if (prerequisite.IsAncestorTask(prerequisite))

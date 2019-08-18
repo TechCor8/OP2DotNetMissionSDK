@@ -1,8 +1,15 @@
 ﻿using DotNetMissionSDK.AI.Managers;
 using DotNetMissionSDK.AI.Tasks.Base.Structure;
+using DotNetMissionSDK.Async;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 {
@@ -17,31 +24,27 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		private CreateCommonMineTask m_CreateMineTask;
 
 
-		public CreateCommonMiningBaseTask(MiningBaseState miningBaseState)									{ m_MiningBaseState = miningBaseState; }
-		public CreateCommonMiningBaseTask(PlayerInfo owner, MiningBaseState miningBaseState) : base(owner)	{ m_MiningBaseState = miningBaseState; }
+		public CreateCommonMiningBaseTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)	{ m_MiningBaseState = miningBaseState; }
 
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			// Task is not complete until every CC beacon has been occupied and saturated
-			if (!m_CreateMineTask.IsTaskComplete())
+			if (!m_CreateMineTask.IsTaskComplete(stateSnapshot))
 				return false;
 
 			// Task is complete if there are no beacons outside of a command center's control area
-			foreach (UnitEx beacon in new PlayerUnitEnum(6))
+			foreach (MiningBeaconState beacon in stateSnapshot.gaia.miningBeacons)
 			{
-				if (beacon.GetUnitType() != map_id.MiningBeacon)
-					continue;
-
-				if (beacon.GetOreType() != BeaconType.Common)
+				if (beacon.oreType != BeaconType.Common)
 					continue;
 
 				// Detect if occupied
 				bool isOccupied = false;
-				for (int i=0; i < TethysGame.NoPlayers(); ++i)
+				foreach (PlayerState player in stateSnapshot.players)
 				{
-					UnitEx building = GetClosestBuildingOfType(i, map_id.Any, beacon.GetPosition());
-					if (building != null && building.GetPosition().GetDiagonalDistance(beacon.GetPosition()) < MiningBaseState.MaxMineDistanceToCC)
+					StructureState building = GetClosestBuildingOfType(player, map_id.Any, beacon.position);
+					if (building != null && building.position.GetDiagonalDistance(beacon.position) < MiningBaseState.MaxMineDistanceToCC)
 					{
 						isOccupied = true;
 						break;
@@ -59,48 +62,48 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_CreateMineTask = new CreateCommonMineTask(m_MiningBaseState), true);
-			AddPrerequisite(new BuildCommandCenterKitTask());
+			AddPrerequisite(m_CreateMineTask = new CreateCommonMineTask(ownerID, m_MiningBaseState), true);
+			AddPrerequisite(new BuildCommandCenterKitTask(ownerID));
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get idle convec with CC
-			UnitEx convec = owner.units.convecs.Find((unit) => unit.GetCargo() == map_id.CommandCenter && unit.GetCurAction() == ActionType.moDone);
+			ConvecState convec = owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == map_id.CommandCenter && unit.curAction == ActionType.moDone);
 			if (convec == null)
 				return true;
 
 			// Find unoccupied common beacon
-			UnitEx unoccupiedBeacon = GetClosestUnusedBeacon(convec.GetPosition());
+			MiningBeaconState unoccupiedBeacon = GetClosestUnusedBeacon(stateSnapshot, convec.position);
 			if (unoccupiedBeacon != null)
 			{
-				LOCATION beaconPosition = unoccupiedBeacon.GetPosition();
+				LOCATION beaconPosition = unoccupiedBeacon.position;
 
 				// Move all non-military units if there is no command center. This new site will be the main base.
 				if (owner.units.commandCenters.Count == 0)
 				{
-					foreach (UnitEx unit in new PlayerUnitEnum(owner.player.playerID))
+					foreach (VehicleState unit in owner.units.GetVehicles())
 					{
-						if (!unit.IsVehicle()) continue;
-
-						map_id unitType = unit.GetUnitType();
+						map_id unitType = unit.unitType;
 
 						// No military units. That is left up to the combat manager
 						if (unitType == map_id.Lynx || unitType == map_id.Panther || unitType == map_id.Tiger ||
 							unitType == map_id.Scorpion || unitType == map_id.Spider)
 							continue;
 
-						unit.DoMove(beaconPosition.x+(TethysGame.GetRand(6)+1), beaconPosition.y+(TethysGame.GetRand(6)+2));
+						unitActions.Add(() => GameState.GetUnit(unit.unitID)?.DoMove(beaconPosition.x+AsyncRandom.GetRange(1,7), beaconPosition.y+AsyncRandom.GetRange(2,8)));
 					}
 				}
 
-				return DeployCC(convec, beaconPosition);
+				return DeployCC(stateSnapshot, unitActions, convec, beaconPosition);
 			}
 
 			return false;
 		}
 
-		private bool DeployCC(UnitEx convec, LOCATION targetPosition)
+		private bool DeployCC(StateSnapshot stateSnapshot, List<Action> unitActions,  ConvecState convec, LOCATION targetPosition)
 		{
 			// Callback for determining if tile is a valid place point
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
@@ -110,15 +113,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 					return false;
 
 				// Get area to deploy structure
-				UnitInfo info = new UnitInfo(convec.GetCargo());
+				GlobalStructureInfo info = stateSnapshot.structureInfo[convec.cargoType];
 				LOCATION size = info.GetSize(true);
 				MAP_RECT targetArea = new MAP_RECT(x-size.x+1, y-size.y+1, size.x,size.y);
 
-				if (!BuildStructureTask.AreTilesPassable(targetArea, x, y))
+				if (!BuildStructureTask.AreTilesPassable(stateSnapshot, targetArea, x, y))
 					return false;
 
 				// Check if area is blocked by structure or enemy
-				if (BuildStructureTask.IsAreaBlocked(targetArea, owner.player.playerID))
+				if (BuildStructureTask.IsAreaBlocked(stateSnapshot, targetArea, ownerID))
 					return false;
 
 				return true;
@@ -126,38 +129,35 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 			// Find open location near beacon
 			LOCATION foundPt;
-			if (!Pathfinder.GetClosestValidTile(targetPosition, BuildStructureTask.GetTileCost, validTileCB, out foundPt))
+			if (!Pathfinder.GetClosestValidTile(targetPosition, (x,y) => BuildStructureTask.GetTileCost(stateSnapshot, x,y), validTileCB, out foundPt))
 				return false;
 
 			// Clear units out of deploy area
-			BuildStructureTask.ClearDeployArea(convec, convec.GetCargo(), foundPt, owner.player);
+			BuildStructureTask.ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
 
 			// Build structure
-			convec.DoBuild(convec.GetCargo(), foundPt.x, foundPt.y);
+			unitActions.Add(() => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
 
 			return true;
 		}
 
-		private UnitEx GetClosestUnusedBeacon(LOCATION position)
+		private MiningBeaconState GetClosestUnusedBeacon(StateSnapshot stateSnapshot, LOCATION position)
 		{
 			// Get closest beacon
-			UnitEx closestBeacon = null;
+			MiningBeaconState closestBeacon = null;
 			int closestDistance = 900000;
 
-			foreach (UnitEx beacon in new PlayerUnitEnum(6))
+			foreach (MiningBeaconState beacon in stateSnapshot.gaia.miningBeacons)
 			{
-				if (beacon.GetUnitType() != map_id.MiningBeacon)
-					continue;
-
-				if (beacon.GetOreType() != BeaconType.Common)
+				if (beacon.oreType != BeaconType.Common)
 					continue;
 
 				// Detect if occupied
 				bool isOccupied = false;
-				for (int i=0; i < TethysGame.NoPlayers(); ++i)
+				foreach (PlayerState player in stateSnapshot.players)
 				{
-					UnitEx building = GetClosestBuildingOfType(i, map_id.Any, beacon.GetPosition());
-					if (building != null && building.GetPosition().GetDiagonalDistance(beacon.GetPosition()) < MiningBaseState.MaxMineDistanceToCC)
+					StructureState building = GetClosestBuildingOfType(player, map_id.Any, beacon.position);
+					if (building != null && building.position.GetDiagonalDistance(beacon.position) < MiningBaseState.MaxMineDistanceToCC)
 					{
 						isOccupied = true;
 						break;
@@ -168,7 +168,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 					continue;
 				
 				// Closest distance
-				int distance = position.GetDiagonalDistance(beacon.GetPosition());
+				int distance = position.GetDiagonalDistance(beacon.position);
 				if (distance < closestDistance)
 				{
 					closestBeacon = beacon;
@@ -179,20 +179,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			return closestBeacon;
 		}
 
-		private UnitEx GetClosestBuildingOfType(int playerID, map_id type, LOCATION position)
+		private StructureState GetClosestBuildingOfType(PlayerState player, map_id type, LOCATION position)
 		{
-			UnitEx closestUnit = null;
+			StructureState closestUnit = null;
 			int closestDistance = 999999;
 
-			OP2Enumerator enumerator;
-			if (type == map_id.Any)
-				enumerator = new PlayerAllBuildingEnum(playerID);
-			else
-				enumerator = new PlayerBuildingEnum(playerID, type);
-
-			foreach (UnitEx unit in enumerator)
+			foreach (StructureState unit in player.units.GetStructures())
 			{
-				int distance = unit.GetPosition().GetDiagonalDistance(position);
+				if (type != map_id.Any && type != unit.unitType)
+					continue;
+
+				int distance = unit.position.GetDiagonalDistance(position);
 				if (distance < closestDistance)
 				{
 					closestUnit = unit;

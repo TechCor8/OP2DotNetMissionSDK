@@ -2,7 +2,13 @@
 using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 {
@@ -14,18 +20,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		private MiningBaseState m_MiningBaseState;
 
 
-		public SaturateCommonMineTask(MiningBaseState miningBaseState)									{ m_MiningBaseState = miningBaseState; }
-		public SaturateCommonMineTask(PlayerInfo owner, MiningBaseState miningBaseState) : base(owner)	{ m_MiningBaseState = miningBaseState; }
+		public SaturateCommonMineTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)	{ m_MiningBaseState = miningBaseState; }
 
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			// Task is complete when there are no unsaturated common mining sites left
 			foreach (MiningBase miningBase in m_MiningBaseState.miningBases)
 			{
 				foreach (MiningSite site in miningBase.miningSites)
 				{
-					if (site.beacon.GetOreType() != BeaconType.Common) continue;
+					if (site.beacon.oreType != BeaconType.Common) continue;
 					if (site.mine == null) continue;
 
 					if (site.smelters.Count < MiningBaseState.SmelterSaturationCount)
@@ -38,13 +43,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildCommonSmelterKitTask());
+			AddPrerequisite(new BuildCommonSmelterKitTask(ownerID));
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get idle convec with smelter
-			UnitEx convec = owner.units.convecs.Find((unit) => unit.GetCargo() == map_id.CommonOreSmelter && unit.GetCurAction() == ActionType.moDone);
+			ConvecState convec = owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == map_id.CommonOreSmelter && unit.curAction == ActionType.moDone);
 			if (convec == null)
 				return true;
 
@@ -57,11 +64,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			{
 				foreach (MiningSite site in miningBase.miningSites)
 				{
-					if (site.beacon.GetOreType() != BeaconType.Common) continue;
+					if (site.beacon.oreType != BeaconType.Common) continue;
 					if (site.mine == null) continue;
 					if (site.smelters.Count >= MiningBaseState.SmelterSaturationCount) continue;
 
-					int distance = convec.GetPosition().GetDiagonalDistance(site.mine.GetPosition());
+					int distance = convec.position.GetDiagonalDistance(site.mine.position);
 					if (distance < closestDistance)
 					{
 						closestMiningBase = miningBase;
@@ -74,18 +81,20 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			if (closestMineSite == null)
 				return false;
 
-			if (!DeploySmelter(convec, closestMiningBase.commandCenter.GetPosition(), closestMineSite.mine.GetPosition()))
+			if (!DeploySmelter(stateSnapshot, unitActions, convec, closestMiningBase.commandCenter.position, closestMineSite.mine.position))
 				return false;
 
 			return true;
 		}
 
-		private bool DeploySmelter(UnitEx convec, LOCATION commandCenterPosition, LOCATION minePosition)
+		private bool DeploySmelter(StateSnapshot stateSnapshot, List<Action> unitActions, ConvecState convec, LOCATION commandCenterPosition, LOCATION minePosition)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Callback for determining tile cost
 			Pathfinder.TileCostCallback getTileCostCB = (int x, int y) =>
 			{
-				if (!GameMap.IsTilePassable(x,y))
+				if (!stateSnapshot.tileMap.IsTilePassable(x,y))
 					return Pathfinder.Impassable;
 
 				// Prevent search from exceeding command center control area
@@ -99,23 +108,23 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
 			{
 				// Get area to deploy structure
-				UnitInfo info = new UnitInfo(convec.GetCargo());
+				GlobalStructureInfo info = stateSnapshot.structureInfo[convec.cargoType];
 				LOCATION size = info.GetSize(true);
 				MAP_RECT targetArea = new MAP_RECT(x-size.x+1, y-size.y+1, size.x,size.y);
 
-				if (!BuildStructureTask.AreTilesPassable(targetArea, x, y))
+				if (!BuildStructureTask.AreTilesPassable(stateSnapshot, targetArea, x, y))
 					return false;
 
 				// Check if area is blocked by structure or enemy
-				if (BuildStructureTask.IsAreaBlocked(targetArea, owner.player.playerID))
+				if (BuildStructureTask.IsAreaBlocked(stateSnapshot, targetArea, ownerID))
 					return false;
 
 				// If can't build tubes, must be touching connected structure to be valid (Apply this to BuildStructureTask, too)
-				if (!CanBuildTubes())
+				if (!CanBuildTubes(owner))
 				{
 					MAP_RECT unbulldozedArea = targetArea;
 					unbulldozedArea.Inflate(-1, -1);
-					return owner.commandGrid.ConnectsTo(unbulldozedArea);
+					return owner.commandMap.ConnectsTo(unbulldozedArea);
 				}
 
 				return true;
@@ -127,25 +136,25 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				return false;
 
 			// Clear units out of deploy area
-			BuildStructureTask.ClearDeployArea(convec, convec.GetCargo(), foundPt, owner.player);
+			BuildStructureTask.ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
 
 			// Build structure
-			convec.DoBuild(convec.GetCargo(), foundPt.x, foundPt.y);
+			unitActions.Add(() => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
 
 			return true;
 		}
 
-		private bool CanBuildTubes()
+		private bool CanBuildTubes(PlayerState owner)
 		{
 			// Must have enough ore to build tubes
-			if (owner.player.Ore() < 500)
+			if (owner.ore < 500)
 				return false;
 
 			if (owner.units.earthWorkers.Count > 0)
 				return true;
 
 			// Can build earthworker?
-			if (owner.units.vehicleFactories.Find((UnitEx unit) => unit.IsEnabled()) != null)
+			if (owner.units.vehicleFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled) != null)
 				return true;
 
 			return false;

@@ -1,9 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
-using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Units;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -19,12 +21,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private BuildGeoConTask m_BuildGeoConTask;
 
 
-		public MaintainPowerTask() { }
-		public MaintainPowerTask(PlayerInfo owner) : base(owner) { }
+		public MaintainPowerTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			if (owner.player.GetAmountPowerAvailable() < 100)
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			if (owner.amountPowerAvailable < 100)
 				return false;
 
 			return true;
@@ -32,10 +35,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			m_Prerequisites.Add(m_BuildTokamakTask = new BuildTokamakTask(owner));
-			m_Prerequisites.Add(m_BuildMHDGeneratorTask = new BuildMHDGeneratorTask(owner));
-			m_Prerequisites.Add(m_BuildSolarArrayTask = new BuildSolarArrayTask(owner));
-			m_Prerequisites.Add(m_BuildGeoConTask = new BuildGeoConTask(owner));
+			m_Prerequisites.Add(m_BuildTokamakTask = new BuildTokamakTask(ownerID));
+			m_Prerequisites.Add(m_BuildMHDGeneratorTask = new BuildMHDGeneratorTask(ownerID));
+			m_Prerequisites.Add(m_BuildSolarArrayTask = new BuildSolarArrayTask(ownerID));
+			m_Prerequisites.Add(m_BuildGeoConTask = new BuildGeoConTask(ownerID));
 
 			m_BuildTokamakTask.targetCountToBuild = 0;
 			m_BuildMHDGeneratorTask.targetCountToBuild = 0;
@@ -46,68 +49,46 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				AddPrerequisite(task);
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Don't build more power plants if we aren't using all the ones we have
-			List<UnitEx> powerPlants = new List<UnitEx>(owner.units.tokamaks);
+			List<StructureState> powerPlants = new List<StructureState>(owner.units.tokamaks);
 			powerPlants.AddRange(owner.units.mhdGenerators);
 			powerPlants.AddRange(owner.units.solarPowerArrays);
 			powerPlants.AddRange(owner.units.geothermalPlants);
 
-			foreach (UnitEx powerPlant in powerPlants)
+			foreach (StructureState powerPlant in powerPlants)
 			{
-				if (!powerPlant.IsEnabled())
+				if (!powerPlant.isEnabled)
 					return false;
 			}
 
 			// Build new power plant
-			if (!BuildGeothermalPlant())
-				BuildPowerPlant();
+			if (!BuildGeothermalPlant(stateSnapshot, owner, unitActions))
+				BuildPowerPlant(stateSnapshot, owner);
 
 			return true;
 		}
 
-		private void BuildPowerPlant()
+		private void BuildPowerPlant(StateSnapshot stateSnapshot, PlayerState owner)
 		{
-			// Determine power plant type to build
+			// Determine power plant type to build. Default to Tokamak.
 			map_id powerPlantTypeToBuild = map_id.Tokamak;
 
-			if (!owner.player.IsEden())
-			{
-				UnitInfo moduleInfo = new UnitInfo(map_id.MHDGenerator);
+			// Build MHD if available
+			if (owner.CanBuildUnit(stateSnapshot, map_id.MHDGenerator))
+				powerPlantTypeToBuild = map_id.MHDGenerator;
 
-				// Fail Check: Kit cost
-				bool canAfford = true;
-				if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID)) canAfford = false;
-				if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID)) canAfford = false;
-
-				UnitInfo unitInfo = new UnitInfo(map_id.MHDGenerator);
-				TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
-
-				if (canAfford && owner.player.HasTechnology(techInfo.GetTechID()))
-					powerPlantTypeToBuild = map_id.MHDGenerator;
-			}
-
-			UnitInfo solarInfo = new UnitInfo(map_id.SolarPowerArray);
-			TechInfo solarTechInfo = Research.GetTechInfo(solarInfo.GetResearchTopic());
-
-			if (owner.player.HasTechnology(solarTechInfo.GetTechID()))
-			{
-				UnitInfo moduleInfo = new UnitInfo(map_id.SolarPowerArray);
-
-				// Fail Check: Kit cost
-				bool canAfford = true;
-				if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID)) canAfford = false;
-				if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID)) canAfford = false;
-
-				if (canAfford && owner.units.solarPowerArrays.Count < owner.units.solarSatelliteCount)
-					powerPlantTypeToBuild = map_id.SolarPowerArray;
-			}
-
+			// Build Solar Power Array if available and satellite in orbit
+			if (owner.CanBuildUnit(stateSnapshot, map_id.SolarPowerArray) && owner.units.solarPowerArrays.Count < owner.units.solarSatelliteCount)
+				powerPlantTypeToBuild = map_id.SolarPowerArray;
+			
 			// Convecs with loaded power kits get priority
-			UnitEx convec = owner.units.convecs.Find((Vehicle unit) =>
+			ConvecState convec = owner.units.convecs.FirstOrDefault((ConvecState unit) =>
 			{
-				switch (unit.GetCargo())
+				switch (unit.cargoType)
 				{
 					case map_id.Tokamak:	return true;
 					case map_id.MHDGenerator: return true;
@@ -123,7 +104,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			});
 
 			if (convec != null)
-				powerPlantTypeToBuild = convec.GetCargo();
+				powerPlantTypeToBuild = convec.cargoType;
 
 			// Set the next power plant to build
 			switch (powerPlantTypeToBuild)
@@ -134,9 +115,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 		}
 
-		private bool BuildGeothermalPlant()
+		private bool BuildGeothermalPlant(StateSnapshot stateSnapshot, PlayerState owner, List<Action> unitActions)
 		{
-			if (!owner.player.IsEden())
+			if (!owner.isEden)
 				return false;
 
 			// If geocon exists, use it
@@ -145,23 +126,23 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				m_BuildGeoConTask.targetCountToBuild = 0;
 
 				// Find fumarole to deploy on
-				UnitEx geocon = owner.units.geoCons[0];
-				UnitEx fumarole = GetClosestUnoccupiedFumarole(geocon.GetPosition());
+				VehicleState geocon = owner.units.geoCons[0];
+				GaiaUnitState fumarole = GetClosestUnoccupiedFumarole(stateSnapshot, geocon.position);
 				if (fumarole == null)
 					return false;
 
-				geocon.DoDeployMiner(fumarole.GetTileX(), fumarole.GetTileY());
+				unitActions.Add(() => GameState.GetUnit(geocon.unitID)?.DoDeployMiner(fumarole.position.x, fumarole.position.y));
 				return true;
 			}
 
 			// Check if we can build a geo con
-			if (!m_BuildGeoConTask.CanPerformTaskTree())
+			if (!m_BuildGeoConTask.CanPerformTaskTree(stateSnapshot))
 				return false;
 
 			// Check if fumaroles are near a CC. If yes, build geocon
-			foreach (UnitEx cc in owner.units.commandCenters)
+			foreach (StructureState cc in owner.units.commandCenters)
 			{
-				UnitEx fumarole = GetClosestUnoccupiedFumarole(cc.GetPosition());
+				GaiaUnitState fumarole = GetClosestUnoccupiedFumarole(stateSnapshot, cc.position);
 
 				if (fumarole == null)
 				{
@@ -169,7 +150,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					return false;
 				}
 
-				if (fumarole.GetPosition().GetDiagonalDistance(cc.GetPosition()) < MaxGeothermalPlantDistanceToCC)
+				if (fumarole.position.GetDiagonalDistance(cc.position) < MaxGeothermalPlantDistanceToCC)
 				{
 					m_BuildGeoConTask.targetCountToBuild = 1;
 					return true;
@@ -181,24 +162,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			return false;
 		}
 
-		private UnitEx GetClosestUnoccupiedFumarole(LOCATION position)
+		private GaiaUnitState GetClosestUnoccupiedFumarole(StateSnapshot stateSnapshot, LOCATION position)
 		{
-			UnitEx closestUnit = null;
+			GaiaUnitState closestUnit = null;
 			int closestDistance = 999999;
 
-			foreach (UnitEx unit in new PlayerUnitEnum(6))
+			foreach (GaiaUnitState unit in stateSnapshot.gaia.fumaroles)
 			{
-				if (unit.GetUnitType() != map_id.Fumarole)
-					continue;
-
-				LOCATION unitPos = unit.GetPosition();
-
 				// Detect if occupied
 				bool isOccupied = false;
-				for (int i=0; i < TethysGame.NoPlayers(); ++i)
+				for (int i=0; i < stateSnapshot.players.Count; ++i)
 				{
-					UnitEx building = GetClosestBuildingOfType(i, map_id.Any, unitPos);
-					if (building != null && building.GetPosition().GetDiagonalDistance(unitPos) < 2)
+					StructureState building = GetClosestBuildingOfType(stateSnapshot.players[i], map_id.Any, unit.position);
+					if (building != null && building.position.GetDiagonalDistance(unit.position) < 2)
 					{
 						isOccupied = true;
 						break;
@@ -209,7 +185,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					continue;
 
 				// Closest distance
-				int distance = position.GetDiagonalDistance(unitPos);
+				int distance = position.GetDiagonalDistance(unit.position);
 				if (distance < closestDistance)
 				{
 					closestUnit = unit;
@@ -220,20 +196,21 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			return closestUnit;
 		}
 
-		private UnitEx GetClosestBuildingOfType(int playerID, map_id type, LOCATION position)
+		private StructureState GetClosestBuildingOfType(PlayerState player, map_id type, LOCATION position)
 		{
-			UnitEx closestUnit = null;
+			StructureState closestUnit = null;
 			int closestDistance = 999999;
 
-			OP2Enumerator enumerator;
-			if (type == map_id.Any)
-				enumerator = new PlayerAllBuildingEnum(playerID);
-			else
-				enumerator = new PlayerBuildingEnum(playerID, type);
+			IEnumerable<UnitState> enumerator;
 
-			foreach (UnitEx unit in enumerator)
+			if (type == map_id.Any)
+				enumerator = player.units.GetStructures();
+			else
+				enumerator = player.units.GetListForType(type);
+
+			foreach (StructureState unit in enumerator)
 			{
-				int distance = unit.GetPosition().GetDiagonalDistance(position);
+				int distance = unit.position.GetDiagonalDistance(position);
 				if (distance < closestDistance)
 				{
 					closestUnit = unit;

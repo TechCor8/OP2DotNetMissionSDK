@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.AI.Managers;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.Async;
+using DotNetMissionSDK.State.Snapshot;
 
 namespace DotNetMissionSDK.AI
 {
@@ -41,14 +42,16 @@ namespace DotNetMissionSDK.AI
 		public bool isActive						{ get; private set; }		// Is the bot controlling the player?
 
 
-		public BotPlayer(BotType botType, PlayerInfo playerToControl)
+		public BotPlayer(BotType botType, int playerToControlID)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			this.botType = botType;
 
-			baseManager = new BaseManager(this, playerToControl);
-			laborManager = new LaborManager(this, playerToControl);
-			researchManager = new ResearchManager(this, playerToControl);
-			combatManager = new CombatManager(this, playerToControl);
+			baseManager = new BaseManager(this, playerToControlID);
+			laborManager = new LaborManager(this, playerToControlID);
+			researchManager = new ResearchManager(this, playerToControlID);
+			combatManager = new CombatManager(this, playerToControlID);
 		}
 
 		public void Start()
@@ -61,16 +64,18 @@ namespace DotNetMissionSDK.AI
 			isActive = false;
 		}
 
-		public void Update()
+		public void Update(StateSnapshot stateSnapshot)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (!isActive)
 				return;
 
 			// Update managers
-			baseManager.Update();
-			laborManager.Update();
-			researchManager.Update();
-			combatManager.Update();
+			baseManager.Update(stateSnapshot);
+			laborManager.Update(stateSnapshot);
+			researchManager.Update(stateSnapshot);
+			combatManager.Update(stateSnapshot);
 		}
 	}
 }

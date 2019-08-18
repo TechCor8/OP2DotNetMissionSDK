@@ -1,6 +1,8 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -9,25 +11,28 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private BuildAgridomeTask m_BuildAgridomeTask;
 
 
-		public MaintainFoodTask() { }
-		public MaintainFoodTask(PlayerInfo owner) : base(owner) { }
+		public MaintainFoodTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			return owner.player.FoodSupply() == FoodStatus.Rising;
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			return owner.foodSupply == FoodStatus.Rising;
 		}
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_BuildAgridomeTask = new BuildAgridomeTask());
+			AddPrerequisite(m_BuildAgridomeTask = new BuildAgridomeTask(ownerID));
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Don't build more agridomes if we aren't using all the ones we have
-			foreach (UnitEx agridome in owner.units.agridomes)
+			foreach (StructureState agridome in owner.units.agridomes)
 			{
-				if (!agridome.IsEnabled())
+				if (!agridome.isEnabled)
 					return false;
 			}
 

@@ -2,7 +2,12 @@
 using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 {
@@ -17,14 +22,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		private SaturateCommonMineTask m_SaturateMineTask;
 
 
-		public CreateCommonMineTask(MiningBaseState miningBaseState)									{ m_MiningBaseState = miningBaseState; }
-		public CreateCommonMineTask(PlayerInfo owner, MiningBaseState miningBaseState) : base(owner)	{ m_MiningBaseState = miningBaseState; }
+		public CreateCommonMineTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)		{ m_MiningBaseState = miningBaseState; }
 
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			// Task is not complete until every CC beacon has been occupied and saturated
-			if (!m_SaturateMineTask.IsTaskComplete())
+			if (!m_SaturateMineTask.IsTaskComplete(stateSnapshot))
 				return false;
 
 			// Task is complete if all controlled beacons have mines
@@ -32,7 +36,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			{
 				foreach (MiningSite site in miningBase.miningSites)
 				{
-					if (site.beacon.GetOreType() != BeaconType.Common)
+					if (site.beacon.oreType != BeaconType.Common)
 						continue;
 
 					if (site.mine == null)
@@ -45,67 +49,69 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_SaturateMineTask = new SaturateCommonMineTask(m_MiningBaseState), true);
-			AddPrerequisite(new BuildSurveyorTask());
-			AddPrerequisite(new BuildMinerTask());
+			AddPrerequisite(m_SaturateMineTask = new SaturateCommonMineTask(ownerID, m_MiningBaseState), true);
+			AddPrerequisite(new BuildSurveyorTask(ownerID));
+			AddPrerequisite(new BuildMinerTask(ownerID));
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get miner
 			if (owner.units.roboMiners.Count == 0) return false;
-			UnitEx miner = owner.units.roboMiners[0];
+			VehicleState miner = owner.units.roboMiners[0];
 
 			// Check if miner is being deployed (Both exist at the same time for a moment and triggers a bug)
-			if (owner.units.commonOreMines.Find((UnitEx mine) => mine.GetPosition().Equals(miner.GetPosition())) != null)
+			if (owner.units.commonOreMines.FirstOrDefault((StructureState mine) => mine.position.Equals(miner.position)) != null)
 				return false;
 
 			// Find closest unoccupied common beacon
-			UnitEx beacon = GetClosestUnusedBeacon(miner);
-			LOCATION beaconPosition = beacon.GetPosition();
+			MiningBeaconState beacon = GetClosestUnusedBeacon(miner);
+			LOCATION beaconPosition = beacon.position;
 
 			// Check if beacon is surveyed
-			if (beacon.GetSurveyedBy(owner.player.playerID))
+			if (beacon.GetSurveyedBy(ownerID))
 			{
 				// Deploy miner
-				BuildStructureTask.ClearDeployArea(miner, map_id.CommonOreMine, beacon.GetPosition(), owner.player);
+				BuildStructureTask.ClearDeployArea(miner, map_id.CommonOreMine, beacon.position, stateSnapshot, ownerID, unitActions);
 
-				if (!miner.GetPosition().Equals(beaconPosition) && miner.GetCurAction() == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
-					miner.DoDeployMiner(beaconPosition.x, beaconPosition.y);
+				if (!miner.position.Equals(beaconPosition) && miner.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
+					unitActions.Add(() => GameState.GetUnit(miner.unitID)?.DoDeployMiner(beaconPosition.x, beaconPosition.y));
 
 				return true;
 			}
 
 			// Move miner involved in expansion close to beacon for efficiency
-			if (miner.GetCurAction() == ActionType.moDone)
-				miner.DoMove(beaconPosition.x-1, beaconPosition.y+1);
+			if (miner.curAction == ActionType.moDone)
+				unitActions.Add(() => GameState.GetUnit(miner.unitID)?.DoMove(beaconPosition.x-1, beaconPosition.y+1));
 
 			// Survey beacon
 			if (owner.units.roboSurveyors.Count == 0)
 				return false;
 
-			UnitEx surveyor = owner.units.roboSurveyors[0];
+			VehicleState surveyor = owner.units.roboSurveyors[0];
 
-			if (!surveyor.GetPosition().Equals(beaconPosition) && surveyor.GetCurAction() == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
-				surveyor.DoMove(beaconPosition.x, beaconPosition.y);
+			if (!surveyor.position.Equals(beaconPosition) && surveyor.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
+				unitActions.Add(() => GameState.GetUnit(surveyor.unitID)?.DoMove(beaconPosition.x, beaconPosition.y));
 
 			return true;
 		}
 
-		private UnitEx GetClosestUnusedBeacon(UnitEx miner)
+		private MiningBeaconState GetClosestUnusedBeacon(VehicleState miner)
 		{
 			// Get closest beacon
-			UnitEx closestBeacon = null;
+			MiningBeaconState closestBeacon = null;
 			int closestDistance = 900000;
 
 			foreach (MiningBase miningBase in m_MiningBaseState.miningBases)
 			{
 				foreach (MiningSite site in miningBase.miningSites)
 				{
-					if (site.beacon.GetOreType() != BeaconType.Common) continue;
+					if (site.beacon.oreType != BeaconType.Common) continue;
 					if (site.mine != null) continue;
 
-					int distance = miner.GetPosition().GetDiagonalDistance(site.beacon.GetPosition());
+					int distance = miner.position.GetDiagonalDistance(site.beacon.position);
 					if (distance < closestDistance)
 					{
 						closestBeacon = site.beacon;

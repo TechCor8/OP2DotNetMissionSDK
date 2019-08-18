@@ -1,6 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
+using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -14,29 +19,31 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		public bool repairCriticalOnly;
 
 
-		public RepairStructuresTask() { }
-		public RepairStructuresTask(PlayerInfo owner) : base(owner) { }
+		public RepairStructuresTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Task is complete if all structures have adequate HP
-			foreach (UnitEx building in new PlayerAllBuildingEnum(owner.player.playerID))
+			foreach (StructureState building in owner.units.GetStructures())
 			{
 				// Critical only repairs
 				if (repairCriticalOnly)
 				{
-					int maxHP = building.GetUnitInfo().GetHitPoints(owner.player.playerID);
-					if (building.GetDamage() / (float)maxHP > 0.75f)
+					UnitInfoState info = owner.GetUnitInfo(building.unitType);
+
+					if (building.damage / (float)info.hitPoints > 0.75f)
 						return false;
 				}
 
 				// Full repairs
-				if (building.GetUnitType() == map_id.Tokamak)
+				if (building.unitType == map_id.Tokamak)
 				{
-					if (building.GetDamage() > 40)
+					if (building.damage > 40)
 						return false;
 				}
-				else if (building.GetDamage() > 0)
+				else if (building.damage > 0)
 					return false;
 			}
 
@@ -45,58 +52,66 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildConvecTask());
-			m_BuildRepairUnitTask = new BuildRepairUnitTask(owner);
+			AddPrerequisite(new BuildConvecTask(ownerID));
+			m_BuildRepairUnitTask = new BuildRepairUnitTask(ownerID);
 			m_BuildRepairUnitTask.GeneratePrerequisites();
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			if (!m_BuildRepairUnitTask.IsTaskComplete())
-				m_BuildRepairUnitTask.PerformTaskTree();
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			if (!m_BuildRepairUnitTask.IsTaskComplete(stateSnapshot))
+				m_BuildRepairUnitTask.PerformTaskTree(stateSnapshot, unitActions);
 
 			// Fail Check: Not enough ore for repairs
-			if (owner.player.Ore() < 50)
+			if (owner.ore < 50)
 				return false;
 
 			int damagedStructureCount = 0;
 
 			// Find damaged structures
-			foreach (UnitEx unitToFix in new PlayerAllBuildingEnum(owner.player.playerID))
+			foreach (UnitState unitToFix in owner.units.GetStructures())
 			{
 				// Must not be under construction
-				if (unitToFix.GetLastCommand() == CommandType.ctMoDevelop || 
-					unitToFix.GetLastCommand() == CommandType.ctMoUnDevelop)
+				if (unitToFix.lastCommand == CommandType.ctMoDevelop || 
+					unitToFix.lastCommand == CommandType.ctMoUnDevelop)
 					continue;
 
 				if (repairCriticalOnly)
 				{
 					// If damage not critical, skip unit
-					int maxHP = unitToFix.GetUnitInfo().GetHitPoints(owner.player.playerID);
-					if (unitToFix.GetDamage() / (float)maxHP < 0.75f)
+					UnitInfoState info = owner.GetUnitInfo(unitToFix.unitType);
+
+					if (unitToFix.damage / (float)info.hitPoints < 0.75f)
 						continue;
 				}
 				else
 				{
 					// If not damaged, skip unit
-					if (unitToFix.GetUnitType() == map_id.Tokamak)
+					if (unitToFix.unitType == map_id.Tokamak)
 					{
-						if (unitToFix.GetDamage() <= 40)
+						if (unitToFix.damage <= 40)
 							continue;
 					}
-					else if (unitToFix.GetDamage() <= 0)
+					else if (unitToFix.damage <= 0)
 						continue;
 				}
 
 				++damagedStructureCount;
 
 				// Get repair unit
-				UnitEx repairUnit = GetClosestRepairUnit(unitToFix.GetPosition());
+				UnitState repairUnit = owner.units.GetClosestUnitOfType(m_BuildRepairUnitTask.repairUnitType, unitToFix.position);
 
-				if (repairUnit == null || repairUnit.GetCurAction() != ActionType.moDone)
+				if (repairUnit == null || repairUnit.curAction != ActionType.moDone)
 					continue;
 
-				repairUnit.DoRepair(unitToFix);
+				unitActions.Add(() =>
+				{
+					UnitEx unitToRepair = GameState.GetUnit(unitToFix.unitID);
+					if (unitToRepair != null)
+						GameState.GetUnit(repairUnit.unitID)?.DoRepair(unitToRepair);
+				});
 			}
 
 			// If we are overwhelmed, build more repair units to meet demand
@@ -104,25 +119,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				m_BuildRepairUnitTask.targetCountToBuild = damagedStructureCount/4 + 1;
 
 			return true;
-		}
-
-		private UnitEx GetClosestRepairUnit(LOCATION position)
-		{
-			UnitEx closestUnit = null;
-			int closestDistance = 999999;
-
-			foreach (UnitEx unit in owner.units.GetListForType(m_BuildRepairUnitTask.repairUnitType))
-			{
-				// Closest distance
-				int distance = position.GetDiagonalDistance(unit.GetPosition());
-				if (distance < closestDistance)
-				{
-					closestUnit = unit;
-					closestDistance = distance;
-				}
-			}
-
-			return closestUnit;
 		}
 	}
 }

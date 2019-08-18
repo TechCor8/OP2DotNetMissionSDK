@@ -1,60 +1,57 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 {
 	public class BuildRocketTask : Task
 	{
-		public BuildRocketTask() { }
-		public BuildRocketTask(PlayerInfo owner) : base(owner) { }
+		public BuildRocketTask(int ownerID) : base(ownerID) { }
 
-
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Find spaceport with rocket
-			List<UnitEx> spaceports = owner.units.spaceports.FindAll((UnitEx unit) => unit.GetObjectOnPad() == map_id.SULV || unit.GetObjectOnPad() == map_id.RLV);
-			return spaceports.Count > 0;
+			return owner.units.spaceports.Count((SpaceportState unit) => unit.objectOnPad == map_id.SULV || unit.objectOnPad == map_id.RLV) > 0;
 		}
 		
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildSpaceportTask());
+			AddPrerequisite(new BuildSpaceportTask(ownerID));
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get active spaceport
-			UnitEx spaceport = owner.units.spaceports.Find((UnitEx unit) => unit.GetObjectOnPad() == map_id.None && unit.IsEnabled());
+			SpaceportState spaceport = owner.units.spaceports.FirstOrDefault((SpaceportState unit) => unit.objectOnPad == map_id.None && unit.isEnabled);
 
 			// If spaceport not found, most likely it is not enabled, but may have EMP missile instead
 			if (spaceport == null)
 				return false;
 
 			// Do nothing if we are waiting for RLV to return
-			if (owner.player.GetRLVCount() > 0)
+			if (owner.rlvCount > 0)
 				return true;
 
-			if (spaceport.IsBusy())
+			if (spaceport.isBusy)
 				return true;
 
 			map_id rocketToBuild = map_id.SULV;
 
 			// Build an RLV if we have the technology
-			UnitInfo unitInfo = new UnitInfo(map_id.RLV);
-			TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
-
-			if (owner.player.HasTechnology(techInfo.GetTechID()))
+			if (owner.HasTechnologyForUnit(stateSnapshot, map_id.RLV))
 				rocketToBuild = map_id.RLV;
 
-			UnitInfo moduleInfo = new UnitInfo(rocketToBuild);
-
 			// Fail Check: Rocket cost
-			if (owner.player.Ore() < moduleInfo.GetOreCost(owner.player.playerID)) return false;
-			if (owner.player.RareOre() < moduleInfo.GetRareOreCost(owner.player.playerID)) return false;
-
-			spaceport.DoDevelop(rocketToBuild);
+			if (owner.CanBuildUnit(stateSnapshot, rocketToBuild))
+				unitActions.Add(() => GameState.GetUnit(spaceport.unitID)?.DoDevelop(rocketToBuild));
 
 			return true;
 		}

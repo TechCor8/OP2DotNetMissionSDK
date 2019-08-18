@@ -1,7 +1,9 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
@@ -16,49 +18,50 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private BuildMeteorDefenseTask m_BuildMeteorDefenseTask;
 
 
-		public MaintainDefenseTask() { }
-		public MaintainDefenseTask(PlayerInfo owner) : base(owner) { }
+		public MaintainDefenseTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			foreach (Task task in m_Prerequisites)
 			{
-				if (!task.IsTaskComplete())
+				if (!task.IsTaskComplete(stateSnapshot))
 					return false;
 			}
 
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Build guard posts at each base
-			foreach (UnitEx cc in owner.units.commandCenters)
+			foreach (UnitState cc in owner.units.commandCenters)
 			{
 				// Get all connected structures at this base so we can use the count to determine the appropriate amount of defense
-				List<UnitEx> connectedStructures = owner.commandGrid.GetConnectedStructures(cc.GetPosition());
+				List<StructureState> connectedStructures = owner.commandMap.GetConnectedStructures(cc.position);
 
 				// Do not build more guard posts if there are disconnected ones. This is to prevent earthworkers from becoming preoccupied.
-				foreach (UnitEx guardPost in owner.units.guardPosts)
+				foreach (UnitState guardPost in owner.units.guardPosts)
 				{
-					if (!owner.commandGrid.ConnectsTo(guardPost.GetPosition()))
+					if (!owner.commandMap.ConnectsTo(guardPost.position))
 						return false;
 				}
 
 				// Get number of guard posts connected to this base. If we have fewer than desired, build another one at this base
-				int guardPosts = connectedStructures.FindAll((UnitEx unit) => unit.GetUnitType() == map_id.GuardPost).Count;
+				int guardPosts = connectedStructures.FindAll((StructureState unit) => unit.unitType == map_id.GuardPost).Count;
 
 				if (guardPosts < GuardPostsPerBase)
 				{
 					m_BuildGuardPostTask.targetCountToBuild = owner.units.guardPosts.Count+1;
 					m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
-					m_BuildGuardPostTask.SetLocation(cc.GetPosition());
+					m_BuildGuardPostTask.SetLocation(cc.position);
 				}
 
 				// Build meteor defenses at this base. If task is null, we are plymouth and can't build these
 				if (m_BuildMeteorDefenseTask != null)
 				{
-					int meteorDefenses = connectedStructures.FindAll((UnitEx unit) => unit.GetUnitType() == map_id.MeteorDefense).Count;
+					int meteorDefenses = connectedStructures.FindAll((StructureState unit) => unit.unitType == map_id.MeteorDefense).Count;
 					if (meteorDefenses >= (connectedStructures.Count / 7) + 1)
 						continue;
 
 					m_BuildMeteorDefenseTask.targetCountToBuild = m_BuildMeteorDefenseTask.targetCountToBuild+1;
-					m_BuildMeteorDefenseTask.SetLocation(cc.GetPosition());
+					m_BuildMeteorDefenseTask.SetLocation(cc.position);
 				}
 			}
 			
@@ -67,12 +70,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			m_Prerequisites.Add(m_BuildGuardPostTask = new BuildGuardPostTask());
+			m_Prerequisites.Add(m_BuildGuardPostTask = new BuildGuardPostTask(ownerID));
 			
-			if (owner.player.IsEden())
+			if (GameState.players[ownerID].IsEden())
 			{
-				m_Prerequisites.Add(new BuildObservatoryTask());
-				m_Prerequisites.Add(m_BuildMeteorDefenseTask = new BuildMeteorDefenseTask());
+				m_Prerequisites.Add(new BuildObservatoryTask(ownerID));
+				m_Prerequisites.Add(m_BuildMeteorDefenseTask = new BuildMeteorDefenseTask(ownerID));
 			}
 
 			foreach (Task task in m_Prerequisites)
@@ -82,7 +85,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
 			return true;
 		}

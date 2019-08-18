@@ -1,7 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -10,18 +14,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private BuildEarthworkerTask m_BuildEarthworkerTask;
 
 
-		public FixDisconnectedStructures() { }
-		public FixDisconnectedStructures(PlayerInfo owner) : base(owner) { }
+		public FixDisconnectedStructures(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Task is complete if all structures are connected
-			foreach (UnitEx building in new PlayerAllBuildingEnum(owner.player.playerID))
+			foreach (StructureState building in owner.units.GetStructures())
 			{
-				if (!BuildStructureTask.NeedsTube(building.GetUnitType()))
+				if (!BuildStructureTask.NeedsTube(building.unitType))
 					continue;
 
-				if (!owner.commandGrid.ConnectsTo(building.GetRect()))
+				if (!owner.commandMap.ConnectsTo(building.GetRect()))
 					return false;
 			}
 
@@ -30,52 +35,56 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildEarthworkerTask());
-			m_BuildEarthworkerTask = new BuildEarthworkerTask(owner);
+			AddPrerequisite(new BuildEarthworkerTask(ownerID));
+			m_BuildEarthworkerTask = new BuildEarthworkerTask(ownerID);
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			if (!m_BuildEarthworkerTask.IsTaskComplete())
-				m_BuildEarthworkerTask.PerformTaskTree();
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			if (!m_BuildEarthworkerTask.IsTaskComplete(stateSnapshot))
+				m_BuildEarthworkerTask.PerformTaskTree(stateSnapshot, unitActions);
 
 			// Fail Check: Not enough ore for tubes
-			if (owner.player.Ore() < 50)
+			if (owner.ore < 50)
 				return false;
 
 			int structuresThatNeedTubes = 0;
 
 			// Find disconnected structures
-			foreach (UnitEx unitToFix in new PlayerAllBuildingEnum(owner.player.playerID))
+			foreach (UnitState unitToFix in owner.units.GetStructures())
 			{
-				if (!BuildStructureTask.NeedsTube(unitToFix.GetUnitType()))
+				if (!BuildStructureTask.NeedsTube(unitToFix.unitType))
 					continue;
 
-				if (owner.commandGrid.ConnectsTo(unitToFix.GetRect()))
+				MAP_RECT buildingRect = stateSnapshot.structureInfo[unitToFix.unitType].GetRect(unitToFix.position);
+
+				if (owner.commandMap.ConnectsTo(buildingRect))
 					continue;
 
 				++structuresThatNeedTubes;
 
 				// Get earthworker
-				UnitEx earthworker = GetClosestEarthworker(unitToFix.GetPosition());
+				UnitState earthworker = owner.units.GetClosestUnitOfType(map_id.Earthworker, unitToFix.position);
 
-				if (earthworker == null || earthworker.GetCurAction() != ActionType.moDone)
+				if (earthworker == null || earthworker.curAction != ActionType.moDone)
 					continue;
 
 				// Get path from tube network to structure
-				LOCATION[] path = owner.commandGrid.GetPathToClosestConnectedTile(unitToFix.GetRect());
+				LOCATION[] path = owner.commandMap.GetPathToClosestConnectedTile(buildingRect);
 				if (path == null)
 					continue;
 
 				// Fix disconnected structure
 				for (int i = 0; i < path.Length; ++i)
 				{
-					if (GameMap.GetCellType(path[i].x, path[i].y) == CellType.Tube0)
+					if (stateSnapshot.tileMap.GetCellType(path[i]) == CellType.Tube0)
 						continue;
 
-					BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, path[i], owner.player);
+					BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, path[i], stateSnapshot, ownerID, unitActions);
 
-					earthworker.DoBuildWall(map_id.Tube, new MAP_RECT(path[i], new LOCATION(1, 1)));
+					unitActions.Add(() => GameState.GetUnit(earthworker.unitID)?.DoBuildWall(map_id.Tube, new MAP_RECT(path[i], new LOCATION(1, 1))));
 					break;
 				}
 			}
@@ -85,25 +94,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				m_BuildEarthworkerTask.targetCountToBuild = structuresThatNeedTubes/4 + 1;
 
 			return true;
-		}
-
-		private UnitEx GetClosestEarthworker(LOCATION position)
-		{
-			UnitEx closestUnit = null;
-			int closestDistance = 999999;
-
-			foreach (UnitEx unit in owner.units.earthWorkers)
-			{
-				// Closest distance
-				int distance = position.GetDiagonalDistance(unit.GetPosition());
-				if (distance < closestDistance)
-				{
-					closestUnit = unit;
-					closestDistance = distance;
-				}
-			}
-
-			return closestUnit;
 		}
 	}
 }

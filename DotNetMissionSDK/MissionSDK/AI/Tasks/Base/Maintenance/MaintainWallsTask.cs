@@ -1,7 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -10,10 +14,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private BuildEarthworkerTask m_BuildEarthworkerTask;
 
 
-		public MaintainWallsTask() { }
-		public MaintainWallsTask(PlayerInfo owner) : base(owner) { }
+		public MaintainWallsTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			// No completion state specified
 			return false;
@@ -21,27 +24,29 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildEarthworkerTask());
-			m_BuildEarthworkerTask = new BuildEarthworkerTask(owner);
+			AddPrerequisite(new BuildEarthworkerTask(ownerID));
+			m_BuildEarthworkerTask = new BuildEarthworkerTask(ownerID);
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			if (!m_BuildEarthworkerTask.IsTaskComplete())
-				m_BuildEarthworkerTask.PerformTaskTree();
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			if (!m_BuildEarthworkerTask.IsTaskComplete(stateSnapshot))
+				m_BuildEarthworkerTask.PerformTaskTree(stateSnapshot, unitActions);
 
 			// Fail Check: Not enough ore for walls
-			if (owner.player.Ore() < 50)
+			if (owner.ore < 50)
 				return false;
 
 			int structuresThatNeedWalls = 0;
 
 			// Find structure that needs walls
-			foreach (UnitEx building in new PlayerAllBuildingEnum(owner.player.playerID))
+			foreach (StructureState building in owner.units.GetStructures())
 			{
 				bool needsWall = false;
 
-				switch (building.GetUnitType())
+				switch (building.unitType)
 				{
 					case map_id.GuardPost:
 					case map_id.AdvancedLab:
@@ -54,21 +59,21 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 				// Get tile for wall
 				LOCATION tile;
-				if (!GetEmptyTileAroundRect(building.GetRect(true), out tile))
+				if (!GetEmptyTileAroundRect(stateSnapshot, building.GetRect(true), out tile))
 					continue;
 
 				// Get earthworker
-				UnitEx earthworker = GetClosestEarthworker(tile);
+				UnitState earthworker = owner.units.GetClosestUnitOfType(map_id.Earthworker, tile);
 
-				if (earthworker == null || earthworker.GetCurAction() != ActionType.moDone)
+				if (earthworker == null || earthworker.curAction != ActionType.moDone)
 				{
 					++structuresThatNeedWalls;
 					continue;
 				}
 
-				BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, tile, owner.player);
+				BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, tile, stateSnapshot, ownerID, unitActions);
 
-				earthworker.DoBuildWall(map_id.Wall, new MAP_RECT(tile, new LOCATION(1, 1)));
+				unitActions.Add(() => GameState.GetUnit(earthworker.unitID)?.DoBuildWall(map_id.Wall, new MAP_RECT(tile, new LOCATION(1, 1))));
 				break;
 			}
 
@@ -79,49 +84,30 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			return true;
 		}
 
-		private UnitEx GetClosestEarthworker(LOCATION position)
-		{
-			UnitEx closestUnit = null;
-			int closestDistance = 999999;
-
-			foreach (UnitEx unit in owner.units.earthWorkers)
-			{
-				// Closest distance
-				int distance = position.GetDiagonalDistance(unit.GetPosition());
-				if (distance < closestDistance)
-				{
-					closestUnit = unit;
-					closestDistance = distance;
-				}
-			}
-
-			return closestUnit;
-		}
-
-		private bool GetEmptyTileAroundRect(MAP_RECT area, out LOCATION tile)
+		private bool GetEmptyTileAroundRect(StateSnapshot stateSnapshot, MAP_RECT area, out LOCATION tile)
 		{
 			for (int tx=area.xMin-1; tx <= area.xMax; ++tx)
 			{
 				tile = new LOCATION(tx, area.yMin-1);
-				if (IsEmptyTile(tx, area.yMin-1)) return true;
+				if (IsEmptyTile(stateSnapshot, tx, area.yMin-1)) return true;
 			}
 
 			for (int ty=area.yMin-1; ty <= area.yMax; ++ty)
 			{
 				tile = new LOCATION(area.xMin-1, ty);
-				if (IsEmptyTile(area.xMin-1, ty)) return true;
+				if (IsEmptyTile(stateSnapshot, area.xMin-1, ty)) return true;
 			}
 
 			for (int tx=area.xMin-1; tx <= area.xMax; ++tx)
 			{
 				tile = new LOCATION(tx, area.yMax);
-				if (IsEmptyTile(tx, area.yMax)) return true;
+				if (IsEmptyTile(stateSnapshot, tx, area.yMax)) return true;
 			}
 
 			for (int ty=area.yMin-1; ty <= area.yMax; ++ty)
 			{
 				tile = new LOCATION(area.xMax, ty);
-				if (IsEmptyTile(area.xMax, ty)) return true;
+				if (IsEmptyTile(stateSnapshot, area.xMax, ty)) return true;
 			}
 
 			tile = new LOCATION(0, 0);
@@ -129,13 +115,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			return false;
 		}
 
-		private bool IsEmptyTile(int tx, int ty)
+		private bool IsEmptyTile(StateSnapshot stateSnapshot, int tx, int ty)
 		{
-			if (!GameMap.IsTilePassable(tx, ty))
+			if (!stateSnapshot.tileMap.IsTilePassable(tx, ty))
 				return false;
-			if (GameMap.GetCellType(tx, ty) == CellType.Tube0)
+			if (stateSnapshot.tileMap.GetCellType(new LOCATION(tx, ty)) == CellType.Tube0)
 				return false;
-			if (BuildStructureTask.IsAreaBlocked(new MAP_RECT(tx, ty, 1, 1), owner.player.playerID, true))
+			if (BuildStructureTask.IsAreaBlocked(stateSnapshot, new MAP_RECT(tx, ty, 1, 1), ownerID, true))
 				return false;
 
 			return true;

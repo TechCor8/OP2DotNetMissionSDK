@@ -1,5 +1,8 @@
-﻿using DotNetMissionSDK.Units;
-using DotNetMissionSDK.Utility;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.Units;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -34,30 +37,21 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		{
 			private List<UnitWithWeaponType> m_SupportedSlotTypes = new List<UnitWithWeaponType>();
 
-			public Vehicle unitInSlot											{ get; set; }
+			public int unitInSlot												{ get; set; }
 			public ReadOnlyCollection<UnitWithWeaponType> supportedSlotTypes	{ get { return m_SupportedSlotTypes.AsReadOnly();	} }
 
 			public UnitSlot(UnitWithWeaponType[] supportedSlotTypes)
 			{
 				m_SupportedSlotTypes = new List<UnitWithWeaponType>(supportedSlotTypes);
+
+				unitInSlot = -1;
 			}
 		}
 
-		protected PlayerInfo m_Owner;
+		protected int m_OwnerID;
 		private UnitSlot[] m_UnitSlots = new UnitSlot[0];
-		private bool m_IsDataDirty;
-
+		
 		public ThreatZone threatZone	{ get; set;			}
-
-		private int m_CombatStrength;
-		public int combatStrength
-		{
-			get
-			{
-				if (m_IsDataDirty) CalculateData();
-				return m_CombatStrength;
-			}
-		}
 
 		/// <summary>
 		/// The vehicle group's type represented as an enum.
@@ -72,7 +66,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		{
 			for (int i=0; i < m_UnitSlots.Length; ++i)
 			{
-				if (m_UnitSlots[i].unitInSlot == null)
+				if (m_UnitSlots[i].unitInSlot == -1)
 					return true;
 			}
 
@@ -80,9 +74,9 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		}
 
 
-		public VehicleGroup(PlayerInfo owner, ThreatZone zone)
+		public VehicleGroup(int ownerID, ThreatZone zone)
 		{
-			m_Owner = owner;
+			m_OwnerID = ownerID;
 			threatZone = zone;
 
 			m_UnitSlots = GetUnitSlots(zone.strengthDesired);
@@ -98,7 +92,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 			List<UnitSlot> unassignedSlots = new List<UnitSlot>();
 			for (int i=0; i < m_UnitSlots.Length; ++i)
 			{
-				if (m_UnitSlots[i].unitInSlot == null)
+				if (m_UnitSlots[i].unitInSlot == -1)
 					unassignedSlots.Add(m_UnitSlots[i]);
 			}
 
@@ -108,22 +102,22 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// <summary>
 		/// Returns true if the unit list can completely fill the group.
 		/// </summary>
-		public bool CanFillGroup(IEnumerable<Vehicle> units)
+		public bool CanFillGroup(IEnumerable<VehicleState> units)
 		{
-			List<Vehicle> unassignedUnits = new List<Vehicle>(units);
+			List<VehicleState> unassignedUnits = new List<VehicleState>(units);
 
 			for (int i=0; i < m_UnitSlots.Length; ++i)
 			{
 				// Skip slots that have already been assigned
-				if (m_UnitSlots[i].unitInSlot != null)
+				if (m_UnitSlots[i].unitInSlot != -1)
 					continue;
 
 				bool didFillSlot = false;
 				for (int j=0; j < unassignedUnits.Count; ++j)
 				{
-					Vehicle unit = unassignedUnits[j];
+					VehicleState unit = unassignedUnits[j];
 
-					if (FitsInSlot(i, unit.GetUnitType(), unit.GetWeapon()))
+					if (FitsInSlot(i, unit.unitType, unit.weapon))
 					{
 						didFillSlot = true;
 						unassignedUnits.RemoveAt(j);
@@ -143,14 +137,13 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		/// </summary>
 		/// <param name="unit">The unit to assign.</param>
 		/// <returns>True, if the unit was assigned. False, if the unit is the wrong type.</returns>
-		public bool AssignUnit(Vehicle unit)
+		public bool AssignUnit(VehicleState unit)
 		{
-			int index = GetEmptySlot(unit.GetUnitType(), unit.GetWeapon());
+			int index = GetEmptySlot(unit.unitType, unit.weapon);
 
 			if (index >= 0)
 			{
-				m_UnitSlots[index].unitInSlot = unit;
-				m_IsDataDirty = true;
+				m_UnitSlots[index].unitInSlot = unit.unitID;
 				return true;
 			}
 
@@ -162,7 +155,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 			for (int i=0; i < m_UnitSlots.Length; ++i)
 			{
 				// Skip slots that have already been assigned
-				if (m_UnitSlots[i].unitInSlot != null)
+				if (m_UnitSlots[i].unitInSlot != -1)
 					continue;
 
 				if (FitsInSlot(i, unitType, weapon))
@@ -179,30 +172,21 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 			return slotTypes.Find((UnitWithWeaponType type) => type.unit == unitType && type.weapon == weapon) != null;
 		}
 
-		private void CalculateData()
-		{
-			m_CombatStrength = 0;
-			foreach (UnitSlot slot in m_UnitSlots)
-			{
-				if (slot.unitInSlot == null)
-					continue;
-
-				m_CombatStrength += slot.unitInSlot.GetWeaponInfo().GetWeaponStrength();
-			}
-
-			m_IsDataDirty = false;
-		}
-
 		/// <summary>
 		/// Called to update vehicle group.
+		/// NOTE: Must be called from main thread.
 		/// </summary>
-		public virtual void Update()
+		public virtual void Update(StateSnapshot stateSnapshot)
 		{
-			UpdateMovement();
+			ThreadAssert.MainThreadRequired();
+
+			UpdateMovement(stateSnapshot);
 		}
 
-		protected void UpdateMovement()
+		protected void UpdateMovement(StateSnapshot stateSnapshot)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			bool goToThreatZone = false;
 
 			// If any unit is in threat zone, or all units are in staging area, send everyone to threat zone
@@ -212,30 +196,38 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 			// Move units
 			foreach (UnitSlot slot in m_UnitSlots)
 			{
-				if (slot.unitInSlot == null)
+				if (slot.unitInSlot == -1)
 					continue;
 
-				Vehicle unit = slot.unitInSlot;
+				Vehicle unit = GameState.GetUnit(slot.unitInSlot) as Vehicle;
+
+				if (unit == null)
+				{
+					// Unit probably dead.
+					continue;
+				}
 
 				if (goToThreatZone)
 				{
 					// Attack closest priority target
 					if (threatZone.priorityTargets.Length > 0)
 					{
-						Unit target = threatZone.GetClosestPriorityTarget(unit.GetPosition());
-						unit.DoAttack(target);
+						UnitState target = threatZone.GetClosestPriorityTarget(unit.GetPosition());
+						Unit targetUnit = GameState.GetUnit(target.unitID);
+						if (targetUnit != null)
+							unit.DoAttack(targetUnit);
 					}
 					else if (!unit.isSearchingOrHasPath || !threatZone.bounds.Contains(unit.destination))
 					{
 						// Otherwise, move to random location in zone
 						LOCATION targetPosition = threatZone.bounds.GetRandomPointInRect();
-						unit.DoMoveWithPathfinder(targetPosition);
+						unit.DoMoveWithPathfinder(stateSnapshot, targetPosition);
 					}
 				}
-				else if (!threatZone.IsInStagingArea(unit) && (!unit.isSearchingOrHasPath || !threatZone.IsInStagingArea(unit.destination)))
+				else if (!threatZone.IsInStagingArea(unit.GetPosition()) && (!unit.isSearchingOrHasPath || !threatZone.IsInStagingArea(unit.destination)))
 				{
 					// Head to staging area
-					threatZone.SendUnitToStagingArea(unit);
+					threatZone.SendUnitToStagingArea(stateSnapshot, unit);
 				}
 			}
 		}
@@ -244,10 +236,15 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		{
 			foreach (UnitSlot slot in m_UnitSlots)
 			{
-				if (slot.unitInSlot == null)
+				if (slot.unitInSlot == -1)
 					continue;
 
-				if (threatZone.Contains(slot.unitInSlot))
+				Vehicle unit = GameState.GetUnit(slot.unitInSlot) as Vehicle;
+
+				if (unit == null)
+					continue;
+
+				if (threatZone.Contains(unit.GetPosition()))
 					return true;
 			}
 
@@ -258,10 +255,15 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		{
 			foreach (UnitSlot slot in m_UnitSlots)
 			{
-				if (slot.unitInSlot == null)
+				if (slot.unitInSlot == -1)
 					continue;
 
-				if (!threatZone.IsInStagingArea(slot.unitInSlot))
+				Vehicle unit = GameState.GetUnit(slot.unitInSlot) as Vehicle;
+
+				if (unit == null)
+					continue;
+
+				if (!threatZone.IsInStagingArea(unit.GetPosition()))
 					return false;
 			}
 

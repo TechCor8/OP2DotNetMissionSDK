@@ -1,5 +1,5 @@
-﻿using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+﻿using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Managers
@@ -17,29 +17,31 @@ namespace DotNetMissionSDK.AI.Managers
 		public const int MaxTrucksPerSmelter = 5;
 		public const int TilesPerTruck = 2;
 
-		private PlayerInfo owner;
+		private int ownerID;
 
-		private List<UnitEx> m_UnassignedCommandCenters = new List<UnitEx>();
-		private List<UnitEx> m_UnassignedBeacons = new List<UnitEx>();
-		private List<UnitEx> m_UnassignedMines = new List<UnitEx>();
-		private List<UnitEx> m_UnassignedSmelters = new List<UnitEx>();
-		private List<UnitEx> m_UnassignedTrucks = new List<UnitEx>();
+		private List<StructureState> m_UnassignedCommandCenters = new List<StructureState>();
+		private List<MiningBeaconState> m_UnassignedBeacons = new List<MiningBeaconState>();
+		private List<StructureState> m_UnassignedMines = new List<StructureState>();
+		private List<StructureState> m_UnassignedSmelters = new List<StructureState>();
+		private List<CargoTruckState> m_UnassignedTrucks = new List<CargoTruckState>();
 
 		public List<MiningBase> miningBases = new List<MiningBase>();
 
 
-		public MiningBaseState(PlayerInfo owner)
+		public MiningBaseState(int ownerID)
 		{
-			this.owner = owner;
+			this.ownerID = ownerID;
 		}
 
-		public void Update()
+		public void Update(StateSnapshot stateSnapshot)
 		{
-			UpdateMiningBases(owner);
+			UpdateMiningBases(stateSnapshot);
 		}
 
-		private void UpdateMiningBases(PlayerInfo owner)
+		private void UpdateMiningBases(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Clear unassigned lists. We are going to recalculate them.
 			m_UnassignedCommandCenters.Clear();
 			m_UnassignedBeacons.Clear();
@@ -47,7 +49,7 @@ namespace DotNetMissionSDK.AI.Managers
 			m_UnassignedSmelters.Clear();
 			m_UnassignedTrucks.Clear();
 
-			GetAllMiningBeacons();
+			GetAllMiningBeacons(stateSnapshot);
 
 			// Add all units to the unassigned lists.
 			m_UnassignedCommandCenters.AddRange(owner.units.commandCenters);
@@ -61,9 +63,9 @@ namespace DotNetMissionSDK.AI.Managers
 			m_UnassignedTrucks.AddRange(owner.units.cargoTrucks);
 
 			// Don't assign trucks carrying things that don't involve mining
-			m_UnassignedTrucks.RemoveAll((UnitEx truck) =>
+			m_UnassignedTrucks.RemoveAll((CargoTruckState truck) =>
 			{
-				switch (truck.GetCargoType())
+				switch (truck.cargoType)
 				{
 					case TruckCargo.CommonMetal:
 					case TruckCargo.RareMetal:
@@ -76,14 +78,14 @@ namespace DotNetMissionSDK.AI.Managers
 			});
 
 			// Remove dead command centers from the current mining bases list
-			miningBases.RemoveAll((MiningBase miningBase) => !miningBase.commandCenter.IsLive());
+			miningBases.RemoveAll((MiningBase miningBase) => !m_UnassignedCommandCenters.Contains(miningBase.commandCenter));
 
 			// Remove existing command centers from unassigned list
 			foreach (MiningBase miningBase in miningBases)
 				miningBase.Cull(m_UnassignedCommandCenters, m_UnassignedBeacons, m_UnassignedMines, m_UnassignedSmelters, m_UnassignedTrucks);
 
 			// Create mining base for new command centers
-			foreach (UnitEx cc in m_UnassignedCommandCenters)
+			foreach (StructureState cc in m_UnassignedCommandCenters)
 				miningBases.Add(new MiningBase(cc));
 
 			// Update base assignments
@@ -91,17 +93,15 @@ namespace DotNetMissionSDK.AI.Managers
 				miningBase.Update(m_UnassignedBeacons, m_UnassignedMines, m_UnassignedSmelters, m_UnassignedTrucks);
 		}
 
-		private void GetAllMiningBeacons()
+		private void GetAllMiningBeacons(StateSnapshot stateSnapshot)
 		{
 			// Get all mining beacons
-			foreach (UnitEx beacon in new PlayerUnitEnum(6))
+			foreach (GaiaUnitState gaiaUnit in stateSnapshot.gaia)
 			{
-				map_id unitType = beacon.GetUnitType();
-
-				if (unitType != map_id.MiningBeacon && unitType != map_id.MagmaVent)
+				if (gaiaUnit.unitType != map_id.MiningBeacon && gaiaUnit.unitType != map_id.MagmaVent)
 					continue;
 
-				m_UnassignedBeacons.Add(beacon);
+				m_UnassignedBeacons.Add((MiningBeaconState)gaiaUnit);
 			}
 		}
 	}
@@ -113,20 +113,25 @@ namespace DotNetMissionSDK.AI.Managers
 	/// </summary>
 	public class MiningBase
 	{
-		public UnitEx commandCenter			{ get; private set; }
+		public StructureState commandCenter		{ get; private set; }
 
 		public List<MiningSite> miningSites = new List<MiningSite>();
 
 
-		public MiningBase(UnitEx cc)
+		public MiningBase(StructureState cc)
 		{
 			commandCenter = cc;
 		}
 
-		public void Cull(List<UnitEx> unassignedCCs, List<UnitEx> unassignedBeacons, List<UnitEx> unassignedMines, List<UnitEx> unassignedSmelters, List<UnitEx> unassignedTrucks)
+		public void Cull(List<StructureState> unassignedCCs, List<MiningBeaconState> unassignedBeacons, List<StructureState> unassignedMines, List<StructureState> unassignedSmelters, List<CargoTruckState> unassignedTrucks)
 		{
 			// Remove existing command centers from unassigned list
-			unassignedCCs.Remove(commandCenter);
+			int ccIndex = unassignedCCs.IndexOf(commandCenter);
+			if (ccIndex >= 0)
+			{
+				commandCenter = unassignedCCs[ccIndex];
+				unassignedCCs.RemoveAt(ccIndex);
+			}
 
 			// Remove dead mining sites? Only if beacons ever disappear
 
@@ -134,12 +139,12 @@ namespace DotNetMissionSDK.AI.Managers
 				miningSite.Cull(unassignedBeacons, unassignedMines, unassignedSmelters, unassignedTrucks);
 		}
 
-		public void Update(List<UnitEx> unassignedBeacons, List<UnitEx> unassignedMines, List<UnitEx> unassignedSmelters, List<UnitEx> unassignedTrucks)
+		public void Update(List<MiningBeaconState> unassignedBeacons, List<StructureState> unassignedMines, List<StructureState> unassignedSmelters, List<CargoTruckState> unassignedTrucks)
 		{
 			// Create mining site for unassigned beacons near this base
 			for (int i=0; i < unassignedBeacons.Count; ++i)
 			{
-				if (unassignedBeacons[i].GetPosition().GetDiagonalDistance(commandCenter.GetPosition()) <= MiningBaseState.MaxMineDistanceToCC)
+				if (unassignedBeacons[i].position.GetDiagonalDistance(commandCenter.position) <= MiningBaseState.MaxMineDistanceToCC)
 				{
 					miningSites.Add(new MiningSite(commandCenter, unassignedBeacons[i]));
 					unassignedBeacons.RemoveAt(i--);
@@ -147,7 +152,7 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 
 			// Sort by distance to command center
-			miningSites.Sort((a,b) => a.beacon.GetPosition().GetDiagonalDistance(commandCenter.GetPosition()).CompareTo(b.beacon.GetPosition().GetDiagonalDistance(commandCenter.GetPosition())));
+			miningSites.Sort((a,b) => a.beacon.position.GetDiagonalDistance(commandCenter.position).CompareTo(b.beacon.position.GetDiagonalDistance(commandCenter.position)));
 
 			// Update mining site assignments
 			foreach (MiningSite site in miningSites)
@@ -157,29 +162,41 @@ namespace DotNetMissionSDK.AI.Managers
 
 	public class MiningSite
 	{
-		private UnitEx commandCenter;
+		private StructureState commandCenter;
 
-		public UnitEx beacon			{ get; private set; }
-		public UnitEx mine				{ get; private set; }
+		public MiningBeaconState beacon	{ get; private set; }
+		public StructureState mine		{ get; private set; }
 
 		public List<MiningSmelter> smelters = new List<MiningSmelter>();
 		
-		public MiningSite(UnitEx commandCenter, UnitEx beacon)
+		public MiningSite(StructureState commandCenter, MiningBeaconState beacon)
 		{
 			this.commandCenter = commandCenter;
 			this.beacon = beacon;
 		}
 
-		public void Cull(List<UnitEx> unassignedBeacons, List<UnitEx> unassignedMines, List<UnitEx> unassignedSmelters, List<UnitEx> unassignedTrucks)
+		public void Cull(List<MiningBeaconState> unassignedBeacons, List<StructureState> unassignedMines, List<StructureState> unassignedSmelters, List<CargoTruckState> unassignedTrucks)
 		{
 			// Remove dead mine
-			if (mine != null && !mine.IsLive())
+			if (mine != null && !unassignedMines.Contains(mine))
 				mine = null;
 
 			// Remove existing beacons and mines from unassigned list
-			unassignedBeacons.Remove(beacon);
+			int beaconIndex = unassignedBeacons.IndexOf(beacon);
+			if (beaconIndex >= 0)
+			{
+				beacon = unassignedBeacons[beaconIndex];
+				unassignedBeacons.RemoveAt(beaconIndex);
+			}
 			if (mine != null)
-				unassignedMines.Remove(mine);
+			{
+				int mineIndex = unassignedMines.IndexOf(mine);
+				if (mineIndex >= 0)
+				{
+					mine = unassignedMines[mineIndex];
+					unassignedMines.RemoveAt(mineIndex);
+				}
+			}
 			else
 			{
 				// Smelters are no longer assigned when the mine is destroyed
@@ -188,18 +205,18 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 
 			// Remove dead smelters
-			smelters.RemoveAll((MiningSmelter smelter) => !smelter.smelter.IsLive());
+			smelters.RemoveAll((MiningSmelter smelter) => !unassignedSmelters.Contains(smelter.smelter));
 
 			foreach (MiningSmelter smelter in smelters)
 				smelter.Cull(unassignedSmelters, unassignedTrucks);
 		}
 
-		public void Update(List<UnitEx> unassignedMines, List<UnitEx> unassignedSmelters, List<UnitEx> unassignedTrucks)
+		public void Update(List<StructureState> unassignedMines, List<StructureState> unassignedSmelters, List<CargoTruckState> unassignedTrucks)
 		{
 			if (mine == null)
 			{
 				// Get mine on beacon
-				int mineIndex = unassignedMines.FindIndex((UnitEx unit) => unit.GetPosition().Equals(beacon.GetPosition()));
+				int mineIndex = unassignedMines.FindIndex((StructureState unit) => unit.position.Equals(beacon.position));
 
 				if (mineIndex >= 0)
 				{
@@ -212,19 +229,19 @@ namespace DotNetMissionSDK.AI.Managers
 				return;
 
 			// Get smelters near command center
-			List<UnitEx> ccSmelters = unassignedSmelters.FindAll((UnitEx smelter) => smelter.GetPosition().GetDiagonalDistance(commandCenter.GetPosition()) <= MiningBaseState.MaxSmelterDistanceToCC);
+			List<StructureState> ccSmelters = unassignedSmelters.FindAll((StructureState smelter) => smelter.position.GetDiagonalDistance(commandCenter.position) <= MiningBaseState.MaxSmelterDistanceToCC);
 
-			map_id smelterType = beacon.GetOreType() == BeaconType.Common ? map_id.CommonOreSmelter : map_id.RareOreSmelter;
+			map_id smelterType = beacon.oreType == BeaconType.Common ? map_id.CommonOreSmelter : map_id.RareOreSmelter;
 
 			// Add closest smelters until mine site is saturated
 			while (smelters.Count < MiningBaseState.SmelterSaturationCount && ccSmelters.Count > 0)
 			{
 				int distance;
-				int closestIndex = GetClosestUnitIndex(mine.GetPosition(), smelterType, ccSmelters, out distance);
+				int closestIndex = GetClosestUnitIndex(mine.position, smelterType, ccSmelters, out distance);
 				if (closestIndex < 0)
 					break;
 
-				UnitEx smelter = ccSmelters[closestIndex];
+				StructureState smelter = ccSmelters[closestIndex];
 
 				// Calculate desiredTruckCount
 				int desiredTruckCount = distance / MiningBaseState.TilesPerTruck + 1;
@@ -245,20 +262,20 @@ namespace DotNetMissionSDK.AI.Managers
 				smelter.Update(unassignedTrucks);
 		}
 
-		private int GetClosestUnitIndex(LOCATION position, map_id unitType, List<UnitEx> units, out int closestDistance)
+		private int GetClosestUnitIndex(LOCATION position, map_id unitType, List<StructureState> units, out int closestDistance)
 		{
 			int closestUnitIndex = -1;
 			closestDistance = 999999;
 
 			for (int i=0; i < units.Count; ++i)
 			{
-				UnitEx unit = units[i];
+				StructureState unit = units[i];
 
-				if (unit.GetUnitType() != unitType)
+				if (unit.unitType != unitType)
 					continue;
 
 				// Closest distance
-				int distance = position.GetDiagonalDistance(unit.GetPosition());
+				int distance = position.GetDiagonalDistance(unit.position);
 				if (distance < closestDistance)
 				{
 					closestUnitIndex = i;
@@ -272,63 +289,77 @@ namespace DotNetMissionSDK.AI.Managers
 
 	public class MiningSmelter
 	{
-		public UnitEx smelter			{ get; private set; }
+		public StructureState smelter		{ get; private set; }
 
-		public List<UnitEx> trucks = new List<UnitEx>();
+		public List<CargoTruckState> trucks = new List<CargoTruckState>();
 
 		public int desiredTruckCount;
 
 
-		public MiningSmelter(UnitEx smelter, int desiredTruckCount)
+		public MiningSmelter(StructureState smelter, int desiredTruckCount)
 		{
 			this.smelter = smelter;
 			this.desiredTruckCount = desiredTruckCount;
 		}
 
-		public void Cull(List<UnitEx> unassignedSmelters, List<UnitEx> unassignedTrucks)
+		public void Cull(List<StructureState> unassignedSmelters, List<CargoTruckState> unassignedTrucks)
 		{
 			// Remove existing smelters from unassigned list
-			unassignedSmelters.Remove(smelter);
+			int smelterIndex = unassignedSmelters.IndexOf(smelter);
+			if (smelterIndex >= 0)
+			{
+				smelter = unassignedSmelters[smelterIndex];
+				unassignedSmelters.RemoveAt(smelterIndex);
+			}
 
 			// Inactive smelter cannot have trucks
-			if (!smelter.IsEnabled())
+			if (!smelter.isEnabled)
 				trucks.Clear();
 
 			// Trucks are removed from mining routes when dead
-			trucks.RemoveAll((UnitEx truck) => !truck.IsLive());
+			trucks.RemoveAll((CargoTruckState truck) => !unassignedTrucks.Contains(truck));
 
 			// Remove existing trucks from unassigned list
-			foreach (UnitEx truck in trucks)
-				unassignedTrucks.Remove(truck);
+			for (int i=0; i < trucks.Count; ++i)
+			{
+				CargoTruckState truck = trucks[i];
+
+				int truckIndex = unassignedTrucks.IndexOf(truck);
+				if (truckIndex >= 0)
+				{
+					trucks[i] = unassignedTrucks[truckIndex];
+					unassignedTrucks.RemoveAt(truckIndex);
+				}
+			}
 		}
 
-		public void Update(List<UnitEx> unassignedTrucks)
+		public void Update(List<CargoTruckState> unassignedTrucks)
 		{
 			// Inactive smelter cannot have trucks
-			if (!smelter.IsEnabled())
+			if (!smelter.isEnabled)
 				return;
 
 			// Add closest trucks to smelter route until saturated
 			while (trucks.Count < desiredTruckCount && unassignedTrucks.Count > 0)
 			{
-				int index = GetClosestUnitIndex(smelter.GetPosition(), unassignedTrucks, out _);
+				int index = GetClosestUnitIndex(smelter.position, unassignedTrucks, out _);
 
 				trucks.Add(unassignedTrucks[index]);
 				unassignedTrucks.RemoveAt(index);
 			}
 		}
 
-		private int GetClosestUnitIndex(LOCATION position, List<UnitEx> units, out int closestDistance)
+		private int GetClosestUnitIndex(LOCATION position, List<CargoTruckState> units, out int closestDistance)
 		{
 			int closestUnitIndex = -1;
 			closestDistance = 999999;
 
 			for (int i=0; i < units.Count; ++i)
 			{
-				UnitEx unit = units[i];
+				CargoTruckState unit = units[i];
 
 				// Closest distance
-				int distance = position.GetDiagonalDistance(unit.GetPosition());
+				int distance = position.GetDiagonalDistance(unit.position);
 				if (distance < closestDistance)
 				{
 					closestUnitIndex = i;

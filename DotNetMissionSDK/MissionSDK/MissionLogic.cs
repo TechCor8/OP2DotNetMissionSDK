@@ -1,11 +1,10 @@
 ﻿using DotNetMissionSDK.AI;
 using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
-using DotNetMissionSDK.Units;
-using DotNetMissionSDK.Utility;
-using DotNetMissionSDK.Utility.Maps;
+using DotNetMissionSDK.State;
 using System;
 using System.Collections.Generic;
+using DotNetMissionSDK.State.Snapshot;
 
 namespace DotNetMissionSDK
 {
@@ -13,7 +12,6 @@ namespace DotNetMissionSDK
 	{
 		private MissionRoot m_Root;
 		private SaveData m_SaveData;
-		private PlayerInfo[] m_PlayerInfo = new PlayerInfo[8];
 		private BotPlayer[] m_BotPlayer = new BotPlayer[8];
 
 		private TriggerManager m_TriggerManager;
@@ -36,9 +34,8 @@ namespace DotNetMissionSDK
 
 			m_TriggerManager.onTriggerFired += OnTriggerExecuted;
 
-			// Initialize PlayerInfo
-			for (int i=0; i < TethysGame.NoPlayers(); ++i)
-				m_PlayerInfo[i] = new PlayerInfo(triggerManager, TethysGame.GetPlayer(i), saveData);
+			// Initialize game state
+			GameState.Initialize(triggerManager, saveData);
 		}
 
 		/// <summary>
@@ -49,12 +46,8 @@ namespace DotNetMissionSDK
 		{
 			Console.WriteLine("Mission started.");
 
-			// Initialize PlayerInfo triggers
-			for (int i=0; i < m_PlayerInfo.Length; ++i)
-				m_PlayerInfo[i]?.InitializeNewMission();
-
-			PlayerStrengthMap.Initialize();
-			PlayerUnitMap.Initialize();
+			// Initialize game state triggers
+			GameState.InitializeNew();
 
 			MissionRoot root = m_Root;
 
@@ -404,7 +397,7 @@ namespace DotNetMissionSDK
 				if (root.players[i].botType == BotType.None)
 					continue;
 
-				m_BotPlayer[i] = new BotPlayer(root.players[i].botType, GetPlayerInfo(i));
+				m_BotPlayer[i] = new BotPlayer(root.players[i].botType, i);
 				m_BotPlayer[i].Start();
 			}
 		}
@@ -441,16 +434,10 @@ namespace DotNetMissionSDK
 		/// <summary>
 		/// Called every game cycle.
 		/// </summary>
-		public virtual void Update()
+		/// <param name="stateSnapshot">The current immutable state of the game.</param>
+		public virtual void Update(StateSnapshot stateSnapshot)
 		{
 			int currentTime = TethysGame.Time();
-
-			// Update PlayerInfo state
-			for (int i=0; i < m_PlayerInfo.Length; ++i)
-				m_PlayerInfo[i]?.Update(m_PlayerInfo);
-
-			PlayerStrengthMap.Update(m_PlayerInfo);
-			PlayerUnitMap.Update(m_PlayerInfo);
 
 			// Update disasters
 			foreach (DisasterData disaster in m_Disasters)
@@ -469,7 +456,7 @@ namespace DotNetMissionSDK
 
 			// Update bots
 			for (int i=0; i < m_BotPlayer.Length; ++i)
-				m_BotPlayer[i]?.Update();
+				m_BotPlayer[i]?.Update(stateSnapshot);
 		}
 
 		private void FireDisaster(DisasterData disaster)
@@ -496,11 +483,6 @@ namespace DotNetMissionSDK
 			return m_TriggerManager.AddTrigger(triggerStub);
 		}
 
-		protected PlayerInfo GetPlayerInfo(int playerID)
-		{
-			return m_PlayerInfo[playerID];
-		}
-
 		/// <summary>
 		/// Releases all mission resources.
 		/// </summary>
@@ -510,9 +492,8 @@ namespace DotNetMissionSDK
 
 			m_TriggerManager.onTriggerFired -= OnTriggerExecuted;
 
-			// Dispose PlayerInfo
-			for (int i=0; i < m_PlayerInfo.Length; ++i)
-				m_PlayerInfo[i]?.Dispose();
+			// Dispose game state
+			GameState.Dispose();
 		}
 	}
 }

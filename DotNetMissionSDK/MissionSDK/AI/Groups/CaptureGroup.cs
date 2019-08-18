@@ -1,6 +1,4 @@
-﻿using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
-
+﻿
 namespace DotNetMissionSDK.AI.Combat.Groups
 {
 	/// <summary>
@@ -11,7 +9,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		public override VehicleGroupType groupType		{ get { return VehicleGroupType.Capture;		}	}
 
 
-		public CaptureGroup(PlayerInfo owner, ThreatZone zone) : base(owner, zone)
+		public CaptureGroup(int ownerID, ThreatZone zone) : base(ownerID, zone)
 		{
 		}
 

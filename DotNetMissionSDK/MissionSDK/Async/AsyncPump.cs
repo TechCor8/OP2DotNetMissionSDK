@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DotNetMissionSDK.Utility
+namespace DotNetMissionSDK.Async
 {
 	/// <summary>
 	/// Runs tasks asynchronously before synchronizing them to a target tick.
@@ -12,14 +12,14 @@ namespace DotNetMissionSDK.Utility
 	{
 		private class AsyncOperation
 		{
-			public int targetTick					{ get; private set; }
+			public int targetTime					{ get; private set; }
 			public CompletedCallback completedCB	{ get; private set; }
 			public Task task;
 			public object returnState;
 
-			public AsyncOperation(int targetTick, CompletedCallback completedCB)
+			public AsyncOperation(int targetTime, CompletedCallback completedCB)
 			{
-				this.targetTick = targetTick;
+				this.targetTime = targetTime;
 				this.completedCB = completedCB;
 			}
 		}
@@ -35,12 +35,19 @@ namespace DotNetMissionSDK.Utility
 		/// <summary>
 		/// Runs the specified action asynchronously.
 		/// Executes completedCB upon completion of the action.
+		/// NOTE: Must be run from main thread.
 		/// </summary>
 		/// <param name="actionCB">The action to run asynchronously.</param>
 		/// <param name="completedCB">The callback to execute when action is completed.</param>
-		public static void Run(ActionCallback actionCB, CompletedCallback completedCB)
+		/// <param name="timeToAdd">How much TethysGame.Time() until the task must complete. Must be > 0</param>
+		public static void Run(ActionCallback actionCB, CompletedCallback completedCB, int timeToAdd=10)
 		{
-			AsyncOperation operation = new AsyncOperation(TethysGame.Time() + 10, completedCB);
+			ThreadAssert.MainThreadRequired();
+
+			if (timeToAdd <= 0)
+				throw new ArgumentOutOfRangeException("timeToAdd", timeToAdd, "timeToAdd must be greater than 0.");
+
+			AsyncOperation operation = new AsyncOperation(TethysGame.Time() + timeToAdd, completedCB);
 
 			lock (m_SyncCompleted)
 				m_PendingOperations.Add(operation);
@@ -60,15 +67,23 @@ namespace DotNetMissionSDK.Utility
 
 		/// <summary>
 		/// Updates the async pump.
+		/// NOTE: Must be run from main thread.
 		/// </summary>
 		public static void Update()
 		{
-			int tick = TethysGame.Time();
+			ThreadAssert.MainThreadRequired();
 
-			// Wait for all pending operations that have reached the target tick
-			foreach (AsyncOperation operation in m_PendingOperations)
+			int time = TethysGame.Time();
+
+			List<AsyncOperation> pendingOperations;
+
+			lock (m_SyncCompleted)
+				pendingOperations = new List<AsyncOperation>(m_PendingOperations);
+
+			// Wait for all pending operations that have reached the target time
+			foreach (AsyncOperation operation in pendingOperations)
 			{
-				if (operation.targetTick == tick)
+				if (operation.targetTime == time)
 					operation.task.Wait();
 			}
 
@@ -76,12 +91,12 @@ namespace DotNetMissionSDK.Utility
 
 			lock (m_SyncCompleted)
 			{
-				// Collect all completed operations that have reached the target tick
+				// Collect all completed operations that have reached the target time
 				for (int i=0; i < m_CompletedOperations.Count; ++i)
 				{
 					AsyncOperation operation = m_CompletedOperations[i];
 
-					if (operation.targetTick == tick)
+					if (operation.targetTime == time)
 					{
 						completedOperations.Add(operation);
 						m_CompletedOperations.RemoveAt(i--);

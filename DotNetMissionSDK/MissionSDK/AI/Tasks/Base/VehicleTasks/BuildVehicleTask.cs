@@ -1,7 +1,10 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
@@ -15,39 +18,49 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		public int targetCountToBuild = 1;
 
 
-		public BuildVehicleTask() { }
-		public BuildVehicleTask(PlayerInfo owner) : base(owner) { }
+		public BuildVehicleTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			IReadOnlyCollection<UnitEx> units = owner.units.GetListForType(m_VehicleToBuild);
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_VehicleToBuild);
 			return units.Count >= targetCountToBuild;
 		}
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildVehicleFactoryTask());
+			AddPrerequisite(new BuildVehicleFactoryTask(ownerID));
 		}
 
-		protected override bool CanPerformTask()
+		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
 		{
-			return owner.player.CanBuildUnit(m_VehicleToBuild, m_VehicleToBuildCargo);
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			return owner.CanBuildUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			if (!CanPerformTask())
+			if (!CanPerformTask(stateSnapshot))
 				return false;
 
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get factory to produce
-			UnitEx factory = owner.units.vehicleFactories.Find((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy());
+			FactoryState factory = owner.units.vehicleFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 			
 			if (factory == null)
 				return true;
 
-			factory.DoProduce(m_VehicleToBuild, m_VehicleToBuildCargo);
+			ProduceUnit(unitActions, factory.unitID, m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			return true;
+		}
+
+		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		{
+			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 	}
 
@@ -56,28 +69,34 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 	/// </summary>
 	public abstract class BuildArachnidTask : BuildVehicleTask
 	{
-		public BuildArachnidTask() { }
-		public BuildArachnidTask(PlayerInfo owner) : base(owner) { }
+		public BuildArachnidTask(int ownerID) : base(ownerID) { }
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildArachnidFactoryTask());
+			AddPrerequisite(new BuildArachnidFactoryTask(ownerID));
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			if (!CanPerformTask())
+			if (!CanPerformTask(stateSnapshot))
 				return false;
 
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get factory to produce
-			UnitEx factory = owner.units.arachnidFactories.Find((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy());
+			FactoryState factory = owner.units.arachnidFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 			
 			if (factory == null)
 				return true;
 
-			factory.DoProduce(m_VehicleToBuild, m_VehicleToBuildCargo);
+			ProduceUnit(unitActions, factory.unitID, m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			return true;
+		}
+
+		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		{
+			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 	}
 }

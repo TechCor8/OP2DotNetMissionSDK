@@ -88,6 +88,7 @@ namespace DotNetMissionSDK.HFL
 		public Variant GetVariant()													{ return (Variant)UnitEx_GetVariant(m_StubIndex);												}
 		public BeaconType GetOreType()												{ return (BeaconType)UnitEx_GetOreType(m_StubIndex);											}
 		public bool GetSurveyedBy(int playerID)										{ return ((1 << playerID) & UnitEx_GetSurveyedBy(m_StubIndex)) != 0;							}
+		public int GetSurveyedFlags()												{ return UnitEx_GetSurveyedBy(m_StubIndex);														}
 
 		// Lab
 		public int GetLabCurrentTopic()												{ return UnitEx_GetLabCurrentTopic(m_StubIndex);												}

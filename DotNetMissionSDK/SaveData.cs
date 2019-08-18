@@ -1,5 +1,5 @@
-﻿using DotNetMissionSDK.Triggers;
-using DotNetMissionSDK.Utility.PlayerState;
+﻿using DotNetMissionSDK.State.Game;
+using DotNetMissionSDK.Triggers;
 using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK
@@ -17,7 +17,7 @@ namespace DotNetMissionSDK
 		public int triggerCount;
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)] // Maximum supported players
-		public PlayerInfoSaveData[] playerInfo;
+		public PlayerStarshipSaveData[] playerStarship;
 
 		// Custom Mission Data
 		[MarshalAs(UnmanagedType.LPStr, SizeConst = 50)]

@@ -1,6 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
@@ -15,10 +20,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		protected BuildStructureTask m_BuildStructureTask;
 
 
-		public BuildSingleVehicleTask() { }
-		public BuildSingleVehicleTask(PlayerInfo owner) : base(owner) { }
+		public BuildSingleVehicleTask(int ownerID) : base(ownerID) { }
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
 			// This task never completes, as it is designed to build one unit and forget about it.
 			return false;
@@ -26,32 +30,41 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildVehicleFactoryTask());
+			AddPrerequisite(new BuildVehicleFactoryTask(ownerID));
 
 			// This task is optional and not required. Used for constructing additional factories.
-			m_BuildStructureTask = new BuildVehicleFactoryTask(owner);
+			m_BuildStructureTask = new BuildVehicleFactoryTask(ownerID);
 			m_BuildStructureTask.GeneratePrerequisites();
 		}
 
-		protected override bool CanPerformTask()
+		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
 		{
-			return owner.player.CanBuildUnit(m_VehicleToBuild, m_VehicleToBuildCargo);
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			return owner.CanBuildUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			if (!CanPerformTask())
+			if (!CanPerformTask(stateSnapshot))
 				return false;
 
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get factory to produce
-			UnitEx factory = owner.units.vehicleFactories.Find((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy());
+			FactoryState factory = owner.units.vehicleFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 			
 			if (factory == null)
 				return false;
 
-			factory.DoProduce(m_VehicleToBuild, m_VehicleToBuildCargo);
+			ProduceUnit(unitActions, factory.unitID, m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			return true;
+		}
+
+		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		{
+			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 
 		/// <summary>
@@ -66,10 +79,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		/// <summary>
 		/// Adds a factory to the base for producing more units.
 		/// </summary>
-		public virtual void AddFactory()
+		public virtual void AddFactory(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			m_BuildStructureTask.targetCountToBuild = owner.units.vehicleFactories.Count+1;
-			m_BuildStructureTask.PerformTaskTree();
+			m_BuildStructureTask.PerformTaskTree(stateSnapshot, unitActions);
 		}
 	}
 
@@ -78,41 +93,49 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 	/// </summary>
 	public class BuildSingleArachnidTask : BuildSingleVehicleTask
 	{
-		public BuildSingleArachnidTask() { }
-		public BuildSingleArachnidTask(PlayerInfo owner) : base(owner) { }
+		public BuildSingleArachnidTask(int ownerID) : base(ownerID) { }
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildArachnidFactoryTask());
+			AddPrerequisite(new BuildArachnidFactoryTask(ownerID));
 
 			// This task is optional and not required. Used for constructing additional factories.
-			m_BuildStructureTask = new BuildArachnidFactoryTask(owner);
+			m_BuildStructureTask = new BuildArachnidFactoryTask(ownerID);
 			m_BuildStructureTask.GeneratePrerequisites();
 		}
 
-		protected override bool PerformTask()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			if (!CanPerformTask())
+			if (!CanPerformTask(stateSnapshot))
 				return false;
 
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get factory to produce
-			UnitEx factory = owner.units.arachnidFactories.Find((UnitEx unit) => unit.IsEnabled() && !unit.IsBusy());
+			FactoryState factory = owner.units.arachnidFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 			
 			if (factory == null)
 				return false;
 
-			factory.DoProduce(m_VehicleToBuild, m_VehicleToBuildCargo);
+			ProduceUnit(unitActions, factory.unitID, m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			return true;
+		}
+
+		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		{
+			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 
 		/// <summary>
 		/// Adds a factory to the base for producing more units.
 		/// </summary>
-		public override void AddFactory()
+		public override void AddFactory(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			m_BuildStructureTask.targetCountToBuild = owner.units.arachnidFactories.Count+1;
-			m_BuildStructureTask.PerformTaskTree();
+			m_BuildStructureTask.PerformTaskTree(stateSnapshot, unitActions);
 		}
 	}
 }

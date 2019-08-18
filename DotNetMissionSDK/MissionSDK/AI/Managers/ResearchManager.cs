@@ -1,6 +1,11 @@
-﻿using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Utility;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DotNetMissionSDK.AI.Managers
 {
@@ -13,14 +18,16 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private int m_CurrentTechLevel = 1;
 
+		private bool m_IsProcessing;
+
 		public BotPlayer botPlayer	{ get; private set; }
-		public PlayerInfo owner		{ get; private set; }
+		public int ownerID			{ get; private set; }
 
 		
-		public ResearchManager(BotPlayer botPlayer, PlayerInfo owner)
+		public ResearchManager(BotPlayer botPlayer, int ownerID)
 		{
 			this.botPlayer = botPlayer;
-			this.owner = owner;
+			this.ownerID = ownerID;
 
 			// Add all tech to tech levels table
 			int techCount = Research.GetTechCount();
@@ -40,41 +47,69 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 		}
 
-		public void Update()
+		public void Update(StateSnapshot stateSnapshot)
 		{
-			// Check if tech level has been completed
-			if (IsTechLevelResearched(m_CurrentTechLevel))
-				++m_CurrentTechLevel;
+			ThreadAssert.MainThreadRequired();
 
-			int availableScientists = owner.player.GetNumAvailableScientists();
+			if (m_IsProcessing)
+				return;
 
-			// Set topics for labs
-			SetTopicForLabs(owner.units.advancedLabs, LabType.ltAdvanced, ref availableScientists);
-			SetTopicForLabs(owner.units.standardLabs, LabType.ltStandard, ref availableScientists);
-			SetTopicForLabs(owner.units.basicLabs, LabType.ltBasic, ref availableScientists);
+			m_IsProcessing = true;
+
+			AsyncPump.Run(() =>
+			{
+				List<Action> buildingActions = new List<Action>();
+
+				PlayerState owner = stateSnapshot.players[ownerID];
+
+				// Check if tech level has been completed
+				if (IsTechLevelResearched(owner, m_CurrentTechLevel))
+					++m_CurrentTechLevel;
+
+				int availableScientists = owner.numAvailableScientists;
+
+				// Set topics for labs
+				SetTopicForLabs(stateSnapshot, buildingActions, owner.units.advancedLabs, LabType.ltAdvanced, ref availableScientists);
+				SetTopicForLabs(stateSnapshot, buildingActions, owner.units.standardLabs, LabType.ltStandard, ref availableScientists);
+				SetTopicForLabs(stateSnapshot, buildingActions, owner.units.basicLabs, LabType.ltBasic, ref availableScientists);
+
+				return buildingActions;
+			},
+			(object returnState) =>
+			{
+				m_IsProcessing = false;
+
+				// Execute all completed actions
+				List<Action> buildingActions = (List<Action>)returnState;
+
+				foreach (Action action in buildingActions)
+					action();
+			});
 		}
 
-		private void SetTopicForLabs(List<UnitEx> labs, LabType labType, ref int availableScientists)
+		private void SetTopicForLabs(StateSnapshot stateSnapshot, List<Action> buildingActions, ReadOnlyCollection<LabState> labs, LabType labType, ref int availableScientists)
 		{
-			foreach (UnitEx lab in labs)
+			foreach (LabState lab in labs)
 			{
 				if (availableScientists == 0)
 					break;
 
-				if (lab.IsEnabled() && !lab.IsBusy())
+				if (lab.isEnabled && !lab.isBusy)
 				{
-					int topic = GetNextResearchTopic(labType);
+					int topic = GetNextResearchTopic(stateSnapshot, labType);
 					if (topic <= 0)
 						break;
 
-					lab.DoResearch(GetTechIndex(topic), 1);
+					buildingActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(GetTechIndex(topic), 1));
 					--availableScientists;
 				}
 			}
 		}
 
-		private int GetNextResearchTopic(LabType labType)
+		private int GetNextResearchTopic(StateSnapshot stateSnapshot, LabType labType)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			List<TechInfo> techList;
 			if (!m_TechLevels.TryGetValue(m_CurrentTechLevel, out techList))
 				return 0;
@@ -89,7 +124,7 @@ namespace DotNetMissionSDK.AI.Managers
 					continue;
 
 				// Skip tech if it is not available for this colony
-				if (owner.player.IsEden())
+				if (owner.isEden)
 				{
 					if (info.GetEdenCost() <= 0)
 						continue;
@@ -101,7 +136,7 @@ namespace DotNetMissionSDK.AI.Managers
 				}
 
 				// Skip tech if this player has already researched this tech
-				if (owner.player.HasTechnology(techID))
+				if (owner.HasTechnology(techID))
 					continue;
 
 				// Make sure another lab isn't researching this topic
@@ -123,21 +158,21 @@ namespace DotNetMissionSDK.AI.Managers
 			return 0;
 		}
 
-		private bool IsLabResearchingTopic(List<UnitEx> labs, int techID)
+		private bool IsLabResearchingTopic(ReadOnlyCollection<LabState> labs, int techID)
 		{
-			foreach (UnitEx lab in labs)
+			foreach (LabState lab in labs)
 			{
-				if (lab.GetCurAction() != ActionType.moDoResearch)
+				if (lab.curAction != ActionType.moDoResearch)
 					continue;
 
-				if (Research.GetTechInfo(lab.GetLabCurrentTopic()).GetTechID() == techID)
+				if (Research.GetTechInfo(lab.labCurrentTopic).GetTechID() == techID)
 					return true;
 			}
 
 			return false;
 		}
 
-		private bool IsTechLevelResearched(int techLevel)
+		private bool IsTechLevelResearched(PlayerState owner, int techLevel)
 		{
 			List<TechInfo> techList;
 			if (!m_TechLevels.TryGetValue(m_CurrentTechLevel, out techList))
@@ -146,7 +181,7 @@ namespace DotNetMissionSDK.AI.Managers
 			foreach (TechInfo info in techList)
 			{
 				// Skip tech if it is not available for this colony
-				if (owner.player.IsEden())
+				if (owner.isEden)
 				{
 					if (info.GetEdenCost() <= 0)
 						continue;
@@ -157,7 +192,7 @@ namespace DotNetMissionSDK.AI.Managers
 						continue;
 				}
 
-				if (!owner.player.HasTechnology(info.GetTechID()))
+				if (!owner.HasTechnology(info.GetTechID()))
 					return false;
 			}
 

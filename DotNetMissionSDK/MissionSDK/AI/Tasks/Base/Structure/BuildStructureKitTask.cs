@@ -1,8 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.Units;
-using DotNetMissionSDK.Utility;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
@@ -16,8 +19,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		private map_id[] m_SkipConvecsWithKits = new map_id[0];		// Task will not control convecs containing these kits
 
-		public BuildStructureKitTask() { }
-		public BuildStructureKitTask(PlayerInfo owner) : base(owner) { }
+		public BuildStructureKitTask(int ownerID) : base(ownerID) { }
 
 		public BuildStructureKitTask Initialize(map_id[] skipConvecsWithKits)
 		{
@@ -27,52 +29,29 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		}
 
 
-		public override bool IsTaskComplete()
+		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Task is complete when convec has kit
-			return owner.units.convecs.Find((Vehicle unit) => unit.GetCargo() == m_KitToBuild) != null;
+			return owner.units.convecs.FirstOrDefault((ConvecState unit) => unit.cargoType == m_KitToBuild) != null;
 		}
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildStructureFactoryTask());
-			AddPrerequisite(new BuildConvecTask());
+			AddPrerequisite(new BuildStructureFactoryTask(ownerID));
+			AddPrerequisite(new BuildConvecTask(ownerID));
 		}
 
-		protected override bool CanPerformTask()
+		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
 		{
-			UnitInfo unitInfo = new UnitInfo(m_KitToBuild);
-
-			// Fail Check: Colony Type
-			if (!unitInfo.CanColonyUseUnit(owner.player.IsEden()))
-				return false;
-
-			// Fail Check: Research
-			TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
-
-			if (!owner.player.HasTechnology(techInfo.GetTechID()))
-				return false;
-
-			if (m_KitToBuildCargo != map_id.None)
-			{
-				UnitInfo cargoInfo = new UnitInfo(m_KitToBuildCargo);
-
-				// Fail Check: Cargo Colony Type
-				if (!cargoInfo.CanColonyUseUnit(owner.player.IsEden()))
-					return false;
-
-				// Fail Check: Cargo Research
-				TechInfo cargoTechInfo = Research.GetTechInfo(cargoInfo.GetResearchTopic());
-
-				if (!owner.player.HasTechnology(cargoTechInfo.GetTechID()))
-					return false;
-			}
+			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Find enabled factory
 			bool hasFactoryWithCargo = false;
 
-			List<UnitEx> factories = owner.units.structureFactories.FindAll((UnitEx unit) => unit.IsEnabled());
-			foreach (UnitEx factory in factories)
+			List<FactoryState> factories = owner.units.structureFactories.Where((FactoryState unit) => unit.isEnabled).ToList();
+			foreach (FactoryState factory in factories)
 			{
 				if (factory.HasBayWithCargo(m_KitToBuild))
 				{
@@ -85,86 +64,58 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (factories.Count == 0)
 				return false;
 
-			// No kit in factory, and can't afford kit
-			if (!hasFactoryWithCargo && !CanAffordKit())
-				return false;
+			// Kit in factory, can build structure
+			if (hasFactoryWithCargo)
+				return true;
 
-			return true;
+			// colony type, tech, metal requirements
+			return owner.CanBuildUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo);
 		}
 
-		private bool CanAffordKit()
+		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
 		{
-			UnitInfo kitInfo = new UnitInfo(m_KitToBuild);
+			PlayerState owner = stateSnapshot.players[ownerID];
 
-			if (m_KitToBuildCargo == map_id.None)
-			{
-				// Fail Check: Kit cost
-				if (owner.player.Ore() < kitInfo.GetOreCost(owner.player.playerID)) return false;
-				if (owner.player.RareOre() < kitInfo.GetRareOreCost(owner.player.playerID)) return false;
-			}
-			else
-			{
-				UnitInfo cargoinfo = new UnitInfo(m_KitToBuildCargo);
-
-				// Fail Check: Kit cost
-				if (owner.player.Ore() < kitInfo.GetOreCost(owner.player.playerID) + cargoinfo.GetOreCost(owner.player.playerID)) return false;
-				if (owner.player.RareOre() < kitInfo.GetRareOreCost(owner.player.playerID) + cargoinfo.GetRareOreCost(owner.player.playerID)) return false;
-			}
-
-			return true;
-		}
-
-		protected override bool PerformTask()
-		{
 			// Fail Check: Research
-			UnitInfo unitInfo = new UnitInfo(m_KitToBuild);
-			TechInfo techInfo = Research.GetTechInfo(unitInfo.GetResearchTopic());
-
-			if (!owner.player.HasTechnology(techInfo.GetTechID()))
+			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuild))
 				return false;
 
-			if (m_KitToBuildCargo != map_id.None)
-			{
-				UnitInfo cargoInfo = new UnitInfo(m_KitToBuildCargo);
-				TechInfo cargoTechInfo = Research.GetTechInfo(cargoInfo.GetResearchTopic());
-
-				if (!owner.player.HasTechnology(cargoTechInfo.GetTechID()))
-					return false;
-			}
+			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuildCargo))
+				return false;
 
 			// Get structure factories with kit
-			List<UnitEx> factories = owner.units.structureFactories.FindAll((UnitEx unit) => unit.HasBayWithCargo(m_KitToBuild));
-			foreach (UnitEx factoryWithKit in factories)
+			List<FactoryState> factories = owner.units.structureFactories.Where((FactoryState unit) => unit.HasBayWithCargo(m_KitToBuild)).ToList();
+			foreach (FactoryState factoryWithKit in factories)
 			{
-				if (!factoryWithKit.IsEnabled())
+				if (!factoryWithKit.isEnabled)
 					continue;
 
 				// Get convec on dock
-				UnitEx convec = owner.units.convecs.Find((Vehicle unit) => unit.IsOnDock(factoryWithKit) && !UnitContainsKit(unit, m_SkipConvecsWithKits));
+				ConvecState convec = owner.units.convecs.FirstOrDefault((ConvecState unit) => unit.IsOnDock(factoryWithKit) && !UnitContainsKit(unit, m_SkipConvecsWithKits));
 				if (convec != null)
 				{
 					// Wait if docking is in progress
-					if (convec.GetCurAction() != ActionType.moDone)
+					if (convec.curAction != ActionType.moDone)
 						return true;
 
-					factoryWithKit.DoTransferCargo(factoryWithKit.GetBayWithCargo(m_KitToBuild));
+					unitActions.Add(() => GameState.GetUnit(factoryWithKit.unitID)?.DoTransferCargo(factoryWithKit.GetBayWithCargo(m_KitToBuild)));
 					return true;
 				}
 
 				// Get closest convec that isn't doing anything
-				List<Vehicle> emptyConvecs = owner.units.convecs.FindAll((Vehicle unit) => unit.GetCargo() == map_id.None && (unit.GetCurAction() == ActionType.moDone || unit.GetCurAction() == ActionType.moMove));
+				List<ConvecState> emptyConvecs = owner.units.convecs.Where((ConvecState unit) => unit.cargoType == map_id.None && (unit.curAction == ActionType.moDone || unit.curAction == ActionType.moMove)).ToList();
 				if (emptyConvecs.Count > 0)
 				{
-					emptyConvecs.Sort((a,b) => a.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition()).CompareTo(b.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition())));
+					emptyConvecs.Sort((a,b) => a.position.GetDiagonalDistance(factoryWithKit.position).CompareTo(b.position.GetDiagonalDistance(factoryWithKit.position)));
 					convec = emptyConvecs[0];
 				}
 				else
 				{
 					// As a last resort, pull an idle convec that has cargo
-					List<Vehicle> idleConvecs = owner.units.convecs.FindAll((Vehicle unit) => unit.GetCurAction() == ActionType.moDone && !UnitContainsKit(unit, m_SkipConvecsWithKits));
+					List<ConvecState> idleConvecs = owner.units.convecs.Where((ConvecState unit) => unit.curAction == ActionType.moDone && !UnitContainsKit(unit, m_SkipConvecsWithKits)).ToList();
 					if (idleConvecs.Count > 0)
 					{
-						idleConvecs.Sort((a,b) => a.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition()).CompareTo(b.GetPosition().GetDiagonalDistance(factoryWithKit.GetPosition())));
+						idleConvecs.Sort((a,b) => a.position.GetDiagonalDistance(factoryWithKit.position).CompareTo(b.position.GetDiagonalDistance(factoryWithKit.position)));
 						convec = idleConvecs[0];
 					}
 				}
@@ -173,7 +124,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 					return true;
 
 				// Send convec to dock
-				convec.DoDock(factoryWithKit);
+				unitActions.Add(() =>
+				{
+					UnitEx facWithKit = GameState.GetUnit(factoryWithKit.unitID);
+					if (facWithKit != null)
+						GameState.GetUnit(convec.unitID)?.DoDock(facWithKit);
+				});
 
 				return true;
 			}
@@ -182,29 +138,34 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				return true;
 
 			// Get active structure factory
-			UnitEx factory = owner.units.structureFactories.Find((UnitEx unit) => unit.IsEnabled());
+			FactoryState factory = owner.units.structureFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled);
 
 			// If factory not found, most likely it is not enabled
 			if (factory == null)
 				return false;
 
-			if (factory.IsBusy())
+			if (factory.isBusy)
 				return true;
 
-			if (!CanAffordKit())
+			if (!owner.CanAffordUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo))
 				return false;
 
 			// Build kit
-			factory.DoProduce(m_KitToBuild, m_KitToBuildCargo);
-
+			ProduceUnit(unitActions, factory.unitID, m_KitToBuild, m_KitToBuildCargo);
+			
 			return true;
 		}
 
-		private bool UnitContainsKit(Vehicle unit, map_id[] kits)
+		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id kitToBuild, map_id kitToBuildCargo)
+		{
+			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(kitToBuild, kitToBuildCargo));
+		}
+
+		private bool UnitContainsKit(ConvecState unit, map_id[] kits)
 		{
 			foreach (map_id type in kits)
 			{
-				if (unit.GetCargo() == type)
+				if (unit.cargoType == type)
 					return true;
 			}
 
