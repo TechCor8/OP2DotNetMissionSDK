@@ -103,14 +103,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				// Get repair unit
 				UnitState repairUnit = owner.units.GetClosestUnitOfType(m_BuildRepairUnitTask.repairUnitType, unitToFix.position);
 
-				if (repairUnit == null || repairUnit.curAction != ActionType.moDone)
+				if (repairUnit == null)
 					continue;
 
 				unitActions.Add(() =>
 				{
+					UnitEx liveRepairUnit = GameState.GetUnit(repairUnit.unitID);
 					UnitEx unitToRepair = GameState.GetUnit(unitToFix.unitID);
-					if (unitToRepair != null)
-						GameState.GetUnit(repairUnit.unitID)?.DoRepair(unitToRepair);
+					if (liveRepairUnit != null && unitToRepair != null)
+					{
+						if (repairUnit.curAction == ActionType.moDone)
+							GameState.GetUnit(repairUnit.unitID)?.DoRepair(unitToRepair);
+					}
 				});
 			}
 
