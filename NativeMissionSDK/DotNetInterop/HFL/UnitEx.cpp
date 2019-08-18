@@ -251,6 +251,13 @@ extern "C"
 
 		return unit.GetCargoType();
 	}
+	extern EXPORT int __stdcall UnitEx_GetWorkersInTraining(int unitID)
+	{
+		UnitEx unit;
+		unit.unitID = unitID;
+
+		return unit.GetWorkersInTraining();
+	}
 	extern EXPORT map_id __stdcall UnitEx_GetFactoryCargo(int unitID, int bay)
 	{
 		UnitEx unit;

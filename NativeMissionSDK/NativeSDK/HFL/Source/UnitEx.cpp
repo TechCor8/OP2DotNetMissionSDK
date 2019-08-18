@@ -183,7 +183,7 @@ struct OP2Unit
 	short timerESG;
 	short unknown8;
 	int unknown9;
-	char unknown10;
+	char workersInTraining;
 	char bayItem[6];
 	char unknown11;
 	int unknown12;
@@ -808,6 +808,19 @@ Truck_Cargo UnitEx::GetCargoType()
 	return (Truck_Cargo)(((*unitArray)[unitID].weaponCargo) & 0xF);
 }
 
+//workersInTraining
+
+int UnitEx::GetWorkersInTraining()
+{
+	if (!isInited)
+		return HFLNOTINITED;
+
+	if (!IsLive())
+		return -1;
+
+	return (int)((*unitArray)[unitID].workersInTraining);
+}
+
 map_id UnitEx::GetFactoryCargo(int bay)
 {
 	if (!isInited)
@@ -1115,7 +1128,7 @@ int UnitEx::GetUnknownValue(int index)
 	case 32:	return (*unitArray)[unitID].timerESG;
 	case 33:	return (*unitArray)[unitID].unknown8;
 	case 34:	return (*unitArray)[unitID].unknown9;
-	case 35:	return (*unitArray)[unitID].unknown10;
+	case 35:	return (*unitArray)[unitID].workersInTraining;
 	case 36:	return (*unitArray)[unitID].bayItem[0];
 	case 37:	return (*unitArray)[unitID].bayItem[1];
 	case 38:	return (*unitArray)[unitID].bayItem[2];
@@ -1180,7 +1193,7 @@ void UnitEx::SetUnknownValue(int index, int value)
 	case 32:	(*unitArray)[unitID].timerESG = value;
 	case 33:	(*unitArray)[unitID].unknown8 = value;
 	case 34:	(*unitArray)[unitID].unknown9 = value;
-	case 35:	(*unitArray)[unitID].unknown10 = value;
+	case 35:	(*unitArray)[unitID].workersInTraining = value;
 	case 36:	(*unitArray)[unitID].bayItem[0] = value;
 	case 37:	(*unitArray)[unitID].bayItem[1] = value;
 	case 38:	(*unitArray)[unitID].bayItem[2] = value;

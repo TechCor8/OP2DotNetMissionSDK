@@ -36,6 +36,7 @@ public:
 	int GetDamage();
 	int GetCargoAmount();
 	Truck_Cargo GetCargoType();
+	int GetWorkersInTraining();
 	map_id GetFactoryCargo(int bay);
 	map_id GetFactoryCargoWeapon(int bay);
 	map_id GetLaunchPadCargo();

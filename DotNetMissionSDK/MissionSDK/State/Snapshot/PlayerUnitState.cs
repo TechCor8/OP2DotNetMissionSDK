@@ -49,7 +49,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		public ReadOnlyCollection<StructureState> nurseries				{ get; private set; }
 		public ReadOnlyCollection<StructureState> solarPowerArrays		{ get; private set; }
 		public ReadOnlyCollection<StructureState> recreationFacilities	{ get; private set; }
-		public ReadOnlyCollection<StructureState> universities			{ get; private set; }
+		public ReadOnlyCollection<UniversityState> universities			{ get; private set; }
 		public ReadOnlyCollection<StructureState> agridomes				{ get; private set; }
 		public ReadOnlyCollection<StructureState> dirts					{ get; private set; }
 		public ReadOnlyCollection<GarageState> garages					{ get; private set; }
@@ -138,7 +138,7 @@ namespace DotNetMissionSDK.State.Snapshot
 			List<StructureState> nurseries				= new List<StructureState>(	prevState?.nurseries.Count ?? 0);
 			List<StructureState> solarPowerArrays		= new List<StructureState>(	prevState?.solarPowerArrays.Count ?? 0);
 			List<StructureState> recreationFacilities	= new List<StructureState>(	prevState?.recreationFacilities.Count ?? 0);
-			List<StructureState> universities			= new List<StructureState>(	prevState?.universities.Count ?? 0);
+			List<UniversityState> universities			= new List<UniversityState>(prevState?.universities.Count ?? 0);
 			List<StructureState> agridomes				= new List<StructureState>(	prevState?.agridomes.Count ?? 0);
 			List<StructureState> dirts					= new List<StructureState>(	prevState?.dirts.Count ?? 0);
 			List<GarageState> garages					= new List<GarageState>(	prevState?.garages.Count ?? 0);
@@ -206,7 +206,7 @@ namespace DotNetMissionSDK.State.Snapshot
 					case map_id.Nursery:				nurseries.Add(				new StructureState(unit,	unitStructureInfo, unitWeaponInfo));		break;
 					case map_id.SolarPowerArray:		solarPowerArrays.Add(		new StructureState(unit,	unitStructureInfo, unitWeaponInfo));		break;
 					case map_id.RecreationFacility:		recreationFacilities.Add(	new StructureState(unit,	unitStructureInfo, unitWeaponInfo));		break;
-					case map_id.University:				universities.Add(			new StructureState(unit,	unitStructureInfo, unitWeaponInfo));		break;
+					case map_id.University:				universities.Add(			new UniversityState(unit,	unitStructureInfo, unitWeaponInfo));		break;
 					case map_id.Agridome:				agridomes.Add(				new StructureState(unit,	unitStructureInfo, unitWeaponInfo));		break;
 					case map_id.DIRT:					dirts.Add(					new StructureState(unit,	unitStructureInfo, unitWeaponInfo));		break;
 					case map_id.Garage:					garages.Add(				new GarageState(unit,		unitStructureInfo, unitWeaponInfo));		break;

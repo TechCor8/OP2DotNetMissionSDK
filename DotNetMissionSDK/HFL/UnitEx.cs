@@ -60,6 +60,7 @@ namespace DotNetMissionSDK.HFL
 
 		public int GetCargoAmount()													{ return UnitEx_GetCargoAmount(m_StubIndex);													}
 		public TruckCargo GetCargoType()											{ return UnitEx_GetCargoType(m_StubIndex);														}
+		public int GetWorkersInTraining()											{ return UnitEx_GetWorkersInTraining(m_StubIndex);												}
 		public map_id GetFactoryCargo(int bay)										{ return UnitEx_GetFactoryCargo(m_StubIndex, bay);												}
 		public map_id GetFactoryCargoWeapon(int bay)								{ return UnitEx_GetFactoryCargoWeapon(m_StubIndex, bay);										}
 		public map_id GetLaunchpadCargo()											{ return UnitEx_GetLaunchPadCargo(m_StubIndex);													}
@@ -228,6 +229,7 @@ namespace DotNetMissionSDK.HFL
 
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetCargoAmount(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern TruckCargo UnitEx_GetCargoType(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetWorkersInTraining(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern map_id UnitEx_GetFactoryCargo(int unitID, int bay);
 		[DllImport("DotNetInterop.dll")] private static extern map_id UnitEx_GetFactoryCargoWeapon(int unitID, int bay);
 		[DllImport("DotNetInterop.dll")] private static extern map_id UnitEx_GetLaunchPadCargo(int unitID);
