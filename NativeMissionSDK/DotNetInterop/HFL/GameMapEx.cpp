@@ -67,4 +67,9 @@ extern "C"
 	{
 		return GameMapEx::LoadMap(fileName);
 	}
+
+	extern EXPORT void __stdcall GameMapEx_CopyTileMap(int* tileMap, int xMin, int xMax, int yMin, int yMax)
+	{
+		GameMapEx::CopyTileMap(tileMap, xMin, xMax, yMin, yMax);
+	}
 }

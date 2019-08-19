@@ -29,8 +29,6 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			m_PlayerID = playerID;
 
 			// Update command grid with connection status
-			Array.Clear(m_Grid, 0, m_Grid.Length);
-
 			foreach (StructureState cc in units.commandCenters)
 			{
 				Pathfinder.GetClosestValidTile(cc.position, GetTileCost, IsValidTile, false);

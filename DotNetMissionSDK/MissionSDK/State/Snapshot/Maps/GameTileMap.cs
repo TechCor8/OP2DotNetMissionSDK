@@ -1,4 +1,6 @@
 ﻿
+using DotNetMissionSDK.HFL;
+
 namespace DotNetMissionSDK.State.Snapshot.Maps
 {
 	/// <summary>
@@ -7,12 +9,10 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 	/// </summary>
 	public class GameTileMap
 	{
-		private struct Tile
-		{
-			public CellType cellType;
-		}
+		private int m_Width;
+		private int m_Height;
 
-		private Tile[,] m_Grid;
+		private int[] m_Grid;
 
 
 		/// <summary>
@@ -20,17 +20,22 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		/// </summary>
 		public GameTileMap()
 		{
-			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
+			m_Width = GameMap.bounds.width;
+			m_Height = GameMap.bounds.height;
+
+			m_Grid = new int[m_Width*m_Height];
 			//Array.Clear(m_Grid, 0, m_Grid.Length);
 
-			for (int x=GameMap.bounds.xMin; x < GameMap.bounds.xMax; ++x)
+			GameMapEx.CopyTileMap(m_Grid);
+
+			/*for (int x=GameMap.bounds.xMin; x < GameMap.bounds.xMax; ++x)
 			{
 				for (int y=GameMap.bounds.yMin; y < GameMap.bounds.yMax; ++y)
 				{
 					LOCATION tile = GetPointInGridSpace(new LOCATION(x,y));
 					m_Grid[tile.x,tile.y].cellType = GameMap.GetCellType(x,y);
 				}
-			}
+			}*/
 		}
 
 		private static LOCATION GetPointInGridSpace(LOCATION pt)
@@ -48,7 +53,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		{
 			tilePosition = GetPointInGridSpace(tilePosition);
 
-			return m_Grid[tilePosition.x, tilePosition.y].cellType;
+			return (CellType)m_Grid[tilePosition.x + tilePosition.y * m_Width];
 		}
 
 		public bool IsTilePassable(int x, int y)

@@ -18,6 +18,10 @@ namespace DotNetMissionSDK.HFL
 		public static int GetNumUnits(int tileX, int tileY)													{ return GameMapEx_GetNumUnits();											}
 		public static int LoadMap(int tileX, int tileY, string fileName)									{ return GameMapEx_LoadMap(fileName);										}
 
+		public static void CopyTileMap(int[] tileMapBuffer)
+		{
+			GameMapEx_CopyTileMap(tileMapBuffer, bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax);
+		}
 
 		[DllImport("DotNetInterop.dll")] private static extern uint GameMapEx_GetTileMappingIndex(int x, int y);
 		[DllImport("DotNetInterop.dll")] private static extern uint GameMapEx_GetTileUnitIndex(int x, int y);
@@ -29,5 +33,7 @@ namespace DotNetMissionSDK.HFL
 
 		[DllImport("DotNetInterop.dll")] private static extern int GameMapEx_GetNumUnits();
 		[DllImport("DotNetInterop.dll")] private static extern int GameMapEx_LoadMap(string fileName);
+
+		[DllImport("DotNetInterop.dll")] private static extern void GameMapEx_CopyTileMap(int[] tileMap, int xMin, int xMax, int yMin, int yMax);
 	}
 }

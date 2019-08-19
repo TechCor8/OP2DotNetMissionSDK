@@ -109,3 +109,19 @@ int GameMapEx::LoadMap(char *fileName)
 	
 	return func(p, 0, fileName);
 }
+
+void GameMapEx::CopyTileMap(int* tileMap, int xMin, int xMax, int yMin, int yMax)
+{
+	int mapWidth = xMax - xMin;
+
+	for (int x = xMin; x < xMax; ++x)
+	{
+		for (int y = yMin; y < yMax; ++y)
+		{
+			int px = x - xMin;
+			int py = y - yMin;
+
+			tileMap[px + py * mapWidth] = GetTileEx(LOCATION(px,py)).cellType;
+		}
+	}
+}
