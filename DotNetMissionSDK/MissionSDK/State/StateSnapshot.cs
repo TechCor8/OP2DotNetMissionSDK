@@ -49,6 +49,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		public GaiaMap gaiaMap													{ get; private set; }
 		public GameTileMap tileMap												{ get; private set; }
 		public PlayerUnitMap unitMap											{ get; private set; }
+		public PlayerCommandMap commandMap										{ get; private set; }
 		public PlayerStrengthMap strengthMap									{ get; private set; }
 
 		/// <summary>
@@ -129,10 +130,11 @@ namespace DotNetMissionSDK.State.Snapshot
 			}
 
 			// Map state
-			if (strengthMap != null) gaiaMap.Initialize(gaia);			else gaiaMap = new GaiaMap(gaia);
-			if (strengthMap != null) tileMap.Initialize();				else tileMap = new GameTileMap();
-			if (strengthMap != null) unitMap.Initialize(m_Players);		else unitMap = new PlayerUnitMap(m_Players);
-			if (strengthMap != null) strengthMap.Initialize(m_Players);	else strengthMap = new PlayerStrengthMap(m_Players);
+			if (gaiaMap != null) gaiaMap.Initialize(gaia);						else gaiaMap = new GaiaMap(gaia);
+			if (tileMap != null) tileMap.Initialize();							else tileMap = new GameTileMap();
+			if (unitMap != null) unitMap.Initialize(m_Players);					else unitMap = new PlayerUnitMap(m_Players);
+			if (commandMap != null) commandMap.Initialize(this);				else commandMap = new PlayerCommandMap(this);
+			if (strengthMap != null) strengthMap.Initialize(m_Players);			else strengthMap = new PlayerStrengthMap(m_Players);
 
 			m_LastSnapshot = this;
 		}
@@ -170,6 +172,7 @@ namespace DotNetMissionSDK.State.Snapshot
 				gaiaMap.Clear();
 				tileMap.Clear();
 				unitMap.Clear();
+				commandMap.Clear();
 				strengthMap.Clear();
 
 				m_SnapshotPool.Release(this);

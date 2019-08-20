@@ -178,7 +178,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			foreach (StructureState cc in owner.units.commandCenters)
 			{
 				// Get needed DIRT count
-				List<StructureState> connectedStructures = owner.commandMap.GetConnectedStructures(cc.position);
+				List<StructureState> connectedStructures = stateSnapshot.commandMap.GetConnectedStructures(ownerID, cc.position);
 				int neededDIRTs = connectedStructures.Count / productionCap + 1;
 
 				m_BuildDirtTask.targetCountToBuild += neededDIRTs;

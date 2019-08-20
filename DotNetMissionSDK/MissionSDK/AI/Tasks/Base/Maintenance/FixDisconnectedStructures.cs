@@ -26,7 +26,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (!BuildStructureTask.NeedsTube(building.unitType))
 					continue;
 
-				if (!owner.commandMap.ConnectsTo(building.GetRect()))
+				if (!stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect()))
 					return false;
 			}
 
@@ -60,7 +60,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 				MAP_RECT buildingRect = stateSnapshot.structureInfo[unitToFix.unitType].GetRect(unitToFix.position);
 
-				if (owner.commandMap.ConnectsTo(buildingRect))
+				if (stateSnapshot.commandMap.ConnectsTo(ownerID, buildingRect))
 					continue;
 
 				++structuresThatNeedTubes;
@@ -72,7 +72,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					continue;
 
 				// Get path from tube network to structure
-				LOCATION[] path = owner.commandMap.GetPathToClosestConnectedTile(buildingRect);
+				LOCATION[] path = stateSnapshot.commandMap.GetPathToClosestConnectedTile(ownerID, buildingRect);
 				if (path == null)
 					continue;
 

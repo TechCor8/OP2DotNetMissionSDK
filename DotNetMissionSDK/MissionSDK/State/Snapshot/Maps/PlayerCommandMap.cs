@@ -6,64 +6,65 @@ using System.Collections.Generic;
 namespace DotNetMissionSDK.State.Snapshot.Maps
 {
 	/// <summary>
-	/// Represents a map of a player's command tube access.
+	/// Represents a map of players' command tube access.
 	/// NOTE: Recommended way to access this class is through StateSnapshot.
 	/// </summary>
 	public class PlayerCommandMap
 	{
 		private struct Tile
 		{
-			public byte hasCommandAccess;			// Command grid. 0 - No command access, 1 - Has command access
-			public StructureState buildingOnTile;
+			/// <summary>
+			/// Bit flags for each player. If flag is set, player has command access.
+			/// </summary>
+			private byte m_HasCommandAccess;
+
+			public void SetCommandAccess(int playerID, int isActive)
+			{
+				m_HasCommandAccess &= (byte)~playerID;
+				m_HasCommandAccess |=  (byte)(isActive << playerID);
+			}
+
+			public bool HasCommandAccess(int playerID)
+			{
+				return (m_HasCommandAccess & (1 << playerID)) != 0;
+			}
 		}
 
 		private Tile[,] m_Grid;
 
-		private int m_PlayerID;
-
+		private StateSnapshot m_StateSnapshot;
+		
 
 		public PlayerCommandMap() { }
 
 		/// <summary>
 		/// Initializes the map. Must be called after GameMap has been initialized.
 		/// </summary>
-		public PlayerCommandMap(PlayerUnitState units, int playerID)
+		public PlayerCommandMap(StateSnapshot stateSnapshot)
 		{
 			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
 
-			Initialize(units, playerID);
+			Initialize(stateSnapshot);
 		}
 
-		internal void Initialize(PlayerUnitState units, int playerID)
+		/// <summary>
+		/// Initializes the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Initialize(StateSnapshot stateSnapshot)
 		{
-			m_PlayerID = playerID;
+			m_StateSnapshot = stateSnapshot;
 
 			// Update command grid with connection status
-			foreach (StructureState cc in units.commandCenters)
+			for (int playerID=0; playerID < stateSnapshot.players.Count; ++playerID)
 			{
-				Pathfinder.GetClosestValidTile(cc.position, GetTileCost, IsValidTile, false);
-
-				LOCATION gridPoint = GetPointInGridSpace(cc.position);
-
-				m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess = 1;
-			}
-
-			// Update buildings on command grid
-			foreach (StructureState building in units.GetStructures())
-			{
-				MAP_RECT buildingArea = building.GetRect();
-
-				for (int x=buildingArea.xMin; x < buildingArea.xMax; ++x)
+				foreach (StructureState cc in stateSnapshot.players[playerID].units.commandCenters)
 				{
-					for (int y=buildingArea.yMin; y < buildingArea.yMax; ++y)
-					{
-						LOCATION gridPoint = new LOCATION(x, y);
-						gridPoint.ClipToMap();
+					Pathfinder.GetClosestValidTile(cc.position, (x,y) => GetTileCost(playerID, x,y), IsValidTile, false);
 
-						gridPoint = GetPointInGridSpace(gridPoint);
+					LOCATION gridPoint = GetPointInGridSpace(cc.position);
 
-						m_Grid[gridPoint.x,gridPoint.y].buildingOnTile = building;
-					}
+					m_Grid[gridPoint.x, gridPoint.y].SetCommandAccess(playerID, 1);
 				}
 			}
 		}
@@ -73,13 +74,13 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		/// </summary>
 		/// <param name="area">The area to check.</param>
 		/// <returns>True, if the area connects to a command center.</returns>
-		public bool ConnectsTo(MAP_RECT area)
+		public bool ConnectsTo(int playerID, MAP_RECT area)
 		{
 			for (int x=area.xMin; x < area.xMax; ++x)
 			{
 				for (int y=area.yMin; y < area.yMax; ++y)
 				{
-					if (ConnectsTo(new LOCATION(x,y)))
+					if (ConnectsTo(playerID, new LOCATION(x,y)))
 						return true;
 				}
 			}
@@ -87,66 +88,66 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			return false;
 		}
 
-		public bool ConnectsTo(LOCATION point)
+		public bool ConnectsTo(int playerID, LOCATION point)
 		{
 			LOCATION gridPoint;
 
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
 
 			point.x -= 1;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
 
 			point.x += 2;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
 
 			point.x -= 1;
 			point.y -= 1;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
 
 			point.y += 2;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].hasCommandAccess > 0) return true;
+			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
 
 			return false;
 		}
 
-		public bool GetClosestConnectedTile(LOCATION pt, out LOCATION closestPt)
+		public bool GetClosestConnectedTile(int playerID, LOCATION pt, out LOCATION closestPt)
 		{
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
 			{
 				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
 
-				return m_Grid[gridPoint.x,gridPoint.y].hasCommandAccess > 0;
+				return m_Grid[gridPoint.x,gridPoint.y].HasCommandAccess(playerID);
 			};
 
 			return Pathfinder.GetClosestValidTile(pt, GetDefaultTileCost, validTileCB, out closestPt, false);
 		}
 
-		public LOCATION[] GetPathToClosestConnectedTile(LOCATION pt)
+		public LOCATION[] GetPathToClosestConnectedTile(int playerID, LOCATION pt)
 		{
 			LOCATION closestPt;
 
-			if (!GetClosestConnectedTile(pt, out closestPt))
+			if (!GetClosestConnectedTile(playerID, pt, out closestPt))
 				return null;
 
 			return Pathfinder.GetPath(pt, closestPt, false, GetDefaultTileCost);
 		}
 
-		public LOCATION[] GetPathToClosestConnectedTile(MAP_RECT area)
+		public LOCATION[] GetPathToClosestConnectedTile(int playerID, MAP_RECT area)
 		{
 			LOCATION centerPt = new LOCATION((area.xMin+area.xMax)/2, (area.yMin+area.yMax)/2);
 			LOCATION closestPt;
 
-			if (!GetClosestConnectedTile(centerPt, out closestPt))
+			if (!GetClosestConnectedTile(playerID, centerPt, out closestPt))
 				return null;
 
 			LOCATION[] path = Pathfinder.GetPath(closestPt, centerPt, false, GetDefaultTileCost);
@@ -180,27 +181,30 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 
 		private int GetDefaultTileCost(int x, int y)
 		{
-			if (!GameMap.IsTilePassable(x,y))
+			if (!m_StateSnapshot.tileMap.IsTilePassable(x,y))
 				return Pathfinder.Impassable;
 
 			return 1;
 		}
 
 		// Callback for determining tile cost
-		private int GetTileCost(int x, int y)
+		private int GetTileCost(int playerID, int x, int y)
 		{
 			// Out of map bounds is impassable
 			if (!GameMap.bounds.Contains(x, y))
 				return Pathfinder.Impassable;
 
-			LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
+			LOCATION tilePosition = new LOCATION(x,y);
+			LOCATION gridPoint = GetPointInGridSpace(tilePosition);
+
+			StructureState building = m_StateSnapshot.unitMap.GetUnitOnTile(tilePosition) as StructureState;
 
 			// If the tile is not a tube or structure, mark it as impassable
-			if (GameMap.GetCellType(x, y) != CellType.Tube0 && m_Grid[gridPoint.x,gridPoint.y].buildingOnTile == null)
+			if (m_StateSnapshot.tileMap.GetCellType(tilePosition) != CellType.Tube0 && building == null)
 				return Pathfinder.Impassable;
 
 			// If tube or structure, mark grid as connected
-			m_Grid[gridPoint.x,gridPoint.y].hasCommandAccess = 1;
+			m_Grid[gridPoint.x,gridPoint.y].SetCommandAccess(playerID, 1);
 
 			return 1;
 		}
@@ -221,7 +225,11 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			return pt;
 		}
 
-		public List<StructureState> GetConnectedStructures(LOCATION tile)
+		/// <summary>
+		/// Gets all structures connected to this tile through the command map.
+		/// If the tile does not have command access, no structures will be returned.
+		/// </summary>
+		public List<StructureState> GetConnectedStructures(int playerID, LOCATION tile)
 		{
 			Dictionary<int, StructureState> connectedStructures = new Dictionary<int, StructureState>();
 
@@ -231,14 +239,15 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 				if (!GameMap.bounds.Contains(x,y))
 					return Pathfinder.Impassable;
 
+				LOCATION tilePosition = new LOCATION(x,y);
 				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
 
-				StructureState building = m_Grid[gridPoint.x,gridPoint.y].buildingOnTile;
+				StructureState building = m_StateSnapshot.unitMap.GetUnitOnTile(gridPoint) as StructureState;
 
-				if (GameMap.GetCellType(x, y) != CellType.Tube0 && building == null)
+				if (m_StateSnapshot.tileMap.GetCellType(tilePosition) != CellType.Tube0 && building == null)
 					return Pathfinder.Impassable;
 
-				if (building != null)
+				if (building != null && building.ownerID == playerID)
 				{
 					int unitID = building.unitID;
 					connectedStructures[unitID] = building;

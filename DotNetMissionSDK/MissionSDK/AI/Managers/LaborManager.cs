@@ -276,7 +276,7 @@ namespace DotNetMissionSDK.AI.Managers
 				return true;
 
 			// Cannot be disconnected from CC
-			return stateSnapshot.players[ownerID].commandMap.ConnectsTo(building.GetRect());
+			return stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect());
 		}
 
 		/// <summary>

@@ -124,7 +124,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				{
 					MAP_RECT unbulldozedArea = targetArea;
 					unbulldozedArea.Inflate(-1, -1);
-					return owner.commandMap.ConnectsTo(unbulldozedArea);
+					return stateSnapshot.commandMap.ConnectsTo(ownerID, unbulldozedArea);
 				}
 
 				return true;

@@ -112,6 +112,9 @@ int GameMapEx::LoadMap(char *fileName)
 
 void GameMapEx::CopyTileMap(int* tileMap, int xMin, int xMax, int yMin, int yMax)
 {
+	OP2Map *p = (OP2Map*)mapObj;
+	int **tileArray = (int**)(mapTileData);
+
 	int mapWidth = xMax - xMin;
 
 	for (int x = xMin; x < xMax; ++x)
@@ -121,7 +124,14 @@ void GameMapEx::CopyTileMap(int* tileMap, int xMin, int xMax, int yMin, int yMax
 			int px = x - xMin;
 			int py = y - yMin;
 
-			tileMap[px + py * mapWidth] = GetTileEx(LOCATION(px,py)).cellType;
+			int xLower = p->tileXMask & px;
+			int xUpper = xLower >> 5;
+			xLower &= 31;
+			xUpper <<= p->logTileHeight;
+			xUpper += py;
+			xUpper <<= 5;
+			
+			tileMap[px + py * mapWidth] = (*tileArray)[xUpper + xLower];
 		}
 	}
 }

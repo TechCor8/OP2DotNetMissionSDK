@@ -144,7 +144,7 @@ namespace DotNetMissionSDK
 			AsyncPump.Update();
 			GameState.Update();
 			StateSnapshot stateSnapshot = StateSnapshot.Create();
-
+			
 			// Update mission logic
 			m_MissionLogic.Update(stateSnapshot);
 

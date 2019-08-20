@@ -34,12 +34,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			foreach (UnitState cc in owner.units.commandCenters)
 			{
 				// Get all connected structures at this base so we can use the count to determine the appropriate amount of defense
-				List<StructureState> connectedStructures = owner.commandMap.GetConnectedStructures(cc.position);
+				List<StructureState> connectedStructures = stateSnapshot.commandMap.GetConnectedStructures(ownerID, cc.position);
 
 				// Do not build more guard posts if there are disconnected ones. This is to prevent earthworkers from becoming preoccupied.
 				foreach (UnitState guardPost in owner.units.guardPosts)
 				{
-					if (!owner.commandMap.ConnectsTo(guardPost.position))
+					if (!stateSnapshot.commandMap.ConnectsTo(ownerID, guardPost.position))
 						return false;
 				}
 

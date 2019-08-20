@@ -9,10 +9,22 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 	/// </summary>
 	public class GameTileMap
 	{
+		public class TileMask
+		{
+			public const uint CellType			= 0x1F;			// Cell type of this tile
+			public const uint TileIndex			= 0xFFE0;		// Mapping index (tile graphics to use)
+			public const uint UnitIndex			= 0x7FF0000;	// Index of unit on this tile
+			public const uint Lava				= 0x8000000;	// true if lava is on the tile
+			public const uint LavaPossible		= 0x10000000;	// true if lava can flow on the tile
+			public const uint Expand			= 0x2000000;	// true if lava / microbe is expanding to this tile
+			public const uint Microbe			= 0x4000000;	// true if microbe is on the tile
+			public const uint WallOrBuilding	= 0x8000000;	// true if a wall or building is on the tile
+		}
+
 		private int m_Width;
 		private int m_Height;
 
-		private int[] m_Grid;
+		private uint[] m_Grid;
 
 
 		/// <summary>
@@ -23,7 +35,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			m_Width = GameMap.bounds.width;
 			m_Height = GameMap.bounds.height;
 
-			m_Grid = new int[m_Width*m_Height];
+			m_Grid = new uint[m_Width*m_Height];
 
 			Initialize();
 		}
@@ -52,7 +64,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		{
 			tilePosition = GetPointInGridSpace(tilePosition);
 
-			return (CellType)m_Grid[tilePosition.x + tilePosition.y * m_Width];
+			return (CellType)(m_Grid[tilePosition.x + tilePosition.y * m_Width] & TileMask.CellType);
 		}
 
 		public bool IsTilePassable(int x, int y)

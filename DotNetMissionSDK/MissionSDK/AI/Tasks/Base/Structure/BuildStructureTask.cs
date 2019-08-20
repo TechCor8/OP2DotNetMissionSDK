@@ -176,7 +176,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				// Force structure to build on connected ground
 				MAP_RECT unbulldozedArea = targetArea;
 				unbulldozedArea.Inflate(-1, -1);
-				if (!owner.commandMap.ConnectsTo(unbulldozedArea))
+				if (!stateSnapshot.commandMap.ConnectsTo(ownerID, unbulldozedArea))
 					return false;
 			}
 

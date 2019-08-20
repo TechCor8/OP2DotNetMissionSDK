@@ -80,8 +80,6 @@ namespace DotNetMissionSDK.State.Snapshot
 
 		public PlayerUnitState units					{ get; private set; }
 
-		public PlayerCommandMap commandMap				{ get; private set; }
-
 
 		private Dictionary<int, bool> m_HasTechnology;
 		
@@ -307,9 +305,6 @@ namespace DotNetMissionSDK.State.Snapshot
 			// Parse units
 			units = new PlayerUnitState(player.playerID, this.vehicleInfo, this.structureInfo, this.weaponInfo, prevPlayerState?.units);
 
-			// Create maps
-			if (commandMap != null) commandMap.Initialize(units, playerID);		else commandMap = new PlayerCommandMap(units, playerID);
-			
 			// Parse technologies
 			int techCount = Research.GetTechCount();
 			Dictionary<int, bool> hasTech = new Dictionary<int, bool>(techCount);
@@ -344,7 +339,6 @@ namespace DotNetMissionSDK.State.Snapshot
 			weaponInfo = null;
 
 			units = null;
-			commandMap.Clear();
 		}
 	}
 }
