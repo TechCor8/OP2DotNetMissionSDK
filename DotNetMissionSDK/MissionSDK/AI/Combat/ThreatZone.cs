@@ -126,7 +126,9 @@ namespace DotNetMissionSDK.AI.Combat
 
 			int unitStrength = unitForPath.GetUnitInfo().GetWeaponStrength();
 
-			unitForPath.DoMoveWithPathfinder((x,y) => GetTileCost(x,y, unitStrength, stateSnapshot), IsTileInStagingArea);
+			stateSnapshot.Retain();
+
+			unitForPath.DoMoveWithPathfinder((x,y) => GetTileCost(x,y, unitStrength, stateSnapshot), IsTileInStagingArea, (path) => stateSnapshot.Release());
 		}
 
 		private int GetTileCost(int x, int y, int unitStrength, StateSnapshot state)

@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.State.Snapshot.Maps
@@ -23,8 +24,16 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		public GaiaMap(GaiaState gaia)
 		{
 			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
-			//Array.Clear(m_Grid, 0, m_Grid.Length);
 
+			Initialize(gaia);
+		}
+
+		/// <summary>
+		/// Initializes the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Initialize(GaiaState gaia)
+		{
 			// Loop through every gaia unit
 			foreach (GaiaUnitState unit in gaia)
 			{
@@ -73,6 +82,15 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			}
 
 			return units;
+		}
+
+		/// <summary>
+		/// Clears the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Clear()
+		{
+			Array.Clear(m_Grid, 0, m_Grid.Length);
 		}
 	}
 }

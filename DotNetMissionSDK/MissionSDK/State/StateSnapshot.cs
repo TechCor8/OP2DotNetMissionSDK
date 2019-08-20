@@ -1,8 +1,11 @@
-﻿using DotNetMissionSDK.State.Snapshot.Maps;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.State.Snapshot.Maps;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
+using DotNetMissionSDK.Utility;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace DotNetMissionSDK.State.Snapshot
 {
@@ -12,14 +15,20 @@ namespace DotNetMissionSDK.State.Snapshot
 	/// NOTE:	Storing references to StateSnapshot is not recommended, as it becomes
 	///			easier to accidentally update the reference that an async operation is using.
 	/// </summary>
-	public class StateSnapshot
+	public partial class StateSnapshot
 	{
+		private static ObjectPool<StateSnapshot> m_SnapshotPool = new ObjectPool<StateSnapshot>();
+
+		private int m_References;
+
 		private static ReadOnlyDictionary<map_id, GlobalVehicleInfo> m_VehicleInfo;
 		private static ReadOnlyDictionary<map_id, GlobalStructureInfo> m_StructureInfo;
 		private static ReadOnlyDictionary<map_id, GlobalWeaponInfo> m_WeaponInfo;
 		private static ReadOnlyDictionary<map_id, GlobalUnitInfo> m_StarshipInfo;
 
 		private Dictionary<int, UnitState> m_Units = new Dictionary<int, UnitState>();
+
+		private PlayerState[] m_Players;
 
 		private static StateSnapshot m_LastSnapshot;
 
@@ -63,10 +72,26 @@ namespace DotNetMissionSDK.State.Snapshot
 		}
 
 		/// <summary>
+		/// Creates a blank snapshot object for use with the SnapshotPool.
+		/// Applications should call Create().
+		/// </summary>
+		public StateSnapshot() { }
+
+		/// <summary>
 		/// Creates a new snapshot from the current game state and TethysGame.Time().
 		/// NOTE: Creating a snapshot is an intensive operation. Only call once per frame.
 		/// </summary>
-		public StateSnapshot()
+		public static StateSnapshot Create()
+		{
+			ThreadAssert.MainThreadRequired();
+
+			StateSnapshot stateSnapshot = m_SnapshotPool.Create();
+			stateSnapshot.Initialize();
+			stateSnapshot.Retain();
+			return stateSnapshot;
+		}
+
+		private void Initialize()
 		{
 			time = TethysGame.Time();
 
@@ -80,29 +105,77 @@ namespace DotNetMissionSDK.State.Snapshot
 			starshipInfo = m_StarshipInfo;
 
 			// Gaia state
-			gaia = new GaiaState();
+			if (gaia != null) gaia.Initialize();	else gaia = new GaiaState();
 
 			// Player state
-			PlayerState[] players = new PlayerState[GameState.players.Count];
-			for (int i=0; i < players.Length; ++i)
-				players[i] = new PlayerState(GameState.players[i], m_LastSnapshot?.players[i]);
+			if (m_Players == null || m_Players.Length != GameState.players.Count)
+				m_Players = new PlayerState[GameState.players.Count];
 
-			this.players = new ReadOnlyCollection<PlayerState>(players);
+			for (int i=0; i < m_Players.Length; ++i)
+			{
+				if (m_Players[i] != null)
+					m_Players[i].Initialize(GameState.players[i], m_LastSnapshot?.players[i]);
+				else
+					m_Players[i] = new PlayerState(GameState.players[i], m_LastSnapshot?.players[i]);
+			}
+
+			this.players = new ReadOnlyCollection<PlayerState>(m_Players);
 
 			// Unit state
-			for (int i=0; i < players.Length; ++i)
+			for (int i=0; i < m_Players.Length; ++i)
 			{
-				foreach (UnitState unit in players[i].units.GetUnits())
+				foreach (UnitState unit in m_Players[i].units.GetUnits())
 					m_Units.Add(unit.unitID, unit);
 			}
 
 			// Map state
-			gaiaMap = new GaiaMap(gaia);
-			tileMap = new GameTileMap();
-			unitMap = new PlayerUnitMap(players);
-			strengthMap = new PlayerStrengthMap(players);
+			if (strengthMap != null) gaiaMap.Initialize(gaia);			else gaiaMap = new GaiaMap(gaia);
+			if (strengthMap != null) tileMap.Initialize();				else tileMap = new GameTileMap();
+			if (strengthMap != null) unitMap.Initialize(m_Players);		else unitMap = new PlayerUnitMap(m_Players);
+			if (strengthMap != null) strengthMap.Initialize(m_Players);	else strengthMap = new PlayerStrengthMap(m_Players);
 
 			m_LastSnapshot = this;
+		}
+
+		/// <summary>
+		/// Retains a reference to this snapshot.
+		/// You must call this to prevent the snapshot from being released if you are going to hold onto it for more than one frame.
+		/// </summary>
+		public void Retain()
+		{
+			Interlocked.Increment(ref m_References);
+		}
+
+		/// <summary>
+		/// Releases the snapshot by sending it back to the snapshot pool.
+		/// </summary>
+		public void Release()
+		{
+			Interlocked.Decrement(ref m_References);
+
+			if (m_References == 0)
+			{
+				gaia.Release();
+
+				for (int i=0; i < m_Players.Length; ++i)
+					m_Players[i].Release();
+
+				vehicleInfo = null;
+				structureInfo = null;
+				weaponInfo = null;
+				starshipInfo = null;
+
+				m_Units.Clear();
+
+				gaiaMap.Clear();
+				tileMap.Clear();
+				unitMap.Clear();
+				strengthMap.Clear();
+
+				m_SnapshotPool.Release(this);
+			}
+			else if (m_References < 0)
+				throw new System.Exception("Object has been released more than it has been retained. Check code for errors.");
 		}
 
 		/// <summary>
@@ -111,6 +184,8 @@ namespace DotNetMissionSDK.State.Snapshot
 		/// </summary>
 		public static void UpdateGlobalInfo()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			Dictionary<map_id, GlobalVehicleInfo> vehicleInfo = new Dictionary<map_id, GlobalVehicleInfo>();
 			Dictionary<map_id, GlobalStructureInfo> structureInfo = new Dictionary<map_id, GlobalStructureInfo>();
 			Dictionary<map_id, GlobalWeaponInfo> weaponInfo = new Dictionary<map_id, GlobalWeaponInfo>();

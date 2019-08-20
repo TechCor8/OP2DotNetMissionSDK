@@ -12,6 +12,11 @@ namespace DotNetMissionSDK.State.Snapshot
 	/// </summary>
 	public class GaiaState : IEnumerable<GaiaUnitState>
 	{
+		private List<MiningBeaconState> m_Beacons = new List<MiningBeaconState>();
+		private List<MiningBeaconState> m_MagmaVents = new List<MiningBeaconState>();
+		private List<GaiaUnitState> m_Fumaroles = new List<GaiaUnitState>();
+		private List<GaiaUnitState> m_Wreckages = new List<GaiaUnitState>();
+
 		public ReadOnlyCollection<MiningBeaconState> miningBeacons	{ get; private set; }
 		public ReadOnlyCollection<MiningBeaconState> magmaVents		{ get; private set; }
 		public ReadOnlyCollection<GaiaUnitState> fumaroles			{ get; private set; }
@@ -23,27 +28,31 @@ namespace DotNetMissionSDK.State.Snapshot
 		/// </summary>
 		public GaiaState()
 		{
-			List<MiningBeaconState> beacons = new List<MiningBeaconState>();
-			List<MiningBeaconState> magmaVents = new List<MiningBeaconState>();
-			List<GaiaUnitState> fumaroles = new List<GaiaUnitState>();
-			List<GaiaUnitState> wreckages = new List<GaiaUnitState>();
+			Initialize();
+		}
 
+		/// <summary>
+		/// Initializes the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Initialize()
+		{
 			foreach (UnitEx unit in new PlayerUnitEnum(6))
 			{
 				switch (unit.GetUnitType())
 				{
-					case map_id.MiningBeacon:		beacons.Add(new MiningBeaconState(unit));		break;
-					case map_id.MagmaVent:			magmaVents.Add(new MiningBeaconState(unit));	break;
-					case map_id.Fumarole:			fumaroles.Add(new GaiaUnitState(unit));			break;
+					case map_id.MiningBeacon:		m_Beacons.Add(new MiningBeaconState(unit));		break;
+					case map_id.MagmaVent:			m_MagmaVents.Add(new MiningBeaconState(unit));	break;
+					case map_id.Fumarole:			m_Fumaroles.Add(new GaiaUnitState(unit));		break;
 
-					case map_id.mapWreckage:		wreckages.Add(new WreckageState(unit));			break;
+					case map_id.mapWreckage:		m_Wreckages.Add(new WreckageState(unit));		break;
 				}
 			}
 
-			this.miningBeacons	= beacons.AsReadOnly();
-			this.magmaVents		= magmaVents.AsReadOnly();
-			this.fumaroles		= fumaroles.AsReadOnly();
-			this.wreckages		= wreckages.AsReadOnly();
+			this.miningBeacons	= m_Beacons.AsReadOnly();
+			this.magmaVents		= m_MagmaVents.AsReadOnly();
+			this.fumaroles		= m_Fumaroles.AsReadOnly();
+			this.wreckages		= m_Wreckages.AsReadOnly();
 		}
 
 		private IReadOnlyCollection<GaiaUnitState> GetListForType(map_id type)
@@ -132,6 +141,18 @@ namespace DotNetMissionSDK.State.Snapshot
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		/// <summary>
+		/// Releases the state.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Release()
+		{
+			m_Beacons.Clear();
+			m_MagmaVents.Clear();
+			m_Fumaroles.Clear();
+			m_Wreckages.Clear();
 		}
 	}
 }

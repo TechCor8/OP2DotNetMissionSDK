@@ -75,13 +75,15 @@ namespace DotNetMissionSDK.Units
 
 			int ownerID = GetOwnerID();
 
-			DoMoveWithPathfinder(targetPosition, (x,y) => GetTileCost(stateSnapshot, ownerID, x,y));
+			stateSnapshot.Retain();
+
+			DoMoveWithPathfinder(targetPosition, (x,y) => GetTileCost(stateSnapshot, ownerID, x,y), (path) => stateSnapshot.Release());
 		}
 
 		/// <summary>
 		/// Generates a path for the unit to navigate through terrain with custom tile cost.
 		/// </summary>
-		public void DoMoveWithPathfinder(LOCATION targetPosition, Pathfinder.TileCostCallback tileCostCB)
+		public void DoMoveWithPathfinder(LOCATION targetPosition, Pathfinder.TileCostCallback tileCostCB, Pathfinder.OnGetPathCompleteCallback onCompleteCB=null)
 		{
 			ThreadAssert.MainThreadRequired();
 
@@ -91,17 +93,17 @@ namespace DotNetMissionSDK.Units
 			{
 				isSearchingForPath = false;
 
-				if (path == null)
-					return;
+				if (path != null)
+					DoMove(path);
 
-				DoMove(path);
+				onCompleteCB?.Invoke(path);
 			});
 		}
 
 		/// <summary>
 		/// Generates a path for the unit to navigate based on custom parameters.
 		/// </summary>
-		public void DoMoveWithPathfinder(Pathfinder.TileCostCallback tileCostCB, Pathfinder.ValidTileCallback validTileCB)
+		public void DoMoveWithPathfinder(Pathfinder.TileCostCallback tileCostCB, Pathfinder.ValidTileCallback validTileCB, Pathfinder.OnGetPathCompleteCallback onCompleteCB=null)
 		{
 			ThreadAssert.MainThreadRequired();
 
@@ -111,10 +113,10 @@ namespace DotNetMissionSDK.Units
 			{
 				isSearchingForPath = false;
 
-				if (path == null)
-					return;
+				if (path != null)
+					DoMove(path);
 
-				DoMove(path);
+				onCompleteCB?.Invoke(path);
 			});
 		}
 

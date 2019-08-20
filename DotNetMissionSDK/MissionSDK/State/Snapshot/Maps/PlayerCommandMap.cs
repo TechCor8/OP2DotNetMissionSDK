@@ -22,10 +22,20 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		private int m_PlayerID;
 
 
+		public PlayerCommandMap() { }
+
+		/// <summary>
+		/// Initializes the map. Must be called after GameMap has been initialized.
+		/// </summary>
 		public PlayerCommandMap(PlayerUnitState units, int playerID)
 		{
 			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
 
+			Initialize(units, playerID);
+		}
+
+		internal void Initialize(PlayerUnitState units, int playerID)
+		{
 			m_PlayerID = playerID;
 
 			// Update command grid with connection status
@@ -240,6 +250,15 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			Pathfinder.GetClosestValidTile(tile, tileCostCB, IsValidTile, false);
 
 			return new List<StructureState>(connectedStructures.Values);
+		}
+
+		/// <summary>
+		/// Clears the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Clear()
+		{
+			Array.Clear(m_Grid, 0, m_Grid.Length);
 		}
 	}
 }

@@ -63,6 +63,8 @@ namespace DotNetMissionSDK.AI.Managers
 
 			m_IsProcessing = true;
 
+			stateSnapshot.Retain();
+
 			AsyncPump.Run(() =>
 			{
 				List<Action> buildingActions = new List<Action>();
@@ -81,6 +83,8 @@ namespace DotNetMissionSDK.AI.Managers
 
 				foreach (Action action in buildingActions)
 					action();
+
+				stateSnapshot.Release();
 			});
 		}
 

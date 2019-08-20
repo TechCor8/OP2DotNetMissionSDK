@@ -48,6 +48,8 @@ namespace DotNetMissionSDK.AI.Managers
 			PlayerState owner = stateSnapshot.players[ownerID];
 			int combatGroupCapacity = m_CombatGroups.Capacity;
 
+			stateSnapshot.Retain();
+
 			AsyncPump.Run(() =>
 			{
 				m_DefenseZones.Clear();
@@ -93,6 +95,8 @@ namespace DotNetMissionSDK.AI.Managers
 				// Update vehicle groups
 				foreach (VehicleGroup group in m_CombatGroups)
 					group.Update(stateSnapshot);
+
+				stateSnapshot.Release();
 			});
 		}
 

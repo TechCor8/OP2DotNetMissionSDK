@@ -94,6 +94,8 @@ namespace DotNetMissionSDK.AI.Managers
 			// Get data that requires main thread
 			List<VehicleGroup.UnitSlot> unassignedCombatSlots = botPlayer.combatManager.GetUnassignedSlots();
 
+			stateSnapshot.Retain();
+
 			//AsyncPump.Run(() =>
 			//{
 				List<Action> unitActions = new List<Action>();
@@ -113,6 +115,8 @@ namespace DotNetMissionSDK.AI.Managers
 
 				foreach (Action action in unitActions)
 					action();
+
+				stateSnapshot.Release();
 			//});
 		}
 

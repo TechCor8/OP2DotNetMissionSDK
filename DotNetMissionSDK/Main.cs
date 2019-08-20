@@ -143,10 +143,12 @@ namespace DotNetMissionSDK
 			m_Triggers.Update();
 			AsyncPump.Update();
 			GameState.Update();
-			StateSnapshot stateSnapshot = new StateSnapshot();
+			StateSnapshot stateSnapshot = StateSnapshot.Create();
 
 			// Update mission logic
 			m_MissionLogic.Update(stateSnapshot);
+
+			stateSnapshot.Release();
 
 			// Update save buffer
 			m_SaveBuffer.Save();

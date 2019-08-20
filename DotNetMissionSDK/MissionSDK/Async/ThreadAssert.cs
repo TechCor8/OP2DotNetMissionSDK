@@ -25,9 +25,6 @@ namespace DotNetMissionSDK.Async
 		[Conditional("DEBUG")]
 		public static void MainThreadRequired()
 		{
-			if (m_MainThreadID != Thread.CurrentThread.ManagedThreadId)
-				m_MainThreadID = m_MainThreadID;
-
 			Debug.Assert(m_MainThreadID == Thread.CurrentThread.ManagedThreadId, "Main Thread Required", "This method was not called from the main thread.");
 		}
 	}

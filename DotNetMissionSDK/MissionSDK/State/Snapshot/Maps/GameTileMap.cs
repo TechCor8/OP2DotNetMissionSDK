@@ -1,5 +1,5 @@
-﻿
-using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.HFL;
+using System;
 
 namespace DotNetMissionSDK.State.Snapshot.Maps
 {
@@ -24,18 +24,17 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			m_Height = GameMap.bounds.height;
 
 			m_Grid = new int[m_Width*m_Height];
-			//Array.Clear(m_Grid, 0, m_Grid.Length);
 
+			Initialize();
+		}
+
+		/// <summary>
+		/// Initializes the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Initialize()
+		{
 			GameMapEx.CopyTileMap(m_Grid);
-
-			/*for (int x=GameMap.bounds.xMin; x < GameMap.bounds.xMax; ++x)
-			{
-				for (int y=GameMap.bounds.yMin; y < GameMap.bounds.yMax; ++y)
-				{
-					LOCATION tile = GetPointInGridSpace(new LOCATION(x,y));
-					m_Grid[tile.x,tile.y].cellType = GameMap.GetCellType(x,y);
-				}
-			}*/
 		}
 
 		private static LOCATION GetPointInGridSpace(LOCATION pt)
@@ -109,6 +108,15 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			}
 
 			return 0;
+		}
+
+		/// <summary>
+		/// Clears the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Clear()
+		{
+			Array.Clear(m_Grid, 0, m_Grid.Length);
 		}
 	}
 }

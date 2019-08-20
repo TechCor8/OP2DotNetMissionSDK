@@ -12,6 +12,13 @@ namespace DotNetMissionSDK.State.Snapshot
 	/// </summary>
 	public class PlayerState
 	{
+		private List<int> m_Allies		= new List<int>();
+		private List<int> m_Enemies		= new List<int>();
+
+		private Dictionary<map_id, VehicleInfo> m_VehicleInfo		= new Dictionary<map_id, VehicleInfo>();
+		private Dictionary<map_id, StructureInfo> m_StructureInfo	= new Dictionary<map_id, StructureInfo>();
+		private Dictionary<map_id, WeaponInfo> m_WeaponInfo			= new Dictionary<map_id, WeaponInfo>();
+
 		public int playerID								{ get; private set; }
 
 		public ReadOnlyCollection<int> allyPlayerIDs	{ get; private set; }
@@ -203,19 +210,24 @@ namespace DotNetMissionSDK.State.Snapshot
 			return true;
 		}
 
-
 		/// <summary>
 		/// Creates an immutable player state from PlayerInfo.
 		/// </summary>
 		/// <param name="player">The player to pull data from.</param>
 		public PlayerState(PlayerEx player, PlayerState prevPlayerState)
 		{
+			Initialize(player, prevPlayerState);
+		}
+
+		/// <summary>
+		/// Initializes the player state.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Initialize(PlayerEx player, PlayerState prevPlayerState)
+		{
 			playerID = player.playerID;
 
 			// Set alliances
-			List<int> allies = new List<int>();
-			List<int> enemies = new List<int>();
-
 			for (int i=0; i < GameState.players.Count; ++i)
 			{
 				PlayerEx otherPlayer = GameState.players[i];
@@ -223,13 +235,13 @@ namespace DotNetMissionSDK.State.Snapshot
 					continue;
 
 				if (otherPlayer.IsAlliedTo(player))
-					allies.Add(otherPlayer.playerID);
+					m_Allies.Add(otherPlayer.playerID);
 				else
-					enemies.Add(otherPlayer.playerID);
+					m_Enemies.Add(otherPlayer.playerID);
 			}
 
-			allyPlayerIDs = allies.AsReadOnly();
-			enemyPlayerIDs = enemies.AsReadOnly();
+			allyPlayerIDs = m_Allies.AsReadOnly();
+			enemyPlayerIDs = m_Enemies.AsReadOnly();
 
 			// Player
 			difficulty						= player.Difficulty();
@@ -279,29 +291,25 @@ namespace DotNetMissionSDK.State.Snapshot
 			totalResidenceCapacity			= player.GetTotalResidenceCapacity();
 
 			// Player Unit Info
-			Dictionary<map_id, VehicleInfo> vehicleInfo = new Dictionary<map_id, VehicleInfo>();
-			Dictionary<map_id, StructureInfo> structureInfo = new Dictionary<map_id, StructureInfo>();
-			Dictionary<map_id, WeaponInfo> weaponInfo = new Dictionary<map_id, WeaponInfo>();
-
 			for (int i=1; i <= 15; ++i)
-				vehicleInfo.Add((map_id)i, new VehicleInfo((map_id)i, playerID));
+				m_VehicleInfo.Add((map_id)i, new VehicleInfo((map_id)i, playerID));
 
 			for (int i=21; i <= 58; ++i)
-				structureInfo.Add((map_id)i, new StructureInfo((map_id)i, playerID));
+				m_StructureInfo.Add((map_id)i, new StructureInfo((map_id)i, playerID));
 
 			for (int i=59; i <= 73; ++i)
-				weaponInfo.Add((map_id)i, new WeaponInfo((map_id)i, playerID));
+				m_WeaponInfo.Add((map_id)i, new WeaponInfo((map_id)i, playerID));
 
-			this.vehicleInfo = new ReadOnlyDictionary<map_id, VehicleInfo>(vehicleInfo);
-			this.structureInfo = new ReadOnlyDictionary<map_id, StructureInfo>(structureInfo);
-			this.weaponInfo = new ReadOnlyDictionary<map_id, WeaponInfo>(weaponInfo);
+			this.vehicleInfo = new ReadOnlyDictionary<map_id, VehicleInfo>(m_VehicleInfo);
+			this.structureInfo = new ReadOnlyDictionary<map_id, StructureInfo>(m_StructureInfo);
+			this.weaponInfo = new ReadOnlyDictionary<map_id, WeaponInfo>(m_WeaponInfo);
 
 			// Parse units
 			units = new PlayerUnitState(player.playerID, this.vehicleInfo, this.structureInfo, this.weaponInfo, prevPlayerState?.units);
 
 			// Create maps
-			commandMap = new PlayerCommandMap(units, playerID);
-
+			if (commandMap != null) commandMap.Initialize(units, playerID);		else commandMap = new PlayerCommandMap(units, playerID);
+			
 			// Parse technologies
 			int techCount = Research.GetTechCount();
 			Dictionary<int, bool> hasTech = new Dictionary<int, bool>(techCount);
@@ -313,6 +321,30 @@ namespace DotNetMissionSDK.State.Snapshot
 			}
 
 			m_HasTechnology = new Dictionary<int, bool>(hasTech);
+		}
+
+		/// <summary>
+		/// Releases the player state.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Release()
+		{
+			m_Allies.Clear();
+			m_Enemies.Clear();
+
+			allyPlayerIDs = null;
+			enemyPlayerIDs = null;
+
+			m_VehicleInfo.Clear();
+			m_StructureInfo.Clear();
+			m_WeaponInfo.Clear();
+
+			vehicleInfo = null;
+			structureInfo = null;
+			weaponInfo = null;
+
+			units = null;
+			commandMap.Clear();
 		}
 	}
 }

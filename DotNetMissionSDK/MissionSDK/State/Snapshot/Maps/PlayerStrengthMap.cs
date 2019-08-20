@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot.Units;
+using System;
 
 namespace DotNetMissionSDK.State.Snapshot.Maps
 {
@@ -26,6 +27,15 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		{
 			m_Grid = new Tile[GameMap.bounds.width, GameMap.bounds.height];
 
+			Initialize(playerStates);
+		}
+
+		/// <summary>
+		/// Initializes the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Initialize(PlayerState[] playerStates)
+		{
 			foreach (PlayerState playerState in playerStates)
 				UpdatePlayerStrength(playerState);
 		}
@@ -137,6 +147,15 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 				totalStrength += m_Grid[pt.x,pt.y].playerStrength[i];
 
 			return totalStrength;
+		}
+
+		/// <summary>
+		/// Clears the map.
+		/// NOTE: Should only be called from StateSnapshot.
+		/// </summary>
+		internal void Clear()
+		{
+			Array.Clear(m_Grid, 0, m_Grid.Length);
 		}
 	}
 }
