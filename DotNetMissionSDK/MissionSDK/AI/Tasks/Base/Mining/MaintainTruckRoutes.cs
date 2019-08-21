@@ -28,7 +28,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(m_BuildCargoTruckTask = new BuildCargoTruckTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			return true;
 		}
@@ -64,7 +64,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			m_BuildCargoTruckTask.targetCountToBuild = desiredTrucks + trucksDoingSomethingElse;
 		}
 
-		public void PerformTruckRoutes(List<Action> unitActions)
+		public void PerformTruckRoutes(BotCommands unitActions)
 		{
 			// Assigned trucks should cycle to mine and smelter
 			foreach (MiningBase miningBase in m_MiningBaseState.miningBases)
@@ -90,12 +90,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 									if (smelter.smelter.unitType == map_id.RareOreSmelter)
 									{
 										// Wrong ore type, dump it
-										unitActions.Add(() => GameState.GetUnit(truck.unitID)?.DoDumpCargo());
+										unitActions.AddUnitCommand(truck.unitID, 0, () => GameState.GetUnit(truck.unitID)?.DoDumpCargo());
 										break;
 									}
 
 									// Dock truck to smelter
-									unitActions.Add(() =>
+									unitActions.AddUnitCommand(truck.unitID, 1, () =>
 									{
 										UnitEx liveSmelter = GameState.GetUnit(smelter.smelter.unitID);
 										if (liveSmelter == null)
@@ -108,12 +108,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 									if (smelter.smelter.unitType == map_id.CommonOreSmelter)
 									{
 										// Wrong ore type, dump it
-										unitActions.Add(() => GameState.GetUnit(truck.unitID)?.DoDumpCargo());
+										unitActions.AddUnitCommand(truck.unitID, 0, () => GameState.GetUnit(truck.unitID)?.DoDumpCargo());
 										break;
 									}
 
 									// Dock truck to smelter
-									unitActions.Add(() =>
+									unitActions.AddUnitCommand(truck.unitID, 1, () =>
 									{
 										UnitEx liveSmelter = GameState.GetUnit(smelter.smelter.unitID);
 										if (liveSmelter == null)
@@ -124,7 +124,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 	
 							case TruckCargo.Empty:
 									// Dock to mine
-									unitActions.Add(() =>
+									unitActions.AddUnitCommand(truck.unitID, 1, () =>
 									{
 										UnitEx liveMine = GameState.GetUnit(site.mine.unitID);
 										if (liveMine == null)
@@ -135,7 +135,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 								default:
 									// Unknown cargo. Dump it.
-									unitActions.Add(() => GameState.GetUnit(truck.unitID)?.DoDumpCargo());
+									unitActions.AddUnitCommand(truck.unitID, 1, () => GameState.GetUnit(truck.unitID)?.DoDumpCargo());
 									break;
 							}
 						}

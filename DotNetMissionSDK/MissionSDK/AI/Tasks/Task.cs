@@ -74,7 +74,7 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
 		/// <param name="unitActions">Actions to be performed by units are added to this list rather than executed directly.</param>
 		/// <returns>True, if task is running. False, if task cannot be performed.</returns>
-		public bool PerformTaskTree(StateSnapshot stateSnapshot, List<Action> unitActions)
+		public bool PerformTaskTree(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			bool prerequisitesComplete = false;
 
@@ -87,13 +87,13 @@ namespace DotNetMissionSDK.AI.Tasks
 			return true;
 		}
 
-		protected abstract bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions);
+		protected abstract bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions);
 
 		/// <summary>
 		/// Performs prerequisite tasks. If a task cannot be performed, returns false.
 		/// </summary>
 		/// <returns>False, if the task cannot be performed.</returns>
-		private bool PerformPrerequisites(StateSnapshot stateSnapshot, List<Action> unitActions, out bool prerequisitesComplete)
+		private bool PerformPrerequisites(StateSnapshot stateSnapshot, BotCommands unitActions, out bool prerequisitesComplete)
 		{
 			prerequisitesComplete = true;
 

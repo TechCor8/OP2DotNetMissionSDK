@@ -54,7 +54,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_KitToBuild) != null;
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -96,12 +96,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
 
 			// Build structure
-			unitActions.Add(() => GameState.GetUnit(convec.unitID)?.DoBuild(m_KitToBuild, foundPt.x, foundPt.y));
+			unitActions.AddUnitCommand(convec.unitID, 2, () => GameState.GetUnit(convec.unitID)?.DoBuild(m_KitToBuild, foundPt.x, foundPt.y));
 
 			return true;
 		}
 
-		public static void ClearDeployArea(UnitState deployUnit, map_id buildingType, LOCATION deployPt, StateSnapshot stateSnapshot, int ownerID, List<Action> unitActions)
+		public static void ClearDeployArea(UnitState deployUnit, map_id buildingType, LOCATION deployPt, StateSnapshot stateSnapshot, int ownerID, BotCommands unitActions)
 		{
 			// Get area to deploy structure
 			GlobalStructureInfo info = stateSnapshot.structureInfo[buildingType];
@@ -141,7 +141,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				if (!stateSnapshot.tileMap.IsTilePassable(position) || IsAreaBlocked(stateSnapshot, new MAP_RECT(position, new LOCATION(1,1)), ownerID))
 					continue;
 
-				unitActions.Add(() => GameState.GetUnit(unit.unitID)?.DoMove(position.x, position.y));
+				unitActions.AddUnitCommand(unit.unitID, 1, () => GameState.GetUnit(unit.unitID)?.DoMove(position.x, position.y));
 			}
 		}
 

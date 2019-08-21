@@ -13,7 +13,7 @@
 //		 See RequiredExports.h for more details.
 //		 ** Be sure to set these when you build your own level**
 // Required data exports  (Description, Map, TechTree, GameType, NumPlayers)
-ExportLevelDetails("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", Colony, 6)
+ExportLevelDetails("6P, LoS, '<map name>'", /*"newworld.map"*/"on6_01.map", "MULTITEK.TXT", Colony, 6)
 // Alternative style:
 // Required data exports  (Description, Map, TechTree, GameType, NumPlayers, maxTechLevel, bUnitOnlyMission)
 //ExportLevelDetailsEx("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", MultiLastOneStanding, 6, 12, false)

@@ -46,7 +46,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(new BuildCommonSmelterKitTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -87,7 +87,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			return true;
 		}
 
-		private bool DeploySmelter(StateSnapshot stateSnapshot, List<Action> unitActions, ConvecState convec, LOCATION commandCenterPosition, LOCATION minePosition)
+		private bool DeploySmelter(StateSnapshot stateSnapshot, BotCommands unitActions, ConvecState convec, LOCATION commandCenterPosition, LOCATION minePosition)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -139,7 +139,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			BuildStructureTask.ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
 
 			// Build structure
-			unitActions.Add(() => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
+			unitActions.AddUnitCommand(convec.unitID, 1, () => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
 
 			return true;
 		}

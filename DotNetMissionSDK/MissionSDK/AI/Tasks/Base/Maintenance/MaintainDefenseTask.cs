@@ -85,7 +85,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			return true;
 		}

@@ -49,7 +49,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				AddPrerequisite(task);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -115,7 +115,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 		}
 
-		private bool BuildGeothermalPlant(StateSnapshot stateSnapshot, PlayerState owner, List<Action> unitActions)
+		private bool BuildGeothermalPlant(StateSnapshot stateSnapshot, PlayerState owner, BotCommands unitActions)
 		{
 			if (!owner.isEden)
 				return false;
@@ -131,7 +131,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (fumarole == null)
 					return false;
 
-				unitActions.Add(() => GameState.GetUnit(geocon.unitID)?.DoDeployMiner(fumarole.position.x, fumarole.position.y));
+				unitActions.AddUnitCommand(geocon.unitID, 1, () => GameState.GetUnit(geocon.unitID)?.DoDeployMiner(fumarole.position.x, fumarole.position.y));
 				return true;
 			}
 

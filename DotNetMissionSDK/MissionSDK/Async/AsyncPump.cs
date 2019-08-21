@@ -40,7 +40,7 @@ namespace DotNetMissionSDK.Async
 		/// <param name="actionCB">The action to run asynchronously.</param>
 		/// <param name="completedCB">The callback to execute when action is completed.</param>
 		/// <param name="timeToAdd">How much TethysGame.Time() until the task must complete. Must be > 0</param>
-		public static void Run(ActionCallback actionCB, CompletedCallback completedCB, int timeToAdd=10)
+		public static void Run(ActionCallback actionCB, CompletedCallback completedCB, int timeToAdd=6)
 		{
 			ThreadAssert.MainThreadRequired();
 

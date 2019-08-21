@@ -39,7 +39,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_BuildEarthworkerTask = new BuildEarthworkerTask(ownerID);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -84,7 +84,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 					BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, path[i], stateSnapshot, ownerID, unitActions);
 
-					unitActions.Add(() => GameState.GetUnit(earthworker.unitID)?.DoBuildWall(map_id.Tube, new MAP_RECT(path[i], new LOCATION(1, 1))));
+					unitActions.AddUnitCommand(earthworker.unitID, 1, () => GameState.GetUnit(earthworker.unitID)?.DoBuildWall(map_id.Tube, new MAP_RECT(path[i], new LOCATION(1, 1))));
 					break;
 				}
 			}

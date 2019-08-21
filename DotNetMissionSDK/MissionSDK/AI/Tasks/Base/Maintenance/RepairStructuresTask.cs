@@ -57,7 +57,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_BuildRepairUnitTask.GeneratePrerequisites();
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -106,7 +106,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (repairUnit == null)
 					continue;
 
-				unitActions.Add(() =>
+				int priority = repairCriticalOnly ? 3 : 0;
+
+				unitActions.AddUnitCommand(repairUnit.unitID, priority, () =>
 				{
 					UnitEx liveRepairUnit = GameState.GetUnit(repairUnit.unitID);
 					UnitEx unitToRepair = GameState.GetUnit(unitToFix.unitID);

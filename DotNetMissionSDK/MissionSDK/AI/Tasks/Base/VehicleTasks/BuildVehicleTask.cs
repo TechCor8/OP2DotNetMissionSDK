@@ -40,7 +40,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return owner.CanBuildUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			if (!CanPerformTask(stateSnapshot))
 				return false;
@@ -58,9 +58,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return true;
 		}
 
-		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
 		{
-			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
+			unitActions.AddUnitCommand(factoryID, 1, () => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 	}
 
@@ -76,7 +76,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			AddPrerequisite(new BuildArachnidFactoryTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			if (!CanPerformTask(stateSnapshot))
 				return false;
@@ -94,9 +94,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return true;
 		}
 
-		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
 		{
-			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
+			unitActions.AddUnitCommand(factoryID, 1, () => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 	}
 }

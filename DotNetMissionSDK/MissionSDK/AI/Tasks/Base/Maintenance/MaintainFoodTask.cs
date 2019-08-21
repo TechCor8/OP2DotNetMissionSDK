@@ -25,7 +25,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			AddPrerequisite(m_BuildAgridomeTask = new BuildAgridomeTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 

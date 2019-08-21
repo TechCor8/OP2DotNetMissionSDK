@@ -49,7 +49,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return true;
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -69,7 +69,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 				for (int i=0; i < 4; ++i) // Attempt up to X passes to find slot
 				{
 					// Randomly select a unit from supported slot types
-					int index = AsyncRandom.GetRange(0, combatSlot.supportedSlotTypes.Count);
+					int index = AsyncRandom.Range(0, combatSlot.supportedSlotTypes.Count);
 					VehicleGroup.UnitWithWeaponType unitWithWeaponType = combatSlot.supportedSlotTypes[index];
 
 					// Use correct factory task to build unit

@@ -12,6 +12,9 @@ using DotNetMissionSDK.AI.Combat.Groups;
 
 namespace DotNetMissionSDK.AI.Managers
 {
+	/// <summary>
+	/// Controls the Bot's base.
+	/// </summary>
 	public class BaseManager
 	{
 		public const int ExpandCommonMining_GoalID			= 0;
@@ -86,6 +89,22 @@ namespace DotNetMissionSDK.AI.Managers
 		{
 			ThreadAssert.MainThreadRequired();
 
+			// ** Update every frame **
+			BotCommands frameCommands = new BotCommands();
+
+			m_MiningBaseState.Update(stateSnapshot);
+
+			// Unload supplies
+			if (!m_Goals[UnloadSupplies_GoalID].task.IsTaskComplete(stateSnapshot))
+				m_Goals[UnloadSupplies_GoalID].task.PerformTaskTree(stateSnapshot, frameCommands);
+
+			// Perform truck routes
+			MaintainTruckRoutes truckRoutes = (MaintainTruckRoutes)m_Goals[MaintainTruckRoutes_GoalID].task;
+			truckRoutes.PerformTruckRoutes(frameCommands);
+
+			frameCommands.Execute();
+
+			// ** Intermittent/async processing below this point **
 			if (m_IsProcessing)
 				return;
 
@@ -96,74 +115,66 @@ namespace DotNetMissionSDK.AI.Managers
 
 			stateSnapshot.Retain();
 
-			//AsyncPump.Run(() =>
-			//{
-				List<Action> unitActions = new List<Action>();
+			AsyncPump.Run(() =>
+			{
+				BotCommands botCommands = new BotCommands();
 
-				m_MiningBaseState.Update(stateSnapshot);
-				UpdateGoal(stateSnapshot, unitActions, unassignedCombatSlots);
-				m_ResetVehicleTask.PerformTaskTree(stateSnapshot, unitActions); // Fix stuck vehicles
+				UpdateGoal(stateSnapshot, botCommands, unassignedCombatSlots);
+				m_ResetVehicleTask.PerformTaskTree(stateSnapshot, botCommands); // Fix stuck vehicles
 
-			//	return unitActions;
-			//},
-			//(object returnState) =>
-			//{
+				return botCommands;
+			},
+			(object returnState) =>
+			{
 				m_IsProcessing = false;
 
 				// Execute all completed actions
-			//	List<Action> unitActions = (List<Action>)returnState;
+				BotCommands botCommands = (BotCommands)returnState;
 
-				foreach (Action action in unitActions)
-					action();
-
+				botCommands.Execute();
+				
 				stateSnapshot.Release();
-			//});
+			});
 		}
 
-		private void UpdateGoal(StateSnapshot stateSnapshot, List<Action> unitActions, List<VehicleGroup.UnitSlot> unassignedCombatSlots)
+		private void UpdateGoal(StateSnapshot stateSnapshot, BotCommands botCommands, List<VehicleGroup.UnitSlot> unassignedCombatSlots)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Top priority is establishing a base with common metals
 			if (owner.units.commandCenters.Count == 0 || owner.units.commonOreMines.Count == 0 || owner.units.commonOreSmelters.Count == 0)
 			{
-				m_Goals[ExpandCommonMining_GoalID].task.PerformTaskTree(stateSnapshot, unitActions);
+				m_Goals[ExpandCommonMining_GoalID].task.PerformTaskTree(stateSnapshot, botCommands);
 				return;
 			}
 
 			// Power level is high priority
 			if (!m_Goals[MaintainPower_GoalID].task.IsTaskComplete(stateSnapshot))
-				m_Goals[MaintainPower_GoalID].task.PerformTaskTree(stateSnapshot, unitActions);
-
-			// Unload supplies
-			if (!m_Goals[UnloadSupplies_GoalID].task.IsTaskComplete(stateSnapshot))
-				m_Goals[UnloadSupplies_GoalID].task.PerformTaskTree(stateSnapshot, unitActions);
+				m_Goals[MaintainPower_GoalID].task.PerformTaskTree(stateSnapshot, botCommands);
 
 			// Maintain truck routes
 			MaintainTruckRoutes truckRoutes = (MaintainTruckRoutes)m_Goals[MaintainTruckRoutes_GoalID].task;
 			truckRoutes.UpdateNeededTrucks(stateSnapshot);
 
 			if (!truckRoutes.IsTaskComplete(stateSnapshot))
-				truckRoutes.PerformTaskTree(stateSnapshot, unitActions);
-
-			truckRoutes.PerformTruckRoutes(unitActions);
+				truckRoutes.PerformTaskTree(stateSnapshot, botCommands);
 
 			// Emergency repairs
 			RepairStructuresTask repairStructureTask = (RepairStructuresTask)m_Goals[RepairStructures_GoalID].task;
 			repairStructureTask.repairCriticalOnly = true;
 
 			if (!repairStructureTask.IsTaskComplete(stateSnapshot))
-				repairStructureTask.PerformTaskTree(stateSnapshot, unitActions);
+				repairStructureTask.PerformTaskTree(stateSnapshot, botCommands);
 			
 			// Fix disconnected structures
 			if (!m_Goals[FixDisconnectedStructures_GoalID].task.IsTaskComplete(stateSnapshot))
-				m_Goals[FixDisconnectedStructures_GoalID].task.PerformTaskTree(stateSnapshot, unitActions); // Tubes
+				m_Goals[FixDisconnectedStructures_GoalID].task.PerformTaskTree(stateSnapshot, botCommands); // Tubes
 			else if (!m_Goals[MaintainWalls_GoalID].task.IsTaskComplete(stateSnapshot))
-				m_Goals[MaintainWalls_GoalID].task.PerformTaskTree(stateSnapshot, unitActions); // Walls
+				m_Goals[MaintainWalls_GoalID].task.PerformTaskTree(stateSnapshot, botCommands); // Walls
 
 			// Keep people fed
 			if (!m_Goals[MaintainFood_GoalID].task.IsTaskComplete(stateSnapshot))
-				m_Goals[MaintainFood_GoalID].task.PerformTaskTree(stateSnapshot, unitActions);
+				m_Goals[MaintainFood_GoalID].task.PerformTaskTree(stateSnapshot, botCommands);
 
 			// Grow population
 			MaintainPopulationTask maintainPopulationTask = (MaintainPopulationTask)m_Goals[MaintainPopulation_GoalID].task;
@@ -171,29 +182,29 @@ namespace DotNetMissionSDK.AI.Managers
 
 			if (!maintainPopulationTask.IsTaskComplete(stateSnapshot))
 			{
-				maintainPopulationTask.PerformTaskTree(stateSnapshot, unitActions);
-				PerformFullRepairs(stateSnapshot, unitActions);
+				maintainPopulationTask.PerformTaskTree(stateSnapshot, botCommands);
+				PerformFullRepairs(stateSnapshot, botCommands);
 				//return;
 			}
 
 			// Build defenses
 			if (!m_Goals[MaintainDefenses_GoalID].task.IsTaskComplete(stateSnapshot))
-				m_Goals[MaintainDefenses_GoalID].task.PerformTaskTree(stateSnapshot, unitActions);
+				m_Goals[MaintainDefenses_GoalID].task.PerformTaskTree(stateSnapshot, botCommands);
 
 			// Expand rare mining
 			if (owner.units.rareOreMines.Count == 0 || owner.units.rareOreSmelters.Count == 0)
 			{
 				if (owner.units.rareOreSmelters.FirstOrDefault((smelter) => !smelter.isEnabled) == null)
-					m_Goals[ExpandRareMining_GoalID].task.PerformTaskTree(stateSnapshot, unitActions);
+					m_Goals[ExpandRareMining_GoalID].task.PerformTaskTree(stateSnapshot, botCommands);
 			}
 			else
 			{
 				// Expand common mining
 				if (owner.units.commonOreSmelters.FirstOrDefault((smelter) => !smelter.isEnabled) == null)
-					m_Goals[ExpandCommonMining_GoalID].task.PerformTaskTree(stateSnapshot, unitActions);
+					m_Goals[ExpandCommonMining_GoalID].task.PerformTaskTree(stateSnapshot, botCommands);
 			}
 
-			PerformFullRepairs(stateSnapshot, unitActions);
+			PerformFullRepairs(stateSnapshot, botCommands);
 
 			// Build combat units
 			if (owner.ore > 2800)
@@ -203,13 +214,13 @@ namespace DotNetMissionSDK.AI.Managers
 				// Unassigned slots are returned in a prioritized order based on the ThreatZone.
 				combatGroupTask.SetVehicleGroupSlots(unassignedCombatSlots);
 
-				combatGroupTask.PerformTaskTree(stateSnapshot, unitActions);
+				combatGroupTask.PerformTaskTree(stateSnapshot, botCommands);
 			}
 
 			//return goals[LaunchStarship_GoalID];
 		}
 
-		private bool PerformFullRepairs(StateSnapshot stateSnapshot, List<Action> unitActions)
+		private bool PerformFullRepairs(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			RepairStructuresTask repairStructureTask = (RepairStructuresTask)m_Goals[RepairStructures_GoalID].task;
 			repairStructureTask.repairCriticalOnly = false;

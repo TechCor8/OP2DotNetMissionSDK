@@ -20,7 +20,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			AddPrerequisite(new BuildRocketTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -41,7 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			{
 				if (spaceport.isBusy) return true;
 
-				unitActions.Add(() => GameState.GetUnit(spaceport.unitID)?.DoLaunch(0, 0, false));
+				unitActions.AddUnitCommand(spaceport.unitID, 2, () => GameState.GetUnit(spaceport.unitID)?.DoLaunch(0, 0, false));
 				return true;
 			}
 			
@@ -52,7 +52,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 				if (spaceport.isBusy) return true;
 
 				int bayIndex = spaceport.GetBayWithCargo(m_StarshipModule);
-				unitActions.Add(() =>
+				unitActions.AddUnitCommand(spaceport.unitID, 1, () =>
 				{
 					UnitEx liveSpaceport = GameState.GetUnit(spaceport.unitID);
 					if (liveSpaceport == null)
@@ -74,7 +74,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 				if (!owner.CanAffordUnit(stateSnapshot, m_StarshipModule))
 					return false;
 
-				unitActions.Add(() => GameState.GetUnit(spaceport.unitID)?.DoDevelop(m_StarshipModule));
+				unitActions.AddUnitCommand(spaceport.unitID, 0, () => GameState.GetUnit(spaceport.unitID)?.DoDevelop(m_StarshipModule));
 				return true;
 			}
 

@@ -32,7 +32,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		{
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -40,9 +40,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			{
 				if (GetVehicleStuckDuration(vehicle, stateSnapshot.time) > 50)
 				{
-					unitActions.Add(() =>
+					unitActions.AddUnitCommand(vehicle.unitID, 0, () =>
 					{
 						UnitEx unit = GameState.GetUnit(vehicle.unitID);
+						if (unit == null)
+							return;
+
 						unit.DoStop();
 						TethysGame.AddMessage(unit, "Destination unreachable", ownerID, 0);
 					});

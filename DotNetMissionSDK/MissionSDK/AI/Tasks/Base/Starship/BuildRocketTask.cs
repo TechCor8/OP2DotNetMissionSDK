@@ -25,7 +25,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			AddPrerequisite(new BuildSpaceportTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -51,7 +51,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 
 			// Fail Check: Rocket cost
 			if (owner.CanBuildUnit(stateSnapshot, rocketToBuild))
-				unitActions.Add(() => GameState.GetUnit(spaceport.unitID)?.DoDevelop(rocketToBuild));
+				unitActions.AddUnitCommand(spaceport.unitID, 1, () => GameState.GetUnit(spaceport.unitID)?.DoDevelop(rocketToBuild));
 
 			return true;
 		}

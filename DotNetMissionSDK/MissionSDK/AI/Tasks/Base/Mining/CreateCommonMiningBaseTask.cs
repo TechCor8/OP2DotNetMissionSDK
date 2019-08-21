@@ -66,7 +66,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(new BuildCommandCenterKitTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -93,7 +93,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 							unitType == map_id.Scorpion || unitType == map_id.Spider)
 							continue;
 
-						unitActions.Add(() => GameState.GetUnit(unit.unitID)?.DoMove(beaconPosition.x+AsyncRandom.GetRange(1,7), beaconPosition.y+AsyncRandom.GetRange(2,8)));
+						unitActions.AddUnitCommand(unit.unitID, 0, () => GameState.GetUnit(unit.unitID)?.DoMove(beaconPosition.x+AsyncRandom.Range(1,7), beaconPosition.y+AsyncRandom.Range(2,8)));
 					}
 				}
 
@@ -103,7 +103,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			return false;
 		}
 
-		private bool DeployCC(StateSnapshot stateSnapshot, List<Action> unitActions,  ConvecState convec, LOCATION targetPosition)
+		private bool DeployCC(StateSnapshot stateSnapshot, BotCommands unitActions,  ConvecState convec, LOCATION targetPosition)
 		{
 			// Callback for determining if tile is a valid place point
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
@@ -136,7 +136,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			BuildStructureTask.ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
 
 			// Build structure
-			unitActions.Add(() => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
+			unitActions.AddUnitCommand(convec.unitID, 1, () => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
 
 			return true;
 		}

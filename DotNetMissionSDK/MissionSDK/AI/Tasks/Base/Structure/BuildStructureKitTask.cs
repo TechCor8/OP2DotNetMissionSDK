@@ -72,7 +72,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return owner.CanBuildUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -98,7 +98,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 					if (convec.curAction != ActionType.moDone)
 						return true;
 
-					unitActions.Add(() => GameState.GetUnit(factoryWithKit.unitID)?.DoTransferCargo(factoryWithKit.GetBayWithCargo(m_KitToBuild)));
+					unitActions.AddUnitCommand(convec.unitID, 1, () => GameState.GetUnit(factoryWithKit.unitID)?.DoTransferCargo(factoryWithKit.GetBayWithCargo(m_KitToBuild)));
 					return true;
 				}
 
@@ -124,7 +124,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 					return true;
 
 				// Send convec to dock
-				unitActions.Add(() =>
+				unitActions.AddUnitCommand(convec.unitID, 1, () =>
 				{
 					UnitEx facWithKit = GameState.GetUnit(factoryWithKit.unitID);
 					if (facWithKit != null)
@@ -147,6 +147,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (factory.isBusy)
 				return true;
 
+			if (!factory.HasEmptyBay())
+				return false;
+
 			if (!owner.CanAffordUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo))
 				return false;
 
@@ -156,9 +159,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return true;
 		}
 
-		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id kitToBuild, map_id kitToBuildCargo)
+		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id kitToBuild, map_id kitToBuildCargo)
 		{
-			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(kitToBuild, kitToBuildCargo));
+			unitActions.AddUnitCommand(factoryID, 1, () => GameState.GetUnit(factoryID)?.DoProduce(kitToBuild, kitToBuildCargo));
 		}
 
 		private bool UnitContainsKit(ConvecState unit, map_id[] kits)

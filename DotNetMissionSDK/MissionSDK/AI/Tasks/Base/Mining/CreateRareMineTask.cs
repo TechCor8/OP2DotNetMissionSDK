@@ -54,7 +54,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(new BuildMinerTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -77,14 +77,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				BuildStructureTask.ClearDeployArea(miner, map_id.RareOreMine, beacon.position, stateSnapshot, ownerID, unitActions);
 
 				if (!miner.position.Equals(beaconPosition) && miner.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
-					unitActions.Add(() => GameState.GetUnit(miner.unitID)?.DoDeployMiner(beaconPosition.x, beaconPosition.y));
+					unitActions.AddUnitCommand(miner.unitID, 1, () => GameState.GetUnit(miner.unitID)?.DoDeployMiner(beaconPosition.x, beaconPosition.y));
 
 				return true;
 			}
 			
 			// Move miner involved in expansion close to beacon for efficiency
 			if (miner.curAction == ActionType.moDone)
-				unitActions.Add(() => GameState.GetUnit(miner.unitID)?.DoMove(beaconPosition.x-1, beaconPosition.y+1));
+				unitActions.AddUnitCommand(miner.unitID, 1, () => GameState.GetUnit(miner.unitID)?.DoMove(beaconPosition.x-1, beaconPosition.y+1));
 			
 			// Survey beacon
 			if (owner.units.roboSurveyors.Count == 0)
@@ -93,7 +93,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			VehicleState surveyor = owner.units.roboSurveyors[0];
 
 			if (!surveyor.position.Equals(beaconPosition) && surveyor.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
-				unitActions.Add(() => GameState.GetUnit(surveyor.unitID)?.DoMove(beaconPosition.x, beaconPosition.y));
+				unitActions.AddUnitCommand(surveyor.unitID, 1, () => GameState.GetUnit(surveyor.unitID)?.DoMove(beaconPosition.x, beaconPosition.y));
 			
 			return true;
 		}

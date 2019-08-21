@@ -57,7 +57,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -80,15 +80,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 						if (smelter != null)
 						{
 							if (!truck.IsOnDock(smelter))
-								unitActions.Add(() =>
+							{
+								unitActions.AddUnitCommand(truck.unitID, 2, () =>
 								{
 									UnitEx liveSmelter = GameState.GetUnit(smelter.unitID);
 									if (liveSmelter != null)
 										GameState.GetUnit(truck.unitID)?.DoDock(liveSmelter);
 								});
+							}
 							else
 							{
-								unitActions.Add(() => GameState.GetUnit(smelter.unitID)?.DoUnloadCargo());
+								unitActions.AddUnitCommand(truck.unitID, 2, () => GameState.GetUnit(smelter.unitID)?.DoUnloadCargo());
 								FixTruckUnloading(stateSnapshot, unitActions, truck);
 							}
 						}
@@ -100,7 +102,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 						{
 							if (!truck.IsOnDock(rareSmelter))
 							{
-								unitActions.Add(() =>
+								unitActions.AddUnitCommand(truck.unitID, 2, () =>
 								{
 									UnitEx liveSmelter = GameState.GetUnit(rareSmelter.unitID);
 									if (liveSmelter != null)
@@ -109,7 +111,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 							}
 							else
 							{
-								unitActions.Add(() => GameState.GetUnit(rareSmelter.unitID)?.DoUnloadCargo());
+								unitActions.AddUnitCommand(truck.unitID, 2, () => GameState.GetUnit(rareSmelter.unitID)?.DoUnloadCargo());
 								FixTruckUnloading(stateSnapshot, unitActions, truck);
 							}
 						}
@@ -121,7 +123,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 						{
 							if (!truck.IsOnDock(agridome))
 							{
-								unitActions.Add(() =>
+								unitActions.AddUnitCommand(truck.unitID, 2, () =>
 								{
 									UnitEx liveAgridome = GameState.GetUnit(agridome.unitID);
 									if (liveAgridome != null)
@@ -130,7 +132,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 							}
 							else
 							{
-								unitActions.Add(() => GameState.GetUnit(agridome.unitID)?.DoUnloadCargo());
+								unitActions.AddUnitCommand(truck.unitID, 2, () => GameState.GetUnit(agridome.unitID)?.DoUnloadCargo());
 								FixTruckUnloading(stateSnapshot, unitActions, truck);
 							}
 						}
@@ -141,14 +143,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			return true;
 		}
 
-		private void FixTruckUnloading(StateSnapshot stateSnapshot, List<Action> unitActions, CargoTruckState truck)
+		private void FixTruckUnloading(StateSnapshot stateSnapshot, BotCommands unitActions, CargoTruckState truck)
 		{
 			if (truck.curAction != ActionType.moDone)
 				return;
 
 			int stateDuration = stateSnapshot.time - GetTruckStateTime(stateSnapshot, truck);
 			if (stateDuration > 8)
-				unitActions.Add(() => GameState.GetUnit(truck.unitID)?.DoMove(truck.position.x, truck.position.y+1));
+				unitActions.AddUnitCommand(truck.unitID, 3, () => GameState.GetUnit(truck.unitID)?.DoMove(truck.position.x, truck.position.y+1));
 		}
 
 		private int GetTruckStateTime(StateSnapshot stateSnapshot, CargoTruckState truck)

@@ -1,10 +1,7 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
@@ -44,7 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return owner.CanBuildUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			if (!CanPerformTask(stateSnapshot))
 				return false;
@@ -62,9 +59,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return true;
 		}
 
-		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
 		{
-			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
+			unitActions.AddUnitCommand(factoryID, 0, () => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 
 		/// <summary>
@@ -79,7 +76,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		/// <summary>
 		/// Adds a factory to the base for producing more units.
 		/// </summary>
-		public virtual void AddFactory(StateSnapshot stateSnapshot, List<Action> unitActions)
+		public virtual void AddFactory(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -104,7 +101,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			m_BuildStructureTask.GeneratePrerequisites();
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			if (!CanPerformTask(stateSnapshot))
 				return false;
@@ -122,15 +119,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return true;
 		}
 
-		private static void ProduceUnit(List<Action> unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
 		{
-			unitActions.Add(() => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
+			unitActions.AddUnitCommand(factoryID, 0, () => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
 		}
 
 		/// <summary>
 		/// Adds a factory to the base for producing more units.
 		/// </summary>
-		public override void AddFactory(StateSnapshot stateSnapshot, List<Action> unitActions)
+		public override void AddFactory(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 

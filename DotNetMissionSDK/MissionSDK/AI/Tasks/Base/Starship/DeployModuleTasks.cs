@@ -33,7 +33,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			AddPrerequisite(new DeployPhoenixModuleTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, List<Action> unitActions)
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 

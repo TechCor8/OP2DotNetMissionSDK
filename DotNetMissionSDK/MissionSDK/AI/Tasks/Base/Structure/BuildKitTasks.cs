@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.State.Snapshot;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.State.Snapshot;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
@@ -145,7 +146,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				int min = includeLineOfSight ? 0 : 2;
 				int max = includeBombs ? 6 : 5;
 
-				int rand = TethysGame.GetRandomRange(min, max);
+				int rand = AsyncRandom.Range(min, max);
 				switch (rand)
 				{
 					case 0:		m_KitToBuildCargo = map_id.Laser;		break;
@@ -161,7 +162,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				int min = includeLineOfSight ? 0 : 2;
 				int max = includeBombs ? 6 : 5;
 
-				int rand = TethysGame.GetRandomRange(min, max);
+				int rand = AsyncRandom.Range(min, max);
 				switch (rand)
 				{
 					case 0:		m_KitToBuildCargo = map_id.Microwave;	break;

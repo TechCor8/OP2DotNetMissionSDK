@@ -29,7 +29,7 @@ namespace DotNetMissionSDK.Async
 		/// </summary>
 		/// <param name="min">The minimum value (inclusive)</param>
 		/// <param name="max">The maximum value (exclusive)</param>
-		public static int GetRange(int min, int max)
+		public static int Range(int min, int max)
 		{
 			lock (m_SyncObject)
 				return m_Random.Next(min, max);
