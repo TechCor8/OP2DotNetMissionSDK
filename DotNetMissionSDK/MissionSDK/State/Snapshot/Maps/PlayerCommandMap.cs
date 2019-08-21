@@ -242,7 +242,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 				LOCATION tilePosition = new LOCATION(x,y);
 				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
 
-				StructureState building = m_StateSnapshot.unitMap.GetUnitOnTile(gridPoint) as StructureState;
+				StructureState building = m_StateSnapshot.unitMap.GetUnitOnTile(tilePosition) as StructureState;
 
 				if (m_StateSnapshot.tileMap.GetCellType(tilePosition) != CellType.Tube0 && building == null)
 					return Pathfinder.Impassable;

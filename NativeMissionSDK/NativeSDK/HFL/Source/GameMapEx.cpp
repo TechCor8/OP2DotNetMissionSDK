@@ -124,11 +124,11 @@ void GameMapEx::CopyTileMap(int* tileMap, int xMin, int xMax, int yMin, int yMax
 			int px = x - xMin;
 			int py = y - yMin;
 
-			int xLower = p->tileXMask & px;
+			int xLower = p->tileXMask & x;
 			int xUpper = xLower >> 5;
 			xLower &= 31;
 			xUpper <<= p->logTileHeight;
-			xUpper += py;
+			xUpper += y;
 			xUpper <<= 5;
 			
 			tileMap[px + py * mapWidth] = (*tileArray)[xUpper + xLower];
