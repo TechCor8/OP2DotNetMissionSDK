@@ -5,6 +5,7 @@
 //		 functions from. Creating an instance of this class serves little
 //		 (or no) purpose and may even crash the game.
 
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -21,13 +22,13 @@ namespace DotNetMissionSDK
 		}
 
 		// Methods
-		public void Destroy()			{ ScStub_Destroy(stubIndex);					}
-		public void Disable()			{ ScStub_Disable(stubIndex);					}
-		public void Enable()			{ ScStub_Enable(stubIndex);						}
+		public void Destroy()			{ ThreadAssert.MainThreadRequired();	ScStub_Destroy(stubIndex);						}
+		public void Disable()			{ ThreadAssert.MainThreadRequired();	ScStub_Disable(stubIndex);						}
+		public void Enable()			{ ThreadAssert.MainThreadRequired();	ScStub_Enable(stubIndex);						}
 		
 		// [Get]
-		public bool IsEnabled()			{ return ScStub_IsEnabled(stubIndex) != 0;		}
-		public bool IsInitialized()		{ return ScStub_IsInitialized(stubIndex) != 0;	}
+		public bool IsEnabled()			{ ThreadAssert.MainThreadRequired();	return ScStub_IsEnabled(stubIndex) != 0;		}
+		public bool IsInitialized()		{ ThreadAssert.MainThreadRequired();	return ScStub_IsInitialized(stubIndex) != 0;	}
 		// [Set]
 		//void SetId(int stubIndex);
 

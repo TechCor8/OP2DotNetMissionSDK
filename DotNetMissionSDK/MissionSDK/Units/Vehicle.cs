@@ -153,6 +153,8 @@ namespace DotNetMissionSDK.Units
 
 		public override void DoAttack(Unit targetUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (targetUnit != m_AttackTarget)
 			{
 				base.DoAttack(targetUnit);
@@ -167,6 +169,8 @@ namespace DotNetMissionSDK.Units
 		/// </summary>
 		public override void Update()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (GetCurAction() == ActionType.moDone)
 			{
 				if (m_IdleTimer < 10)
@@ -216,6 +220,8 @@ namespace DotNetMissionSDK.Units
 		/// </summary>
 		public override void OnDestroy()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (m_DebugMarker != null)
 			{
 				// Remove marker

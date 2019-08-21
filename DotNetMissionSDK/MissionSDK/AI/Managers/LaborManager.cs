@@ -138,7 +138,7 @@ namespace DotNetMissionSDK.AI.Managers
 			//if (m_StructurePriority.Count > 2 &&
 			//	m_StructurePriority[m_StructurePriority.Count-1].GetUnitType() == map_id.University &&
 			//	m_StructurePriority[m_StructurePriority.Count-2].GetUnitType() == map_id.Nursery)
-			if (TethysGame.UsesMorale())
+			if (stateSnapshot.usesMorale)
 			{
 				// Morale fluctuates, include morale structures
 

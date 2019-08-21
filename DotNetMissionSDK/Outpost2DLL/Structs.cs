@@ -2,6 +2,7 @@
 // Note: Some of these structures are really more like full classes but
 //		 since they called them struct's we'll let that one slide. =)
 
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -22,16 +23,22 @@ namespace DotNetMissionSDK
 
 		public PatrolRoute(int waypointSize)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = PatrolRoute_Create(waypointSize);
 		}
 
 		public void SetWaypoint(int index, LOCATION pt)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			PatrolRoute_SetWaypoint(m_Handle, index, pt.x, pt.y);
 		}
 
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			PatrolRoute_Release(m_Handle);

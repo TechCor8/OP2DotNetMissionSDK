@@ -1,6 +1,7 @@
 // Note: The UnitBlock class can be used for creating blocks of units
 //		 of certain predefined types.
 
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -15,6 +16,8 @@ namespace DotNetMissionSDK
 
 		public UnitBlock(UnitRecord[] unitRecordTable)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			// Write records into array
 			IntPtr arr = UnitRecord_CreateArray(unitRecordTable.Length);
 
@@ -33,6 +36,8 @@ namespace DotNetMissionSDK
 		// Returns numUnitsCreated
 		public int CreateUnits(int playerID, int bLightsOn)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			return UnitBlock_CreateUnits(m_Handle, playerID, bLightsOn);
 		}
 

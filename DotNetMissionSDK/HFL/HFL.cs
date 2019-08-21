@@ -1,3 +1,4 @@
+using DotNetMissionSDK.Async;
 using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK.HFL
@@ -7,8 +8,8 @@ namespace DotNetMissionSDK.HFL
 	/// </summary>
 	public class HFLCore
 	{
-		public static bool Init()										{ return HFL_Init() != HFLCANTINIT;		}
-		public static void Cleanup()									{ HFL_Cleanup();						}
+		public static bool Init()										{ ThreadAssert.MainThreadRequired();	return HFL_Init() != HFLCANTINIT;		}
+		public static void Cleanup()									{ ThreadAssert.MainThreadRequired();	HFL_Cleanup();							}
 		
 
 

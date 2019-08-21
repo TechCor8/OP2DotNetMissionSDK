@@ -1,3 +1,4 @@
+using DotNetMissionSDK.Async;
 using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK.HFL
@@ -7,19 +8,21 @@ namespace DotNetMissionSDK.HFL
 	/// </summary>
 	public class GameMapEx : GameMap
 	{
-		public static uint GetTileMappingIndex(int tileX, int tileY)										{ return GameMapEx_GetTileMappingIndex(tileX, tileY);						}
-		public static uint GetTileUnitIndex(int tileX, int tileY)											{ return GameMapEx_GetTileUnitIndex(tileX, tileY);							}
-		public static uint GetTileFlags(int tileX, int tileY)												{ return GameMapEx_GetTileFlags(tileX, tileY);								}
-		public static void SetTile(int tileX, int tileY, uint mappingIndex, uint unitIndex, uint flags)		{ GameMapEx_SetTile(tileX, tileY, mappingIndex, unitIndex, flags);			}
+		public static uint GetTileMappingIndex(int tileX, int tileY)										{ ThreadAssert.MainThreadRequired();	return GameMapEx_GetTileMappingIndex(tileX, tileY);					}
+		public static uint GetTileUnitIndex(int tileX, int tileY)											{ ThreadAssert.MainThreadRequired();	return GameMapEx_GetTileUnitIndex(tileX, tileY);					}
+		public static uint GetTileFlags(int tileX, int tileY)												{ ThreadAssert.MainThreadRequired();	return GameMapEx_GetTileFlags(tileX, tileY);						}
+		public static void SetTile(int tileX, int tileY, uint mappingIndex, uint unitIndex, uint flags)		{ ThreadAssert.MainThreadRequired();	GameMapEx_SetTile(tileX, tileY, mappingIndex, unitIndex, flags);	}
 
-		public static int GetMapWidth(int tileX, int tileY)													{ return GameMapEx_GetMapWidth();											}
-		public static int GetMapHeight(int tileX, int tileY)												{ return GameMapEx_GetMapHeight();											}
+		public static int GetMapWidth(int tileX, int tileY)													{ ThreadAssert.MainThreadRequired();	return GameMapEx_GetMapWidth();										}
+		public static int GetMapHeight(int tileX, int tileY)												{ ThreadAssert.MainThreadRequired();	return GameMapEx_GetMapHeight();									}
 
-		public static int GetNumUnits(int tileX, int tileY)													{ return GameMapEx_GetNumUnits();											}
-		public static int LoadMap(int tileX, int tileY, string fileName)									{ return GameMapEx_LoadMap(fileName);										}
+		public static int GetNumUnits(int tileX, int tileY)													{ ThreadAssert.MainThreadRequired();	return GameMapEx_GetNumUnits();										}
+		public static int LoadMap(int tileX, int tileY, string fileName)									{ ThreadAssert.MainThreadRequired();	return GameMapEx_LoadMap(fileName);									}
 
 		public static void CopyTileMap(uint[] tileMapBuffer)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			GameMapEx_CopyTileMap(tileMapBuffer, bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax);
 		}
 

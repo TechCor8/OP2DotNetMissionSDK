@@ -1,3 +1,4 @@
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -17,16 +18,16 @@ namespace DotNetMissionSDK
 		public static MAP_RECT bounds											{ get; private set; } // In "map coordinates" Ex: (32,0,160,127)
 
 		// [Get]
-		public static CellType GetCellType(int x, int y)						{ return (CellType)GameMap_GetCellType(x, y);				}
-		public static int GetTile(int x, int y)									{ return GameMap_GetTile(x, y);								}
+		public static CellType GetCellType(int x, int y)						{ ThreadAssert.MainThreadRequired();	return (CellType)GameMap_GetCellType(x, y);				}
+		public static int GetTile(int x, int y)									{ ThreadAssert.MainThreadRequired();	return GameMap_GetTile(x, y);							}
 
 		// [Set]
-		public static void InitialSetTile(int x, int y, int tileIndex)			{ GameMap_InitialSetTile(x, y, tileIndex);					}
-		public static void SetTile(int x, int y, int tileIndex)					{ GameMap_SetTile(x, y, tileIndex);							}
-		public static void SetCellType(int x, int y, int cellIndex)				{ GameMap_SetCellType(x, y, cellIndex);						}
-		public static void SetLavaPossible(int x, int y, bool bLavaPossible)	{ GameMap_SetLavaPossible(x, y, bLavaPossible ? 1 : 0);		}
-		public static void SetVirusUL(int x, int y, bool bBlightPresent)		{ GameMap_SetVirusUL(x, y, bBlightPresent ? 1 : 0);			}
-		public static void SetInitialLightLevel(int lightPosition)				{ GameMap_SetInitialLightLevel(lightPosition);				}
+		public static void InitialSetTile(int x, int y, int tileIndex)			{ ThreadAssert.MainThreadRequired();	GameMap_InitialSetTile(x, y, tileIndex);				}
+		public static void SetTile(int x, int y, int tileIndex)					{ ThreadAssert.MainThreadRequired();	GameMap_SetTile(x, y, tileIndex);						}
+		public static void SetCellType(int x, int y, int cellIndex)				{ ThreadAssert.MainThreadRequired();	GameMap_SetCellType(x, y, cellIndex);					}
+		public static void SetLavaPossible(int x, int y, bool bLavaPossible)	{ ThreadAssert.MainThreadRequired();	GameMap_SetLavaPossible(x, y, bLavaPossible ? 1 : 0);	}
+		public static void SetVirusUL(int x, int y, bool bBlightPresent)		{ ThreadAssert.MainThreadRequired();	GameMap_SetVirusUL(x, y, bBlightPresent ? 1 : 0);		}
+		public static void SetInitialLightLevel(int lightPosition)				{ ThreadAssert.MainThreadRequired();	GameMap_SetInitialLightLevel(lightPosition);			}
 
 		// [Get]
 		[DllImport("DotNetInterop.dll")] private static extern int GameMap_GetCellType(int x, int y);
@@ -40,13 +41,12 @@ namespace DotNetMissionSDK
 		[DllImport("DotNetInterop.dll")] private static extern void GameMap_SetVirusUL(int x, int y, int bBlightPresent);
 		[DllImport("DotNetInterop.dll")] private static extern void GameMap_SetInitialLightLevel(int lightPosition);
 
-		public static bool IsTilePassable(int x, int y)
-		{
-			return IsTilePassable(new LOCATION(x,y));
-		}
+		public static bool IsTilePassable(int x, int y)							{ ThreadAssert.MainThreadRequired();	return IsTilePassable(new LOCATION(x,y));				}
 
 		public static bool IsTilePassable(LOCATION tile)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			// If tile is out of bounds, it is not passable
 			if (!tile.IsInMapBounds())
 				return false;
@@ -69,13 +69,12 @@ namespace DotNetMissionSDK
 			return false;
 		}
 
-		public static int GetTileMovementCost(int x, int y)
-		{
-			return GetTileMovementCost(new LOCATION(x,y));
-		}
+		public static int GetTileMovementCost(int x, int y)						{ ThreadAssert.MainThreadRequired();	return GetTileMovementCost(new LOCATION(x,y));			}
 
 		public static int GetTileMovementCost(LOCATION tile)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (!tile.IsInMapBounds())
 				return 0;
 
@@ -100,6 +99,8 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public static void Initialize()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			// Calculate the map bounds
 			LOCATION min = new LOCATION(-1,-1);
 			LOCATION max;

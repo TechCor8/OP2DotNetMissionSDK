@@ -1,3 +1,4 @@
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -15,93 +16,93 @@ namespace DotNetMissionSDK.HFL
 
 		public UnitEx(int stubIndex) : base(stubIndex) { }
 
-		public PlayerEx GetOwner()													{ return TethysGame.GetPlayer(GetOwnerID());													}
+		public PlayerEx GetOwner()													{ ThreadAssert.MainThreadRequired();	return TethysGame.GetPlayer(GetOwnerID());													}
 
-		public void DoAttack(int tileX, int tileY)									{ UnitEx_DoAttack(m_StubIndex, tileX, tileY);													}
-		public void DoDeployMiner(int tileX, int tileY)								{ UnitEx_DoDeployMiner(m_StubIndex, tileX, tileY);												}
-		public void DoDoze(MAP_RECT dozeArea)										{ UnitEx_DoDoze(m_StubIndex, dozeArea.xMin, dozeArea.yMin, dozeArea.xMax, dozeArea.yMax);		}
+		public void DoAttack(int tileX, int tileY)									{ ThreadAssert.MainThreadRequired();	UnitEx_DoAttack(m_StubIndex, tileX, tileY);													}
+		public void DoDeployMiner(int tileX, int tileY)								{ ThreadAssert.MainThreadRequired();	UnitEx_DoDeployMiner(m_StubIndex, tileX, tileY);											}
+		public void DoDoze(MAP_RECT dozeArea)										{ ThreadAssert.MainThreadRequired();	UnitEx_DoDoze(m_StubIndex, dozeArea.xMin, dozeArea.yMin, dozeArea.xMax, dozeArea.yMax);		}
 
-		public void DoDock(UnitEx targetDock)										{ LOCATION tile = targetDock.GetDockLocation(); DoDock(tile.x, tile.y);							}
-		public void DoDock(int tileX, int tileY)									{ UnitEx_DoDock(m_StubIndex, tileX, tileY);														}
-		public void DoDockAtGarage(int tileX, int tileY)							{ UnitEx_DoDockAtGarage(m_StubIndex, tileX, tileY);												}
+		public void DoDock(UnitEx targetDock)										{ ThreadAssert.MainThreadRequired();	LOCATION tile = targetDock.GetDockLocation(); DoDock(tile.x, tile.y);						}
+		public void DoDock(int tileX, int tileY)									{ ThreadAssert.MainThreadRequired();	UnitEx_DoDock(m_StubIndex, tileX, tileY);													}
+		public void DoDockAtGarage(int tileX, int tileY)							{ ThreadAssert.MainThreadRequired();	UnitEx_DoDockAtGarage(m_StubIndex, tileX, tileY);											}
 
-		public void DoStandGround(int tileX, int tileY)								{ UnitEx_DoStandGround(m_StubIndex, tileX, tileY);												}
-		public void DoBuildWall(map_id wallType, MAP_RECT area)						{ UnitEx_DoBuildWall(m_StubIndex, wallType, area.xMin, area.yMin, area.xMax, area.yMax);		}
-		public void DoRemoveWall(MAP_RECT area)										{ UnitEx_DoRemoveWall(m_StubIndex, area.xMin, area.yMin, area.xMax, area.yMax);					}
+		public void DoStandGround(int tileX, int tileY)								{ ThreadAssert.MainThreadRequired();	UnitEx_DoStandGround(m_StubIndex, tileX, tileY);											}
+		public void DoBuildWall(map_id wallType, MAP_RECT area)						{ ThreadAssert.MainThreadRequired();	UnitEx_DoBuildWall(m_StubIndex, wallType, area.xMin, area.yMin, area.xMax, area.yMax);		}
+		public void DoRemoveWall(MAP_RECT area)										{ ThreadAssert.MainThreadRequired();	UnitEx_DoRemoveWall(m_StubIndex, area.xMin, area.yMin, area.xMax, area.yMax);				}
 
-		public void DoProduce(map_id unitType, map_id cargoWeaponType)				{ UnitEx_DoProduce(m_StubIndex, unitType, cargoWeaponType);										}
+		public void DoProduce(map_id unitType, map_id cargoWeaponType)				{ ThreadAssert.MainThreadRequired();	UnitEx_DoProduce(m_StubIndex, unitType, cargoWeaponType);									}
 
-		public void DoTransferCargo(int bay)										{ UnitEx_DoTransferCargo(m_StubIndex, bay);														}
-		public void DoLoadCargo()													{ UnitEx_DoLoadCargo(m_StubIndex);																}
-		public void DoUnloadCargo()													{ UnitEx_DoUnloadCargo(m_StubIndex);															}
-		public void DoDumpCargo()													{ UnitEx_DoDumpCargo(m_StubIndex);																}
+		public void DoTransferCargo(int bay)										{ ThreadAssert.MainThreadRequired();	UnitEx_DoTransferCargo(m_StubIndex, bay);													}
+		public void DoLoadCargo()													{ ThreadAssert.MainThreadRequired();	UnitEx_DoLoadCargo(m_StubIndex);															}
+		public void DoUnloadCargo()													{ ThreadAssert.MainThreadRequired();	UnitEx_DoUnloadCargo(m_StubIndex);															}
+		public void DoDumpCargo()													{ ThreadAssert.MainThreadRequired();	UnitEx_DoDumpCargo(m_StubIndex);															}
 
-		public void DoResearch(int techID, int numScientists)						{ UnitEx_DoResearch(m_StubIndex, techID, numScientists);										}
-		public void DoTrainScientists(int numScientists)							{ UnitEx_DoTrainScientists(m_StubIndex, numScientists);											}
+		public void DoResearch(int techID, int numScientists)						{ ThreadAssert.MainThreadRequired();	UnitEx_DoResearch(m_StubIndex, techID, numScientists);										}
+		public void DoTrainScientists(int numScientists)							{ ThreadAssert.MainThreadRequired();	UnitEx_DoTrainScientists(m_StubIndex, numScientists);										}
 
-		public void DoRepair(Unit targetUnit)										{ UnitEx_DoRepair(m_StubIndex, targetUnit.GetStubIndex());										}
-		public void DoReprogram(Unit targetUnit)									{ UnitEx_DoReprogram(m_StubIndex, targetUnit.GetStubIndex());									}
-		public void DoDismantle(Unit targetUnit)									{ UnitEx_DoDismantle(m_StubIndex, targetUnit.GetStubIndex());									}
+		public void DoRepair(Unit targetUnit)										{ ThreadAssert.MainThreadRequired();	UnitEx_DoRepair(m_StubIndex, targetUnit.GetStubIndex());									}
+		public void DoReprogram(Unit targetUnit)									{ ThreadAssert.MainThreadRequired();	UnitEx_DoReprogram(m_StubIndex, targetUnit.GetStubIndex());									}
+		public void DoDismantle(Unit targetUnit)									{ ThreadAssert.MainThreadRequired();	UnitEx_DoDismantle(m_StubIndex, targetUnit.GetStubIndex());									}
 
-		public void DoSalvage(MAP_RECT salvageArea, Unit targetGORF)				{ UnitEx_DoSalvage(m_StubIndex, salvageArea.xMin, salvageArea.yMin, salvageArea.xMax, salvageArea.yMax, targetGORF.GetStubIndex());		}
-		public void DoGuard(Unit targetUnit)										{ UnitEx_DoGuard(m_StubIndex, targetUnit.GetStubIndex());										}
-		public void DoPoof()														{ UnitEx_DoPoof(m_StubIndex);																	}
+		public void DoSalvage(MAP_RECT salvageArea, Unit targetGORF)				{ ThreadAssert.MainThreadRequired();	UnitEx_DoSalvage(m_StubIndex, salvageArea.xMin, salvageArea.yMin, salvageArea.xMax, salvageArea.yMax, targetGORF.GetStubIndex());		}
+		public void DoGuard(Unit targetUnit)										{ ThreadAssert.MainThreadRequired();	UnitEx_DoGuard(m_StubIndex, targetUnit.GetStubIndex());										}
+		public void DoPoof()														{ ThreadAssert.MainThreadRequired();	UnitEx_DoPoof(m_StubIndex);																	}
 
-		public CommandType GetLastCommand()											{ return UnitEx_GetLastCommand(m_StubIndex);													}
-		public ActionType GetCurAction()											{ return UnitEx_GetCurAction(m_StubIndex);														}
+		public CommandType GetLastCommand()											{ ThreadAssert.MainThreadRequired();	return UnitEx_GetLastCommand(m_StubIndex);													}
+		public ActionType GetCurAction()											{ ThreadAssert.MainThreadRequired();	return UnitEx_GetCurAction(m_StubIndex);													}
 
-		public int CreatorID()														{ return UnitEx_CreatorID(m_StubIndex);															}
+		public int CreatorID()														{ ThreadAssert.MainThreadRequired();	return UnitEx_CreatorID(m_StubIndex);														}
 
-		public bool IsEMPedEx()														{ return UnitEx_IsEMPedEx(m_StubIndex) > 0;														}
-		public bool IsStickyfoamed()												{ return UnitEx_IsStickyfoamed(m_StubIndex) > 0;												}
-		public bool IsESGed()														{ return UnitEx_IsESGed(m_StubIndex) > 0;														}
+		public bool IsEMPedEx()														{ ThreadAssert.MainThreadRequired();	return UnitEx_IsEMPedEx(m_StubIndex) > 0;													}
+		public bool IsStickyfoamed()												{ ThreadAssert.MainThreadRequired();	return UnitEx_IsStickyfoamed(m_StubIndex) > 0;												}
+		public bool IsESGed()														{ ThreadAssert.MainThreadRequired();	return UnitEx_IsESGed(m_StubIndex) > 0;														}
 
-		public int GetDamage()														{ return UnitEx_GetDamage(m_StubIndex);															}
+		public int GetDamage()														{ ThreadAssert.MainThreadRequired();	return UnitEx_GetDamage(m_StubIndex);														}
 
-		public int GetCargoAmount()													{ return UnitEx_GetCargoAmount(m_StubIndex);													}
-		public TruckCargo GetCargoType()											{ return UnitEx_GetCargoType(m_StubIndex);														}
-		public int GetWorkersInTraining()											{ return UnitEx_GetWorkersInTraining(m_StubIndex);												}
-		public map_id GetFactoryCargo(int bay)										{ return UnitEx_GetFactoryCargo(m_StubIndex, bay);												}
-		public map_id GetFactoryCargoWeapon(int bay)								{ return UnitEx_GetFactoryCargoWeapon(m_StubIndex, bay);										}
-		public map_id GetLaunchpadCargo()											{ return UnitEx_GetLaunchPadCargo(m_StubIndex);													}
-		public void SetLaunchpadCargo(map_id moduleType)							{ UnitEx_SetLaunchPadCargo(m_StubIndex, moduleType);											}
+		public int GetCargoAmount()													{ ThreadAssert.MainThreadRequired();	return UnitEx_GetCargoAmount(m_StubIndex);													}
+		public TruckCargo GetCargoType()											{ ThreadAssert.MainThreadRequired();	return UnitEx_GetCargoType(m_StubIndex);													}
+		public int GetWorkersInTraining()											{ ThreadAssert.MainThreadRequired();	return UnitEx_GetWorkersInTraining(m_StubIndex);											}
+		public map_id GetFactoryCargo(int bay)										{ ThreadAssert.MainThreadRequired();	return UnitEx_GetFactoryCargo(m_StubIndex, bay);											}
+		public map_id GetFactoryCargoWeapon(int bay)								{ ThreadAssert.MainThreadRequired();	return UnitEx_GetFactoryCargoWeapon(m_StubIndex, bay);										}
+		public map_id GetLaunchpadCargo()											{ ThreadAssert.MainThreadRequired();	return UnitEx_GetLaunchPadCargo(m_StubIndex);												}
+		public void SetLaunchpadCargo(map_id moduleType)							{ ThreadAssert.MainThreadRequired();	UnitEx_SetLaunchPadCargo(m_StubIndex, moduleType);											}
 
-		public bool GetLights()														{ return UnitEx_GetLights(m_StubIndex) > 0;														}
-		public bool HasPower()														{ return UnitEx_HasPower(m_StubIndex) > 0;														}
-		public bool HasWorkers()													{ return UnitEx_HasWorkers(m_StubIndex) > 0;													}
-		public bool HasScientists()													{ return UnitEx_HasScientists(m_StubIndex) > 0;													}
-		public bool IsInfected()													{ return UnitEx_IsInfected(m_StubIndex) > 0;													}
+		public bool GetLights()														{ ThreadAssert.MainThreadRequired();	return UnitEx_GetLights(m_StubIndex) > 0;													}
+		public bool HasPower()														{ ThreadAssert.MainThreadRequired();	return UnitEx_HasPower(m_StubIndex) > 0;													}
+		public bool HasWorkers()													{ ThreadAssert.MainThreadRequired();	return UnitEx_HasWorkers(m_StubIndex) > 0;													}
+		public bool HasScientists()													{ ThreadAssert.MainThreadRequired();	return UnitEx_HasScientists(m_StubIndex) > 0;												}
+		public bool IsInfected()													{ ThreadAssert.MainThreadRequired();	return UnitEx_IsInfected(m_StubIndex) > 0;													}
 
-		public bool GetDoubleFireRate()												{ return UnitEx_GetDoubleFireRate(m_StubIndex) > 0;												}
-		public bool GetInvisible()													{ return UnitEx_GetInvisible(m_StubIndex) > 0;													}
+		public bool GetDoubleFireRate()												{ ThreadAssert.MainThreadRequired();	return UnitEx_GetDoubleFireRate(m_StubIndex) > 0;											}
+		public bool GetInvisible()													{ ThreadAssert.MainThreadRequired();	return UnitEx_GetInvisible(m_StubIndex) > 0;												}
 
-		public void SetDoubleFireRate(bool active)									{ UnitEx_SetDoubleFireRate(m_StubIndex, active ? 1 : 0);										}
-		public void SetInvisible(bool active)										{ UnitEx_SetInvisible(m_StubIndex, active ? 1 : 0);												}
+		public void SetDoubleFireRate(bool active)									{ ThreadAssert.MainThreadRequired();	UnitEx_SetDoubleFireRate(m_StubIndex, active ? 1 : 0);										}
+		public void SetInvisible(bool active)										{ ThreadAssert.MainThreadRequired();	UnitEx_SetInvisible(m_StubIndex, active ? 1 : 0);											}
 
-		public UnitInfo GetUnitInfo()												{ return new UnitInfo(GetUnitType());															}
-		public UnitInfo GetWeaponInfo()												{ return new UnitInfo(GetWeapon());																}
+		public UnitInfo GetUnitInfo()												{ ThreadAssert.MainThreadRequired();	return new UnitInfo(GetUnitType());															}
+		public UnitInfo GetWeaponInfo()												{ ThreadAssert.MainThreadRequired();	return new UnitInfo(GetWeapon());															}
 
-		public void SetAnimation(int animIdx, int animDelay, int animStartDelay, bool invisible, bool skipDoDeath)	{ UnitEx_SetAnimation(m_StubIndex, animIdx, animDelay, animStartDelay, invisible ? 1 : 0, skipDoDeath ? 1 : 0);	}
+		public void SetAnimation(int animIdx, int animDelay, int animStartDelay, bool invisible, bool skipDoDeath)	{ ThreadAssert.MainThreadRequired();	UnitEx_SetAnimation(m_StubIndex, animIdx, animDelay, animStartDelay, invisible ? 1 : 0, skipDoDeath ? 1 : 0);	}
 
 		// Mining beacon
-		public int GetNumTruckLoadsSoFar()											{ return UnitEx_GetNumTruckLoadsSoFar(m_StubIndex);												}
-		public Yield GetBarYield()													{ return (Yield)UnitEx_GetBarYield(m_StubIndex);												}
-		public Variant GetVariant()													{ return (Variant)UnitEx_GetVariant(m_StubIndex);												}
-		public BeaconType GetOreType()												{ return (BeaconType)UnitEx_GetOreType(m_StubIndex);											}
-		public bool GetSurveyedBy(int playerID)										{ return ((1 << playerID) & UnitEx_GetSurveyedBy(m_StubIndex)) != 0;							}
-		public int GetSurveyedFlags()												{ return UnitEx_GetSurveyedBy(m_StubIndex);														}
+		public int GetNumTruckLoadsSoFar()											{ ThreadAssert.MainThreadRequired();	return UnitEx_GetNumTruckLoadsSoFar(m_StubIndex);											}
+		public Yield GetBarYield()													{ ThreadAssert.MainThreadRequired();	return (Yield)UnitEx_GetBarYield(m_StubIndex);												}
+		public Variant GetVariant()													{ ThreadAssert.MainThreadRequired();	return (Variant)UnitEx_GetVariant(m_StubIndex);												}
+		public BeaconType GetOreType()												{ ThreadAssert.MainThreadRequired();	return (BeaconType)UnitEx_GetOreType(m_StubIndex);											}
+		public bool GetSurveyedBy(int playerID)										{ ThreadAssert.MainThreadRequired();	return ((1 << playerID) & UnitEx_GetSurveyedBy(m_StubIndex)) != 0;							}
+		public int GetSurveyedFlags()												{ ThreadAssert.MainThreadRequired();	return UnitEx_GetSurveyedBy(m_StubIndex);													}
 
 		// Lab
-		public int GetLabCurrentTopic()												{ return UnitEx_GetLabCurrentTopic(m_StubIndex);												}
-		public int GetLabScientistCount()											{ return UnitEx_GetLabScientistCount(m_StubIndex);												}
-		public void SetLabScientistCount(int numScientists)							{ UnitEx_SetLabScientistCount(m_StubIndex, numScientists);										}
+		public int GetLabCurrentTopic()												{ ThreadAssert.MainThreadRequired();	return UnitEx_GetLabCurrentTopic(m_StubIndex);												}
+		public int GetLabScientistCount()											{ ThreadAssert.MainThreadRequired();	return UnitEx_GetLabScientistCount(m_StubIndex);											}
+		public void SetLabScientistCount(int numScientists)							{ ThreadAssert.MainThreadRequired();	UnitEx_SetLabScientistCount(m_StubIndex, numScientists);									}
 
-		public bool HasWeapon()														{ return GetWeaponInfo().GetWeaponStrength() > 0;												}
+		public bool HasWeapon()														{ ThreadAssert.MainThreadRequired();	return GetWeaponInfo().GetWeaponStrength() > 0;												}
 
-		public bool HasEmptyBay()													{ return GetBayWithCargo(map_id.None) >= 0;														}
-		public bool HasBayWithCargo(map_id cargoType)								{ return GetBayWithCargo(cargoType) >= 0;														}
+		public bool HasEmptyBay()													{ ThreadAssert.MainThreadRequired();	return GetBayWithCargo(map_id.None) >= 0;													}
+		public bool HasBayWithCargo(map_id cargoType)								{ ThreadAssert.MainThreadRequired();	return GetBayWithCargo(cargoType) >= 0;														}
 
-		public MAP_RECT GetRect(bool includeBulldozedArea=false)					{ return GetUnitInfo().GetRect(GetPosition(), includeBulldozedArea);							}
+		public MAP_RECT GetRect(bool includeBulldozedArea=false)					{ ThreadAssert.MainThreadRequired();	return GetUnitInfo().GetRect(GetPosition(), includeBulldozedArea);							}
 
 		/// <summary>
 		/// Returns the bay index that contains cargo type.
@@ -110,6 +111,8 @@ namespace DotNetMissionSDK.HFL
 		/// <param name="cargoType">The cargo type to search for.</param>
 		public int GetBayWithCargo(map_id cargoType)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			UnitInfo info = GetUnitInfo();
 			int bayCount = info.GetNumStorageBays(GetOwnerID());
 			for (int i=0; i < bayCount; ++i)
@@ -123,6 +126,8 @@ namespace DotNetMissionSDK.HFL
 
 		public LOCATION GetDockLocation()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			LOCATION pos;
 			long result = UnitEx_GetDockLocation(m_StubIndex);
 			pos.x = (int)(result & uint.MaxValue);
@@ -132,19 +137,23 @@ namespace DotNetMissionSDK.HFL
 
 		public bool IsOnDock(UnitEx unitWithDock)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			LOCATION dock = unitWithDock.GetDockLocation();
 			return dock.Equals(GetPosition());
 		}
 
 		// True if structure is enabled.
-		public bool IsEnabled()														{ return UnitEx_GetLights(m_StubIndex) == 1;													}
+		public bool IsEnabled()														{ ThreadAssert.MainThreadRequired();	return UnitEx_GetLights(m_StubIndex) == 1;													}
 
 		// True if structure is disabled. A structure is not disabled if it is idle.
-		public bool IsDisabled()													{ return UnitEx_GetLights(m_StubIndex) == 0 && UnitEx_GetLastCommand(m_StubIndex) != CommandType.ctMoIdle;	}
+		public bool IsDisabled()													{ ThreadAssert.MainThreadRequired();	return UnitEx_GetLights(m_StubIndex) == 0 && UnitEx_GetLastCommand(m_StubIndex) != CommandType.ctMoIdle;	}
 
 		// Swaps cargo between bay and launchpad
 		public void DoTransferLaunchpadCargo(int bay)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (GetUnitType() != map_id.Spaceport)
 				return;
 
@@ -160,6 +169,8 @@ namespace DotNetMissionSDK.HFL
 
 		public string VarDump()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			System.Text.StringBuilder sb = new System.Text.StringBuilder();
 			sb.AppendLine("** " + GetUnitType() + " Vars **");
 

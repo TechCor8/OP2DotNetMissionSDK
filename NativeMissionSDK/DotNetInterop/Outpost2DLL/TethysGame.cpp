@@ -10,12 +10,12 @@
 extern "C"
 {
 	// Player Number and Number of Players
-	extern EXPORT int __stdcall LocalPlayer()
+	extern EXPORT int __stdcall TethysGame_LocalPlayer()
 	{
 		return TethysGame::LocalPlayer();
 	}
 
-	extern EXPORT int __stdcall NoPlayers()
+	extern EXPORT int __stdcall TethysGame_NoPlayers()
 	{
 		return TethysGame::NoPlayers();
 	}
@@ -53,30 +53,30 @@ extern "C"
 	}
 
 	// Game Time
-	extern EXPORT int __stdcall Tick()
+	extern EXPORT int __stdcall TethysGame_Tick()
 	{
 		return TethysGame::Tick();
 	}
 
-	extern EXPORT int __stdcall Time()
+	extern EXPORT int __stdcall TethysGame_Time()
 	{
 		return TethysGame::Time();
 	}
 
 	// Game Sounds and Voice warnings
 	//  Note: SoundIndex = 94..227 [Inclusive] are recorded voice messages
-	extern EXPORT void __stdcall AddGameSound(int soundIndex, int toPlayerNum)
+	extern EXPORT void __stdcall TethysGame_AddGameSound(int soundIndex, int toPlayerNum)
 	{
 		TethysGame::AddGameSound(soundIndex, toPlayerNum);
 	}
 
-	extern EXPORT void __stdcall AddMapSound(int soundIndex, int tileX, int tileY)
+	extern EXPORT void __stdcall TethysGame_AddMapSound(int soundIndex, int tileX, int tileY)
 	{
 		TethysGame::AddMapSound(soundIndex, LOCATION(tileX,tileY));
 	}
 
 	// Message log
-	extern EXPORT void __stdcall AddMessage(int pixelX, int pixelY, char *message, int toPlayerNum, int soundIndex)
+	extern EXPORT void __stdcall TethysGame_AddMessage(int pixelX, int pixelY, char *message, int toPlayerNum, int soundIndex)
 	{
 		TethysGame::AddMessage(pixelX, pixelY, message, toPlayerNum, soundIndex);
 	}
@@ -99,19 +99,19 @@ extern "C"
 		TethysGame::SetDaylightMoves(bOn);
 	}
 	// Cheat flags  [gutted and useless by official Sierra update]
-	extern EXPORT void __stdcall SetCheatFastProduction(int bOn)
+	extern EXPORT void __stdcall TethysGame_SetCheatFastProduction(int bOn)
 	{
 		TethysGame::SetCheatFastProduction(bOn);
 	}
-	extern EXPORT void __stdcall SetCheatFastUnits(int bOn)
+	extern EXPORT void __stdcall TethysGame_SetCheatFastUnits(int bOn)
 	{
 		TethysGame::SetCheatFastUnits(bOn);
 	}
-	extern EXPORT void __stdcall SetCheatProduceAll(int bOn)
+	extern EXPORT void __stdcall TethysGame_SetCheatProduceAll(int bOn)
 	{
 		TethysGame::SetCheatProduceAll(bOn);
 	}
-	extern EXPORT void __stdcall SetCheatUnlimitedResources(int bOn)
+	extern EXPORT void __stdcall TethysGame_SetCheatUnlimitedResources(int bOn)
 	{
 		TethysGame::SetCheatUnlimitedResources(bOn);
 	}
@@ -125,7 +125,7 @@ extern "C"
 		
 		return returnedUnit.unitID;
 	}
-	extern EXPORT int __stdcall CreateBeacon(map_id beaconType, int tileX, int tileY, int commonRareType, int barYield, int barVariant)
+	extern EXPORT int __stdcall TethysGame_CreateBeacon(map_id beaconType, int tileX, int tileY, int commonRareType, int barYield, int barVariant)
 	{
 		return TethysGame::CreateBeacon(beaconType, tileX, tileY, commonRareType, barYield, barVariant);
 	}
@@ -141,7 +141,7 @@ extern "C"
 		
 		return returnedUnit.unitID;
 	}
-	extern EXPORT int __stdcall CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType)
+	extern EXPORT int __stdcall TethysGame_CreateWallOrTube(int tileX, int tileY, int unused, map_id wallTubeType)
 	{
 		return TethysGame::CreateWallOrTube(tileX, tileY, unused, wallTubeType);
 	}
@@ -151,69 +151,69 @@ extern "C"
 	//  Note: playerNum: -1 = PlayerAll
 	//  Note: Calling ForceMoraleX functions after tick 0 will cause a "Cheated Game!" message to appear. FreeMoraleLevel can be called any time.
 	//  Bug: ForceMoraleX is buggy if playerNum is not -1. You may need to call the function twice for the correct effect (see Forum post). FreeMoraleLevel is not affected by this bug.
-	extern EXPORT void __stdcall ForceMoraleGreat(int playerNum)
+	extern EXPORT void __stdcall TethysGame_ForceMoraleGreat(int playerNum)
 	{
 		TethysGame::ForceMoraleGreat(playerNum);
 	}
-	extern EXPORT void __stdcall ForceMoraleGood(int playerNum)
+	extern EXPORT void __stdcall TethysGame_ForceMoraleGood(int playerNum)
 	{
 		TethysGame::ForceMoraleGood(playerNum);
 	}
-	extern EXPORT void __stdcall ForceMoraleOK(int playerNum)
+	extern EXPORT void __stdcall TethysGame_ForceMoraleOK(int playerNum)
 	{
 		TethysGame::ForceMoraleOK(playerNum);
 	}
-	extern EXPORT void __stdcall ForceMoralePoor(int playerNum)
+	extern EXPORT void __stdcall TethysGame_ForceMoralePoor(int playerNum)
 	{
 		TethysGame::ForceMoralePoor(playerNum);
 	}
-	extern EXPORT void __stdcall ForceMoraleRotten(int playerNum)
+	extern EXPORT void __stdcall TethysGame_ForceMoraleRotten(int playerNum)
 	{
 		TethysGame::ForceMoraleRotten(playerNum);
 	}
 
-	extern EXPORT void __stdcall FreeMoraleLevel(int playerNum)
+	extern EXPORT void __stdcall TethysGame_FreeMoraleLevel(int playerNum)
 	{
 		TethysGame::FreeMoraleLevel(playerNum);
 	}
 
 	// Random number generation
-	extern EXPORT void __stdcall SetSeed(unsigned int randNumSeed)
+	extern EXPORT void __stdcall TethysGame_SetSeed(unsigned int randNumSeed)
 	{
 		TethysGame::SetSeed(randNumSeed);
 	}
-	extern EXPORT int __stdcall GetRand(int range)
+	extern EXPORT int __stdcall TethysGame_GetRand(int range)
 	{
 		return TethysGame::GetRand(range);
 	}
 	
 	// Disaster Creation
-	extern EXPORT void __stdcall SetMeteor(int tileX, int tileY, int size)
+	extern EXPORT void __stdcall TethysGame_SetMeteor(int tileX, int tileY, int size)
 	{
 		TethysGame::SetMeteor(tileX, tileY, size);
 	}
-	extern EXPORT void __stdcall SetEarthquake(int tileX, int tileY, int magnitude)
+	extern EXPORT void __stdcall TethysGame_SetEarthquake(int tileX, int tileY, int magnitude)
 	{
 		TethysGame::SetEarthquake(tileX, tileY, magnitude);
 	}
-	extern EXPORT void __stdcall SetEruption(int tileX, int tileY, int spreadSpeed)
+	extern EXPORT void __stdcall TethysGame_SetEruption(int tileX, int tileY, int spreadSpeed)
 	{
 		TethysGame::SetEruption(tileX, tileY, spreadSpeed);
 	}
-	extern EXPORT void __stdcall SetLightning(int startTileX, int startTileY, int duration, int endTileX, int endTileY)
+	extern EXPORT void __stdcall TethysGame_SetLightning(int startTileX, int startTileY, int duration, int endTileX, int endTileY)
 	{
 		TethysGame::SetLightning(startTileX, startTileY, duration, endTileX, endTileY);
 	}
-	extern EXPORT void __stdcall SetTornado(int startTileX, int startTileY, int duration, int endTileX, int endTileY, int bImmediate)
+	extern EXPORT void __stdcall TethysGame_SetTornado(int startTileX, int startTileY, int duration, int endTileX, int endTileY, int bImmediate)
 	{
 		TethysGame::SetTornado(startTileX, startTileY, duration, endTileX, endTileY, bImmediate);
 	}
 	// Disaster spread speed
-	extern EXPORT void __stdcall SetLavaSpeed(int spreadSpeed)
+	extern EXPORT void __stdcall TethysGame_SetLavaSpeed(int spreadSpeed)
 	{
 		TethysGame::SetLavaSpeed(spreadSpeed);
 	}
-	extern EXPORT void __stdcall SetMicrobeSpreadSpeed(int spreadSpeed)
+	extern EXPORT void __stdcall TethysGame_SetMicrobeSpreadSpeed(int spreadSpeed)
 	{
 		TethysGame::SetMicrobeSpreadSpeed(spreadSpeed);
 	}
@@ -223,7 +223,7 @@ extern "C"
 	//  Note: The target location is at the block center (+3, +3)
 	//  Note: Targets first found block of heighest (non-negative) weight, or the first block if all blocks have negative weight
 	//  Note: Target player military units weigh 64, non-target player military units weigh -32, and non-target player non-military units weigh 1.
-	extern EXPORT INT64 __stdcall FindEMPMissleTarget(int startTileX, int startTileY, int endTileX, int endTileY, int destPlayerNum)
+	extern EXPORT INT64 __stdcall TethysGame_FindEMPMissleTarget(int startTileX, int startTileY, int endTileX, int endTileY, int destPlayerNum)
 	{
 		LOCATION loc = TethysGame::FindEMPMissleTarget(startTileX, startTileY, endTileX, endTileY, destPlayerNum);
 		INT64 result = loc.x | ((INT64)loc.y << 32);
@@ -231,23 +231,23 @@ extern "C"
 	}
 	// Launches an EMP missile. May be launched from off screen (no spaceport required).
 	// Will not launch an EMP missile if the selected sourcePlayer is not Plymouth.
-	extern EXPORT void __stdcall SetEMPMissile(int launchTileX, int launchTileY, int sourcePlayerNum, int destTileX, int destTileY)
+	extern EXPORT void __stdcall TethysGame_SetEMPMissile(int launchTileX, int launchTileY, int sourcePlayerNum, int destTileX, int destTileY)
 	{
 		TethysGame::SetEMPMissile(launchTileX, launchTileY, sourcePlayerNum, destTileX, destTileY);
 	}
 
 	// Save/Load Games
-	extern EXPORT void __stdcall SaveGame(const char* savedGameName)
+	extern EXPORT void __stdcall TethysGame_SaveGame(const char* savedGameName)
 	{
 		TethysGame::SaveGame(savedGameName);
 	}
-	extern EXPORT void __stdcall LoadGame(const char* savedGameName)
+	extern EXPORT void __stdcall TethysGame_LoadGame(const char* savedGameName)
 	{
 		TethysGame::LoadGame(savedGameName);
 	}
 
 	// Misc
-	extern EXPORT void __stdcall SetMusicPlayList(int numSongs, int repeatStartIndex, SongIds* songIdList)
+	extern EXPORT void __stdcall TethysGame_SetMusicPlayList(int numSongs, int repeatStartIndex, SongIds* songIdList)
 	{
 		TethysGame::SetMusicPlayList(numSongs, repeatStartIndex, songIdList);
 	}

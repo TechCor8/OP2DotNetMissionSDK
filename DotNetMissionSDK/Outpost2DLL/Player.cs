@@ -11,6 +11,7 @@
 //		 Outpost 2 has no real AI and all computer actions are
 //		 hardcoded into each DLL).
 
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -34,30 +35,30 @@ namespace DotNetMissionSDK
 
 
 		// [Get] Game Settings
-		public int Difficulty()				{ return Player_Difficulty(m_Handle);						}
-		public bool IsEden()				{ return Player_IsEden(m_Handle) != 0;						}
-		public bool IsHuman()				{ return Player_IsHuman(m_Handle) != 0;						}
+		public int Difficulty()				{ ThreadAssert.MainThreadRequired();	return Player_Difficulty(m_Handle);							}
+		public bool IsEden()				{ ThreadAssert.MainThreadRequired();	return Player_IsEden(m_Handle) != 0;						}
+		public bool IsHuman()				{ ThreadAssert.MainThreadRequired();	return Player_IsHuman(m_Handle) != 0;						}
 		// [Get] Population
-		public int Kids()					{ return Player_Kids(m_Handle);								}
-		public int Workers()				{ return Player_Workers(m_Handle);							}
-		public int Scientists()				{ return Player_Scientists(m_Handle);						}
-		public int TotalPopulation()		{ return Kids() + Workers() + Scientists();					}
+		public int Kids()					{ ThreadAssert.MainThreadRequired();	return Player_Kids(m_Handle);								}
+		public int Workers()				{ ThreadAssert.MainThreadRequired();	return Player_Workers(m_Handle);							}
+		public int Scientists()				{ ThreadAssert.MainThreadRequired();	return Player_Scientists(m_Handle);							}
+		public int TotalPopulation()		{ ThreadAssert.MainThreadRequired();	return Kids() + Workers() + Scientists();					}
 		// [Get] Resources
-		public int Ore()					{ return Player_Ore(m_Handle);								}
-		public int RareOre()				{ return Player_RareOre(m_Handle);							}
-		public int FoodStored()				{ return Player_FoodStored(m_Handle);						}
-		public FoodStatus FoodSupply()		{ return Player_FoodSupply(m_Handle);						}
+		public int Ore()					{ ThreadAssert.MainThreadRequired();	return Player_Ore(m_Handle);								}
+		public int RareOre()				{ ThreadAssert.MainThreadRequired();	return Player_RareOre(m_Handle);							}
+		public int FoodStored()				{ ThreadAssert.MainThreadRequired();	return Player_FoodStored(m_Handle);							}
+		public FoodStatus FoodSupply()		{ ThreadAssert.MainThreadRequired();	return Player_FoodSupply(m_Handle);							}
 		// [Get] Misc
-		public MoraleLevel MoraleLevel()	{ return Player_MoraleLevel(m_Handle);						}
-		public int GetRLVCount()			{ return Player_GetRLVCount(m_Handle);						}
+		public MoraleLevel MoraleLevel()	{ ThreadAssert.MainThreadRequired();	return Player_MoraleLevel(m_Handle);						}
+		public int GetRLVCount()			{ ThreadAssert.MainThreadRequired();	return Player_GetRLVCount(m_Handle);						}
 		// [Get] Indirect property lookups
 		/// <summary>
 		/// Returns true if the player has the specified technology.
 		/// NOTE: techID is NOT the array index value returned by GetResearchTopic. Use GetTechInfo().GetTechID().
 		/// </summary>
 		/// <param name="techID">The techID of the technology as found in the techInfo.txt files.</param>
-		public bool HasTechnology(int techID){ return Player_HasTechnology(m_Handle, techID) != 0;		}
-		public ScGroup GetDefaultGroup()	{ return new ScGroup(Player_GetDefaultGroup(m_Handle));		}
+		public bool HasTechnology(int techID)	{ ThreadAssert.MainThreadRequired();	return Player_HasTechnology(m_Handle, techID) != 0;		}
+		public ScGroup GetDefaultGroup()		{ ThreadAssert.MainThreadRequired();	return new ScGroup(Player_GetDefaultGroup(m_Handle));	}
 		// [Get] Player Strength  [Calculational]
 		// Note: Unit Strengths are as follows:
 		//	Spider/Scorpion	: 4
@@ -68,61 +69,58 @@ namespace DotNetMissionSDK
 		//	Other			: 0  [Including Units in a Garage]
 	
 		// Returns (strength / 8), where strength is the sum of all units owned by the player in the given map rectangle
-		public int GetPlayerStrength(MAP_RECT mapRect)	{ return Player_GetPlayerStrength(m_Handle, mapRect.xMin, mapRect.yMin, mapRect.xMax, mapRect.yMax);	}
+		public int GetPlayerStrength(MAP_RECT mapRect)	{ ThreadAssert.MainThreadRequired();	return Player_GetPlayerStrength(m_Handle, mapRect.xMin, mapRect.yMin, mapRect.xMax, mapRect.yMax);	}
 		// Returns (strength / 8), where strength is the sum of all units owned by the player
-		public int GetTotalPlayerStrength()				{ return Player_GetTotalPlayerStrength(m_Handle);								}
+		public int GetTotalPlayerStrength()				{ ThreadAssert.MainThreadRequired();	return Player_GetTotalPlayerStrength(m_Handle);								}
 		// [Get] Checks  [Prerequisite searching]
 		// Checks for (CommonOreMine, or (hasVehicle(mapRoboMiner, mapAny), or canBuildVehicle(true))) + (hasVehicle(mapCargoTruck, mapAny), or canBuildVehicle(true)) + (CommonOreSmelter, or canBuildBuilding)
-		public bool CanAccumulateOre()					{ return Player_CanAccumulateOre(m_Handle) != 0;								}
+		public bool CanAccumulateOre()					{ ThreadAssert.MainThreadRequired();	return Player_CanAccumulateOre(m_Handle) != 0;								}
 		// Checks for (RareOreMine, or (hasVehicle(mapRoboMiner, mapAny), or canBuildVehicle(true))) + (hasVehicle(mapCargoTruck, mapAny), or canBuildVehicle(true)) + (RareOreSmelter, or canBuildBuilding)
-		public bool CanAccumulateRareOre()				{ return Player_CanAccumulateRareOre(m_Handle) != 0;							}
+		public bool CanAccumulateRareOre()				{ ThreadAssert.MainThreadRequired();	return Player_CanAccumulateRareOre(m_Handle) != 0;							}
 		// Checks for Spaceport, or hasVehicle(mapConvec, mapSpaceport), or canBuildBuilding
-		public bool CanBuildSpace()						{ return Player_CanBuildSpace(m_Handle) != 0;									}
+		public bool CanBuildSpace()						{ ThreadAssert.MainThreadRequired();	return Player_CanBuildSpace(m_Handle) != 0;									}
 		// Checks for StructureFactory + (Convec, or (VehicleFactory, or (redundant) hasVehicle(mapConvec, mapVehicleFactory))), or hasVehicle(mapConvec, mapStructureFactory)
-		public bool CanBuildBuilding()					{ return Player_CanBuildBuilding(m_Handle) != 0;								}
+		public bool CanBuildBuilding()					{ ThreadAssert.MainThreadRequired();	return Player_CanBuildBuilding(m_Handle) != 0;								}
 		// Checks for VehicleFactory, or hasVehicle(mapConvec, mapVehicleFactory), or [optional] canBuildBuilding  [Note: Uses last cached result if available, so optional parameter may not function as expected]
-		public bool CanBuildVehicle(bool bCheckCanBuildBuilding){ return Player_CanBuildVehicle(m_Handle, bCheckCanBuildBuilding ? 1 : 0) != 0;	}
+		public bool CanBuildVehicle(bool bCheckCanBuildBuilding){ ThreadAssert.MainThreadRequired();	return Player_CanBuildVehicle(m_Handle, bCheckCanBuildBuilding ? 1 : 0) != 0;	}
 		// Checks for <Tech.labType>Lab, or hasVehicle(mapConvec, map<Techc.labType>Lab), or canBuildBuilding
-		public bool CanDoResearch(int techID)			{ return Player_CanDoResearch(m_Handle, techID) != 0;							}
+		public bool CanDoResearch(int techID)			{ ThreadAssert.MainThreadRequired();	return Player_CanDoResearch(m_Handle, techID) != 0;							}
 		// [cargoOrWeaponType: -1 = mapAny]  Checks for free units, or units in Garages
-		public bool HasVehicle(map_id vehicleType, map_id cargoOrWeaponType)
-		{
-			return Player_HasVehicle(m_Handle, vehicleType, cargoOrWeaponType) > 0;
-		}
-		public bool HasActiveCommand()					{ return Player_HasActiveCommand(m_Handle) > 0;									}
+		public bool HasVehicle(map_id vehicleType, map_id cargoOrWeaponType)	{ ThreadAssert.MainThreadRequired();	return Player_HasVehicle(m_Handle, vehicleType, cargoOrWeaponType) > 0;		}
+		public bool HasActiveCommand()					{ ThreadAssert.MainThreadRequired();	return Player_HasActiveCommand(m_Handle) > 0;								}
 		// Reset cached check values
 		// Clears checkValue array to -1  [Not Set]
-		public void ResetChecks()						{ Player_ResetChecks(m_Handle);													}
+		public void ResetChecks()						{ ThreadAssert.MainThreadRequired();	Player_ResetChecks(m_Handle);												}
 
 		// [Set] Game Settings
-		public void SetColorNumber(PlayerColor color)	{ Player_SetColorNumber(m_Handle, color);										}
+		public void SetColorNumber(PlayerColor color)	{ ThreadAssert.MainThreadRequired();	Player_SetColorNumber(m_Handle, color);										}
 		// [Set] Population
-		public void SetKids(int numKids)				{ Player_SetKids(m_Handle, numKids);											}
-		public void SetWorkers(int numWorkers)			{ Player_SetWorkers(m_Handle, numWorkers);										}
-		public void SetScientists(int numScientists)	{ Player_SetScientists(m_Handle, numScientists);								}
+		public void SetKids(int numKids)				{ ThreadAssert.MainThreadRequired();	Player_SetKids(m_Handle, numKids);											}
+		public void SetWorkers(int numWorkers)			{ ThreadAssert.MainThreadRequired();	Player_SetWorkers(m_Handle, numWorkers);									}
+		public void SetScientists(int numScientists)	{ ThreadAssert.MainThreadRequired();	Player_SetScientists(m_Handle, numScientists);								}
 		// [Set] Resources
-		public void SetOre(int newCommonOre)			{ Player_SetOre(m_Handle, newCommonOre);										}
-		public void SetRareOre(int newRareOre)			{ Player_SetRareOre(m_Handle, newRareOre);										}
-		public void SetFoodStored(int newFoodStored)	{ Player_SetFoodStored(m_Handle, newFoodStored);								}
+		public void SetOre(int newCommonOre)			{ ThreadAssert.MainThreadRequired();	Player_SetOre(m_Handle, newCommonOre);										}
+		public void SetRareOre(int newRareOre)			{ ThreadAssert.MainThreadRequired();	Player_SetRareOre(m_Handle, newRareOre);									}
+		public void SetFoodStored(int newFoodStored)	{ ThreadAssert.MainThreadRequired();	Player_SetFoodStored(m_Handle, newFoodStored);								}
 		// [Set] Misc
-		public void SetSolarSat(int numSolarSatellites)	{ Player_SetSolarSat(m_Handle, numSolarSatellites);								}
+		public void SetSolarSat(int numSolarSatellites)	{ ThreadAssert.MainThreadRequired();	Player_SetSolarSat(m_Handle, numSolarSatellites);							}
 		// [Set] Indirect property setting
 		// Gives all techs with techID <= (techLevel * 1000), and all free subsequent techs
-		public void SetTechLevel(int techLevel)			{ Player_SetTechLevel(m_Handle, techLevel);										}
+		public void SetTechLevel(int techLevel)			{ ThreadAssert.MainThreadRequired();	Player_SetTechLevel(m_Handle, techLevel);									}
 		// Gives the tech with the given tech ID, and all free subsequent techs
-		public void MarkResearchComplete(int techID)	{ Player_MarkResearchComplete(m_Handle, techID);								}
-		public void SetDefaultGroup(ScGroup newDefaultGroup)	{ Player_SetDefaultGroup(m_Handle, newDefaultGroup.stubIndex);			}
+		public void MarkResearchComplete(int techID)	{ ThreadAssert.MainThreadRequired();	Player_MarkResearchComplete(m_Handle, techID);								}
+		public void SetDefaultGroup(ScGroup newDefaultGroup)	{ ThreadAssert.MainThreadRequired();	Player_SetDefaultGroup(m_Handle, newDefaultGroup.stubIndex);		}
 
 		// [Method]
-		public void GoEden()							{ Player_GoEden(m_Handle);														}
-		public void GoPlymouth()						{ Player_GoPlymouth(m_Handle);													}
-		public void GoAI()								{ Player_GoAI(m_Handle);														}
-		public void GoHuman()							{ Player_GoHuman(m_Handle);														}
-		public void AllyWith(int playerNum)				{ Player_AllyWith(m_Handle, playerNum);											}
+		public void GoEden()							{ ThreadAssert.MainThreadRequired();	Player_GoEden(m_Handle);													}
+		public void GoPlymouth()						{ ThreadAssert.MainThreadRequired();	Player_GoPlymouth(m_Handle);												}
+		public void GoAI()								{ ThreadAssert.MainThreadRequired();	Player_GoAI(m_Handle);														}
+		public void GoHuman()							{ ThreadAssert.MainThreadRequired();	Player_GoHuman(m_Handle);													}
+		public void AllyWith(int playerNum)				{ ThreadAssert.MainThreadRequired();	Player_AllyWith(m_Handle, playerNum);										}
 		// Steals an RLV from the source Player, provided they have one
-		public void CaptureRLV(int sourcePlayerNum)		{ Player_CaptureRLV(m_Handle, sourcePlayerNum);									}
+		public void CaptureRLV(int sourcePlayerNum)		{ ThreadAssert.MainThreadRequired();	Player_CaptureRLV(m_Handle, sourcePlayerNum);								}
 		// Sets the view for this Player (does nothing if player is not the local player)
-		public void CenterViewOn(int tileX, int tileY)	{ Player_CenterViewOn(m_Handle, tileX, tileY);									}
+		public void CenterViewOn(int tileX, int tileY)	{ ThreadAssert.MainThreadRequired();	Player_CenterViewOn(m_Handle, tileX, tileY);								}
 	
 
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr Player_Create(int playerNum);

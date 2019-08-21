@@ -4,6 +4,7 @@ using DotNetMissionSDK.HFL;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using DotNetMissionSDK.Async;
 
 namespace DotNetMissionSDK
 {
@@ -68,6 +69,8 @@ namespace DotNetMissionSDK
 		/// <param name="existingUnits">A list of units that have already been created. For collision processing.</param>
 		public BaseGenerator(IEnumerable<Unit> existingUnits)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_CreatedUnits = new List<Unit>(existingUnits);
 		}
 
@@ -76,6 +79,8 @@ namespace DotNetMissionSDK
 		/// </summary>
 		public BaseGenerator()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_CreatedUnits = new List<Unit>();
 		}
 
@@ -87,6 +92,8 @@ namespace DotNetMissionSDK
 		/// <param name="unitData">The list of unit definitions to create the base with.</param>
 		public void Generate(Player owner, LOCATION baseCenterPt, UnitData[] unitData)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_FirstStructure = true;
 			baseCenterPt = TethysGame.GetMapCoordinates(baseCenterPt);
 			MAP_RECT spawnArea = new MAP_RECT(baseCenterPt, new LOCATION(1,1));

@@ -1,3 +1,4 @@
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -12,65 +13,69 @@ namespace DotNetMissionSDK.HFL
 		{
 		}
 
-		public string GetPlayerName()									{ return Marshal.PtrToStringAnsi(PlayerEx_GetPlayerName(playerID));			}
-		public void SetPlayerName(string newName)						{ PlayerEx_SetPlayerName(playerID, newName);								}
+		public string GetPlayerName()									{ ThreadAssert.MainThreadRequired();	return Marshal.PtrToStringAnsi(PlayerEx_GetPlayerName(playerID));		}
+		public void SetPlayerName(string newName)						{ ThreadAssert.MainThreadRequired();	PlayerEx_SetPlayerName(playerID, newName);								}
 
-		//public int GetRLVCount()										{ return PlayerEx_GetSatelliteCount(playerID, map_id.RLV);					}
-		public int GetSolarSatelliteCount()								{ return PlayerEx_GetSatelliteCount(playerID, map_id.SolarSatellite);		}
-		public int GetEDWARDSatelliteCount()							{ return PlayerEx_GetSatelliteCount(playerID, map_id.EDWARDSatellite);		}
+		//public int GetRLVCount()										{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetSatelliteCount(playerID, map_id.RLV);				}
+		public int GetSolarSatelliteCount()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetSatelliteCount(playerID, map_id.SolarSatellite);		}
+		public int GetEDWARDSatelliteCount()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetSatelliteCount(playerID, map_id.EDWARDSatellite);	}
 
-		public void SetRLVCount(int count)								{ PlayerEx_SetSatelliteCount(playerID, map_id.RLV, count);					}
-		public void SetSolarSatelliteCount(int count)					{ PlayerEx_SetSatelliteCount(playerID, map_id.SolarSatellite, count);		}
-		public void SetEDWARDSatelliteCount(int count)					{ PlayerEx_SetSatelliteCount(playerID, map_id.EDWARDSatellite, count);		}
+		public void SetRLVCount(int count)								{ ThreadAssert.MainThreadRequired();	PlayerEx_SetSatelliteCount(playerID, map_id.RLV, count);				}
+		public void SetSolarSatelliteCount(int count)					{ ThreadAssert.MainThreadRequired();	PlayerEx_SetSatelliteCount(playerID, map_id.SolarSatellite, count);		}
+		public void SetEDWARDSatelliteCount(int count)					{ ThreadAssert.MainThreadRequired();	PlayerEx_SetSatelliteCount(playerID, map_id.EDWARDSatellite, count);	}
 		
-		public int GetColorNumber()										{ return PlayerEx_GetColorNumber(playerID);									}
+		public int GetColorNumber()										{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetColorNumber(playerID);								}
 		public bool IsAlliedTo(Player ally)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (ally.playerID == playerID)
 				return true;
 
 			return PlayerEx_IsAlliedTo(playerID, ally.playerID) > 0;
 		}
-		public int GetNumBuildingsBuilt()								{ return PlayerEx_GetNumBuildingsBuilt(playerID);							}
+		public int GetNumBuildingsBuilt()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumBuildingsBuilt(playerID);							}
 
-		public void Starve(int numToStarve, bool skipMoraleUpdate)		{ PlayerEx_Starve(playerID, numToStarve, skipMoraleUpdate ? 1 : 0);			}
+		public void Starve(int numToStarve, bool skipMoraleUpdate)		{ ThreadAssert.MainThreadRequired();	PlayerEx_Starve(playerID, numToStarve, skipMoraleUpdate ? 1 : 0);		}
 
-		public int GetMaxCommonOre()									{ return PlayerEx_GetMaxOre(playerID);										}
-		public int GetMaxRareOre()										{ return PlayerEx_GetMaxRareOre(playerID);									}
+		public int GetMaxCommonOre()									{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetMaxOre(playerID);									}
+		public int GetMaxRareOre()										{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetMaxRareOre(playerID);								}
 
 		// Not sure what this does. If it's required for info to be updated, perhaps call in update loop?
-		public void RecalculateValues()									{ PlayerEx_RecalculateValues(playerID);										}
+		public void RecalculateValues()									{ ThreadAssert.MainThreadRequired();	PlayerEx_RecalculateValues(playerID);									}
 
-		public int GetNumAvailableWorkers()								{ return PlayerEx_GetNumAvailableWorkers(playerID);							}
-		public int GetNumAvailableScientists()							{ return PlayerEx_GetNumAvailableScientists(playerID);						}
-		public int GetAmountPowerGenerated()							{ return PlayerEx_GetAmountPowerGenerated(playerID);						}
-		public int GetInactivePowerCapacity()							{ return PlayerEx_GetInactivePowerCapacity(playerID);						}
-		public int GetAmountPowerConsumed()								{ return PlayerEx_GetAmountPowerConsumed(playerID);							}
-		public int GetAmountPowerAvailable()							{ return PlayerEx_GetAmountPowerAvailable(playerID);						}
-		public int GetNumIdleBuildings()								{ return PlayerEx_GetNumIdleBuildings(playerID);							}
-		public int GetNumActiveBuildings()								{ return PlayerEx_GetNumActiveBuildings(playerID);							}
-		public int GetNumBuildings()									{ return PlayerEx_GetNumBuildings(playerID);								}
-		public int GetNumUnpoweredStructures()							{ return PlayerEx_GetNumUnpoweredStructures(playerID);						}
-		public int GetNumWorkersRequired()								{ return PlayerEx_GetNumWorkersRequired(playerID);							}
-		public int GetNumScientistsRequired()							{ return PlayerEx_GetNumScientistsRequired(playerID);						}
-		public int GetNumScientistsAsWorkers()							{ return PlayerEx_GetNumScientistsAsWorkers(playerID);						}
-		public int GetNumScientistsAssignedToResearch()					{ return PlayerEx_GetNumScientistsAssignedToResearch(playerID);				}
-		public int GetTotalFoodProduction()								{ return PlayerEx_GetTotalFoodProduction(playerID);							}
-		public int GetTotalFoodConsumption()							{ return PlayerEx_GetTotalFoodConsumption(playerID);						}
-		public int GetFoodLacking()										{ return PlayerEx_GetFoodLacking(playerID);									}
-		public int GetNetFoodProduction()								{ return PlayerEx_GetNetFoodProduction(playerID);							}
-		public int GetNumSolarSatellites()								{ return PlayerEx_GetNumSolarSatellites(playerID);							}
+		public int GetNumAvailableWorkers()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumAvailableWorkers(playerID);						}
+		public int GetNumAvailableScientists()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumAvailableScientists(playerID);					}
+		public int GetAmountPowerGenerated()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetAmountPowerGenerated(playerID);						}
+		public int GetInactivePowerCapacity()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetInactivePowerCapacity(playerID);						}
+		public int GetAmountPowerConsumed()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetAmountPowerConsumed(playerID);						}
+		public int GetAmountPowerAvailable()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetAmountPowerAvailable(playerID);						}
+		public int GetNumIdleBuildings()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumIdleBuildings(playerID);							}
+		public int GetNumActiveBuildings()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumActiveBuildings(playerID);						}
+		public int GetNumBuildings()									{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumBuildings(playerID);								}
+		public int GetNumUnpoweredStructures()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumUnpoweredStructures(playerID);					}
+		public int GetNumWorkersRequired()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumWorkersRequired(playerID);						}
+		public int GetNumScientistsRequired()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumScientistsRequired(playerID);						}
+		public int GetNumScientistsAsWorkers()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumScientistsAsWorkers(playerID);					}
+		public int GetNumScientistsAssignedToResearch()					{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumScientistsAssignedToResearch(playerID);			}
+		public int GetTotalFoodProduction()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetTotalFoodProduction(playerID);						}
+		public int GetTotalFoodConsumption()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetTotalFoodConsumption(playerID);						}
+		public int GetFoodLacking()										{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetFoodLacking(playerID);								}
+		public int GetNetFoodProduction()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNetFoodProduction(playerID);							}
+		public int GetNumSolarSatellites()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetNumSolarSatellites(playerID);						}
 
-		public int GetTotalRecreationFacilityCapacity()					{ return PlayerEx_GetTotalRecreationFacilityCapacity(playerID);				}
-		public int GetTotalForumCapacity()								{ return PlayerEx_GetTotalForumCapacity(playerID);							}
-		public int GetTotalMedCenterCapacity()							{ return PlayerEx_GetTotalMedCenterCapacity(playerID);						}
-		public int GetTotalResidenceCapacity()							{ return PlayerEx_GetTotalResidenceCapacity(playerID);						}
+		public int GetTotalRecreationFacilityCapacity()					{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetTotalRecreationFacilityCapacity(playerID);			}
+		public int GetTotalForumCapacity()								{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetTotalForumCapacity(playerID);						}
+		public int GetTotalMedCenterCapacity()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetTotalMedCenterCapacity(playerID);					}
+		public int GetTotalResidenceCapacity()							{ ThreadAssert.MainThreadRequired();	return PlayerEx_GetTotalResidenceCapacity(playerID);					}
 
 		/// <summary>
 		/// Checks if this player is the correct colony type, has completed the required research, and has the required resources to build a unit.
 		/// </summary>
 		public bool CanBuildUnit(map_id unitType, map_id cargoOrWeaponType=map_id.None)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			bool isEden = IsEden();
 
 			UnitInfo vehicleInfo = new UnitInfo(unitType);

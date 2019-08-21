@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DotNetMissionSDK.Async;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.Triggers
 {
@@ -21,6 +22,8 @@ namespace DotNetMissionSDK.Triggers
 		/// <param name="saveData">The loaded save data.</param>
 		public TriggerManager(SaveData saveData)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_SaveData = saveData;
 
 			// Load triggers into system
@@ -35,6 +38,8 @@ namespace DotNetMissionSDK.Triggers
 		/// <returns>True, if the trigger was successfully added.</returns>
 		public bool AddTrigger(TriggerStub triggerStub)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			bool foundSlot = false;
 
 			// Place trigger stub in next available slot
@@ -69,6 +74,8 @@ namespace DotNetMissionSDK.Triggers
 		/// </summary>
 		public void Update()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			// Check triggers
 			for (int i=0; i < m_Triggers.Count; ++i)
 			{

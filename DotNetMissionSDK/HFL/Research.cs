@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetMissionSDK.Async;
+using System;
 using System.Runtime.InteropServices;
 
 namespace DotNetMissionSDK.HFL
@@ -48,23 +49,23 @@ namespace DotNetMissionSDK.HFL
 	{
 		private IntPtr m_Handle;
 
-		public TechInfo(IntPtr handle)								{ m_Handle = handle;													}
+		public TechInfo(IntPtr handle)								{ m_Handle = handle;																	}
 
-		public bool IsValid()										{ return TechInfo_IsValid(m_Handle) > 0;								}
-		public int GetTechID()										{ return TechInfo_GetTechID(m_Handle);									}
-		public TechCategory GetCategory()							{ return TechInfo_GetCategory(m_Handle);								}
-		public int GetTechLevel()									{ return TechInfo_GetTechLevel(m_Handle);								}
-		public int GetPlymouthCost()								{ return TechInfo_GetPlymouthCost(m_Handle);							}
-		public int GetEdenCost()									{ return TechInfo_GetEdenCost(m_Handle);								}
-		public int GetMaxScientists()								{ return TechInfo_GetMaxScientists(m_Handle);							}
-		public LabType GetLab()										{ return TechInfo_GetLab(m_Handle);										}
-		public int GetPlayerHasTech()								{ return TechInfo_GetPlayerHasTech(m_Handle);							}
-		public int GetNumUpgrades()									{ return TechInfo_GetNumUpgrades(m_Handle);								}
-		public int GetNumRequiredTechs()							{ return TechInfo_GetNumRequiredTechs(m_Handle);						}
-		public string GetTechName()									{ return Marshal.PtrToStringAnsi(TechInfo_GetTechName(m_Handle));		}
-		public string GetDescription()								{ return Marshal.PtrToStringAnsi(TechInfo_GetDescription(m_Handle));	}
-		public string GetTeaser()									{ return Marshal.PtrToStringAnsi(TechInfo_GetTeaser(m_Handle));			}
-		public string GetImproveDesc()								{ return Marshal.PtrToStringAnsi(TechInfo_GetImproveDesc(m_Handle));	}
+		public bool IsValid()										{ return TechInfo_IsValid(m_Handle) > 0;												}
+		public int GetTechID()										{ return TechInfo_GetTechID(m_Handle);													}
+		public TechCategory GetCategory()							{ return TechInfo_GetCategory(m_Handle);												}
+		public int GetTechLevel()									{ return TechInfo_GetTechLevel(m_Handle);												}
+		public int GetPlymouthCost()								{ return TechInfo_GetPlymouthCost(m_Handle);											}
+		public int GetEdenCost()									{ return TechInfo_GetEdenCost(m_Handle);												}
+		public int GetMaxScientists()								{ return TechInfo_GetMaxScientists(m_Handle);											}
+		public LabType GetLab()										{ return TechInfo_GetLab(m_Handle);														}
+		public int GetPlayerHasTech()								{ ThreadAssert.MainThreadRequired();	return TechInfo_GetPlayerHasTech(m_Handle);		}
+		public int GetNumUpgrades()									{ return TechInfo_GetNumUpgrades(m_Handle);												}
+		public int GetNumRequiredTechs()							{ return TechInfo_GetNumRequiredTechs(m_Handle);										}
+		public string GetTechName()									{ return Marshal.PtrToStringAnsi(TechInfo_GetTechName(m_Handle));						}
+		public string GetDescription()								{ return Marshal.PtrToStringAnsi(TechInfo_GetDescription(m_Handle));					}
+		public string GetTeaser()									{ return Marshal.PtrToStringAnsi(TechInfo_GetTeaser(m_Handle));							}
+		public string GetImproveDesc()								{ return Marshal.PtrToStringAnsi(TechInfo_GetImproveDesc(m_Handle));					}
 
 
 		[DllImport("DotNetInterop.dll")] private static extern int TechInfo_IsValid(IntPtr handle);

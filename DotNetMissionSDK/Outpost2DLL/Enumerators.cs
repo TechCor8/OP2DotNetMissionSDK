@@ -9,6 +9,7 @@
 //	passed as the first parameter.
 // ------------------------------------------------------------------------
 
+using DotNetMissionSDK.Async;
 using DotNetMissionSDK.HFL;
 using System;
 using System.Collections;
@@ -72,6 +73,8 @@ namespace DotNetMissionSDK
 
 		public GroupEnumerator(ScGroup group)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = GroupEnumerator_Create(group.stubIndex);
 		}
 
@@ -82,6 +85,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = GroupEnumerator_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -97,6 +102,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources
@@ -112,6 +119,8 @@ namespace DotNetMissionSDK
 
 		public PlayerVehicleEnum(int playerID)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = PlayerVehicleEnum_Create(playerID);
 		}
 
@@ -122,6 +131,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = PlayerVehicleEnum_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -137,6 +148,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources
@@ -152,6 +165,8 @@ namespace DotNetMissionSDK
 
 		public PlayerBuildingEnum(int playerID, map_id buildingType)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = PlayerBuildingEnum_Create(playerID, buildingType);
 		}
 
@@ -162,6 +177,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = PlayerBuildingEnum_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -177,6 +194,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources
@@ -193,6 +212,8 @@ namespace DotNetMissionSDK
 
 		public PlayerAllBuildingEnum(int playerID)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_PlayerID = playerID;
 			m_BuildingIndex = 21;
 			m_CurEnumerator = new PlayerBuildingEnum(m_PlayerID, (map_id)m_BuildingIndex);
@@ -200,6 +221,8 @@ namespace DotNetMissionSDK
 
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			do
 			{
 				if (m_CurEnumerator.GetNext(returnedUnit))
@@ -217,6 +240,8 @@ namespace DotNetMissionSDK
 
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			if (disposing)
@@ -232,6 +257,8 @@ namespace DotNetMissionSDK
 
 		public PlayerUnitEnum(int playerID)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = PlayerUnitEnum_Create(playerID);
 		}
 
@@ -242,6 +269,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = PlayerUnitEnum_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -257,6 +286,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources
@@ -272,6 +303,8 @@ namespace DotNetMissionSDK
 
 		public InRangeEnumerator(LOCATION centerPoint, int maxTileDistance)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = InRangeEnumerator_Create(centerPoint.x, centerPoint.y, maxTileDistance);
 		}
 
@@ -282,6 +315,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = InRangeEnumerator_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -297,6 +332,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources
@@ -312,6 +349,8 @@ namespace DotNetMissionSDK
 
 		public InRectEnumerator(MAP_RECT rect)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = InRectEnumerator_Create(rect.xMin, rect.yMin, rect.xMax, rect.yMax);
 		}
 
@@ -322,6 +361,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = InRectEnumerator_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -337,6 +378,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources
@@ -352,6 +395,8 @@ namespace DotNetMissionSDK
 
 		public LocationEnumerator(LOCATION location)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = LocationEnumerator_Create(location.x, location.y);
 		}
 
@@ -362,6 +407,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = LocationEnumerator_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -377,6 +424,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources
@@ -392,6 +441,8 @@ namespace DotNetMissionSDK
 
 		public ClosestEnumerator(LOCATION location)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_Handle = ClosestEnumerator_Create(location.x, location.y);
 		}
 
@@ -402,6 +453,8 @@ namespace DotNetMissionSDK
 		/// <returns>The true if the next unit is found, otherwise false.</returns>
 		public override bool GetNext(Unit returnedUnit)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			int stubIndex = ClosestEnumerator_GetNext(m_Handle);
 			if (stubIndex < 0)
 				return false;
@@ -418,6 +471,8 @@ namespace DotNetMissionSDK
 		// Dispose managed resources if "disposing" == true. Always dispose unmanaged resources.
 		protected override void Dispose(bool disposing)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			base.Dispose(disposing);
 
 			// Release unmanaged resources

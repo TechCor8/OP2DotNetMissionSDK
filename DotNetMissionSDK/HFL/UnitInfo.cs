@@ -1,3 +1,4 @@
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -16,104 +17,104 @@ namespace DotNetMissionSDK.HFL
 			m_UnitType = unitType;
 		}
 
-		public bool IsValid()										{ return UnitInfo_IsValid(m_UnitType) > 0;								}
+		public bool IsValid()										{ ThreadAssert.MainThreadRequired();	return UnitInfo_IsValid(m_UnitType) > 0;							}
 	
 		// *** Player unit type settings ***
-		public int GetHitPoints(int playerID)						{ return UnitInfo_GetHitPoints(m_UnitType, playerID);					}
-		public void SetHitPoints(int playerID, int value)			{ UnitInfo_SetHitPoints(m_UnitType, playerID, value);					}
+		public int GetHitPoints(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetHitPoints(m_UnitType, playerID);					}
+		public void SetHitPoints(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetHitPoints(m_UnitType, playerID, value);					}
 	
-		public int GetRepairAmount(int playerID)					{ return UnitInfo_GetRepairAmount(m_UnitType, playerID);				}
-		public void SetRepairAmount(int playerID, int value)		{ UnitInfo_SetRepairAmount(m_UnitType, playerID, value);				}
+		public int GetRepairAmount(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetRepairAmount(m_UnitType, playerID);				}
+		public void SetRepairAmount(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetRepairAmount(m_UnitType, playerID, value);				}
 	
-		public int GetArmor(int playerID)							{ return UnitInfo_GetArmor(m_UnitType, playerID);						}
-		public void SetArmor(int playerID, int value)				{ UnitInfo_SetArmor(m_UnitType, playerID, value);						}
+		public int GetArmor(int playerID)							{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetArmor(m_UnitType, playerID);						}
+		public void SetArmor(int playerID, int value)				{ ThreadAssert.MainThreadRequired();	UnitInfo_SetArmor(m_UnitType, playerID, value);						}
 	
-		public int GetOreCost(int playerID)							{ return UnitInfo_GetOreCost(m_UnitType, playerID);						}
-		public void SetOreCost(int playerID, int value)				{ UnitInfo_SetOreCost(m_UnitType, playerID, value);						}
+		public int GetOreCost(int playerID)							{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetOreCost(m_UnitType, playerID);					}
+		public void SetOreCost(int playerID, int value)				{ ThreadAssert.MainThreadRequired();	UnitInfo_SetOreCost(m_UnitType, playerID, value);					}
 	
-		public int GetRareOreCost(int playerID)						{ return UnitInfo_GetRareOreCost(m_UnitType, playerID);					}
-		public void SetRareOreCost(int playerID, int value)			{ UnitInfo_SetRareOreCost(m_UnitType, playerID, value);					}
+		public int GetRareOreCost(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetRareOreCost(m_UnitType, playerID);				}
+		public void SetRareOreCost(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetRareOreCost(m_UnitType, playerID, value);				}
 	
-		public int GetBuildTime(int playerID)						{ return UnitInfo_GetBuildTime(m_UnitType, playerID);					}
-		public void SetBuildTime(int playerID, int value)			{ UnitInfo_SetBuildTime(m_UnitType, playerID, value);					}
+		public int GetBuildTime(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetBuildTime(m_UnitType, playerID);					}
+		public void SetBuildTime(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetBuildTime(m_UnitType, playerID, value);					}
 	
-		public int GetSightRange(int playerID)						{ return UnitInfo_GetSightRange(m_UnitType, playerID);					}
-		public void SetSightRange(int playerID, int value)			{ UnitInfo_SetSightRange(m_UnitType, playerID, value);					}
+		public int GetSightRange(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetSightRange(m_UnitType, playerID);				}
+		public void SetSightRange(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetSightRange(m_UnitType, playerID, value);				}
 		
-		public int GetWeaponRange(int playerID)						{ return UnitInfo_GetWeaponRange(m_UnitType, playerID);					}
-		public void SetWeaponRange(int playerID, int value)			{ UnitInfo_SetWeaponRange(m_UnitType, playerID, value);					}
+		public int GetWeaponRange(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetWeaponRange(m_UnitType, playerID);				}
+		public void SetWeaponRange(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetWeaponRange(m_UnitType, playerID, value);				}
 		
-		public int GetPowerRequired(int playerID)					{ return UnitInfo_GetPowerRequired(m_UnitType, playerID);				}
-		public void SetPowerRequired(int playerID, int value)		{ UnitInfo_SetPowerRequired(m_UnitType, playerID, value);				}
+		public int GetPowerRequired(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetPowerRequired(m_UnitType, playerID);				}
+		public void SetPowerRequired(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetPowerRequired(m_UnitType, playerID, value);				}
 		
-		public int GetMovePoints(int playerID)						{ return UnitInfo_GetMovePoints(m_UnitType, playerID);					}
-		public void SetMovePoints(int playerID, int value)			{ UnitInfo_SetMovePoints(m_UnitType, playerID, value);					}
+		public int GetMovePoints(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetMovePoints(m_UnitType, playerID);				}
+		public void SetMovePoints(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetMovePoints(m_UnitType, playerID, value);				}
 		
-		public int GetTurretTurnRate(int playerID)					{ return UnitInfo_GetTurretTurnRate(m_UnitType, playerID);				}
-		public void SetTurretTurnRate(int playerID, int value)		{ UnitInfo_SetTurretTurnRate(m_UnitType, playerID, value);				}
+		public int GetTurretTurnRate(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetTurretTurnRate(m_UnitType, playerID);			}
+		public void SetTurretTurnRate(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetTurretTurnRate(m_UnitType, playerID, value);			}
 		
-		public int GetConcussionDamage(int playerID)				{ return UnitInfo_GetConcussionDamage(m_UnitType, playerID);			}
-		public void SetConcussionDamage(int playerID, int value)	{ UnitInfo_SetConcussionDamage(m_UnitType, playerID, value);			}
+		public int GetConcussionDamage(int playerID)				{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetConcussionDamage(m_UnitType, playerID);			}
+		public void SetConcussionDamage(int playerID, int value)	{ ThreadAssert.MainThreadRequired();	UnitInfo_SetConcussionDamage(m_UnitType, playerID, value);			}
 		
-		public int GetWorkersRequired(int playerID)					{ return UnitInfo_GetWorkersRequired(m_UnitType, playerID);				}
-		public void SetWorkersRequired(int playerID, int value)		{ UnitInfo_SetWorkersRequired(m_UnitType, playerID, value);				}
+		public int GetWorkersRequired(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetWorkersRequired(m_UnitType, playerID);			}
+		public void SetWorkersRequired(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetWorkersRequired(m_UnitType, playerID, value);			}
 		
-		public int GetTurnRate(int playerID)						{ return UnitInfo_GetTurnRate(m_UnitType, playerID);					}
-		public void SetTurnRate(int playerID, int value)			{ UnitInfo_SetTurnRate(m_UnitType, playerID, value);					}
+		public int GetTurnRate(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetTurnRate(m_UnitType, playerID);					}
+		public void SetTurnRate(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetTurnRate(m_UnitType, playerID, value);					}
 		
-		public int GetPenetrationDamage(int playerID)				{ return UnitInfo_GetPenetrationDamage(m_UnitType, playerID);			}
-		public void SetPenetrationDamage(int playerID, int value)	{ UnitInfo_SetPenetrationDamage(m_UnitType, playerID, value);			}
+		public int GetPenetrationDamage(int playerID)				{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetPenetrationDamage(m_UnitType, playerID);			}
+		public void SetPenetrationDamage(int playerID, int value)	{ ThreadAssert.MainThreadRequired();	UnitInfo_SetPenetrationDamage(m_UnitType, playerID, value);			}
 		
-		public int GetScientistsRequired(int playerID)				{ return UnitInfo_GetScientistsRequired(m_UnitType, playerID);			}
-		public void SetScientistsRequired(int playerID, int value)	{ UnitInfo_SetScientistsRequired(m_UnitType, playerID, value);			}
+		public int GetScientistsRequired(int playerID)				{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetScientistsRequired(m_UnitType, playerID);		}
+		public void SetScientistsRequired(int playerID, int value)	{ ThreadAssert.MainThreadRequired();	UnitInfo_SetScientistsRequired(m_UnitType, playerID, value);		}
 		
-		public int GetProductionRate(int playerID)					{ return UnitInfo_GetProductionRate(m_UnitType, playerID);				}
-		public void SetProductionRate(int playerID, int value)		{ UnitInfo_SetProductionRate(m_UnitType, playerID, value);				}
+		public int GetProductionRate(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetProductionRate(m_UnitType, playerID);			}
+		public void SetProductionRate(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetProductionRate(m_UnitType, playerID, value);			}
 		
-		public int GetReloadTime(int playerID)						{ return UnitInfo_GetReloadTime(m_UnitType, playerID);					}
-		public void SetReloadTime(int playerID, int value)			{ UnitInfo_SetReloadTime(m_UnitType, playerID, value);					}
+		public int GetReloadTime(int playerID)						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetReloadTime(m_UnitType, playerID);				}
+		public void SetReloadTime(int playerID, int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetReloadTime(m_UnitType, playerID, value);				}
 	
-		public int GetStorageCapacity(int playerID)					{ return UnitInfo_GetStorageCapacity(m_UnitType, playerID);				}
-		public void SetStorageCapacity(int playerID, int value)		{ UnitInfo_SetStorageCapacity(m_UnitType, playerID, value);				}
+		public int GetStorageCapacity(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetStorageCapacity(m_UnitType, playerID);			}
+		public void SetStorageCapacity(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetStorageCapacity(m_UnitType, playerID, value);			}
 		
-		public int GetWeaponSightRange(int playerID)				{ return UnitInfo_GetWeaponSightRange(m_UnitType, playerID);			}
-		public void SetWeaponSightRange(int playerID, int value)	{ UnitInfo_SetWeaponSightRange(m_UnitType, playerID, value);			}
+		public int GetWeaponSightRange(int playerID)				{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetWeaponSightRange(m_UnitType, playerID);			}
+		public void SetWeaponSightRange(int playerID, int value)	{ ThreadAssert.MainThreadRequired();	UnitInfo_SetWeaponSightRange(m_UnitType, playerID, value);			}
 		
-		public int GetProductionCapacity(int playerID)				{ return UnitInfo_GetProductionCapacity(m_UnitType, playerID);			}
-		public void SetProductionCapacity(int playerID, int value)	{ UnitInfo_SetProductionCapacity(m_UnitType, playerID, value);			}
+		public int GetProductionCapacity(int playerID)				{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetProductionCapacity(m_UnitType, playerID);		}
+		public void SetProductionCapacity(int playerID, int value)	{ ThreadAssert.MainThreadRequired();	UnitInfo_SetProductionCapacity(m_UnitType, playerID, value);		}
 		
-		public int GetNumStorageBays(int playerID)					{ return UnitInfo_GetNumStorageBays(m_UnitType, playerID);				}
-		public void SetNumStorageBays(int playerID, int value)		{ UnitInfo_SetNumStorageBays(m_UnitType, playerID, value);				}
+		public int GetNumStorageBays(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetNumStorageBays(m_UnitType, playerID);			}
+		public void SetNumStorageBays(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetNumStorageBays(m_UnitType, playerID, value);			}
 		
-		public int GetCargoCapacity(int playerID)					{ return UnitInfo_GetCargoCapacity(m_UnitType, playerID);				}
-		public void SetCargoCapacity(int playerID, int value)		{ UnitInfo_SetCargoCapacity(m_UnitType, playerID, value);				}
+		public int GetCargoCapacity(int playerID)					{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetCargoCapacity(m_UnitType, playerID);				}
+		public void SetCargoCapacity(int playerID, int value)		{ ThreadAssert.MainThreadRequired();	UnitInfo_SetCargoCapacity(m_UnitType, playerID, value);				}
 		
 		// *** Global unit type settings ***
 		/// <summary>
 		/// Gets the unit's research topic.
 		/// Returns the TechInfo array index NOT the techID.
 		/// </summary>
-		public int GetResearchTopic()								{ return UnitInfo_GetResearchTopic(m_UnitType);							}
-		public void SetResearchTopic(int techIndex)					{ UnitInfo_SetResearchTopic(m_UnitType, techIndex);						}
+		public int GetResearchTopic()								{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetResearchTopic(m_UnitType);						}
+		public void SetResearchTopic(int techIndex)					{ ThreadAssert.MainThreadRequired();	UnitInfo_SetResearchTopic(m_UnitType, techIndex);					}
 		
-		public TrackType GetTrackType()								{ return UnitInfo_GetTrackType(m_UnitType);								}
-		public void SetTrackType(TrackType type)					{ UnitInfo_SetTrackType(m_UnitType, type);								}
+		public TrackType GetTrackType()								{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetTrackType(m_UnitType);							}
+		public void SetTrackType(TrackType type)					{ ThreadAssert.MainThreadRequired();	UnitInfo_SetTrackType(m_UnitType, type);							}
 		
-		//public OwnerFlags GetOwnerFlags()							{ return (OwnerFlags)UnitInfo_GetOwnerFlags(m_UnitType);				}
-		public void SetOwnerFlags(OwnerFlags flags)					{ UnitInfo_SetOwnerFlags(m_UnitType, (int)flags);						}
+		//public OwnerFlags GetOwnerFlags()							{ ThreadAssert.MainThreadRequired();	return (OwnerFlags)UnitInfo_GetOwnerFlags(m_UnitType);				}
+		public void SetOwnerFlags(OwnerFlags flags)					{ ThreadAssert.MainThreadRequired();	UnitInfo_SetOwnerFlags(m_UnitType, (int)flags);						}
 		
-		public string GetUnitName()									{ return UnitInfo_GetUnitName(m_UnitType);								}
-		public void SetUnitName(string newName)						{ UnitInfo_SetUnitName(m_UnitType, newName);							}
+		public string GetUnitName()									{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetUnitName(m_UnitType);							}
+		public void SetUnitName(string newName)						{ ThreadAssert.MainThreadRequired();	UnitInfo_SetUnitName(m_UnitType, newName);							}
 		
-		public string GetProduceListName()							{ return UnitInfo_GetProduceListName(m_UnitType);						}
-		public void SetProduceListName(string newName)				{ UnitInfo_SetProduceListName(m_UnitType, newName);						}
+		public string GetProduceListName()							{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetProduceListName(m_UnitType);						}
+		public void SetProduceListName(string newName)				{ ThreadAssert.MainThreadRequired();	UnitInfo_SetProduceListName(m_UnitType, newName);					}
 		
-		public int GetXSize()										{ return IsStructure() ? UnitInfo_GetXSize(m_UnitType) : 1;				} // If not a structure, returns 1
-		public void SetXSize(int value)								{ UnitInfo_SetXSize(m_UnitType, value);									}
+		public int GetXSize()										{ ThreadAssert.MainThreadRequired();	return IsStructure() ? UnitInfo_GetXSize(m_UnitType) : 1;			} // If not a structure, returns 1
+		public void SetXSize(int value)								{ ThreadAssert.MainThreadRequired();	UnitInfo_SetXSize(m_UnitType, value);								}
 
 		// Only valid for weapons
-		public int GetDamageRadius()								{ return UnitInfo_GetDamageRadius(m_UnitType);							}
-		public void SetDamageRadius(int value)						{ UnitInfo_SetDamageRadius(m_UnitType, value);							}
+		public int GetDamageRadius()								{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetDamageRadius(m_UnitType);						}
+		public void SetDamageRadius(int value)						{ ThreadAssert.MainThreadRequired();	UnitInfo_SetDamageRadius(m_UnitType, value);						}
 
 		public int GetWeaponStrength()
 		{
@@ -139,37 +140,37 @@ namespace DotNetMissionSDK.HFL
 		}
 		
 		// Only valid for vehicles
-		public VehicleFlags GetVehicleFlags()						{ return (VehicleFlags)UnitInfo_GetVehicleFlags(m_UnitType);			}
-		public void SetVehicleFlags(VehicleFlags flags)				{ UnitInfo_SetVehicleFlags(m_UnitType, (int)flags);						}
+		public VehicleFlags GetVehicleFlags()						{ ThreadAssert.MainThreadRequired();	return (VehicleFlags)UnitInfo_GetVehicleFlags(m_UnitType);			}
+		public void SetVehicleFlags(VehicleFlags flags)				{ ThreadAssert.MainThreadRequired();	UnitInfo_SetVehicleFlags(m_UnitType, (int)flags);					}
 		
-		public int GetYSize()										{ return IsStructure() ? UnitInfo_GetYSize(m_UnitType) : 1;				} // If not a structure, returns 1
-		public void SetYSize(int value)								{ UnitInfo_SetYSize(m_UnitType, value);									}
+		public int GetYSize()										{ ThreadAssert.MainThreadRequired();	return IsStructure() ? UnitInfo_GetYSize(m_UnitType) : 1;			} // If not a structure, returns 1
+		public void SetYSize(int value)								{ ThreadAssert.MainThreadRequired();	UnitInfo_SetYSize(m_UnitType, value);								}
 		
-		public int GetPixelsSkippedWhenFiring()						{ return UnitInfo_GetPixelsSkippedWhenFiring(m_UnitType);				}
-		public void SetPixelsSkippedWhenFiring(int value)			{ UnitInfo_SetPixelsSkippedWhenFiring(m_UnitType, value);				}
+		public int GetPixelsSkippedWhenFiring()						{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetPixelsSkippedWhenFiring(m_UnitType);				}
+		public void SetPixelsSkippedWhenFiring(int value)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetPixelsSkippedWhenFiring(m_UnitType, value);				}
 		
-		public BuildingFlags GetBuildingFlags()						{ return (BuildingFlags)UnitInfo_GetBuildingFlags(m_UnitType);			}
-		public void SetBuildingFlags(BuildingFlags flags)			{ UnitInfo_SetBuildingFlags(m_UnitType, (int)flags);					}
+		public BuildingFlags GetBuildingFlags()						{ ThreadAssert.MainThreadRequired();	return (BuildingFlags)UnitInfo_GetBuildingFlags(m_UnitType);		}
+		public void SetBuildingFlags(BuildingFlags flags)			{ ThreadAssert.MainThreadRequired();	UnitInfo_SetBuildingFlags(m_UnitType, (int)flags);					}
 		
-		public int GetExplosionSize()								{ return UnitInfo_GetExplosionSize(m_UnitType);							}
-		public void SetExplosionSize(int value)						{ UnitInfo_SetExplosionSize(m_UnitType, value);							}
+		public int GetExplosionSize()								{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetExplosionSize(m_UnitType);						}
+		public void SetExplosionSize(int value)						{ ThreadAssert.MainThreadRequired();	UnitInfo_SetExplosionSize(m_UnitType, value);						}
 		
-		public int GetResourcePriority()							{ return UnitInfo_GetResourcePriority(m_UnitType);						}
-		public void SetResourcePriority(int value)					{ UnitInfo_SetResourcePriority(m_UnitType, value);						}
+		public int GetResourcePriority()							{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetResourcePriority(m_UnitType);					}
+		public void SetResourcePriority(int value)					{ ThreadAssert.MainThreadRequired();	UnitInfo_SetResourcePriority(m_UnitType, value);					}
 		
-		public int GetRareRubble()									{ return UnitInfo_GetRareRubble(m_UnitType);							}
-		public void SetRareRubble(int value)						{ UnitInfo_SetRareRubble(m_UnitType, value);							}
+		public int GetRareRubble()									{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetRareRubble(m_UnitType);							}
+		public void SetRareRubble(int value)						{ ThreadAssert.MainThreadRequired();	UnitInfo_SetRareRubble(m_UnitType, value);							}
 		
-		public int GetRubble()										{ return UnitInfo_GetRubble(m_UnitType);								}
-		public void SetRubble(int value)							{ UnitInfo_SetRubble(m_UnitType, value);								}
+		public int GetRubble()										{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetRubble(m_UnitType);								}
+		public void SetRubble(int value)							{ ThreadAssert.MainThreadRequired();	UnitInfo_SetRubble(m_UnitType, value);								}
 		
-		public int GetEdenDockPos()									{ return UnitInfo_GetEdenDockPos(m_UnitType);							}
-		public void SetEdenDockPos(int value)						{ UnitInfo_SetEdenDockPos(m_UnitType, value);							}
+		public int GetEdenDockPos()									{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetEdenDockPos(m_UnitType);							}
+		public void SetEdenDockPos(int value)						{ ThreadAssert.MainThreadRequired();	UnitInfo_SetEdenDockPos(m_UnitType, value);							}
 		
-		public int GetPlymDockPos()									{ return UnitInfo_GetPlymDockPos(m_UnitType);							}
-		public void SetPlymDockPos(int value)						{ UnitInfo_SetPlymDockPos(m_UnitType, value);							}
+		public int GetPlymDockPos()									{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetPlymDockPos(m_UnitType);							}
+		public void SetPlymDockPos(int value)						{ ThreadAssert.MainThreadRequired();	UnitInfo_SetPlymDockPos(m_UnitType, value);							}
 		
-		public string GetCodeName()									{ return Marshal.PtrToStringAnsi(UnitInfo_GetCodeName(m_UnitType));		}
+		public string GetCodeName()									{ ThreadAssert.MainThreadRequired();	return Marshal.PtrToStringAnsi(UnitInfo_GetCodeName(m_UnitType));	}
 		
 		//public int CreateUnit(int tileX, int tileY, int unitID)	{ return UnitInfo_CreateUnit(m_UnitType, tileX, tileY, unitID);			}
 
@@ -180,6 +181,8 @@ namespace DotNetMissionSDK.HFL
 		// includeBulldozedArea only applies to structures.
 		public LOCATION GetSize(bool includeBulldozedArea=false)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			LOCATION result = new LOCATION(GetXSize(), GetYSize());
 
 			if (includeBulldozedArea && IsStructure())
@@ -199,6 +202,8 @@ namespace DotNetMissionSDK.HFL
 		/// <returns>The unit rect.</returns>
 		public MAP_RECT GetRect(LOCATION position, bool includeBulldozedArea=false)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			LOCATION size = GetSize(includeBulldozedArea);
 
 			return new MAP_RECT(position - (size / 2), size);

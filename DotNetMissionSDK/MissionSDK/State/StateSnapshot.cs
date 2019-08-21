@@ -35,6 +35,8 @@ namespace DotNetMissionSDK.State.Snapshot
 		// Snapshot time (From TethysGame.Time() when snapshot was created)
 		public int time															{ get; private set; }
 
+		public bool usesMorale													{ get; private set; }
+
 		// Global Unit Info
 		public ReadOnlyDictionary<map_id, GlobalVehicleInfo> vehicleInfo		{ get; private set; }
 		public ReadOnlyDictionary<map_id, GlobalStructureInfo> structureInfo	{ get; private set; }
@@ -95,6 +97,8 @@ namespace DotNetMissionSDK.State.Snapshot
 		private void Initialize()
 		{
 			time = TethysGame.Time();
+
+			usesMorale = TethysGame.UsesMorale();
 
 			// Global Unit Info
 			if (m_VehicleInfo == null)
@@ -170,7 +174,7 @@ namespace DotNetMissionSDK.State.Snapshot
 				m_Units.Clear();
 
 				gaiaMap.Clear();
-				tileMap.Clear();
+				//tileMap.Clear();
 				unitMap.Clear();
 				commandMap.Clear();
 				strengthMap.Clear();

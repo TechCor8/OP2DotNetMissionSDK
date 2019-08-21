@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Game;
 using DotNetMissionSDK.Triggers;
 using DotNetMissionSDK.Units;
@@ -15,17 +16,20 @@ namespace DotNetMissionSDK.State
 	{
 		private static SaveData m_SaveData;        // The save data object to store persistent state
 
-		private static Dictionary<int, UnitEx> m_Units = new Dictionary<int, UnitEx>();
-		private static List<UnitEx> m_UnitCache = new List<UnitEx>();
+		private static Dictionary<int, UnitEx> m_Units		= new Dictionary<int, UnitEx>();
+		private static List<UnitEx> m_UnitCache				= new List<UnitEx>();
+
+		private static PlayerEx[] m_Players					= new PlayerEx[0];
+		private static PlayerStarship[] m_Starships			= new PlayerStarship[0];
 
 		// Players
-		public static ReadOnlyCollection<PlayerEx> players						{ get; private set; }
-		public static ReadOnlyCollection<PlayerStarship> playerStarships		{ get; private set; }
+		public static ReadOnlyCollection<PlayerEx> players						{ get { ThreadAssert.MainThreadRequired();	return new ReadOnlyCollection<PlayerEx>(m_Players);			}	}
+		public static ReadOnlyCollection<PlayerStarship> playerStarships		{ get { ThreadAssert.MainThreadRequired();	return new ReadOnlyCollection<PlayerStarship>(m_Starships);	}	}
 
 		/// <summary>
 		/// Contains all gaia and player units. Key is the unit's ID.
 		/// </summary>
-		public static ReadOnlyDictionary<int, UnitEx> units						{ get { return new ReadOnlyDictionary<int, UnitEx>(m_Units);	}	}
+		public static ReadOnlyDictionary<int, UnitEx> units						{ get { ThreadAssert.MainThreadRequired();	return new ReadOnlyDictionary<int, UnitEx>(m_Units);		}	}
 
 		// Delegates
 		//public delegate void OnUnitCallback(UnitEx unit);
@@ -39,6 +43,8 @@ namespace DotNetMissionSDK.State
 		/// </summary>
 		public static UnitEx GetUnit(int unitID)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			UnitEx unit;
 			units.TryGetValue(unitID, out unit);
 			return unit;
@@ -52,23 +58,21 @@ namespace DotNetMissionSDK.State
 		/// <param name="saveData">The global save object for storing persistent state.</param>
 		public static void Initialize(TriggerManager triggerManager, SaveData saveData)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_SaveData = saveData;
 
 			// Initialize players
-			PlayerEx[] players = new PlayerEx[TethysGame.NoPlayers()];
-			for (int i=0; i < players.Length; ++i)
-				players[i] = TethysGame.GetPlayer(i);
+			m_Players = new PlayerEx[TethysGame.PlayerCount()];
+			for (int i=0; i < m_Players.Length; ++i)
+				m_Players[i] = TethysGame.GetPlayer(i);
 
-			GameState.players = new ReadOnlyCollection<PlayerEx>(players);
-
-
+			
 			// Initialize player starships
-			PlayerStarship[] starships = new PlayerStarship[players.Length];
+			m_Starships = new PlayerStarship[m_Players.Length];
 
-			for (int i=0; i < starships.Length; ++i)
-				starships[i] = new PlayerStarship(triggerManager, i, m_SaveData.playerStarship[i]);
-
-			playerStarships = new ReadOnlyCollection<PlayerStarship>(starships);
+			for (int i=0; i < m_Starships.Length; ++i)
+				m_Starships[i] = new PlayerStarship(triggerManager, i, m_SaveData.playerStarship[i]);
 		}
 
 		/// <summary>
@@ -77,6 +81,8 @@ namespace DotNetMissionSDK.State
 		/// </summary>
 		public static void InitializeNew()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			// Initialize player starships for a new mission
 			for (int i=0; i < playerStarships.Count; ++i)
 			{
@@ -92,6 +98,8 @@ namespace DotNetMissionSDK.State
 		/// </summary>
 		public static void Update()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			// Mark lookup table for deletion
 			Dictionary<int, bool> deleteLookup = new Dictionary<int, bool>(m_Units.Count);
 			foreach (int key in m_Units.Keys)
@@ -208,6 +216,8 @@ namespace DotNetMissionSDK.State
 		/// </summary>
 		public static void Dispose()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			foreach (PlayerStarship starship in playerStarships)
 				starship.Dispose();
 		}

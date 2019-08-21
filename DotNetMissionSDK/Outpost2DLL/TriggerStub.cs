@@ -5,6 +5,7 @@
 //		 this class to control a trigger and it is usually destroyed
 //		 shortly after it is returned from the trigger creation function.
 
+using DotNetMissionSDK.Async;
 using System;
 using System.Runtime.InteropServices;
 
@@ -37,24 +38,26 @@ namespace DotNetMissionSDK.Triggers
 		// [Properties]
 		public int stubIndex
 		{
-			get { return m_StubData.stubIndex;				}
+			get { ThreadAssert.MainThreadRequired();	return m_StubData.stubIndex;			}
 		}
 
 		public int id
 		{
-			get { return m_StubData.id;						}
-			set { m_StubData.id = value;					}
+			get { ThreadAssert.MainThreadRequired();	return m_StubData.id;					}
+			set { ThreadAssert.MainThreadRequired();	m_StubData.id = value;					}
 		}
 
-		public bool isActive					{ get { return m_StubData.isActive;		} }
+		public bool isActive					{ get { ThreadAssert.MainThreadRequired();	return m_StubData.isActive;		} }
 
-		internal TriggerStubData stubData		{ get { return m_StubData;				} }
+		internal TriggerStubData stubData		{ get { ThreadAssert.MainThreadRequired();	return m_StubData;				} }
 
 		/// <summary>
 		/// Only call this from TriggerManager for loading existing triggers.
 		/// </summary>
 		internal TriggerStub(int stubIndex, int triggerID, bool enabled, bool oneShot, int playerID)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_StubData.isActive = true;
 
 			m_StubData.stubIndex = stubIndex;
@@ -73,6 +76,8 @@ namespace DotNetMissionSDK.Triggers
 
 		public void Destroy()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_StubData.isActive = false;
 
 			Trigger_Destroy(m_StubData.stubIndex);
@@ -80,6 +85,8 @@ namespace DotNetMissionSDK.Triggers
 
 		public void Disable()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_StubData.enabled = false;
 
 			Trigger_Disable(m_StubData.stubIndex);
@@ -87,6 +94,8 @@ namespace DotNetMissionSDK.Triggers
 
 		public void Enable()
 		{
+			ThreadAssert.MainThreadRequired();
+
 			m_StubData.enabled = true;
 
 			Trigger_Enable(m_StubData.stubIndex);
@@ -94,6 +103,8 @@ namespace DotNetMissionSDK.Triggers
 
 		public bool HasFired(int playerID)  // Note: Do not pass -1 = PlayerAll
 		{
+			ThreadAssert.MainThreadRequired();
+
 			return Trigger_HasFired(m_StubData.stubIndex, playerID) != 0;
 		}
 
@@ -104,6 +115,8 @@ namespace DotNetMissionSDK.Triggers
 		/// <returns>True if the trigger should be executed.</returns>
 		public bool CheckTrigger(int playerID=-1)
 		{
+			ThreadAssert.MainThreadRequired();
+
 			if (playerID < 0)
 				playerID = m_StubData.playerID;
 
@@ -139,12 +152,14 @@ namespace DotNetMissionSDK.Triggers
 		// Victory/Failure condition triggers
 		public static TriggerStub CreateVictoryCondition(int triggerID, bool enabled, TriggerStub victoryTriggerStub, string missionObjective)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateVictoryCondition(enabled ? 1 : 0, 0, victoryTriggerStub.m_StubData.stubIndex, missionObjective);
 			return new TriggerStub(index, triggerID, enabled, true, victoryTriggerStub.m_StubData.playerID);
 		}
 
 		public static TriggerStub CreateFailureCondition(int triggerID, bool enabled, TriggerStub failureTriggerStub)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateFailureCondition(enabled ? 1 : 0, 0, failureTriggerStub.m_StubData.stubIndex);
 			return new TriggerStub(index, triggerID, enabled, true, failureTriggerStub.m_StubData.playerID);
 		}
@@ -152,24 +167,28 @@ namespace DotNetMissionSDK.Triggers
 		// Typical Victory Triggers
 		public static TriggerStub CreateOnePlayerLeftTrigger(int triggerID, bool enabled, bool oneShot) // Last One Standing (and later part of Land Rush)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateOnePlayerLeftTrigger(enabled ? 1 : 0, oneShot ? 1 : 0);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 
 		public static TriggerStub CreateEvacTrigger(int triggerID, bool enabled, bool oneShot, int playerID)  // Spacerace
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateEvacTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
 
 		public static TriggerStub CreateMidasTrigger(int triggerID, bool enabled, bool oneShot, int time)     // Midas
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateMidasTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, time);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
 
 		public static TriggerStub CreateOperationalTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id buildingType, int refValue, CompareMode compareType)  // Converting Land Rush to Last One Standing (when CC becomes active). Do not use PlayerAll.
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateOperationalTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, buildingType, refValue, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
@@ -177,81 +196,110 @@ namespace DotNetMissionSDK.Triggers
 		// Research and Resource Count Triggers  [Note: Typically used to set what needs to be done by the end of a campaign mission]
 		public static TriggerStub CreateResearchTrigger(int triggerID, bool enabled, bool oneShot, int techID, int playerID)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateResearchTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, techID, playerID);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		public static TriggerStub CreateResourceTrigger(int triggerID, bool enabled, bool oneShot, TriggerResource resourceType, int refAmount, int playerID, CompareMode compareType)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateResourceTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, resourceType, refAmount, playerID, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		public static TriggerStub CreateKitTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id id, int refCount)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateKitTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, id, refCount);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		public static TriggerStub CreateEscapeTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y, int width, int height, int refValue, map_id unitType, TruckCargo cargoType, int cargoAmount)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateEscapeTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, x, y, width, height, refValue, unitType, cargoType, cargoAmount);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		public static TriggerStub CreateCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, map_id unitType, map_id cargoOrWeapon, int refCount, CompareMode compareType)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, unitType, cargoOrWeapon, refCount, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		// Unit Count Triggers  [Note: See also CreateCountTrigger]
 		public static TriggerStub CreateVehicleCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, CompareMode compareType)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateVehicleCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, refCount, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		public static TriggerStub CreateBuildingCountTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int refCount, CompareMode compareType)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateBuildingCountTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, refCount, compareType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		// Attack/Damage Triggers
 		public static TriggerStub CreateAttackedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup group)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateAttackedTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, group.stubIndex);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
+
 		public static TriggerStub CreateDamagedTrigger(int triggerID, bool enabled, bool oneShot, ScGroup group, int damage)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateDamagedTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, group.stubIndex, damage);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
+
 		// Time Triggers
 		public static TriggerStub CreateTimeTrigger(int triggerID, bool enabled, bool oneShot, int timeMin, int timeMax)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateTimeTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, timeMin, timeMax);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
+
 		public static TriggerStub CreateTimeTrigger(int triggerID, bool enabled, bool oneShot, int time)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateTimeTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, time);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
+
 		// Positional Triggers
 		public static TriggerStub CreatePointTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreatePointTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, x, y);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		public static TriggerStub CreateRectTrigger(int triggerID, bool enabled, bool oneShot, int playerID, int x, int y, int width, int height)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateRectTrigger(enabled ? 1 : 0, oneShot ? 1 : 0, playerID, x, y, width, height);
 			return new TriggerStub(index, triggerID, enabled, oneShot, playerID);
 		}
+
 		// Special Target Trigger/Data
 		public static TriggerStub CreateSpecialTarget(int triggerID, bool enabled, bool oneShot, Unit targetUnit /* Lab */, map_id sourceUnitType /* mapScout */)
 		{
+			ThreadAssert.MainThreadRequired();
 			int index = Trigger_CreateSpecialTarget(enabled ? 1 : 0, oneShot ? 1 : 0, targetUnit.GetStubIndex(), sourceUnitType);
 			return new TriggerStub(index, triggerID, enabled, oneShot, -1);
 		}
+
 		public void GetSpecialTargetData(Unit sourceUnit /* Scout */)
 		{
+			ThreadAssert.MainThreadRequired();
 			Trigger_GetSpecialTargetData(m_StubData.stubIndex, sourceUnit.GetStubIndex());
 		}
 
