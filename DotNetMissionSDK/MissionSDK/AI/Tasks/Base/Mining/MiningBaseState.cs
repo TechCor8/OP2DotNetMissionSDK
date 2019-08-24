@@ -88,9 +88,29 @@ namespace DotNetMissionSDK.AI.Managers
 			foreach (StructureState cc in m_UnassignedCommandCenters)
 				miningBases.Add(new MiningBase(cc));
 
-			// Update base assignments
+			// Update mine assignments
 			foreach (MiningBase miningBase in miningBases)
-				miningBase.Update(m_UnassignedBeacons, m_UnassignedMines, m_UnassignedSmelters, m_UnassignedTrucks);
+				miningBase.UpdateMines(m_UnassignedBeacons, m_UnassignedMines);
+
+			// Update smelter assignments
+			foreach (StructureState smelter in m_UnassignedSmelters)
+			{
+				BeaconType oreType = smelter.unitType == map_id.CommonOreSmelter ? BeaconType.Common : BeaconType.Rare;
+
+				// Get closest unsaturated mine to smelter
+				MiningSite closestSite = GetClosestMiningSite(smelter.position, oreType);
+				if (closestSite == null)
+					continue;
+
+				closestSite.AddSmelter(smelter);
+			}
+
+			// Update truck assignments
+			foreach (MiningBase miningBase in miningBases)
+			{
+				foreach (MiningSite miningSite in miningBase.miningSites)
+					miningSite.AddTrucks(m_UnassignedTrucks);
+			}
 		}
 
 		private void GetAllMiningBeacons(StateSnapshot stateSnapshot)
@@ -103,6 +123,32 @@ namespace DotNetMissionSDK.AI.Managers
 
 				m_UnassignedBeacons.Add((MiningBeaconState)gaiaUnit);
 			}
+		}
+
+		private MiningSite GetClosestMiningSite(LOCATION position, BeaconType oreType)
+		{
+			MiningSite closestUnit = null;
+			int closestDistance = 999999;
+
+			foreach (MiningBase miningBase in miningBases)
+			{
+				foreach (MiningSite miningSite in miningBase.miningSites)
+				{
+					if (miningSite.mine == null) continue;
+					if (miningSite.beacon.oreType != oreType) continue;
+					if (miningSite.smelters.Count >= MiningBaseState.SmelterSaturationCount) continue;
+
+					// Closest distance
+					int distance = position.GetDiagonalDistance(miningSite.mine.position);
+					if (distance < closestDistance)
+					{
+						closestUnit = miningSite;
+						closestDistance = distance;
+					}
+				}
+			}
+
+			return closestUnit;
 		}
 	}
 
@@ -139,7 +185,7 @@ namespace DotNetMissionSDK.AI.Managers
 				miningSite.Cull(unassignedBeacons, unassignedMines, unassignedSmelters, unassignedTrucks);
 		}
 
-		public void Update(List<MiningBeaconState> unassignedBeacons, List<StructureState> unassignedMines, List<StructureState> unassignedSmelters, List<CargoTruckState> unassignedTrucks)
+		public void UpdateMines(List<MiningBeaconState> unassignedBeacons, List<StructureState> unassignedMines)
 		{
 			// Create mining site for unassigned beacons near this base
 			for (int i=0; i < unassignedBeacons.Count; ++i)
@@ -156,7 +202,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 			// Update mining site assignments
 			foreach (MiningSite site in miningSites)
-				site.Update(unassignedMines, unassignedSmelters, unassignedTrucks);
+				site.UpdateMine(unassignedMines);
 		}
 	}
 
@@ -211,7 +257,7 @@ namespace DotNetMissionSDK.AI.Managers
 				smelter.Cull(unassignedSmelters, unassignedTrucks);
 		}
 
-		public void Update(List<StructureState> unassignedMines, List<StructureState> unassignedSmelters, List<CargoTruckState> unassignedTrucks)
+		public void UpdateMine(List<StructureState> unassignedMines)
 		{
 			if (mine == null)
 			{
@@ -224,42 +270,32 @@ namespace DotNetMissionSDK.AI.Managers
 					unassignedMines.RemoveAt(mineIndex);
 				}
 			}
+		}
 
+		public void AddSmelter(StructureState smelter)
+		{
 			if (mine == null)
 				return;
 
-			// Get smelters near command center
-			List<StructureState> ccSmelters = unassignedSmelters.FindAll((StructureState smelter) => smelter.position.GetDiagonalDistance(commandCenter.position) <= MiningBaseState.MaxSmelterDistanceToCC);
+			int distance = smelter.position.GetDiagonalDistance(mine.position);
 
-			map_id smelterType = beacon.oreType == BeaconType.Common ? map_id.CommonOreSmelter : map_id.RareOreSmelter;
+			// Calculate desiredTruckCount
+			int desiredTruckCount = distance / MiningBaseState.TilesPerTruck + 1;
 
-			// Add closest smelters until mine site is saturated
-			while (smelters.Count < MiningBaseState.SmelterSaturationCount && ccSmelters.Count > 0)
-			{
-				int distance;
-				int closestIndex = GetClosestUnitIndex(mine.position, smelterType, ccSmelters, out distance);
-				if (closestIndex < 0)
-					break;
+			if (desiredTruckCount < MiningBaseState.MinTrucksPerSmelter)
+				desiredTruckCount = MiningBaseState.MinTrucksPerSmelter;
+			if (desiredTruckCount > MiningBaseState.MaxTrucksPerSmelter)
+				desiredTruckCount = MiningBaseState.MaxTrucksPerSmelter;
 
-				StructureState smelter = ccSmelters[closestIndex];
+			// Add smelter
+			smelters.Add(new MiningSmelter(smelter, desiredTruckCount));
+		}
 
-				// Calculate desiredTruckCount
-				int desiredTruckCount = distance / MiningBaseState.TilesPerTruck + 1;
-
-				if (desiredTruckCount < MiningBaseState.MinTrucksPerSmelter)
-					desiredTruckCount = MiningBaseState.MinTrucksPerSmelter;
-				if (desiredTruckCount > MiningBaseState.MaxTrucksPerSmelter)
-					desiredTruckCount = MiningBaseState.MaxTrucksPerSmelter;
-
-				// Add smelter
-				smelters.Add(new MiningSmelter(smelter, desiredTruckCount));
-				ccSmelters.RemoveAt(closestIndex);
-				unassignedSmelters.Remove(smelter);
-			}
-
+		public void AddTrucks(List<CargoTruckState> unassignedTrucks)
+		{
 			// Update smelter truck assignments
 			foreach (MiningSmelter smelter in smelters)
-				smelter.Update(unassignedTrucks);
+				smelter.AddTrucks(unassignedTrucks);
 		}
 
 		private int GetClosestUnitIndex(LOCATION position, map_id unitType, List<StructureState> units, out int closestDistance)
@@ -333,7 +369,7 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 		}
 
-		public void Update(List<CargoTruckState> unassignedTrucks)
+		public void AddTrucks(List<CargoTruckState> unassignedTrucks)
 		{
 			// Inactive smelter cannot have trucks
 			if (!smelter.isEnabled)
