@@ -70,8 +70,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			// Find idle earthworkers
 			foreach (UnitState earthworker in owner.units.earthWorkers)
 			{
-				if (earthworker.curAction != ActionType.moDone)
-					continue;
+				//if (earthworker.curAction != ActionType.moDone)
+				//	continue;
 
 				// Find closest disconnected structure
 				UnitState unitToFix = GetClosestUnit(disconnectedStructures, earthworker.position);

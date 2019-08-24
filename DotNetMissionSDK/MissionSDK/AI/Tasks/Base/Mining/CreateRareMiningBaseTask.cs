@@ -31,11 +31,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			// Task is not complete until every CC beacon has been occupied and saturated
 			if (!m_CreateMineTask.IsTaskComplete(stateSnapshot))
 				return false;
+
+			PlayerState owner = stateSnapshot.players[ownerID];
 			
 			// Task is complete if there are no beacons outside of a command center's control area
-			foreach (MiningBeaconState beacon in stateSnapshot.gaia.miningBeacons)
+			foreach (MiningBeaconState beacon in stateSnapshot.gaia)
 			{
-				if (beacon.unitType != map_id.MiningBeacon)
+				if (beacon.unitType != map_id.MiningBeacon && beacon.unitType != map_id.MagmaVent)
+					continue;
+
+				if (beacon.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
 					continue;
 				
 				if (beacon.oreType != BeaconType.Rare)
@@ -129,13 +134,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		private MiningBeaconState GetClosestUnusedBeacon(StateSnapshot stateSnapshot, LOCATION position)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get closest beacon
 			MiningBeaconState closestBeacon = null;
 			int closestDistance = 900000;
 
 			foreach (MiningBeaconState beacon in stateSnapshot.gaia.miningBeacons)
 			{
-				if (beacon.unitType != map_id.MiningBeacon)
+				if (beacon.unitType != map_id.MiningBeacon && beacon.unitType != map_id.MagmaVent)
+					continue;
+
+				if (beacon.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
 					continue;
 
 				if (beacon.oreType != BeaconType.Rare)

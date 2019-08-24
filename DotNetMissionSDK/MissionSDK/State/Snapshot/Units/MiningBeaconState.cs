@@ -30,7 +30,7 @@ namespace DotNetMissionSDK.State.Snapshot.Units
 			numTruckLoadsSoFar		= unit.GetNumTruckLoadsSoFar();
 			barYield				= unit.GetBarYield();
 			variant					= unit.GetVariant();
-			oreType					= unit.GetOreType();
+			oreType					= unitType == map_id.MagmaVent ? BeaconType.Rare : unit.GetOreType();
 
 			m_PlayerSurveyedFlags	= unit.GetSurveyedFlags();
 		}

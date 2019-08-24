@@ -245,6 +245,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				case map_id.LightTower:
 				case map_id.CommonOreMine:
 				case map_id.RareOreMine:
+				case map_id.MagmaWell:
 				case map_id.Tokamak:
 				case map_id.SolarPowerArray:
 				case map_id.MHDGenerator:

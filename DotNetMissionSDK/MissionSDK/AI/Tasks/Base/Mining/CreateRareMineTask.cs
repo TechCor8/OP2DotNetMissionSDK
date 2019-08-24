@@ -71,7 +71,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			LOCATION beaconPosition = beacon.position;
 			
 			// Check if beacon is surveyed
-			if (beacon.GetSurveyedBy(ownerID))
+			if (beacon.unitType == map_id.MagmaVent || beacon.GetSurveyedBy(ownerID))
 			{
 				// Deploy miner
 				BuildStructureTask.ClearDeployArea(miner, map_id.RareOreMine, beacon.position, stateSnapshot, ownerID, unitActions);

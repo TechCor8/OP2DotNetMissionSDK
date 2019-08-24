@@ -56,6 +56,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 			m_UnassignedMines.AddRange(owner.units.commonOreMines);
 			m_UnassignedMines.AddRange(owner.units.rareOreMines);
+			m_UnassignedMines.AddRange(owner.units.magmaWells);
 
 			m_UnassignedSmelters.AddRange(owner.units.commonOreSmelters);
 			m_UnassignedSmelters.AddRange(owner.units.rareOreSmelters);
@@ -115,10 +116,15 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private void GetAllMiningBeacons(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Get all mining beacons
 			foreach (GaiaUnitState gaiaUnit in stateSnapshot.gaia)
 			{
 				if (gaiaUnit.unitType != map_id.MiningBeacon && gaiaUnit.unitType != map_id.MagmaVent)
+					continue;
+
+				if (gaiaUnit.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
 					continue;
 
 				m_UnassignedBeacons.Add((MiningBeaconState)gaiaUnit);
