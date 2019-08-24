@@ -315,6 +315,19 @@ namespace DotNetMissionSDK.AI.Managers
 			// Deactivate crippled structures
 			foreach (StructureState building in m_CrippledStructures)
 			{
+				// Skip metal storage if it will destroy metals
+				if (building.unitType == map_id.CommonOreSmelter || building.unitType == map_id.CommonStorage)
+				{
+					if (owner.ore > owner.maxCommonOre-building.structureInfo.storageCapacity)
+						continue;
+				}
+				if (building.unitType == map_id.RareOreSmelter || building.unitType == map_id.RareStorage)
+				{
+					if (owner.rareOre > owner.maxRareOre-building.structureInfo.storageCapacity)
+						continue;
+				}
+
+				// Deactivate structure
 				if (building.lastCommand != CommandType.ctMoIdle)
 					idleActions.Add(() => GameState.GetUnit(building.unitID)?.DoIdle());
 			}

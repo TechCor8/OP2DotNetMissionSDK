@@ -1,11 +1,9 @@
 ﻿using DotNetMissionSDK.AI.Combat;
 using DotNetMissionSDK.AI.Combat.Groups;
 using DotNetMissionSDK.Async;
-using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
-using DotNetMissionSDK.Units;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Managers

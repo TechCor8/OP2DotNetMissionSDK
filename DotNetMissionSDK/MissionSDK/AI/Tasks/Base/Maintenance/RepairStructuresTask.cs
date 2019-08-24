@@ -106,7 +106,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (repairUnit == null)
 					continue;
 
-				int priority = repairCriticalOnly ? 3 : 0;
+				int priority = repairCriticalOnly ? 4 : 2;
 
 				unitActions.AddUnitCommand(repairUnit.unitID, priority, () =>
 				{

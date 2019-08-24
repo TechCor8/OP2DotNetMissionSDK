@@ -50,9 +50,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			if (owner.ore < 50)
 				return false;
 
-			int structuresThatNeedTubes = 0;
+			List<UnitState> disconnectedStructures = new List<UnitState>();
 
-			// Find disconnected structures
+			// Create list of disconnected structures
 			foreach (UnitState unitToFix in owner.units.GetStructures())
 			{
 				if (!BuildStructureTask.NeedsTube(unitToFix.unitType))
@@ -63,13 +63,24 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (stateSnapshot.commandMap.ConnectsTo(ownerID, buildingRect))
 					continue;
 
-				++structuresThatNeedTubes;
+				disconnectedStructures.Add(unitToFix);
+			}
 
-				// Get earthworker
-				UnitState earthworker = owner.units.GetClosestUnitOfType(map_id.Earthworker, unitToFix.position);
 
-				if (earthworker == null || earthworker.curAction != ActionType.moDone)
+			// Find idle earthworkers
+			foreach (UnitState earthworker in owner.units.earthWorkers)
+			{
+				if (earthworker.curAction != ActionType.moDone)
 					continue;
+
+				// Find closest disconnected structure
+				UnitState unitToFix = GetClosestUnit(disconnectedStructures, earthworker.position);
+				if (unitToFix == null)
+					continue;
+
+				disconnectedStructures.Remove(unitToFix);
+
+				MAP_RECT buildingRect = stateSnapshot.structureInfo[unitToFix.unitType].GetRect(unitToFix.position);
 
 				// Get path from tube network to structure
 				LOCATION[] path = stateSnapshot.commandMap.GetPathToClosestConnectedTile(ownerID, buildingRect);
@@ -90,10 +101,29 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 
 			// If we are overwhelmed, build more earthworkers to meet demand
-			if (structuresThatNeedTubes/4 + 1 > owner.units.earthWorkers.Count)
-				m_BuildEarthworkerTask.targetCountToBuild = structuresThatNeedTubes/4 + 1;
+			if (disconnectedStructures.Count/4 + 1 > owner.units.earthWorkers.Count)
+				m_BuildEarthworkerTask.targetCountToBuild = disconnectedStructures.Count/4 + 1;
 
 			return true;
+		}
+
+		private UnitState GetClosestUnit(IEnumerable<UnitState> list, LOCATION position)
+		{
+			UnitState closestUnit = null;
+			int closestDistance = 999999;
+
+			foreach (UnitState unit in list)
+			{
+				// Closest distance
+				int distance = position.GetDiagonalDistance(unit.position);
+				if (distance < closestDistance)
+				{
+					closestUnit = unit;
+					closestDistance = distance;
+				}
+			}
+
+			return closestUnit;
 		}
 	}
 }
