@@ -2,13 +2,12 @@
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
+namespace DotNetMissionSDK.AI.Tasks.Base.Unloading
 {
-	public class UnloadSuppliesTask : Task
+	public abstract class UnloadSuppliesTask : Task
 	{
 		private class TruckState
 		{
@@ -17,6 +16,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		}
 
 		private Dictionary<int, TruckState> m_TruckTimeSinceStateChanged = new Dictionary<int, TruckState>(); // <UnitID, TruckState>
+
+		protected TruckCargo m_CargoToUnload = TruckCargo.CommonMetal;
+		protected map_id m_StructureToDock = map_id.CommonOreSmelter;
 
 
 		public UnloadSuppliesTask(int ownerID) : base(ownerID) { }
@@ -28,25 +30,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			// Task is complete when all trucks have unloaded metals and food
 			foreach (CargoTruckState truck in owner.units.cargoTrucks)
 			{
-				switch (truck.cargoType)
+				if (truck.cargoType == m_CargoToUnload)
 				{
-					case TruckCargo.CommonMetal:
-						if (owner.units.commonOreSmelters.Count > 0)
-							return false;
-
-						break;
-
-					case TruckCargo.RareMetal:
-						if (owner.units.rareOreSmelters.Count > 0)
-							return false;
-
-						break;
-
-					case TruckCargo.Food:
-						if (owner.units.agridomes.Count > 0)
-							return false;
-
-						break;
+					if (owner.units.GetListForType(m_StructureToDock).Count > 0)
+						return false;
 				}
 			}
 

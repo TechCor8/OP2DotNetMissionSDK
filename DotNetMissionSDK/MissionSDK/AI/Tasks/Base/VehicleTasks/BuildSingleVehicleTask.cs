@@ -43,10 +43,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
-			if (!CanPerformTask(stateSnapshot))
-				return false;
-
 			PlayerState owner = stateSnapshot.players[ownerID];
+
+			if (!CanPerformTask(stateSnapshot))
+				return owner.CanAffordUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			// Get factory to produce
 			FactoryState factory = owner.units.vehicleFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);
@@ -103,10 +103,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
-			if (!CanPerformTask(stateSnapshot))
-				return false;
-
 			PlayerState owner = stateSnapshot.players[ownerID];
+
+			if (!CanPerformTask(stateSnapshot))
+				return owner.CanAffordUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
 
 			// Get factory to produce
 			FactoryState factory = owner.units.arachnidFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);

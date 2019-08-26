@@ -38,7 +38,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			if (owner.foodStored < 10000)
-				return false;
+				return true;
 
 			return base.PerformTask(stateSnapshot, unitActions);
 		}

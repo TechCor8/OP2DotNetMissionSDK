@@ -64,7 +64,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 			// Check if miner is being deployed (Both exist at the same time for a moment and triggers a bug)
 			if (owner.units.commonOreMines.FirstOrDefault((StructureState mine) => mine.position.Equals(miner.position)) != null)
-				return false;
+				return true;
 
 			// Find closest unoccupied common beacon
 			MiningBeaconState beacon = GetClosestUnusedBeacon(miner);

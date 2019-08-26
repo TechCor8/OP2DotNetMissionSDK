@@ -1,17 +1,13 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
-using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
-using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
 	public class MaintainDefenseTask : Task
 	{
-		private const int GuardPostsPerBase = 6;
-
 		private List<Task> m_Prerequisites = new List<Task>();
 
 		private BuildGuardPostTask m_BuildGuardPostTask;
@@ -30,6 +26,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			PlayerState owner = stateSnapshot.players[ownerID];
 
+			UnitState ccWithLeastGuards = null;
+			int leastGuardCount = 99999;
+
 			// Build guard posts at each base
 			foreach (UnitState cc in owner.units.commandCenters)
 			{
@@ -46,11 +45,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				// Get number of guard posts connected to this base. If we have fewer than desired, build another one at this base
 				int guardPosts = connectedStructures.FindAll((StructureState unit) => unit.unitType == map_id.GuardPost).Count;
 
-				if (guardPosts < GuardPostsPerBase)
+				if (guardPosts < leastGuardCount)
 				{
-					m_BuildGuardPostTask.targetCountToBuild = owner.units.guardPosts.Count+1;
-					m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
-					m_BuildGuardPostTask.SetLocation(cc.position);
+					ccWithLeastGuards = cc;
+					leastGuardCount = guardPosts;
 				}
 
 				// Build meteor defenses at this base. If task is null, we are plymouth and can't build these
@@ -63,6 +61,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					m_BuildMeteorDefenseTask.targetCountToBuild = m_BuildMeteorDefenseTask.targetCountToBuild+1;
 					m_BuildMeteorDefenseTask.SetLocation(cc.position);
 				}
+			}
+
+			if (ccWithLeastGuards != null)
+			{
+				m_BuildGuardPostTask.targetCountToBuild = owner.units.guardPosts.Count+1;
+				m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
+				m_BuildGuardPostTask.SetLocation(ccWithLeastGuards.position);
 			}
 			
 			return true;

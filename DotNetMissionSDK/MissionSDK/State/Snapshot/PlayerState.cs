@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot.Maps;
+using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -73,12 +74,16 @@ namespace DotNetMissionSDK.State.Snapshot
 		public int totalMedCenterCapacity				{ get; private set; }
 		public int totalResidenceCapacity				{ get; private set; }
 
+		// Calculated
+		public int totalOffensiveStrength				{ get; private set; }
+
 		// Player Unit Info
 		public ReadOnlyDictionary<map_id, VehicleInfo> vehicleInfo		{ get; private set; }
 		public ReadOnlyDictionary<map_id, StructureInfo> structureInfo	{ get; private set; }
 		public ReadOnlyDictionary<map_id, WeaponInfo> weaponInfo		{ get; private set; }
 
 		public PlayerUnitState units					{ get; private set; }
+		public PlayerStarshipState starship				{ get; private set; }
 
 
 		private Dictionary<int, bool> m_HasTechnology;
@@ -212,16 +217,16 @@ namespace DotNetMissionSDK.State.Snapshot
 		/// Creates an immutable player state from PlayerInfo.
 		/// </summary>
 		/// <param name="player">The player to pull data from.</param>
-		public PlayerState(PlayerEx player, PlayerState prevPlayerState)
+		public PlayerState(StateSnapshot stateSnapshot, PlayerEx player, PlayerState prevPlayerState)
 		{
-			Initialize(player, prevPlayerState);
+			Initialize(stateSnapshot, player, prevPlayerState);
 		}
 
 		/// <summary>
 		/// Initializes the player state.
 		/// NOTE: Should only be called from StateSnapshot.
 		/// </summary>
-		internal void Initialize(PlayerEx player, PlayerState prevPlayerState)
+		internal void Initialize(StateSnapshot stateSnapshot, PlayerEx player, PlayerState prevPlayerState)
 		{
 			playerID = player.playerID;
 
@@ -304,6 +309,7 @@ namespace DotNetMissionSDK.State.Snapshot
 
 			// Parse units
 			units = new PlayerUnitState(player.playerID, this.vehicleInfo, this.structureInfo, this.weaponInfo, prevPlayerState?.units);
+			starship = new PlayerStarshipState(GameState.playerStarships[player.playerID]);
 
 			// Parse technologies
 			int techCount = Research.GetTechCount();
@@ -316,6 +322,14 @@ namespace DotNetMissionSDK.State.Snapshot
 			}
 
 			m_HasTechnology = new Dictionary<int, bool>(hasTech);
+
+			foreach (UnitState unit in units.GetVehicles())
+			{
+				if (!unit.hasWeapon)
+					continue;
+
+				totalOffensiveStrength += stateSnapshot.weaponInfo[unit.weapon].weaponStrength;
+			}
 		}
 
 		/// <summary>
@@ -339,6 +353,7 @@ namespace DotNetMissionSDK.State.Snapshot
 			weaponInfo = null;
 
 			units = null;
+			starship = null;
 		}
 	}
 }

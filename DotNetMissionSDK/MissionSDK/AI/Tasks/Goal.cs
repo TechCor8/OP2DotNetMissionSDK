@@ -1,19 +1,48 @@
-﻿using System;
+﻿using DotNetMissionSDK.State.Snapshot;
 
 namespace DotNetMissionSDK.AI.Tasks
 {
-	public class Goal
+	/// <summary>
+	/// A top-level task that gets assigned a priority based on importance.
+	/// </summary>
+	public abstract class Goal
 	{
-		public Task task			{ get; private set; }
-		public float weight			{ get; private set; }
+		protected int m_OwnerID;
+		protected Task m_Task;
+		
+		public float weight				{ get; private set; }
+		public float importance			{ get; protected set; }
+		public bool blockLowerPriority	{ get; protected set; }
 
 
-		public Goal(Task task, float weight)
+		public Goal(int ownerID, float weight)
 		{
-			this.task = task;
+			m_OwnerID = ownerID;
 			this.weight = weight;
+		}
 
-			task.GeneratePrerequisites();
+		/// <summary>
+		/// Updates the importance of this goal.
+		/// </summary>
+		public abstract void UpdateImportance(StateSnapshot stateSnapshot, PlayerState owner);
+
+		/// <summary>
+		/// Performs this goal's task.
+		/// </summary>
+		/// <returns>Returns true if the task was performed and the next goal should be executed.</returns>
+		public virtual bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		{
+			if (!m_Task.IsTaskComplete(stateSnapshot))
+				return m_Task.PerformTaskTree(stateSnapshot, unitActions);
+
+			return true;
+		}
+
+		protected float Clamp(float val)
+		{
+			if (val < 0) return 0;
+			if (val > 1) return 1;
+			return val;
 		}
 	}
 }

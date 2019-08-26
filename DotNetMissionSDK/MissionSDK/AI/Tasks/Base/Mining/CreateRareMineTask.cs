@@ -59,12 +59,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Get miner
-			if (owner.units.roboMiners.Count == 0) return false;
+			if (owner.units.roboMiners.Count == 0) return true;
 			VehicleState miner = owner.units.roboMiners[0];
 			
 			// Check if miner is being deployed (Both exist at the same time for a moment and triggers a bug)
 			if (owner.units.rareOreMines.FirstOrDefault((StructureState mine) => mine.position.Equals(miner.position)) != null)
-				return false;
+				return true;
 			
 			// Find closest unoccupied rare beacon
 			MiningBeaconState beacon = GetClosestUnusedBeacon(miner);
@@ -88,7 +88,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			
 			// Survey beacon
 			if (owner.units.roboSurveyors.Count == 0)
-				return false;
+				return true;
 			
 			VehicleState surveyor = owner.units.roboSurveyors[0];
 

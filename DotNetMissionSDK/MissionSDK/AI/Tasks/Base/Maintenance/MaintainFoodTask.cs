@@ -1,8 +1,6 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
-using System;
-using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -33,7 +31,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			foreach (StructureState agridome in owner.units.agridomes)
 			{
 				if (!agridome.isEnabled)
-					return false;
+					return true;
 			}
 
 			// Keep building one more agridome until task complete

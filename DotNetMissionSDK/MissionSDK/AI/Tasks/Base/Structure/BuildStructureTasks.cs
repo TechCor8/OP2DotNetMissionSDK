@@ -8,7 +8,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
-			//AddPrerequisite(new BuildCommandCenterTask());
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildStructureFactoryKitTask(ownerID));
 		}
 	}
@@ -19,6 +19,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildCommonSmelterKitTask(ownerID));
 		}
 	}
@@ -29,6 +30,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildAgridomeKitTask(ownerID));
 		}
 	}
@@ -39,6 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildTokamakKitTask(ownerID));
 		}
 	}
@@ -49,6 +52,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildMHDGeneratorKitTask(ownerID));
 		}
 	}
@@ -59,6 +63,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildSolarArrayKitTask(ownerID));
 		}
 	}
@@ -69,6 +74,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildNurseryKitTask(ownerID));
 		}
 	}
@@ -79,6 +85,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildUniversityKitTask(ownerID));
 		}
 	}
@@ -89,6 +96,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildResidenceKitTask(ownerID));
 		}
 	}
@@ -99,6 +107,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildReinforcedResidenceKitTask(ownerID));
 		}
 	}
@@ -109,6 +118,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildAdvancedResidenceKitTask(ownerID));
 		}
 	}
@@ -119,6 +129,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildMedicalCenterKitTask(ownerID));
 		}
 	}
@@ -129,6 +140,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildDIRTKitTask(ownerID));
 		}
 	}
@@ -139,6 +151,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildRecreationKitTask(ownerID));
 		}
 	}
@@ -149,6 +162,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildForumKitTask(ownerID));
 		}
 	}
@@ -159,6 +173,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildGORFKitTask(ownerID));
 		}
 	}
@@ -169,6 +184,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildVehicleFactoryKitTask(ownerID));
 		}
 	}
@@ -179,6 +195,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildArachnidFactoryKitTask(ownerID));
 		}
 	}
@@ -189,6 +206,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildStandardLabKitTask(ownerID));
 		}
 	}
@@ -199,6 +217,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildAdvancedLabKitTask(ownerID));
 		}
 	}
@@ -209,6 +228,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildRobotCommandKitTask(ownerID));
 		}
 	}
@@ -219,6 +239,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildSpaceportKitTask(ownerID));
 		}
 	}
@@ -229,6 +250,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildObservatoryKitTask(ownerID));
 		}
 	}
@@ -239,6 +261,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildMeteorDefenseKitTask(ownerID));
 		}
 	}
@@ -251,6 +274,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			base.GeneratePrerequisites();
 			AddPrerequisite(kitTask = new BuildGuardPostKitTask(ownerID));
 
 			kitTask.RandomizeTurret(GameState.players[ownerID].IsEden());

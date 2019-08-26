@@ -18,6 +18,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		protected map_id m_KitToBuild = map_id.Agridome;
 		protected int m_DesiredDistance = 0;                // Desired minimum distance to nearest structure
 
+		private ConnectStructureTask m_ConnectStructureTask;
+
 		private bool m_CanBuildDisconnected;
 		//private bool m_IsSearchingForDeployLocation;
 
@@ -26,6 +28,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public int targetCountToBuild = 1;
 
+
 		public BuildStructureTask(int ownerID) : base(ownerID) { }
 
 		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
@@ -33,7 +36,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_KitToBuild);
-			return units.Count >= targetCountToBuild;
+			if (units.Count >= targetCountToBuild)
+				return m_ConnectStructureTask.IsTaskComplete(stateSnapshot);
+			
+			return false;
 		}
 
 		public void SetLocation(LOCATION targetPosition)
@@ -44,6 +50,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			AddPrerequisite(m_ConnectStructureTask = new ConnectStructureTask(m_KitToBuild, ownerID), true);
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)

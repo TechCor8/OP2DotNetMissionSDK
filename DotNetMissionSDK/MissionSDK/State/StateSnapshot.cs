@@ -119,9 +119,9 @@ namespace DotNetMissionSDK.State.Snapshot
 			for (int i=0; i < m_Players.Length; ++i)
 			{
 				if (m_Players[i] != null)
-					m_Players[i].Initialize(GameState.players[i], m_LastSnapshot?.players[i]);
+					m_Players[i].Initialize(this, GameState.players[i], m_LastSnapshot?.players[i]);
 				else
-					m_Players[i] = new PlayerState(GameState.players[i], m_LastSnapshot?.players[i]);
+					m_Players[i] = new PlayerState(this, GameState.players[i], m_LastSnapshot?.players[i]);
 			}
 
 			this.players = new ReadOnlyCollection<PlayerState>(m_Players);

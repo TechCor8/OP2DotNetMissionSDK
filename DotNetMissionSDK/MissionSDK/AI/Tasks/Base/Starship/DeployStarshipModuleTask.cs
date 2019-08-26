@@ -26,14 +26,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 
 			// Fail Check: Research
 			if (!owner.HasTechnologyForUnit(stateSnapshot, m_StarshipModule))
-				return false;
+				return true;
 			
 			// Get spaceports with rocket
 			List<SpaceportState> spaceports = owner.units.spaceports.Where((SpaceportState unit) => (unit.objectOnPad == map_id.SULV || unit.objectOnPad == map_id.RLV) && unit.isEnabled).ToList();
 
 			// If no spaceports are found, most likely they are not enabled
 			if (spaceports.Count == 0)
-				return false;
+				return true;
 
 			// Get spaceport with module in rocket and launch
 			SpaceportState spaceport = spaceports.Find((SpaceportState unit) => unit.launchpadCargo == m_StarshipModule);

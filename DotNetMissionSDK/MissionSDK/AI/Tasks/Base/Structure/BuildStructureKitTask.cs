@@ -78,10 +78,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			// Fail Check: Research
 			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuild))
-				return false;
+				return true;
 
 			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuildCargo))
-				return false;
+				return true;
 
 			// Get structure factories with kit
 			List<FactoryState> factories = owner.units.structureFactories.Where((FactoryState unit) => unit.HasBayWithCargo(m_KitToBuild)).ToList();
@@ -148,7 +148,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				return true;
 
 			if (!factory.HasEmptyBay())
-				return false;
+				return true;
 
 			if (!owner.CanAffordUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo))
 				return false;

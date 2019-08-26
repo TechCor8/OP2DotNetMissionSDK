@@ -6,8 +6,6 @@ using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Mining
@@ -19,12 +17,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 	{
 		private MiningBaseState m_MiningBaseState;
 
+		private ConnectStructureTask m_ConnectStructureTask;
+
 
 		public SaturateRareMineTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)	{ m_MiningBaseState = miningBaseState; }
 
 
 		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
 			// Task is complete when there are no unsaturated rare mining sites left
 			foreach (MiningBase miningBase in m_MiningBaseState.miningBases)
 			{
@@ -43,6 +45,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
+			AddPrerequisite(new SaturateRareSmelterTask(ownerID, m_MiningBaseState), true);
+			AddPrerequisite(m_ConnectStructureTask = new ConnectStructureTask(map_id.RareOreSmelter, ownerID), true);
 			AddPrerequisite(new BuildRareSmelterKitTask(ownerID));
 		}
 
@@ -79,10 +83,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			}
 			
 			if (closestMineSite == null)
-				return false;
+				return true;
 			
 			if (!DeploySmelter(stateSnapshot, unitActions, convec, closestMiningBase.commandCenter.position, closestMineSite.mine.position))
-				return false;
+				return true;
 
 			return true;
 		}

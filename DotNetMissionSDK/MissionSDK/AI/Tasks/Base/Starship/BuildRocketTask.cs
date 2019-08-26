@@ -34,7 +34,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 
 			// If spaceport not found, most likely it is not enabled, but may have EMP missile instead
 			if (spaceport == null)
-				return false;
+				return true;
 
 			// Do nothing if we are waiting for RLV to return
 			if (owner.rlvCount > 0)

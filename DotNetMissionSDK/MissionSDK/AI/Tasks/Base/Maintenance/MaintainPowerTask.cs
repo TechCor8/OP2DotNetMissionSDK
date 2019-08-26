@@ -62,7 +62,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			foreach (StructureState powerPlant in powerPlants)
 			{
 				if (!powerPlant.isEnabled)
-					return false;
+					return true;
 			}
 
 			// Build new power plant

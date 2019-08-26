@@ -35,13 +35,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			PlayerState owner = stateSnapshot.players[ownerID];
 			
 			// Task is complete if there are no beacons outside of a command center's control area
-			foreach (MiningBeaconState beacon in stateSnapshot.gaia)
+			foreach (GaiaUnitState gaiaUnit in stateSnapshot.gaia)
 			{
-				if (beacon.unitType != map_id.MiningBeacon && beacon.unitType != map_id.MagmaVent)
+				if (gaiaUnit.unitType != map_id.MiningBeacon && gaiaUnit.unitType != map_id.MagmaVent)
 					continue;
 
-				if (beacon.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
+				if (gaiaUnit.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
 					continue;
+
+				MiningBeaconState beacon = gaiaUnit as MiningBeaconState;
 				
 				if (beacon.oreType != BeaconType.Rare)
 					continue;
@@ -91,7 +93,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				return DeployCC(stateSnapshot, unitActions, convec, beaconPosition);
 			}
 			
-			return false;
+			return true;
 		}
 
 		private bool DeployCC(StateSnapshot stateSnapshot, BotCommands unitActions, ConvecState convec, LOCATION targetPosition)
@@ -140,13 +142,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			MiningBeaconState closestBeacon = null;
 			int closestDistance = 900000;
 
-			foreach (MiningBeaconState beacon in stateSnapshot.gaia.miningBeacons)
+			foreach (GaiaUnitState gaiaUnit in stateSnapshot.gaia)
 			{
-				if (beacon.unitType != map_id.MiningBeacon && beacon.unitType != map_id.MagmaVent)
+				if (gaiaUnit.unitType != map_id.MiningBeacon && gaiaUnit.unitType != map_id.MagmaVent)
 					continue;
 
-				if (beacon.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
+				if (gaiaUnit.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
 					continue;
+
+				MiningBeaconState beacon = gaiaUnit as MiningBeaconState;
 
 				if (beacon.oreType != BeaconType.Rare)
 					continue;

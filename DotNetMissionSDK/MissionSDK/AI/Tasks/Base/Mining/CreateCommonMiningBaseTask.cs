@@ -100,7 +100,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				return DeployCC(stateSnapshot, unitActions, convec, beaconPosition);
 			}
 
-			return false;
+			return true;
 		}
 
 		private bool DeployCC(StateSnapshot stateSnapshot, BotCommands unitActions,  ConvecState convec, LOCATION targetPosition)
