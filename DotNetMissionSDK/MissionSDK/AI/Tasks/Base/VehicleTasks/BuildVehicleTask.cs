@@ -2,7 +2,6 @@
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,7 +29,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildVehicleFactoryTask(ownerID));
+			AddPrerequisite(new MaintainVehicleFactoryTask(ownerID));
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
@@ -73,7 +72,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildArachnidFactoryTask(ownerID));
+			AddPrerequisite(new MaintainArachnidFactoryTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

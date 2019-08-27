@@ -14,7 +14,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		protected map_id m_VehicleToBuild;
 		protected map_id m_VehicleToBuildCargo;
 
-		protected BuildStructureTask m_BuildStructureTask;
+		protected MaintainStructureTask m_MaintainStructureTask;
 
 
 		public BuildSingleVehicleTask(int ownerID) : base(ownerID) { }
@@ -27,11 +27,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildVehicleFactoryTask(ownerID));
+			AddPrerequisite(new MaintainVehicleFactoryTask(ownerID));
 
 			// This task is optional and not required. Used for constructing additional factories.
-			m_BuildStructureTask = new BuildVehicleFactoryTask(ownerID);
-			m_BuildStructureTask.GeneratePrerequisites();
+			m_MaintainStructureTask = new MaintainVehicleFactoryTask(ownerID);
+			m_MaintainStructureTask.GeneratePrerequisites();
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
@@ -80,8 +80,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			m_BuildStructureTask.targetCountToBuild = owner.units.vehicleFactories.Count+1;
-			m_BuildStructureTask.PerformTaskTree(stateSnapshot, unitActions);
+			m_MaintainStructureTask.targetCountToMaintain = owner.units.vehicleFactories.Count+1;
+			m_MaintainStructureTask.PerformTaskTree(stateSnapshot, unitActions);
 		}
 	}
 
@@ -94,11 +94,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildArachnidFactoryTask(ownerID));
+			AddPrerequisite(new MaintainArachnidFactoryTask(ownerID));
 
 			// This task is optional and not required. Used for constructing additional factories.
-			m_BuildStructureTask = new BuildArachnidFactoryTask(ownerID);
-			m_BuildStructureTask.GeneratePrerequisites();
+			m_MaintainStructureTask = new MaintainArachnidFactoryTask(ownerID);
+			m_MaintainStructureTask.GeneratePrerequisites();
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
@@ -131,8 +131,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			m_BuildStructureTask.targetCountToBuild = owner.units.arachnidFactories.Count+1;
-			m_BuildStructureTask.PerformTaskTree(stateSnapshot, unitActions);
+			m_MaintainStructureTask.targetCountToMaintain = owner.units.arachnidFactories.Count+1;
+			m_MaintainStructureTask.PerformTaskTree(stateSnapshot, unitActions);
 		}
 	}
 }

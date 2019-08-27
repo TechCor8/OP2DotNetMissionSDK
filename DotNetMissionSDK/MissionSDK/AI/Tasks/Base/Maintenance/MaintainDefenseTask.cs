@@ -10,8 +10,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 	{
 		private List<Task> m_Prerequisites = new List<Task>();
 
-		private BuildGuardPostTask m_BuildGuardPostTask;
-		private BuildMeteorDefenseTask m_BuildMeteorDefenseTask;
+		private MaintainGuardPostTask m_MaintainGuardPostTask;
+		private MaintainMeteorDefenseTask m_MaintainMeteorDefenseTask;
 
 
 		public MaintainDefenseTask(int ownerID) : base(ownerID) { }
@@ -52,22 +52,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				}
 
 				// Build meteor defenses at this base. If task is null, we are plymouth and can't build these
-				if (m_BuildMeteorDefenseTask != null)
+				if (m_MaintainMeteorDefenseTask != null)
 				{
 					int meteorDefenses = connectedStructures.FindAll((StructureState unit) => unit.unitType == map_id.MeteorDefense).Count;
 					if (meteorDefenses >= (connectedStructures.Count / 7) + 1)
 						continue;
 
-					m_BuildMeteorDefenseTask.targetCountToBuild = m_BuildMeteorDefenseTask.targetCountToBuild+1;
-					m_BuildMeteorDefenseTask.SetLocation(cc.position);
+					m_MaintainMeteorDefenseTask.targetCountToMaintain = m_MaintainMeteorDefenseTask.targetCountToMaintain+1;
+					m_MaintainMeteorDefenseTask.buildTask.SetLocation(cc.position);
 				}
 			}
 
 			if (ccWithLeastGuards != null)
 			{
-				m_BuildGuardPostTask.targetCountToBuild = owner.units.guardPosts.Count+1;
-				m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
-				m_BuildGuardPostTask.SetLocation(ccWithLeastGuards.position);
+				m_MaintainGuardPostTask.targetCountToMaintain = owner.units.guardPosts.Count+1;
+				m_MaintainGuardPostTask.guardKitTask.RandomizeTurret(false);
+				m_MaintainGuardPostTask.buildTask.SetLocation(ccWithLeastGuards.position);
 			}
 			
 			return true;
@@ -75,19 +75,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			m_Prerequisites.Add(m_BuildGuardPostTask = new BuildGuardPostTask(ownerID));
+			m_Prerequisites.Add(m_MaintainGuardPostTask = new MaintainGuardPostTask(ownerID));
 			
 			if (GameState.players[ownerID].IsEden())
 			{
 				m_Prerequisites.Add(new BuildObservatoryTask(ownerID));
-				m_Prerequisites.Add(m_BuildMeteorDefenseTask = new BuildMeteorDefenseTask(ownerID));
+				m_Prerequisites.Add(m_MaintainMeteorDefenseTask = new MaintainMeteorDefenseTask(ownerID));
 			}
 
 			foreach (Task task in m_Prerequisites)
 				AddPrerequisite(task, false);
 
-			m_BuildGuardPostTask.targetCountToBuild = 0;
-			m_BuildGuardPostTask.kitTask.RandomizeTurret(false);
+			m_MaintainGuardPostTask.targetCountToMaintain = 0;
+			m_MaintainGuardPostTask.guardKitTask.RandomizeTurret(false);
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

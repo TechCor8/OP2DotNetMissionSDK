@@ -9,7 +9,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 	/// </summary>
 	public class MaintainResearchTask : Task
 	{
-		private BuildAdvancedLabTask m_BuildAdvancedLabTask;
+		private MaintainAdvancedLabTask m_MaintainAdvancedLabTask;
 
 		
 		public MaintainResearchTask(int ownerID) : base(ownerID) { }
@@ -25,15 +25,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			// If we have extra scientists, build more advanced labs
 			if (scientistsForResearch > 8)
-				m_BuildAdvancedLabTask.targetCountToBuild = (int)Math.Ceiling(scientistsForResearch / 16.0f) + 1;
+				m_MaintainAdvancedLabTask.targetCountToMaintain = (int)Math.Ceiling(scientistsForResearch / 16.0f) + 1;
 
-			return owner.units.standardLabs.Count > 0 && owner.units.advancedLabs.Count >= m_BuildAdvancedLabTask.targetCountToBuild;
+			return owner.units.standardLabs.Count > 0 && owner.units.advancedLabs.Count >= m_MaintainAdvancedLabTask.targetCountToMaintain;
 		}
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildStandardLabTask(ownerID));
-			AddPrerequisite(m_BuildAdvancedLabTask = new BuildAdvancedLabTask(ownerID));
+			AddPrerequisite(new MaintainStandardLabTask(ownerID));
+			AddPrerequisite(m_MaintainAdvancedLabTask = new MaintainAdvancedLabTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

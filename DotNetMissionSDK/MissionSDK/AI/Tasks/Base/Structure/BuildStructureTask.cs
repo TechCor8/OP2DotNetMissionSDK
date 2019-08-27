@@ -4,7 +4,6 @@ using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,13 +11,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
 	/// <summary>
 	/// This abstract class finds a suitable location and deploys a structure.
+	/// Should only ever be used as a prerequisite to MaintainStructure tasks, as this task is only complete when the structure is disconnected.
 	/// </summary>
 	public abstract class BuildStructureTask : Task
 	{
 		protected map_id m_KitToBuild = map_id.Agridome;
 		protected int m_DesiredDistance = 0;                // Desired minimum distance to nearest structure
-
-		private ConnectStructureTask m_ConnectStructureTask;
 
 		private bool m_CanBuildDisconnected;
 		//private bool m_IsSearchingForDeployLocation;
@@ -26,19 +24,23 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		private bool m_OverrideLocation = false;
 		private LOCATION m_TargetLocation;
 
-		public int targetCountToBuild = 1;
-
 
 		public BuildStructureTask(int ownerID) : base(ownerID) { }
 
 		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			PlayerState owner = stateSnapshot.players[ownerID];
+			/*PlayerState owner = stateSnapshot.players[ownerID];
 
-			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_KitToBuild);
-			if (units.Count >= targetCountToBuild)
-				return m_ConnectStructureTask.IsTaskComplete(stateSnapshot);
-			
+			// Task is complete if a structure is not connected.
+			foreach (UnitState unit in owner.units.GetListForType(m_KitToBuild))
+			{
+				StructureState building = (StructureState)unit;
+
+				if (!stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect()))
+					return true;
+			}*/
+
+			// Task is never complete. Always try to build another one.
 			return false;
 		}
 
@@ -50,7 +52,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_ConnectStructureTask = new ConnectStructureTask(m_KitToBuild, ownerID), true);
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)

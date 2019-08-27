@@ -22,7 +22,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 		
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildSpaceportTask(ownerID));
+			AddPrerequisite(new MaintainSpaceportTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

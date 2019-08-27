@@ -1,28 +1,34 @@
-﻿using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
-using DotNetMissionSDK.State;
+﻿using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
-	public class ConnectStructureTask : Task
+	/// <summary>
+	/// This abstract class maintains a certain number of connected/repaired structures of a type.
+	/// </summary>
+	public abstract class ConnectStructureTask : Task
 	{
 		protected map_id m_StructureToConnect = map_id.Agridome;
 
-		public ConnectStructureTask(map_id structureToConnect, int ownerID) : base(ownerID) { m_StructureToConnect = structureToConnect; }
+		public BuildStructureTask buildTask { get; protected set; }
+		
+		
+		public ConnectStructureTask(int ownerID) : base(ownerID) { }
 
 		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			// Skip task if structure does not need tubes
 			if (!BuildStructureTask.NeedsTube(m_StructureToConnect))
 				return true;
 
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Task is complete if all structures are connected
-			foreach (StructureState building in owner.units.GetListForType(m_StructureToConnect))
+			foreach (UnitState unit in owner.units.GetListForType(m_StructureToConnect))
 			{
+				StructureState building = (StructureState)unit;
+
 				if (!stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect()))
 					return false;
 			}
@@ -32,7 +38,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildEarthworkerTask(ownerID));
+		}
+
+		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
+		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			foreach (UnitState unit in owner.units.GetListForType(m_StructureToConnect))
+			{
+				StructureState building = (StructureState)unit;
+
+				// If any structures disconnected, earthworker required
+				if (!stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect()))
+					return owner.units.earthWorkers.Count > 0;
+			}
+
+			return true;
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

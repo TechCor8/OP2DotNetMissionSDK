@@ -19,8 +19,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildNurseryTask(ownerID));
-			AddPrerequisite(new BuildUniversityTask(ownerID));
+			AddPrerequisite(new MaintainNurseryTask(ownerID));
+			AddPrerequisite(new MaintainUniversityTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

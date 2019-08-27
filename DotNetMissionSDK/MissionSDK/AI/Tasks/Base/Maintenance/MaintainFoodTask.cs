@@ -6,7 +6,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
 	public class MaintainFoodTask : Task
 	{
-		private BuildAgridomeTask m_BuildAgridomeTask;
+		private MaintainAgridomeTask m_BuildAgridomeTask;
 
 
 		public MaintainFoodTask(int ownerID) : base(ownerID) { }
@@ -20,7 +20,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_BuildAgridomeTask = new BuildAgridomeTask(ownerID));
+			AddPrerequisite(m_BuildAgridomeTask = new MaintainAgridomeTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
@@ -35,7 +35,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 
 			// Keep building one more agridome until task complete
-			m_BuildAgridomeTask.targetCountToBuild = owner.units.agridomes.Count+1;
+			m_BuildAgridomeTask.targetCountToMaintain = owner.units.agridomes.Count+1;
 
 			return true;
 		}

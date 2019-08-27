@@ -8,15 +8,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
 	public class MaintainMoraleTask : Task
 	{
-		private List<BuildStructureTask> m_Prerequisites = new List<BuildStructureTask>();
+		private List<MaintainStructureTask> m_Prerequisites = new List<MaintainStructureTask>();
 
-		private BuildResidenceTask m_BuildResidenceTask;
-		private BuildAdvancedResidenceTask m_BuildEdenResidenceTask;
-		private BuildReinforcedResidenceTask m_BuildPlymouthResidenceTask;
-		private BuildMedicalCenterTask m_BuildMedicalCenterTask;
-		private BuildRecreationTask m_BuildRecreationTask;
-		private BuildForumTask m_BuildForumTask;
-		private BuildDIRTTask m_BuildDirtTask;
+		private MaintainResidenceTask m_BuildResidenceTask;
+		private MaintainAdvancedResidenceTask m_BuildEdenResidenceTask;
+		private MaintainReinforcedResidenceTask m_BuildPlymouthResidenceTask;
+		private MaintainMedicalCenterTask m_BuildMedicalCenterTask;
+		private MaintainRecreationTask m_BuildRecreationTask;
+		private MaintainForumTask m_BuildForumTask;
+		private MaintainDIRTTask m_BuildDirtTask;
 		
 
 		public MaintainMoraleTask(int ownerID) : base(ownerID) { }
@@ -34,27 +34,27 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			m_Prerequisites.Add(new BuildNurseryTask(ownerID));
-			m_Prerequisites.Add(new BuildUniversityTask(ownerID));
-			m_Prerequisites.Add(m_BuildResidenceTask = new BuildResidenceTask(ownerID));
-			m_Prerequisites.Add(m_BuildEdenResidenceTask = new BuildAdvancedResidenceTask(ownerID));
-			m_Prerequisites.Add(m_BuildPlymouthResidenceTask = new BuildReinforcedResidenceTask(ownerID));
-			m_Prerequisites.Add(m_BuildMedicalCenterTask = new BuildMedicalCenterTask(ownerID));
-			m_Prerequisites.Add(new BuildRobotCommandTask(ownerID)); // Should find a better place for this
-			m_Prerequisites.Add(m_BuildRecreationTask = new BuildRecreationTask(ownerID));
-			m_Prerequisites.Add(m_BuildForumTask = new BuildForumTask(ownerID));
-			m_Prerequisites.Add(m_BuildDirtTask = new BuildDIRTTask(ownerID));
-			m_Prerequisites.Add(new BuildGORFTask(ownerID));
+			m_Prerequisites.Add(new MaintainNurseryTask(ownerID));
+			m_Prerequisites.Add(new MaintainUniversityTask(ownerID));
+			m_Prerequisites.Add(m_BuildResidenceTask = new MaintainResidenceTask(ownerID));
+			m_Prerequisites.Add(m_BuildEdenResidenceTask = new MaintainAdvancedResidenceTask(ownerID));
+			m_Prerequisites.Add(m_BuildPlymouthResidenceTask = new MaintainReinforcedResidenceTask(ownerID));
+			m_Prerequisites.Add(m_BuildMedicalCenterTask = new MaintainMedicalCenterTask(ownerID));
+			m_Prerequisites.Add(new MaintainRobotCommandTask(ownerID)); // Should find a better place for this
+			m_Prerequisites.Add(m_BuildRecreationTask = new MaintainRecreationTask(ownerID));
+			m_Prerequisites.Add(m_BuildForumTask = new MaintainForumTask(ownerID));
+			m_Prerequisites.Add(m_BuildDirtTask = new MaintainDIRTTask(ownerID));
+			m_Prerequisites.Add(new MaintainGORFTask(ownerID));
 
-			m_BuildResidenceTask.targetCountToBuild = 0;
-			m_BuildEdenResidenceTask.targetCountToBuild = 0;
-			m_BuildPlymouthResidenceTask.targetCountToBuild = 0;
-			m_BuildMedicalCenterTask.targetCountToBuild = 0;
-			m_BuildRecreationTask.targetCountToBuild = 0;
-			m_BuildForumTask.targetCountToBuild = 0;
-			m_BuildDirtTask.targetCountToBuild = 0;
+			m_BuildResidenceTask.targetCountToMaintain = 0;
+			m_BuildEdenResidenceTask.targetCountToMaintain = 0;
+			m_BuildPlymouthResidenceTask.targetCountToMaintain = 0;
+			m_BuildMedicalCenterTask.targetCountToMaintain = 0;
+			m_BuildRecreationTask.targetCountToMaintain = 0;
+			m_BuildForumTask.targetCountToMaintain = 0;
+			m_BuildDirtTask.targetCountToMaintain = 0;
 
-			foreach (BuildStructureTask task in m_Prerequisites)
+			foreach (MaintainStructureTask task in m_Prerequisites)
 				AddPrerequisite(task);
 		}
 
@@ -105,9 +105,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			switch (residenceTypeToBuild)
 			{
-				case map_id.Residence:				m_BuildResidenceTask.targetCountToBuild = owner.units.residences.Count+1;						break;
-				case map_id.AdvancedResidence:		m_BuildEdenResidenceTask.targetCountToBuild = owner.units.advancedResidences.Count+1;			break;
-				case map_id.ReinforcedResidence:	m_BuildPlymouthResidenceTask.targetCountToBuild = owner.units.reinforcedResidences.Count+1;		break;
+				case map_id.Residence:				m_BuildResidenceTask.targetCountToMaintain = owner.units.residences.Count+1;						break;
+				case map_id.AdvancedResidence:		m_BuildEdenResidenceTask.targetCountToMaintain = owner.units.advancedResidences.Count+1;			break;
+				case map_id.ReinforcedResidence:	m_BuildPlymouthResidenceTask.targetCountToMaintain = owner.units.reinforcedResidences.Count+1;		break;
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			}
 
 			if (owner.totalMedCenterCapacity < owner.totalPopulation)
-				m_BuildMedicalCenterTask.targetCountToBuild = owner.units.medicalCenters.Count+1;
+				m_BuildMedicalCenterTask.targetCountToMaintain = owner.units.medicalCenters.Count+1;
 		}
 
 		private void BuildRecreation(StateSnapshot stateSnapshot, PlayerState owner)
@@ -150,14 +150,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			switch (recreationTypeToBuild)
 			{
-				case map_id.RecreationFacility:		m_BuildRecreationTask.targetCountToBuild = owner.units.recreationFacilities.Count+1;		break;
-				case map_id.Forum:					m_BuildForumTask.targetCountToBuild = owner.units.forums.Count+1;							break;
+				case map_id.RecreationFacility:		m_BuildRecreationTask.targetCountToMaintain = owner.units.recreationFacilities.Count+1;		break;
+				case map_id.Forum:					m_BuildForumTask.targetCountToMaintain = owner.units.forums.Count+1;						break;
 			}
 		}
 
 		private void BuildDIRT(StateSnapshot stateSnapshot, PlayerState owner)
 		{
-			m_BuildDirtTask.targetCountToBuild = 0;
+			m_BuildDirtTask.targetCountToMaintain = 0;
 
 			// Don't build more DIRT if we aren't using all the ones we have
 			foreach (StructureState dirt in owner.units.dirts)
@@ -178,7 +178,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				List<StructureState> connectedStructures = stateSnapshot.commandMap.GetConnectedStructures(ownerID, cc.position);
 				int neededDIRTs = connectedStructures.Count / productionCap + 1;
 
-				m_BuildDirtTask.targetCountToBuild += neededDIRTs;
+				m_BuildDirtTask.targetCountToMaintain += neededDIRTs;
 
 				// Get DIRTs connected to this CC
 				int currentDIRTs = 0;
@@ -198,7 +198,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					continue;
 
 				// Add DIRT to this CC
-				m_BuildDirtTask.SetLocation(cc.position);
+				m_BuildDirtTask.buildTask.SetLocation(cc.position);
 				shouldBuildDIRT = true;
 			}
 		}

@@ -39,7 +39,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new BuildStructureFactoryTask(ownerID));
+			AddPrerequisite(new MaintainStructureFactoryTask(ownerID));
 			AddPrerequisite(new BuildConvecTask(ownerID));
 		}
 

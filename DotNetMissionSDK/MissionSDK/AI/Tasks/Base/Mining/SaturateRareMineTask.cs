@@ -17,9 +17,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 	{
 		private MiningBaseState m_MiningBaseState;
 
-		private ConnectStructureTask m_ConnectStructureTask;
-
-
+		
 		public SaturateRareMineTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)	{ m_MiningBaseState = miningBaseState; }
 
 
@@ -46,7 +44,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new SaturateRareSmelterTask(ownerID, m_MiningBaseState), true);
-			AddPrerequisite(m_ConnectStructureTask = new ConnectStructureTask(map_id.RareOreSmelter, ownerID), true);
 			AddPrerequisite(new BuildRareSmelterKitTask(ownerID));
 		}
 

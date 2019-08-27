@@ -15,9 +15,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		private List<Task> m_Prerequisites = new List<Task>();
 
-		private BuildTokamakTask m_BuildTokamakTask;
-		private BuildMHDGeneratorTask m_BuildMHDGeneratorTask;
-		private BuildSolarArrayTask m_BuildSolarArrayTask;
+		private MaintainTokamakTask m_MaintainTokamakTask;
+		private MaintainMHDGeneratorTask m_MaintainMHDGeneratorTask;
+		private MaintainSolarArrayTask m_MaintainSolarArrayTask;
 		private BuildGeoConTask m_BuildGeoConTask;
 
 
@@ -35,14 +35,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override void GeneratePrerequisites()
 		{
-			m_Prerequisites.Add(m_BuildTokamakTask = new BuildTokamakTask(ownerID));
-			m_Prerequisites.Add(m_BuildMHDGeneratorTask = new BuildMHDGeneratorTask(ownerID));
-			m_Prerequisites.Add(m_BuildSolarArrayTask = new BuildSolarArrayTask(ownerID));
+			m_Prerequisites.Add(m_MaintainTokamakTask = new MaintainTokamakTask(ownerID));
+			m_Prerequisites.Add(m_MaintainMHDGeneratorTask = new MaintainMHDGeneratorTask(ownerID));
+			m_Prerequisites.Add(m_MaintainSolarArrayTask = new MaintainSolarArrayTask(ownerID));
 			m_Prerequisites.Add(m_BuildGeoConTask = new BuildGeoConTask(ownerID));
 
-			m_BuildTokamakTask.targetCountToBuild = 0;
-			m_BuildMHDGeneratorTask.targetCountToBuild = 0;
-			m_BuildSolarArrayTask.targetCountToBuild = 0;
+			m_MaintainTokamakTask.targetCountToMaintain = 0;
+			m_MaintainMHDGeneratorTask.targetCountToMaintain = 0;
+			m_MaintainSolarArrayTask.targetCountToMaintain = 0;
 			m_BuildGeoConTask.targetCountToBuild = 0;
 
 			foreach (Task task in m_Prerequisites)
@@ -109,9 +109,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			// Set the next power plant to build
 			switch (powerPlantTypeToBuild)
 			{
-				case map_id.Tokamak:				m_BuildTokamakTask.targetCountToBuild = owner.units.tokamaks.Count+1;					break;
-				case map_id.MHDGenerator:			m_BuildMHDGeneratorTask.targetCountToBuild = owner.units.mhdGenerators.Count+1;			break;
-				case map_id.SolarPowerArray:		m_BuildSolarArrayTask.targetCountToBuild = owner.units.solarPowerArrays.Count+1;		break;
+				case map_id.Tokamak:				m_MaintainTokamakTask.targetCountToMaintain = owner.units.tokamaks.Count+1;				break;
+				case map_id.MHDGenerator:			m_MaintainMHDGeneratorTask.targetCountToMaintain = owner.units.mhdGenerators.Count+1;	break;
+				case map_id.SolarPowerArray:		m_MaintainSolarArrayTask.targetCountToMaintain = owner.units.solarPowerArrays.Count+1;	break;
 			}
 		}
 

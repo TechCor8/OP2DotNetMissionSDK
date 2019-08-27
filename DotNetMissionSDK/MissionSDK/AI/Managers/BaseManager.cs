@@ -1,14 +1,9 @@
-﻿using DotNetMissionSDK.AI.Tasks.Base.Starship;
-using DotNetMissionSDK.AI.Tasks;
+﻿using DotNetMissionSDK.AI.Tasks;
 using DotNetMissionSDK.AI.Tasks.Base.Mining;
-using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
 using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.State.Snapshot;
-using System.Linq;
 using DotNetMissionSDK.Async;
 using System.Collections.Generic;
-using System;
-using DotNetMissionSDK.AI.Combat.Groups;
 using DotNetMissionSDK.AI.Tasks.Base.Goals;
 
 namespace DotNetMissionSDK.AI.Managers
@@ -50,7 +45,6 @@ namespace DotNetMissionSDK.AI.Managers
 				new UnloadCommonMetalGoal(ownerID, 1),
 				new UnloadRareMetalGoal(ownerID, 1),
 				new UnloadFoodGoal(ownerID, 1),
-				//new FixDisconnectedStructuresGoal(ownerID, 1),
 				new RepairStructuresGoal(ownerID, 1),
 				new MaintainFoodGoal(ownerID, 0.99f),
 				new MaintainPopulationGoal(ownerID, 1),

@@ -268,16 +268,21 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 	public sealed class BuildGuardPostTask : BuildStructureTask
 	{
-		public BuildGuardPostKitTask kitTask;
+		private BuildGuardPostKitTask m_KitTask;
 
 		public BuildGuardPostTask(int ownerID) : base(ownerID)				{ m_KitToBuild = map_id.GuardPost;	m_DesiredDistance = 4;		}
 
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(kitTask = new BuildGuardPostKitTask(ownerID));
+			AddPrerequisite(m_KitTask = new BuildGuardPostKitTask(ownerID));
 
-			kitTask.RandomizeTurret(GameState.players[ownerID].IsEden());
+			m_KitTask.RandomizeTurret(GameState.players[ownerID].IsEden());
+		}
+
+		public void RandomizeTurret(bool isEden, bool lineOfSight=true, bool includeBombs=false)
+		{
+			m_KitTask.RandomizeTurret(isEden, lineOfSight, includeBombs);
 		}
 	}
 }
