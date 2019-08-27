@@ -1,5 +1,4 @@
 ﻿using DotNetMissionSDK.HFL;
-using DotNetMissionSDK.State.Snapshot.Maps;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System.Collections.Generic;
@@ -19,6 +18,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		private Dictionary<map_id, VehicleInfo> m_VehicleInfo		= new Dictionary<map_id, VehicleInfo>();
 		private Dictionary<map_id, StructureInfo> m_StructureInfo	= new Dictionary<map_id, StructureInfo>();
 		private Dictionary<map_id, WeaponInfo> m_WeaponInfo			= new Dictionary<map_id, WeaponInfo>();
+		private Dictionary<map_id, UnitInfoState> m_StarshipInfo	= new Dictionary<map_id, UnitInfoState>();
 
 		public int playerID								{ get; private set; }
 
@@ -81,6 +81,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		public ReadOnlyDictionary<map_id, VehicleInfo> vehicleInfo		{ get; private set; }
 		public ReadOnlyDictionary<map_id, StructureInfo> structureInfo	{ get; private set; }
 		public ReadOnlyDictionary<map_id, WeaponInfo> weaponInfo		{ get; private set; }
+		public ReadOnlyDictionary<map_id, UnitInfoState> starshipInfo	{ get; private set; }
 
 		public PlayerUnitState units					{ get; private set; }
 		public PlayerStarshipState starship				{ get; private set; }
@@ -140,6 +141,7 @@ namespace DotNetMissionSDK.State.Snapshot
 			if ((int)unitTypeID >= 1 && (int)unitTypeID <= 15)		return vehicleInfo[unitTypeID];
 			if ((int)unitTypeID >= 21 && (int)unitTypeID <= 58)		return structureInfo[unitTypeID];
 			if ((int)unitTypeID >= 59 && (int)unitTypeID <= 73)		return weaponInfo[unitTypeID];
+			if ((int)unitTypeID >= 88 && (int)unitTypeID <= 107)	return starshipInfo[unitTypeID];
 
 			throw new System.ArgumentOutOfRangeException("unitTypeID", "unitTypeID is invalid!");
 		}
@@ -303,9 +305,13 @@ namespace DotNetMissionSDK.State.Snapshot
 			for (int i=59; i <= 73; ++i)
 				m_WeaponInfo.Add((map_id)i, new WeaponInfo((map_id)i, playerID));
 
+			for (int i=88; i <= 107; ++i)
+				m_StarshipInfo.Add((map_id)i, new WeaponInfo((map_id)i, playerID));
+
 			this.vehicleInfo = new ReadOnlyDictionary<map_id, VehicleInfo>(m_VehicleInfo);
 			this.structureInfo = new ReadOnlyDictionary<map_id, StructureInfo>(m_StructureInfo);
 			this.weaponInfo = new ReadOnlyDictionary<map_id, WeaponInfo>(m_WeaponInfo);
+			this.starshipInfo = new ReadOnlyDictionary<map_id, UnitInfoState>(m_StarshipInfo);
 
 			// Parse units
 			units = new PlayerUnitState(player.playerID, this.vehicleInfo, this.structureInfo, this.weaponInfo, prevPlayerState?.units);
@@ -347,6 +353,7 @@ namespace DotNetMissionSDK.State.Snapshot
 			m_VehicleInfo.Clear();
 			m_StructureInfo.Clear();
 			m_WeaponInfo.Clear();
+			m_StarshipInfo.Clear();
 
 			vehicleInfo = null;
 			structureInfo = null;
