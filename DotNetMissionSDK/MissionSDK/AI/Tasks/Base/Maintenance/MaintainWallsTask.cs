@@ -50,11 +50,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				{
 					case map_id.GuardPost:
 					case map_id.AdvancedLab:
+					case map_id.Spaceport:
 						needsWall = true;
 						break;
 				}
 
 				if (!needsWall)
+					continue;
+
+				// Structure must be connected, or we will accidentally cut it off
+				if (!stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect()))
 					continue;
 
 				// Get tile for wall
