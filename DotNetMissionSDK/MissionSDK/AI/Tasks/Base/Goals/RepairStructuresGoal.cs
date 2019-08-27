@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
@@ -29,6 +30,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			// Importance increases as damage becomes severe.
 			foreach (StructureState building in owner.units.GetStructures())
 			{
+				// Must not be under construction
+				if (building.lastCommand == CommandType.ctMoDevelop || 
+					building.lastCommand == CommandType.ctMoUnDevelop)
+					continue;
+
 				UnitInfoState info = owner.GetUnitInfo(building.unitType);
 
 				float hpRemaining = 1.0f - (building.damage / (float)info.hitPoints);

@@ -24,6 +24,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
+			int targetCountMet = 0;
+
 			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_StructureToMaintain);
 			if (units.Count >= targetCountToMaintain)
 			{
@@ -35,14 +37,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 					// If any structures that need tubes aren't connected, task is not complete
 					if (BuildStructureTask.NeedsTube(m_StructureToMaintain) && !stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect()))
-						return false;
+						continue;
 
 					// If any structures crippled, task is not complete
-					//if (building.damage / (float)info.hitPoints >= 0.75f)
-					//	return false;
+					if (building.damage / (float)info.hitPoints >= 0.75f)
+						continue;
+
+					++targetCountMet;
 				}
 
-				return true;
+				return targetCountMet >= targetCountToMaintain;
 			}
 			
 			return false;
@@ -71,7 +75,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				}
 			}
 
-			/*foreach (UnitState unit in owner.units.GetListForType(m_StructureToMaintain))
+			foreach (UnitState unit in owner.units.GetListForType(m_StructureToMaintain))
 			{
 				StructureState building = (StructureState)unit;
 
@@ -83,7 +87,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 					needRepairUnit = true;
 					break;
 				}
-			}*/
+			}
 
 			if (needEarthworker && owner.units.earthWorkers.Count > 0)
 				return true;

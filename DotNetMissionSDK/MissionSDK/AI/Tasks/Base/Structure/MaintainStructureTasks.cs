@@ -9,6 +9,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectStructureFactoryTask(ownerID), true);
+			AddPrerequisite(new RepairStructureFactoryTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildStructureFactoryTask(ownerID));
 		}
 	}
@@ -21,6 +22,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectCommonSmelterTask(ownerID), true);
+			AddPrerequisite(new RepairCommonSmelterTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildCommonSmelterTask(ownerID));
 		}
 	}
@@ -33,6 +35,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectAgridomeTask(ownerID), true);
+			AddPrerequisite(new RepairAgridomeTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildAgridomeTask(ownerID));
 		}
 	}
@@ -45,6 +48,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectTokamakTask(ownerID), true);
+			AddPrerequisite(new RepairTokamakTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildTokamakTask(ownerID));
 		}
 	}
@@ -57,6 +61,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectMHDGeneratorTask(ownerID), true);
+			AddPrerequisite(new RepairMHDGeneratorTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildMHDGeneratorTask(ownerID));
 		}
 	}
@@ -69,6 +74,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectSolarArrayTask(ownerID), true);
+			AddPrerequisite(new RepairSolarArrayTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildSolarArrayTask(ownerID));
 		}
 	}
@@ -81,6 +87,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectNurseryTask(ownerID), true);
+			AddPrerequisite(new RepairNurseryTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildNurseryTask(ownerID));
 		}
 	}
@@ -93,6 +100,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectUniversityTask(ownerID), true);
+			AddPrerequisite(new RepairUniversityTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildUniversityTask(ownerID));
 		}
 	}
@@ -105,6 +113,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectResidenceTask(ownerID), true);
+			AddPrerequisite(new RepairResidenceTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildResidenceTask(ownerID));
 		}
 	}
@@ -117,6 +126,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectReinforcedResidenceTask(ownerID), true);
+			AddPrerequisite(new RepairReinforcedResidenceTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildReinforcedResidenceTask(ownerID));
 		}
 	}
@@ -129,6 +139,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectAdvancedResidenceTask(ownerID), true);
+			AddPrerequisite(new RepairAdvancedResidenceTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildAdvancedResidenceTask(ownerID));
 		}
 	}
@@ -141,6 +152,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectMedicalCenterTask(ownerID), true);
+			AddPrerequisite(new RepairMedicalCenterTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildMedicalCenterTask(ownerID));
 		}
 	}
@@ -153,6 +165,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectDIRTTask(ownerID), true);
+			AddPrerequisite(new RepairDIRTTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildDIRTTask(ownerID));
 		}
 	}
@@ -165,6 +178,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectRecreationTask(ownerID), true);
+			AddPrerequisite(new RepairRecreationTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildRecreationTask(ownerID));
 		}
 	}
@@ -177,6 +191,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectForumTask(ownerID), true);
+			AddPrerequisite(new RepairForumTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildForumTask(ownerID));
 		}
 	}
@@ -189,6 +204,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectGORFTask(ownerID), true);
+			AddPrerequisite(new RepairGORFTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildGORFTask(ownerID));
 		}
 	}
@@ -201,6 +217,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectVehicleFactoryTask(ownerID), true);
+			AddPrerequisite(new RepairVehicleFactoryTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildVehicleFactoryTask(ownerID));
 		}
 	}
@@ -213,6 +230,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectArachnidFactoryTask(ownerID), true);
+			AddPrerequisite(new RepairArachnidFactoryTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildArachnidFactoryTask(ownerID));
 		}
 	}
@@ -225,6 +243,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectStandardLabTask(ownerID), true);
+			AddPrerequisite(new RepairStandardLabTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildStandardLabTask(ownerID));
 		}
 	}
@@ -237,6 +256,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectAdvancedLabTask(ownerID), true);
+			AddPrerequisite(new RepairAdvancedLabTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildAdvancedLabTask(ownerID));
 		}
 	}
@@ -249,6 +269,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectRobotCommandTask(ownerID), true);
+			AddPrerequisite(new RepairRobotCommandTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildRobotCommandTask(ownerID));
 		}
 	}
@@ -261,6 +282,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectSpaceportTask(ownerID), true);
+			AddPrerequisite(new RepairSpaceportTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildSpaceportTask(ownerID));
 		}
 	}
@@ -273,6 +295,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectObservatoryTask(ownerID), true);
+			AddPrerequisite(new RepairObservatoryTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildObservatoryTask(ownerID));
 		}
 	}
@@ -285,6 +308,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectMeteorDefenseTask(ownerID), true);
+			AddPrerequisite(new RepairMeteorDefenseTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildMeteorDefenseTask(ownerID));
 		}
 	}
@@ -299,6 +323,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(connectTask = new ConnectGuardPostTask(ownerID), true);
+			AddPrerequisite(new RepairGuardPostTask(ownerID), true);
 			AddPrerequisite(buildTask = new BuildGuardPostTask(ownerID));
 
 			guardKitTask = (BuildGuardPostTask)buildTask;

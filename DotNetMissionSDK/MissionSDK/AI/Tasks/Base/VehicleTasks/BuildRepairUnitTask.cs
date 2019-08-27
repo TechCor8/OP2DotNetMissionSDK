@@ -40,7 +40,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 				m_BuildVehicleTask = m_BuildSpiderTask;
 			}
 
-			m_BuildVehicleTask.targetCountToBuild = targetCountToBuild;
+			SetTargetCountToBuild(targetCountToBuild);
 
 			// Check if task is complete
 			if (m_BuildVehicleTask.IsTaskComplete(stateSnapshot))
@@ -56,7 +56,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			// ...Otherwise, use convecs
 			repairUnitType = map_id.ConVec;
 			m_BuildVehicleTask = m_BuildConvecTask;
-			m_BuildVehicleTask.targetCountToBuild = targetCountToBuild;
+			SetTargetCountToBuild(targetCountToBuild);
 
 			// Check if there are enough convecs
 			return m_BuildVehicleTask.IsTaskComplete(stateSnapshot);
@@ -68,15 +68,20 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			m_BuildVehicleTask = m_BuildConvecTask;
 		}
 
+		private void SetTargetCountToBuild(int targetCount)
+		{
+			m_BuildRepairVehicleTask.targetCountToBuild = 0;
+			m_BuildSpiderTask.targetCountToBuild = 0;
+			m_BuildConvecTask.targetCountToBuild = 0;
+
+			m_BuildVehicleTask.targetCountToBuild = targetCount;
+		}
+
 		public override void GeneratePrerequisites()
 		{
-			m_BuildRepairVehicleTask = new BuildRepairVehicleTask(ownerID);
-			m_BuildSpiderTask = new BuildSpiderTask(ownerID);
-			m_BuildConvecTask = new BuildConvecTask(ownerID);
-
-			m_BuildRepairVehicleTask.GeneratePrerequisites();
-			m_BuildSpiderTask.GeneratePrerequisites();
-			m_BuildConvecTask.GeneratePrerequisites();
+			AddPrerequisite(m_BuildRepairVehicleTask = new BuildRepairVehicleTask(ownerID));
+			AddPrerequisite(m_BuildSpiderTask = new BuildSpiderTask(ownerID));
+			AddPrerequisite(m_BuildConvecTask = new BuildConvecTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
