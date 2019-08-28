@@ -293,6 +293,19 @@ namespace DotNetMissionSDK.AI.Managers
 			foreach (UniversityState university in owner.units.universities)
 				m_AvailableWorkers -= university.workersInTraining;
 
+			// Since we cannot remove workers from busy structures, substract from available labor pool.
+			foreach (UnitState unit in owner.units.GetStructures())
+			{
+				if (!unit.isBusy)
+					continue;
+
+				StructureState structure = (StructureState)unit;
+				StructureInfo info = owner.structureInfo[unit.unitType];
+
+				if (structure.hasWorkers) m_AvailableWorkers -= info.workersRequired;
+				if (structure.hasScientists) m_AvailableScientists -= info.scientistsRequired;
+			}
+
 			List<Action> idleActions = new List<Action>();
 			List<Action> enableActions = new List<Action>();
 

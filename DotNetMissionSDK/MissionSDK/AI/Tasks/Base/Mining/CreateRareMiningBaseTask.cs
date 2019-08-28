@@ -71,8 +71,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_CreateMineTask = new CreateRareMineTask(ownerID, m_MiningBaseState), true);
-			AddPrerequisite(new BuildCommandCenterKitTask(ownerID));
+			AddPrerequisite(m_CreateMineTask = new CreateRareMineTask(ownerID, m_MiningBaseState));
+			AddPrerequisite(new BuildCommandCenterKitTask(ownerID), true);
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

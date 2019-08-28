@@ -49,8 +49,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_SaturateMineTask = new SaturateRareMineTask(ownerID, m_MiningBaseState), true);
-			AddPrerequisite(new BuildSurveyorTask(ownerID));
+			AddPrerequisite(m_SaturateMineTask = new SaturateRareMineTask(ownerID, m_MiningBaseState));
+			AddPrerequisite(new BuildSurveyorTask(ownerID), true);
 			AddPrerequisite(new BuildMinerTask(ownerID));
 		}
 

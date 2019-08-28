@@ -8,9 +8,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectStructureFactoryTask(ownerID), true);
-			AddPrerequisite(new RepairStructureFactoryTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildStructureFactoryTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectStructureFactoryTask(ownerID));
+			AddPrerequisite(new RepairStructureFactoryTask(ownerID));
+			AddPrerequisite(buildTask = new BuildStructureFactoryTask(ownerID), true);
 		}
 	}
 
@@ -21,9 +21,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectCommonSmelterTask(ownerID), true);
-			AddPrerequisite(new RepairCommonSmelterTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildCommonSmelterTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectCommonSmelterTask(ownerID));
+			AddPrerequisite(new RepairCommonSmelterTask(ownerID));
+			AddPrerequisite(buildTask = new BuildCommonSmelterTask(ownerID), true);
 		}
 	}
 
@@ -34,9 +34,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectAgridomeTask(ownerID), true);
-			AddPrerequisite(new RepairAgridomeTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildAgridomeTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectAgridomeTask(ownerID));
+			AddPrerequisite(new RepairAgridomeTask(ownerID));
+			AddPrerequisite(buildTask = new BuildAgridomeTask(ownerID), true);
 		}
 	}
 
@@ -47,9 +47,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectTokamakTask(ownerID), true);
-			AddPrerequisite(new RepairTokamakTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildTokamakTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectTokamakTask(ownerID));
+			AddPrerequisite(new RepairTokamakTask(ownerID));
+			AddPrerequisite(buildTask = new BuildTokamakTask(ownerID), true);
 		}
 	}
 
@@ -60,9 +60,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectMHDGeneratorTask(ownerID), true);
-			AddPrerequisite(new RepairMHDGeneratorTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildMHDGeneratorTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectMHDGeneratorTask(ownerID));
+			AddPrerequisite(new RepairMHDGeneratorTask(ownerID));
+			AddPrerequisite(buildTask = new BuildMHDGeneratorTask(ownerID), true);
 		}
 	}
 
@@ -73,9 +73,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectSolarArrayTask(ownerID), true);
-			AddPrerequisite(new RepairSolarArrayTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildSolarArrayTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectSolarArrayTask(ownerID));
+			AddPrerequisite(new RepairSolarArrayTask(ownerID));
+			AddPrerequisite(buildTask = new BuildSolarArrayTask(ownerID), true);
 		}
 	}
 
@@ -86,9 +86,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectNurseryTask(ownerID), true);
-			AddPrerequisite(new RepairNurseryTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildNurseryTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectNurseryTask(ownerID));
+			AddPrerequisite(new RepairNurseryTask(ownerID));
+			AddPrerequisite(buildTask = new BuildNurseryTask(ownerID), true);
 		}
 	}
 
@@ -99,9 +99,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectUniversityTask(ownerID), true);
-			AddPrerequisite(new RepairUniversityTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildUniversityTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectUniversityTask(ownerID));
+			AddPrerequisite(new RepairUniversityTask(ownerID));
+			AddPrerequisite(buildTask = new BuildUniversityTask(ownerID), true);
 		}
 	}
 
@@ -112,9 +112,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectResidenceTask(ownerID), true);
-			AddPrerequisite(new RepairResidenceTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildResidenceTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectResidenceTask(ownerID));
+			AddPrerequisite(new RepairResidenceTask(ownerID));
+			AddPrerequisite(buildTask = new BuildResidenceTask(ownerID), true);
 		}
 	}
 
@@ -125,9 +125,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectReinforcedResidenceTask(ownerID), true);
-			AddPrerequisite(new RepairReinforcedResidenceTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildReinforcedResidenceTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectReinforcedResidenceTask(ownerID));
+			AddPrerequisite(new RepairReinforcedResidenceTask(ownerID));
+			AddPrerequisite(buildTask = new BuildReinforcedResidenceTask(ownerID), true);
 		}
 	}
 
@@ -138,9 +138,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectAdvancedResidenceTask(ownerID), true);
-			AddPrerequisite(new RepairAdvancedResidenceTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildAdvancedResidenceTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectAdvancedResidenceTask(ownerID));
+			AddPrerequisite(new RepairAdvancedResidenceTask(ownerID));
+			AddPrerequisite(buildTask = new BuildAdvancedResidenceTask(ownerID), true);
 		}
 	}
 
@@ -151,9 +151,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectMedicalCenterTask(ownerID), true);
-			AddPrerequisite(new RepairMedicalCenterTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildMedicalCenterTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectMedicalCenterTask(ownerID));
+			AddPrerequisite(new RepairMedicalCenterTask(ownerID));
+			AddPrerequisite(buildTask = new BuildMedicalCenterTask(ownerID), true);
 		}
 	}
 
@@ -164,9 +164,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectDIRTTask(ownerID), true);
-			AddPrerequisite(new RepairDIRTTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildDIRTTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectDIRTTask(ownerID));
+			AddPrerequisite(new RepairDIRTTask(ownerID));
+			AddPrerequisite(buildTask = new BuildDIRTTask(ownerID), true);
 		}
 	}
 
@@ -177,9 +177,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectRecreationTask(ownerID), true);
-			AddPrerequisite(new RepairRecreationTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildRecreationTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectRecreationTask(ownerID));
+			AddPrerequisite(new RepairRecreationTask(ownerID));
+			AddPrerequisite(buildTask = new BuildRecreationTask(ownerID), true);
 		}
 	}
 
@@ -190,9 +190,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectForumTask(ownerID), true);
-			AddPrerequisite(new RepairForumTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildForumTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectForumTask(ownerID));
+			AddPrerequisite(new RepairForumTask(ownerID));
+			AddPrerequisite(buildTask = new BuildForumTask(ownerID), true);
 		}
 	}
 
@@ -203,9 +203,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectGORFTask(ownerID), true);
-			AddPrerequisite(new RepairGORFTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildGORFTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectGORFTask(ownerID));
+			AddPrerequisite(new RepairGORFTask(ownerID));
+			AddPrerequisite(buildTask = new BuildGORFTask(ownerID), true);
 		}
 	}
 
@@ -216,9 +216,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectVehicleFactoryTask(ownerID), true);
-			AddPrerequisite(new RepairVehicleFactoryTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildVehicleFactoryTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectVehicleFactoryTask(ownerID));
+			AddPrerequisite(new RepairVehicleFactoryTask(ownerID));
+			AddPrerequisite(buildTask = new BuildVehicleFactoryTask(ownerID), true);
 		}
 	}
 
@@ -229,9 +229,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectArachnidFactoryTask(ownerID), true);
-			AddPrerequisite(new RepairArachnidFactoryTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildArachnidFactoryTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectArachnidFactoryTask(ownerID));
+			AddPrerequisite(new RepairArachnidFactoryTask(ownerID));
+			AddPrerequisite(buildTask = new BuildArachnidFactoryTask(ownerID), true);
 		}
 	}
 
@@ -242,9 +242,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectStandardLabTask(ownerID), true);
-			AddPrerequisite(new RepairStandardLabTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildStandardLabTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectStandardLabTask(ownerID));
+			AddPrerequisite(new RepairStandardLabTask(ownerID));
+			AddPrerequisite(buildTask = new BuildStandardLabTask(ownerID), true);
 		}
 	}
 
@@ -255,9 +255,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectAdvancedLabTask(ownerID), true);
-			AddPrerequisite(new RepairAdvancedLabTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildAdvancedLabTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectAdvancedLabTask(ownerID));
+			AddPrerequisite(new RepairAdvancedLabTask(ownerID));
+			AddPrerequisite(buildTask = new BuildAdvancedLabTask(ownerID), true);
 		}
 	}
 
@@ -268,9 +268,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectRobotCommandTask(ownerID), true);
-			AddPrerequisite(new RepairRobotCommandTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildRobotCommandTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectRobotCommandTask(ownerID));
+			AddPrerequisite(new RepairRobotCommandTask(ownerID));
+			AddPrerequisite(buildTask = new BuildRobotCommandTask(ownerID), true);
 		}
 	}
 
@@ -281,9 +281,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectSpaceportTask(ownerID), true);
-			AddPrerequisite(new RepairSpaceportTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildSpaceportTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectSpaceportTask(ownerID));
+			AddPrerequisite(new RepairSpaceportTask(ownerID));
+			AddPrerequisite(buildTask = new BuildSpaceportTask(ownerID), true);
 		}
 	}
 
@@ -294,9 +294,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectObservatoryTask(ownerID), true);
-			AddPrerequisite(new RepairObservatoryTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildObservatoryTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectObservatoryTask(ownerID));
+			AddPrerequisite(new RepairObservatoryTask(ownerID));
+			AddPrerequisite(buildTask = new BuildObservatoryTask(ownerID), true);
 		}
 	}
 
@@ -307,9 +307,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectMeteorDefenseTask(ownerID), true);
-			AddPrerequisite(new RepairMeteorDefenseTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildMeteorDefenseTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectMeteorDefenseTask(ownerID));
+			AddPrerequisite(new RepairMeteorDefenseTask(ownerID));
+			AddPrerequisite(buildTask = new BuildMeteorDefenseTask(ownerID), true);
 		}
 	}
 
@@ -322,9 +322,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(connectTask = new ConnectGuardPostTask(ownerID), true);
-			AddPrerequisite(new RepairGuardPostTask(ownerID), true);
-			AddPrerequisite(buildTask = new BuildGuardPostTask(ownerID));
+			AddPrerequisite(connectTask = new ConnectGuardPostTask(ownerID));
+			AddPrerequisite(new RepairGuardPostTask(ownerID));
+			AddPrerequisite(buildTask = new BuildGuardPostTask(ownerID), true);
 
 			guardKitTask = (BuildGuardPostTask)buildTask;
 

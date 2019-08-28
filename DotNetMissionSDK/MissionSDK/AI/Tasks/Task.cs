@@ -8,7 +8,7 @@ namespace DotNetMissionSDK.AI.Tasks
 	{
 		private Task m_Parent;
 		private List<Task> m_Prerequisites = new List<Task>();
-		private bool blockSiblingPrerequisites;
+		private bool waitForSiblingPrerequisites;
 		
 		protected int ownerID		{ get; private set; }
 
@@ -103,15 +103,15 @@ namespace DotNetMissionSDK.AI.Tasks
 				if (m_Prerequisites[i].IsTaskComplete(stateSnapshot))
 					continue;
 
+				// If task has been set to wait for siblings, skip remaining prerequisites.
+				if (m_Prerequisites[i].waitForSiblingPrerequisites && !prerequisitesComplete)
+					break;
+
 				prerequisitesComplete = false;
 
 				// Perform the task. Fail out if it can't be done.
 				if (!m_Prerequisites[i].PerformTaskTree(stateSnapshot, unitActions))
 					return false;
-
-				// If task has been set to block, skip remaining prerequisites.
-				if (m_Prerequisites[i].blockSiblingPrerequisites)
-					break;
 			}
 
 			return true;
@@ -124,12 +124,12 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// </para>
 		/// </summary>
 		/// <param name="prerequisite">The task to add as a prerequisite to this task. Should always be new().</param>
-		/// <param name="blockSiblingPrerequisites">If true, this task will prevent subsequently added Prerequisites from running in parallel.</param>
-		protected void AddPrerequisite(Task prerequisite, bool blockSiblingPrerequisites=false)
+		/// <param name="waitForSiblingPrerequisites">If true, this task will wait for previously added prerequisites to complete before executing.</param>
+		protected void AddPrerequisite(Task prerequisite, bool waitForSiblingPrerequisites=false)
 		{
 			prerequisite.m_Parent = this;
 			prerequisite.ownerID = ownerID;
-			prerequisite.blockSiblingPrerequisites = blockSiblingPrerequisites;
+			prerequisite.waitForSiblingPrerequisites = waitForSiblingPrerequisites;
 
 			if (prerequisite.IsAncestorTask(prerequisite))
 				return;

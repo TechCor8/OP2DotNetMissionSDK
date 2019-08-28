@@ -10,6 +10,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 	{
 		private List<MaintainStructureTask> m_Prerequisites = new List<MaintainStructureTask>();
 
+		private MaintainAgridomeTask m_BuildAgridomeTask;
 		private MaintainResidenceTask m_BuildResidenceTask;
 		private MaintainAdvancedResidenceTask m_BuildEdenResidenceTask;
 		private MaintainReinforcedResidenceTask m_BuildPlymouthResidenceTask;
@@ -36,6 +37,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 			m_Prerequisites.Add(new MaintainNurseryTask(ownerID));
 			m_Prerequisites.Add(new MaintainUniversityTask(ownerID));
+			m_Prerequisites.Add(m_BuildAgridomeTask = new MaintainAgridomeTask(ownerID));
 			m_Prerequisites.Add(m_BuildResidenceTask = new MaintainResidenceTask(ownerID));
 			m_Prerequisites.Add(m_BuildEdenResidenceTask = new MaintainAdvancedResidenceTask(ownerID));
 			m_Prerequisites.Add(m_BuildPlymouthResidenceTask = new MaintainReinforcedResidenceTask(ownerID));
@@ -46,6 +48,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_Prerequisites.Add(m_BuildDirtTask = new MaintainDIRTTask(ownerID));
 			m_Prerequisites.Add(new MaintainGORFTask(ownerID));
 
+			m_BuildAgridomeTask.targetCountToMaintain = 0;
 			m_BuildResidenceTask.targetCountToMaintain = 0;
 			m_BuildEdenResidenceTask.targetCountToMaintain = 0;
 			m_BuildPlymouthResidenceTask.targetCountToMaintain = 0;
@@ -67,14 +70,34 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
+			BuildAgridome(stateSnapshot, owner);
 			BuildResidence(stateSnapshot, owner);
 			BuildMedicalCenter(owner);
 			BuildRecreation(stateSnapshot, owner);
 			BuildDIRT(stateSnapshot, owner);
 		}
 
+		private void BuildAgridome(StateSnapshot stateSnapshot, PlayerState owner)
+		{
+			if (owner.foodSupply == FoodStatus.Rising)
+				return;
+
+			// Don't build more agridomes if we aren't using all the ones we have
+			foreach (StructureState agridome in owner.units.agridomes)
+			{
+				if (!agridome.isEnabled)
+					return;
+			}
+
+			// Keep building one more agridome until task complete
+			m_BuildAgridomeTask.targetCountToMaintain = owner.units.agridomes.Count+1;
+		}
+
 		private void BuildResidence(StateSnapshot stateSnapshot, PlayerState owner)
 		{
+			if (owner.totalResidenceCapacity >= owner.totalPopulation)
+				return;
+
 			// Don't build more residences if we aren't using all the ones we have
 			List<StructureState> residences = new List<StructureState>(owner.units.residences);
 			residences.AddRange(owner.units.advancedResidences);
@@ -85,9 +108,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (!residence.isEnabled)
 					return;
 			}
-
-			if (owner.totalResidenceCapacity >= owner.totalPopulation)
-				return;
 
 			// Determine residence type to build
 			map_id residenceTypeToBuild = map_id.Residence;
@@ -113,6 +133,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		private void BuildMedicalCenter(PlayerState owner)
 		{
+			if (owner.totalMedCenterCapacity >= owner.totalPopulation)
+				return;
+
 			// Don't build more medical centers if we aren't using all the ones we have
 			foreach (StructureState medicalCenter in owner.units.medicalCenters)
 			{
@@ -120,12 +143,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					return;
 			}
 
-			if (owner.totalMedCenterCapacity < owner.totalPopulation)
-				m_BuildMedicalCenterTask.targetCountToMaintain = owner.units.medicalCenters.Count+1;
+			m_BuildMedicalCenterTask.targetCountToMaintain = owner.units.medicalCenters.Count+1;
 		}
 
 		private void BuildRecreation(StateSnapshot stateSnapshot, PlayerState owner)
 		{
+			if (owner.totalRecreationFacilityCapacity + owner.totalForumCapacity >= owner.totalPopulation)
+				return;
+
 			// Don't build more recreation facilities if we aren't using all the ones we have
 			List<StructureState> recreations = new List<StructureState>(owner.units.recreationFacilities);
 			recreations.AddRange(owner.units.forums);
@@ -135,9 +160,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (!recreation.isEnabled)
 					return;
 			}
-
-			if (owner.totalRecreationFacilityCapacity + owner.totalForumCapacity >= owner.totalPopulation)
-				return;
 
 			// Determine recreation type to build
 			map_id recreationTypeToBuild = map_id.RecreationFacility;

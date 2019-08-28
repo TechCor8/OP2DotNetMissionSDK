@@ -43,8 +43,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new SaturateRareSmelterTask(ownerID, m_MiningBaseState), true);
-			AddPrerequisite(new BuildRareSmelterKitTask(ownerID));
+			AddPrerequisite(new SaturateRareSmelterTask(ownerID, m_MiningBaseState));
+			AddPrerequisite(new BuildRareSmelterKitTask(ownerID), true);
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
