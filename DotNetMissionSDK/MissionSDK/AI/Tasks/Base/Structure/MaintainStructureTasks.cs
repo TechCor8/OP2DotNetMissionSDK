@@ -1,6 +1,18 @@
 ﻿
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
+	public sealed class MaintainCommandCenterTask : MaintainStructureTask
+	{
+		public MaintainCommandCenterTask(int ownerID) : base(ownerID)			{ m_StructureToMaintain = map_id.CommandCenter;					}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+			AddPrerequisite(new RepairCommandCenterTask(ownerID));
+			AddPrerequisite(buildTask = new BuildCommandCenterTask(ownerID), true);
+		}
+	}
+
 	public sealed class MaintainStructureFactoryTask : MaintainStructureTask
 	{
 		public MaintainStructureFactoryTask(int ownerID) : base(ownerID)		{ m_StructureToMaintain = map_id.StructureFactory;				}
@@ -24,6 +36,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			AddPrerequisite(connectTask = new ConnectCommonSmelterTask(ownerID));
 			AddPrerequisite(new RepairCommonSmelterTask(ownerID));
 			AddPrerequisite(buildTask = new BuildCommonSmelterTask(ownerID), true);
+		}
+	}
+
+	public sealed class MaintainRareSmelterTask : MaintainStructureTask
+	{
+		public MaintainRareSmelterTask(int ownerID) : base(ownerID)				{ m_StructureToMaintain = map_id.RareOreSmelter;				}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+			AddPrerequisite(connectTask = new ConnectRareSmelterTask(ownerID));
+			AddPrerequisite(new RepairRareSmelterTask(ownerID));
+			AddPrerequisite(buildTask = new BuildRareSmelterTask(ownerID), true);
 		}
 	}
 

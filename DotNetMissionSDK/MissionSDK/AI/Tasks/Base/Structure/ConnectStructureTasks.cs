@@ -11,6 +11,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public ConnectCommonSmelterTask(int ownerID) : base(ownerID)		{ m_StructureToConnect = map_id.CommonOreSmelter;				}
 	}
 
+	public sealed class ConnectRareSmelterTask : ConnectStructureTask
+	{
+		public ConnectRareSmelterTask(int ownerID) : base(ownerID)			{ m_StructureToConnect = map_id.RareOreSmelter;					}
+	}
+
 	public sealed class ConnectAgridomeTask : ConnectStructureTask
 	{
 		public ConnectAgridomeTask(int ownerID) : base(ownerID)				{ m_StructureToConnect = map_id.Agridome;						}

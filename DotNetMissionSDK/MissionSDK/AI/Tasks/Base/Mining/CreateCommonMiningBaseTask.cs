@@ -22,6 +22,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		private MiningBaseState m_MiningBaseState;
 
 		private CreateCommonMineTask m_CreateMineTask;
+		private MaintainCommandCenterTask m_MaintainCCTask;
 
 
 		public CreateCommonMiningBaseTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)	{ m_MiningBaseState = miningBaseState; }
@@ -32,6 +33,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			// Task is not complete until every CC beacon has been occupied and saturated
 			if (!m_CreateMineTask.IsTaskComplete(stateSnapshot))
 				return false;
+
+			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Task is complete if there are no beacons outside of a command center's control area
 			foreach (MiningBeaconState beacon in stateSnapshot.gaia.miningBeacons)
@@ -54,6 +57,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				if (isOccupied)
 					continue;
 
+				// Build more mining bases
+				m_MaintainCCTask.targetCountToMaintain = owner.units.commandCenters.Count + 1;
+				SetBaseLocation(stateSnapshot);
+
 				return false;
 			}
 
@@ -63,10 +70,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(m_CreateMineTask = new CreateCommonMineTask(ownerID, m_MiningBaseState));
-			AddPrerequisite(new BuildCommandCenterKitTask(ownerID), true);
+			AddPrerequisite(m_MaintainCCTask = new MaintainCommandCenterTask(ownerID), true);
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		{
+			return true;
+		}
+
+		private bool SetBaseLocation(StateSnapshot stateSnapshot)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -78,32 +90,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			// Find unoccupied common beacon
 			MiningBeaconState unoccupiedBeacon = GetClosestUnusedBeacon(stateSnapshot, convec.position);
 			if (unoccupiedBeacon != null)
-			{
-				LOCATION beaconPosition = unoccupiedBeacon.position;
-
-				// Move all non-military units if there is no command center. This new site will be the main base.
-				if (owner.units.commandCenters.Count == 0)
-				{
-					foreach (VehicleState unit in owner.units.GetVehicles())
-					{
-						map_id unitType = unit.unitType;
-
-						// No military units. That is left up to the combat manager
-						if (unitType == map_id.Lynx || unitType == map_id.Panther || unitType == map_id.Tiger ||
-							unitType == map_id.Scorpion || unitType == map_id.Spider)
-							continue;
-
-						unitActions.AddUnitCommand(unit.unitID, 0, () => GameState.GetUnit(unit.unitID)?.DoMove(beaconPosition.x+AsyncRandom.Range(1,7), beaconPosition.y+AsyncRandom.Range(2,8)));
-					}
-				}
-
-				return DeployCC(stateSnapshot, unitActions, convec, beaconPosition);
-			}
+				return DeployCC(stateSnapshot, convec, unoccupiedBeacon.position);
 
 			return true;
 		}
 
-		private bool DeployCC(StateSnapshot stateSnapshot, BotCommands unitActions,  ConvecState convec, LOCATION targetPosition)
+		private bool DeployCC(StateSnapshot stateSnapshot,  ConvecState convec, LOCATION targetPosition)
 		{
 			// Callback for determining if tile is a valid place point
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
@@ -132,11 +124,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			if (!Pathfinder.GetClosestValidTile(targetPosition, (x,y) => BuildStructureTask.GetTileCost(stateSnapshot, x,y), validTileCB, out foundPt))
 				return false;
 
-			// Clear units out of deploy area
-			BuildStructureTask.ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
-
 			// Build structure
-			unitActions.AddUnitCommand(convec.unitID, 1, () => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
+			m_MaintainCCTask.buildTask.SetLocation(foundPt);
 
 			return true;
 		}

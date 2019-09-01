@@ -21,6 +21,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		private MiningBaseState m_MiningBaseState;
 
 		private CreateRareMineTask m_CreateMineTask;
+		private MaintainCommandCenterTask m_MaintainCCTask;
 
 
 		public CreateRareMiningBaseTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)	{ m_MiningBaseState = miningBaseState; }
@@ -63,6 +64,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				if (isOccupied)
 					continue;
 
+				// Build more mining bases
+				m_MaintainCCTask.targetCountToMaintain = owner.units.commandCenters.Count + 1;
+				SetBaseLocation(stateSnapshot);
+
 				return false;
 			}
 
@@ -72,10 +77,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(m_CreateMineTask = new CreateRareMineTask(ownerID, m_MiningBaseState));
-			AddPrerequisite(new BuildCommandCenterKitTask(ownerID), true);
+			AddPrerequisite(m_MaintainCCTask = new MaintainCommandCenterTask(ownerID), true);
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		{
+			return true;
+		}
+
+		private bool SetBaseLocation(StateSnapshot stateSnapshot)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -90,13 +100,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			if (unoccupiedBeacon != null)
 			{
 				LOCATION beaconPosition = unoccupiedBeacon.position;
-				return DeployCC(stateSnapshot, unitActions, convec, beaconPosition);
+				return DeployCC(stateSnapshot, convec, beaconPosition);
 			}
 			
 			return true;
 		}
 
-		private bool DeployCC(StateSnapshot stateSnapshot, BotCommands unitActions, ConvecState convec, LOCATION targetPosition)
+		private bool DeployCC(StateSnapshot stateSnapshot, ConvecState convec, LOCATION targetPosition)
 		{
 			// Callback for determining if tile is a valid place point
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
@@ -125,11 +135,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			if (!Pathfinder.GetClosestValidTile(targetPosition, (x,y) => BuildStructureTask.GetTileCost(stateSnapshot, x,y), validTileCB, out foundPt))
 				return false;
 			
-			// Clear units out of deploy area
-			BuildStructureTask.ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
-			
 			// Build structure
-			unitActions.AddUnitCommand(convec.unitID, 1, () => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
+			m_MaintainCCTask.buildTask.SetLocation(foundPt);
 			
 			return true;
 		}

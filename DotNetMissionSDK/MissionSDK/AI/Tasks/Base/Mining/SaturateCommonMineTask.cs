@@ -17,6 +17,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 	{
 		private MiningBaseState m_MiningBaseState;
 
+		private MaintainCommonSmelterTask m_MaintainSmelterTask;
+
 		
 		public SaturateCommonMineTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)	{ m_MiningBaseState = miningBaseState; }
 
@@ -34,7 +36,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 					if (site.mine == null) continue;
 
 					if (site.smelters.Count < MiningBaseState.SmelterSaturationCount)
+					{
+						// Build more mining bases
+						m_MaintainSmelterTask.targetCountToMaintain = owner.units.commonOreSmelters.Count + 1;
+						SetSmelterLocation(stateSnapshot);
+
 						return false;
+					}
 				}
 			}
 
@@ -44,10 +52,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new SaturateCommonSmelterTask(ownerID, m_MiningBaseState));
-			AddPrerequisite(new BuildCommonSmelterKitTask(ownerID), true);
+			AddPrerequisite(m_MaintainSmelterTask = new MaintainCommonSmelterTask(ownerID), true);
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		{
+			return true;
+		}
+
+		private bool SetSmelterLocation(StateSnapshot stateSnapshot)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -82,13 +95,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			if (closestMineSite == null)
 				return true;
 
-			if (!DeploySmelter(stateSnapshot, unitActions, convec, closestMiningBase.commandCenter.position, closestMineSite.mine.position))
+			if (!DeploySmelter(stateSnapshot, convec, closestMiningBase.commandCenter.position, closestMineSite.mine.position))
 				return true;
 
 			return true;
 		}
 
-		private bool DeploySmelter(StateSnapshot stateSnapshot, BotCommands unitActions, ConvecState convec, LOCATION commandCenterPosition, LOCATION minePosition)
+		private bool DeploySmelter(StateSnapshot stateSnapshot, ConvecState convec, LOCATION commandCenterPosition, LOCATION minePosition)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -136,11 +149,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			if (!Pathfinder.GetClosestValidTile(minePosition, getTileCostCB, validTileCB, out foundPt))
 				return false;
 
-			// Clear units out of deploy area
-			BuildStructureTask.ClearDeployArea(convec, convec.cargoType, foundPt, stateSnapshot, ownerID, unitActions);
-
 			// Build structure
-			unitActions.AddUnitCommand(convec.unitID, 1, () => GameState.GetUnit(convec.unitID)?.DoBuild(convec.cargoType, foundPt.x, foundPt.y));
+			m_MaintainSmelterTask.buildTask.SetLocation(foundPt);
 
 			return true;
 		}

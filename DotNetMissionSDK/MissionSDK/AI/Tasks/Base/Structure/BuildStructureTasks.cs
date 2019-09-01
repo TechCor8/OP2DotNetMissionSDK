@@ -1,7 +1,50 @@
-﻿using DotNetMissionSDK.State;
+﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.State;
+using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
+	public sealed class BuildCommandCenterTask : BuildStructureTask
+	{
+		public BuildCommandCenterTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.CommandCenter;							}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+			AddPrerequisite(new BuildCommandCenterKitTask(ownerID));
+		}
+
+		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			// Move all non-military units if there is no command center. This new site will be the main base.
+			if (owner.units.commandCenters.Count == 0)
+			{
+				ConvecState convec = owner.units.convecs.FirstOrDefault((ConvecState convec1) => convec1.cargoType == map_id.CommandCenter);
+
+				foreach (VehicleState unit in owner.units.GetVehicles())
+				{
+					if (unit.unitID == convec.unitID)
+						continue;
+
+					map_id unitType = unit.unitType;
+
+					// No military units. That is left up to the combat manager
+					if (unitType == map_id.Lynx || unitType == map_id.Panther || unitType == map_id.Tiger ||
+						unitType == map_id.Scorpion || unitType == map_id.Spider)
+						continue;
+
+					unitActions.AddUnitCommand(unit.unitID, 0, () => GameState.GetUnit(unit.unitID)?.DoMove(convec.position.x+AsyncRandom.Range(1,7), convec.position.y+AsyncRandom.Range(2,8)));
+				}
+			}
+
+			return base.PerformTask(stateSnapshot, unitActions);
+		}
+	}
+
 	public sealed class BuildStructureFactoryTask : BuildStructureTask
 	{
 		public BuildStructureFactoryTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.StructureFactory;						}
@@ -21,6 +64,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			base.GeneratePrerequisites();
 			AddPrerequisite(new BuildCommonSmelterKitTask(ownerID));
+		}
+	}
+
+	public sealed class BuildRareSmelterTask : BuildStructureTask
+	{
+		public BuildRareSmelterTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.RareOreSmelter;							}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+			AddPrerequisite(new BuildRareSmelterKitTask(ownerID));
 		}
 	}
 
