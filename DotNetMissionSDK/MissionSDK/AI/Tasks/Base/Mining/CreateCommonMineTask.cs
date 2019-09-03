@@ -5,8 +5,6 @@ using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Mining
@@ -19,18 +17,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 	{
 		private MiningBaseState m_MiningBaseState;
 
-		private SaturateCommonMineTask m_SaturateMineTask;
-
 
 		public CreateCommonMineTask(int ownerID, MiningBaseState miningBaseState) : base(ownerID)		{ m_MiningBaseState = miningBaseState; }
 
 
 		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			// Task is not complete until every CC beacon has been occupied and saturated
-			if (!m_SaturateMineTask.IsTaskComplete(stateSnapshot))
-				return false;
-
 			// Task is complete if all controlled beacons have mines
 			foreach (MiningBase miningBase in m_MiningBaseState.miningBases)
 			{
@@ -49,8 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_SaturateMineTask = new SaturateCommonMineTask(ownerID, m_MiningBaseState));
-			AddPrerequisite(new BuildSurveyorTask(ownerID), true);
+			AddPrerequisite(new BuildSurveyorTask(ownerID));
 			AddPrerequisite(new BuildMinerTask(ownerID));
 		}
 

@@ -63,13 +63,25 @@ namespace DotNetMissionSDK.AI.Managers
 
 			m_IsProcessing = true;
 
+			// Get data that requires main thread
+			ReadOnlyCollection<int> structureLaborOrderByID = botPlayer.baseManager.GetStructureLaborOrderByID();
+
 			stateSnapshot.Retain();
 
 			AsyncPump.Run(() =>
 			{
 				List<Action> buildingActions = new List<Action>();
 
-				UpdatePriorityList(stateSnapshot);
+				// Convert order ID to structure state
+				List<StructureState> priorityStructures = new List<StructureState>(structureLaborOrderByID.Count);
+				foreach (int id in structureLaborOrderByID)
+				{
+					StructureState unit = stateSnapshot.GetUnit(id) as StructureState;
+					if (unit == null) continue;
+					priorityStructures.Add(unit);
+				}
+
+				UpdatePriorityList(stateSnapshot, priorityStructures.ToArray());
 				UpdateActivations(stateSnapshot, buildingActions);
 
 				return buildingActions;
@@ -88,7 +100,7 @@ namespace DotNetMissionSDK.AI.Managers
 			});
 		}
 
-		private void UpdatePriorityList(StateSnapshot stateSnapshot)
+		private void UpdatePriorityList(StateSnapshot stateSnapshot, StructureState[] priorityStructures)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -110,6 +122,9 @@ namespace DotNetMissionSDK.AI.Managers
 
 			// TODO: Detect if buildings connected to CC are active, if not, mark CC as useless. For now, just make them all high priority
 			AddPriorityBuilding(stateSnapshot, owner.units.commandCenters, owner.units.commandCenters.Count);
+
+			// Labor manager chosen structures are very high priority
+			AddPriorityBuilding(stateSnapshot, priorityStructures, int.MaxValue);
 
 			// Primary smelters should always be online
 			AddPriorityBuilding(stateSnapshot, owner.units.commonOreSmelters, 1);
@@ -231,20 +246,30 @@ namespace DotNetMissionSDK.AI.Managers
 			foreach (StructureState building in buildings)
 			{
 				if (!CanBeActivated(stateSnapshot, building))
-					m_CrippledStructures.Add(building);
+					AddPriorityUnique(m_CrippledStructures, building);
 				else
 				{
 					if (needed > 0)
 					{
-						m_StructurePriority.Add(building);
+						AddPriorityUnique(m_StructurePriority, building);
 						--needed;
 					}
 					else if (!markExtrasAsUseless)
-						m_LowPriorityStructures.Add(building);
+						AddPriorityUnique(m_LowPriorityStructures, building);
 					else
-						m_UselessStructures.Add(building);
+						AddPriorityUnique(m_UselessStructures, building);
 				}
 			}
+		}
+
+		private void AddPriorityUnique(List<StructureState> list, StructureState building)
+		{
+			if (m_CrippledStructures.Contains(building)) return;
+			if (m_StructurePriority.Contains(building)) return;
+			if (m_LowPriorityStructures.Contains(building)) return;
+			if (m_UselessStructures.Contains(building)) return;
+
+			list.Add(building);
 		}
 
 		/// <summary>
@@ -304,6 +329,13 @@ namespace DotNetMissionSDK.AI.Managers
 
 				if (structure.hasWorkers) m_AvailableWorkers -= info.workersRequired;
 				if (structure.hasScientists) m_AvailableScientists -= info.scientistsRequired;
+				if (structure.isEnabled)
+				{
+					m_StructurePriority.Remove(structure);
+					m_LowPriorityStructures.Remove(structure);
+					m_UselessStructures.Remove(structure);
+					m_CrippledStructures.Remove(structure);
+				}
 			}
 
 			List<Action> idleActions = new List<Action>();

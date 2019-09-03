@@ -1,4 +1,6 @@
 ﻿using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks
 {
@@ -36,6 +38,16 @@ namespace DotNetMissionSDK.AI.Tasks
 				return m_Task.PerformTaskTree(stateSnapshot, unitActions);
 
 			return true;
+		}
+
+		/// <summary>
+		/// Gets the list of structures to activate.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="structureIDs">The list to add structures to.</param>
+		public void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		{
+			m_Task.GetStructuresToActivate(stateSnapshot, structureIDs);
 		}
 
 		protected float Clamp(float val)

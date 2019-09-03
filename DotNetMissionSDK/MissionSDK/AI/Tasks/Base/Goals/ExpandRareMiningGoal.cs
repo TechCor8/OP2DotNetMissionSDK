@@ -12,7 +12,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 	{
 		public ExpandRareMiningGoal(int ownerID, MiningBaseState miningBaseState, float weight) : base(ownerID, weight)
 		{
-			m_Task = new CreateRareMiningBaseTask(ownerID, miningBaseState);
+			m_Task = new ExpandRareMiningTask(ownerID, miningBaseState);
 			m_Task.GeneratePrerequisites();
 		}
 

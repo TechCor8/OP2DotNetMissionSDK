@@ -13,7 +13,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 	{
 		public ExpandCommonMiningGoal(int ownerID, MiningBaseState miningBaseState, float weight) : base(ownerID, weight)
 		{
-			m_Task = new CreateCommonMiningBaseTask(ownerID, miningBaseState);
+			m_Task = new ExpandCommonMiningTask(ownerID, miningBaseState);
 			m_Task.GeneratePrerequisites();
 		}
 

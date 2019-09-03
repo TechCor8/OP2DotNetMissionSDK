@@ -102,5 +102,35 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		{
 			return true;
 		}
+
+		/// <summary>
+		/// Gets the list of structures to activate.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="structureIDs">The list to add structures to.</param>
+		public override void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			int numToActivate = targetCountToMaintain;
+
+			// Add structures that we are maintaining
+			foreach (UnitState unit in owner.units.GetListForType(m_StructureToMaintain))
+			{
+				// The assumption here is that maintain structure tasks share activated structures.
+				// e.g. Task A activates 2 smelters and Task B activates 1 smelter = 2 smelters are activated (not 3).
+				if (!structureIDs.Contains(unit.unitID))
+					structureIDs.Add(unit.unitID);
+
+				--numToActivate;
+				if (numToActivate == 0)
+					break;
+			}
+
+			// If there are not enough structures of this type, parse priorities in children
+			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_StructureToMaintain);
+			if (units.Count < targetCountToMaintain)
+				base.GetStructuresToActivate(stateSnapshot, structureIDs);
+		}
 	}
 }

@@ -5,6 +5,8 @@ using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.Async;
 using System.Collections.Generic;
 using DotNetMissionSDK.AI.Tasks.Base.Goals;
+using DotNetMissionSDK.State.Snapshot.Units;
+using System.Collections.ObjectModel;
 
 namespace DotNetMissionSDK.AI.Managers
 {
@@ -25,9 +27,18 @@ namespace DotNetMissionSDK.AI.Managers
 		private ResetVehicleTask m_ResetVehicleTask;
 
 		private bool m_IsProcessing;
+		private string m_DebugMessage = "None";
 
-		public BotPlayer botPlayer	{ get; private set; }
-		public int ownerID			{ get; private set; }
+		public BotPlayer botPlayer								{ get; private set; }
+		public int ownerID										{ get; private set; }
+
+		private ReadOnlyCollection<int> m_StructureLaborOrder;
+		public ReadOnlyCollection<int> GetStructureLaborOrderByID()
+		{
+			ThreadAssert.MainThreadRequired();
+
+			return m_StructureLaborOrder;
+		}
 
 		
 		public BaseManager(BotPlayer botPlayer, int ownerID)
@@ -73,6 +84,8 @@ namespace DotNetMissionSDK.AI.Managers
 
 			m_MaintainTruckRoutes = new MaintainTruckRoutes(ownerID, m_MiningBaseState);
 			m_ResetVehicleTask = new ResetVehicleTask(ownerID);
+
+			m_StructureLaborOrder = new ReadOnlyCollection<int>(new int[0]);
 		}
 
 		public void Update(StateSnapshot stateSnapshot)
@@ -98,14 +111,25 @@ namespace DotNetMissionSDK.AI.Managers
 			// Get data that requires main thread
 			m_MaintainArmyGoal.SetVehicleGroupSlots(botPlayer.combatManager.GetUnassignedSlots());
 
+			// Variables that should only be used in async callbacks
+			List<int> structureIDLaborOrder = new List<int>();
+
 			stateSnapshot.Retain();
 
 			AsyncPump.Run(() =>
 			{
 				BotCommands botCommands = new BotCommands();
 
-				UpdateGoal(stateSnapshot, botCommands);
+				// Get goals and perform goal tasks
+				List<Goal> goals = GetPrioritizedGoals(stateSnapshot);
+				PerformGoalTasks(goals, stateSnapshot, botCommands);
 				m_ResetVehicleTask.PerformTaskTree(stateSnapshot, botCommands); // Fix stuck vehicles
+
+				m_DebugMessage = goals[0].GetType().Name; // DEBUG
+
+				// Get activation and research priorities
+				foreach (Goal goal in goals)
+					goal.GetStructuresToActivate(stateSnapshot, structureIDLaborOrder);
 
 				return botCommands;
 			},
@@ -117,6 +141,9 @@ namespace DotNetMissionSDK.AI.Managers
 				BotCommands botCommands = (BotCommands)returnState;
 
 				botCommands.Execute();
+
+				// Store data
+				m_StructureLaborOrder = structureIDLaborOrder.AsReadOnly();
 				
 				stateSnapshot.Release();
 
@@ -128,7 +155,7 @@ namespace DotNetMissionSDK.AI.Managers
 			});
 		}
 
-		private void UpdateGoal(StateSnapshot stateSnapshot, BotCommands botCommands)
+		private List<Goal> GetPrioritizedGoals(StateSnapshot stateSnapshot)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -141,21 +168,25 @@ namespace DotNetMissionSDK.AI.Managers
 			// Sort priority descending
 			goals.Sort((Goal a, Goal b) => b.importance.CompareTo(a.importance));
 
+			return goals;
+		}
+
+		private void PerformGoalTasks(IEnumerable<Goal> goals, StateSnapshot stateSnapshot, BotCommands botCommands)
+		{
 			foreach (Goal goal in goals)
 			{
+				// Goals that approach zero importance should not be performed at all.
 				if (goal.importance < 0.0001f)
 					continue;
 
+				// If task failed, do not perform lower priority tasks, as they may prevent acquisition of resources to complete this task.
 				if (!goal.PerformTask(stateSnapshot, botCommands))
 					break;
 
+				// If true, this goal always blocks lower priority goals, regardless of whether the goal's task was completed successfully.
 				if (goal.blockLowerPriority)
 					break;
 			}
-
-			m_DebugMessage = goals[0].GetType().Name;
 		}
-
-		private string m_DebugMessage = "None";
 	}
 }

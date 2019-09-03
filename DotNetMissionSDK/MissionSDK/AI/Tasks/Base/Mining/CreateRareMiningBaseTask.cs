@@ -2,25 +2,20 @@
 using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 {
 	/// <summary>
 	/// Finds beacons outside of a command center's control area and builds a new command center.
-	/// All bases must be fully saturated before a new base is created.
 	/// </summary>
 	public class CreateRareMiningBaseTask : Task
 	{
 		private MiningBaseState m_MiningBaseState;
 
-		private CreateRareMineTask m_CreateMineTask;
 		private MaintainCommandCenterTask m_MaintainCCTask;
 
 
@@ -29,10 +24,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			// Task is not complete until every CC beacon has been occupied and saturated
-			if (!m_CreateMineTask.IsTaskComplete(stateSnapshot))
-				return false;
-
 			PlayerState owner = stateSnapshot.players[ownerID];
 			
 			// Task is complete if there are no beacons outside of a command center's control area
@@ -76,8 +67,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(m_CreateMineTask = new CreateRareMineTask(ownerID, m_MiningBaseState));
-			AddPrerequisite(m_MaintainCCTask = new MaintainCommandCenterTask(ownerID), true);
+			AddPrerequisite(m_MaintainCCTask = new MaintainCommandCenterTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

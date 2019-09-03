@@ -1,5 +1,4 @@
 ﻿using DotNetMissionSDK.State.Snapshot;
-using System;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks
@@ -10,7 +9,8 @@ namespace DotNetMissionSDK.AI.Tasks
 		private List<Task> m_Prerequisites = new List<Task>();
 		private bool waitForSiblingPrerequisites;
 		
-		protected int ownerID		{ get; private set; }
+		protected int ownerID								{ get; private set; }
+		protected IReadOnlyCollection<Task> prerequisites	{ get { return m_Prerequisites.AsReadOnly(); } }
 
 
 		/// <summary>
@@ -26,6 +26,7 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// <summary>
 		/// Checks if this task is complete.
 		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
 		/// <returns>True, if the task is complete.</returns>
 		public abstract bool IsTaskComplete(StateSnapshot stateSnapshot);
 
@@ -153,6 +154,40 @@ namespace DotNetMissionSDK.AI.Tasks
 				return true;
 
 			return m_Parent.IsAncestorTask(task);
+		}
+
+		/// <summary>
+		/// Gets the list of structures to activate.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="structureIDs">The list to add structures to.</param>
+		public virtual void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		{
+			// Process all children
+			for (int i=0; i < m_Prerequisites.Count; ++i)
+				m_Prerequisites[i].GetStructuresToActivate(stateSnapshot, structureIDs);
+
+			/*if (IsTaskComplete(stateSnapshot))
+				return;
+
+			bool prerequisitesComplete = true;
+
+			for (int i=0; i < m_Prerequisites.Count; ++i)
+			{
+				// Skip completed tasks
+				if (m_Prerequisites[i].IsTaskComplete(stateSnapshot))
+					continue;
+
+				// If task has been set to wait for siblings, skip remaining prerequisites.
+				if (m_Prerequisites[i].waitForSiblingPrerequisites && !prerequisitesComplete)
+					break;
+
+				prerequisitesComplete = false;
+
+				// Perform the task. Fail out if it can't be done.
+				if (!m_Prerequisites[i].PerformTaskTree(stateSnapshot, unitActions))
+					return false;
+			}*/
 		}
 	}
 }

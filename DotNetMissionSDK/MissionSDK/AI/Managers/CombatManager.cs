@@ -58,10 +58,11 @@ namespace DotNetMissionSDK.AI.Managers
 
 				// Create threat zones
 				CreateProximityZones(stateSnapshot, combatGroups);
+				CreateDefenseZones(stateSnapshot, combatGroups);
 				CreateVulnerableStructureZones(stateSnapshot, combatGroups);
 				CreateVulnerableVehicleZones(stateSnapshot, combatGroups);
 				CreateEnemyBaseZones(stateSnapshot, combatGroups);
-				CreateDefenseZones(stateSnapshot, combatGroups);
+				//CreateDefenseZones(stateSnapshot, combatGroups);
 				CreateMiningZones(stateSnapshot, combatGroups);
 
 				PopulateCombatGroups(owner, combatGroups);

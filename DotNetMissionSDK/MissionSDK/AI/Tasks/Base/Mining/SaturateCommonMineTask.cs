@@ -2,7 +2,6 @@
 using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.Pathfinding;
-using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
@@ -35,6 +34,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 					if (site.beacon.oreType != BeaconType.Common) continue;
 					if (site.mine == null) continue;
 
+					foreach (MiningSmelter smelter in site.smelters)
+					{
+						if (!smelter.smelter.isEnabled)
+							return false;
+					}
+
 					if (site.smelters.Count < MiningBaseState.SmelterSaturationCount)
 					{
 						// Build more mining bases
@@ -51,7 +56,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new SaturateCommonSmelterTask(ownerID, m_MiningBaseState));
 			AddPrerequisite(m_MaintainSmelterTask = new MaintainCommonSmelterTask(ownerID), true);
 		}
 
