@@ -14,8 +14,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		protected map_id m_VehicleToBuild;
 		protected map_id m_VehicleToBuildCargo;
 
-		protected MaintainStructureTask m_MaintainStructureTask;
-
 
 		public BuildSingleVehicleTask(int ownerID) : base(ownerID) { }
 
@@ -28,10 +26,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new MaintainVehicleFactoryTask(ownerID));
-
-			// This task is optional and not required. Used for constructing additional factories.
-			m_MaintainStructureTask = new MaintainVehicleFactoryTask(ownerID);
-			m_MaintainStructureTask.GeneratePrerequisites();
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
@@ -72,17 +66,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			m_VehicleToBuild = vehicleToBuild;
 			m_VehicleToBuildCargo = vehicleToBuildCargo;
 		}
-
-		/// <summary>
-		/// Adds a factory to the base for producing more units.
-		/// </summary>
-		public virtual void AddFactory(StateSnapshot stateSnapshot, BotCommands unitActions)
-		{
-			PlayerState owner = stateSnapshot.players[ownerID];
-
-			m_MaintainStructureTask.targetCountToMaintain = owner.units.vehicleFactories.Count+1;
-			m_MaintainStructureTask.PerformTaskTree(stateSnapshot, unitActions);
-		}
 	}
 
 	/// <summary>
@@ -95,10 +78,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new MaintainArachnidFactoryTask(ownerID));
-
-			// This task is optional and not required. Used for constructing additional factories.
-			m_MaintainStructureTask = new MaintainArachnidFactoryTask(ownerID);
-			m_MaintainStructureTask.GeneratePrerequisites();
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
@@ -122,17 +101,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
 		{
 			unitActions.AddUnitCommand(factoryID, 0, () => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
-		}
-
-		/// <summary>
-		/// Adds a factory to the base for producing more units.
-		/// </summary>
-		public override void AddFactory(StateSnapshot stateSnapshot, BotCommands unitActions)
-		{
-			PlayerState owner = stateSnapshot.players[ownerID];
-
-			m_MaintainStructureTask.targetCountToMaintain = owner.units.arachnidFactories.Count+1;
-			m_MaintainStructureTask.PerformTaskTree(stateSnapshot, unitActions);
 		}
 	}
 }

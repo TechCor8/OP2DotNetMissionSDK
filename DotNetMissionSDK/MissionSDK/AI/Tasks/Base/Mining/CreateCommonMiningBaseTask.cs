@@ -54,6 +54,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				return false;
 			}
 
+			m_MaintainCCTask.targetCountToMaintain = owner.units.commandCenters.Count;
+
 			return true;
 		}
 

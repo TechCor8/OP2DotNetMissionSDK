@@ -57,9 +57,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			int vehicleFactoryCount = owner.units.vehicleFactories.Count((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 			int arachnidFactoryCount = owner.units.arachnidFactories.Count((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 
-			bool shouldBuildVehicleFactory = false;
-			bool shouldBuildArachnidFactory = false;
-
 			// Loop through each slot and try to build a unit for it.
 			foreach (VehicleGroup.UnitSlot combatSlot in m_UnitSlotsToBuild)
 			{
@@ -82,13 +79,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 						case map_id.Scorpion:
 							vehicleTask = m_BuildSingleArachnidTask;
 							hasAvailableFactory = arachnidFactoryCount > 0;
-							shouldBuildArachnidFactory = !hasAvailableFactory;
 							break;
 
 						default:
 							vehicleTask = m_BuildSingleVehicleTask;
 							hasAvailableFactory = vehicleFactoryCount > 0;
-							shouldBuildVehicleFactory = !hasAvailableFactory;
 							break;
 					}
 
@@ -109,26 +104,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 						// We are done with this slot, move to the next one
 						break;
 					}
-				}
-			}
-
-			// If factories are not available, build more
-			if (shouldBuildVehicleFactory)
-			{
-				// Only build more factories if there aren't any deactivated factories
-				if (owner.units.vehicleFactories.FirstOrDefault((FactoryState unit) => !unit.isEnabled) == null)
-				{
-					m_BuildSingleVehicleTask.AddFactory(stateSnapshot, unitActions);
-					m_BuildSingleVehicleTask.PerformTaskTree(stateSnapshot, unitActions);
-				}
-			}
-			else if (shouldBuildArachnidFactory)
-			{
-				// Only build more factories if there aren't any deactivated factories
-				if (owner.units.arachnidFactories.FirstOrDefault((FactoryState unit) => !unit.isEnabled) == null)
-				{
-					m_BuildSingleArachnidTask.AddFactory(stateSnapshot, unitActions);
-					m_BuildSingleArachnidTask.PerformTaskTree(stateSnapshot, unitActions);
 				}
 			}
 

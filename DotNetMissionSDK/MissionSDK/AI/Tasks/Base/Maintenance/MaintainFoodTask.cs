@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -34,8 +35,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					return true;
 			}
 
-			// Keep building one more agridome until task complete
-			m_BuildAgridomeTask.targetCountToMaintain = owner.units.agridomes.Count+1;
+			// Calculate number of agridomes needed for net positive
+			int neededAgridomes = 1;
+			int numActiveAgridomes = owner.units.agridomes.Count((StructureState unit) => unit.isEnabled);
+			if (numActiveAgridomes > 0)
+			{
+				int foodPerAgridome = owner.totalFoodProduction / numActiveAgridomes;
+				if (foodPerAgridome == 0) foodPerAgridome = 1;
+				neededAgridomes = owner.totalFoodConsumption / foodPerAgridome + 1;
+			}
+
+			m_BuildAgridomeTask.targetCountToMaintain = neededAgridomes;
 
 			return true;
 		}

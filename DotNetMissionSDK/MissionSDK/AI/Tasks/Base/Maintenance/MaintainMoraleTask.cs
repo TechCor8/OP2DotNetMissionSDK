@@ -3,6 +3,7 @@ using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 {
@@ -70,114 +71,157 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			BuildAgridome(stateSnapshot, owner);
-			BuildResidence(stateSnapshot, owner);
-			BuildMedicalCenter(owner);
-			BuildRecreation(stateSnapshot, owner);
-			BuildDIRT(stateSnapshot, owner);
+			UpdateAgridomeCount(stateSnapshot, owner);
+			UpdateResidenceCount(stateSnapshot, owner);
+			UpdateMedicalCenterCount(owner);
+			UpdateRecreationCenterCount(stateSnapshot, owner);
+			UpdateDIRTCount(stateSnapshot, owner);
 		}
 
-		private void BuildAgridome(StateSnapshot stateSnapshot, PlayerState owner)
+		private void UpdateAgridomeCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
-			if (owner.foodSupply == FoodStatus.Rising)
-				return;
-
-			// Don't build more agridomes if we aren't using all the ones we have
-			foreach (StructureState agridome in owner.units.agridomes)
+			// Calculate number of agridomes needed for net positive
+			int neededAgridomes = 1;
+			int numActiveAgridomes = owner.units.agridomes.Count((StructureState unit) => unit.isEnabled);
+			if (numActiveAgridomes > 0)
 			{
-				if (!agridome.isEnabled)
-					return;
+				int foodPerAgridome = owner.totalFoodProduction / numActiveAgridomes;
+				if (foodPerAgridome == 0) foodPerAgridome = 1;
+				neededAgridomes = owner.totalFoodConsumption / foodPerAgridome + 1;
 			}
 
-			// Keep building one more agridome until task complete
-			m_BuildAgridomeTask.targetCountToMaintain = owner.units.agridomes.Count+1;
+			m_BuildAgridomeTask.targetCountToMaintain = neededAgridomes;
 		}
 
-		private void BuildResidence(StateSnapshot stateSnapshot, PlayerState owner)
+		private void UpdateResidenceCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
-			if (owner.totalResidenceCapacity >= owner.totalPopulation)
-				return;
+			StructureInfo residenceInfo = owner.structureInfo[map_id.Residence];
+			StructureInfo advancedInfo = owner.structureInfo[map_id.AdvancedResidence];
+			StructureInfo reinforcedInfo = owner.structureInfo[map_id.ReinforcedResidence];
 
-			// Don't build more residences if we aren't using all the ones we have
-			List<StructureState> residences = new List<StructureState>(owner.units.residences);
-			residences.AddRange(owner.units.advancedResidences);
-			residences.AddRange(owner.units.reinforcedResidences);
+			int plannedCapacity = 0;
 
-			foreach (StructureState residence in residences)
+			m_BuildResidenceTask.targetCountToMaintain = 0;
+			m_BuildEdenResidenceTask.targetCountToMaintain = 0;
+			m_BuildPlymouthResidenceTask.targetCountToMaintain = 0;
+
+			for (int i=0; plannedCapacity < owner.totalPopulation; ++i)
 			{
-				if (!residence.isEnabled)
-					return;
+				if (i % 3 == 2)
+				{
+					// Build tech residence
+					if (owner.isEden && owner.HasTechnologyForUnit(stateSnapshot, map_id.AdvancedResidence))
+					{
+						++m_BuildEdenResidenceTask.targetCountToMaintain;
+						plannedCapacity += advancedInfo.productionCapacity;
+						continue;
+					}
+					else if (!owner.isEden && owner.HasTechnologyForUnit(stateSnapshot, map_id.ReinforcedResidence))
+					{
+						++m_BuildPlymouthResidenceTask.targetCountToMaintain;
+						plannedCapacity += reinforcedInfo.productionCapacity;
+						continue;
+					}
+				}
+
+				++m_BuildResidenceTask.targetCountToMaintain;
+				plannedCapacity += residenceInfo.productionCapacity;
 			}
 
-			// Determine residence type to build
-			map_id residenceTypeToBuild = map_id.Residence;
-
-			if (owner.isEden)
+			// If we have more residences than planned, subtract from the tech residences
+			while (owner.units.residences.Count > m_BuildResidenceTask.targetCountToMaintain + 1)
 			{
-				if (owner.HasTechnologyForUnit(stateSnapshot, map_id.AdvancedResidence) && owner.units.residences.Count > owner.units.advancedResidences.Count * 2)
-					residenceTypeToBuild = map_id.AdvancedResidence;
-			}
-			else
-			{
-				if (owner.HasTechnologyForUnit(stateSnapshot, map_id.ReinforcedResidence) && owner.units.residences.Count > owner.units.reinforcedResidences.Count * 2)
-					residenceTypeToBuild = map_id.ReinforcedResidence;
+				m_BuildResidenceTask.targetCountToMaintain += 2;
+				if (owner.isEden)
+					--m_BuildEdenResidenceTask.targetCountToMaintain;
+				else
+					--m_BuildPlymouthResidenceTask.targetCountToMaintain;
 			}
 
-			switch (residenceTypeToBuild)
+			if (m_BuildEdenResidenceTask.targetCountToMaintain < 0)		m_BuildEdenResidenceTask.targetCountToMaintain = 0;
+			if (m_BuildPlymouthResidenceTask.targetCountToMaintain < 0)	m_BuildPlymouthResidenceTask.targetCountToMaintain = 0;
+
+			// If we have more tech residences than planned, subtract from normal residences
+			int techResidenceCount = owner.isEden ? owner.units.advancedResidences.Count : owner.units.reinforcedResidences.Count;
+			int plannedTechCount = owner.isEden ? m_BuildEdenResidenceTask.targetCountToMaintain : m_BuildPlymouthResidenceTask.targetCountToMaintain;
+
+			while (techResidenceCount > plannedTechCount)
 			{
-				case map_id.Residence:				m_BuildResidenceTask.targetCountToMaintain = owner.units.residences.Count+1;						break;
-				case map_id.AdvancedResidence:		m_BuildEdenResidenceTask.targetCountToMaintain = owner.units.advancedResidences.Count+1;			break;
-				case map_id.ReinforcedResidence:	m_BuildPlymouthResidenceTask.targetCountToMaintain = owner.units.reinforcedResidences.Count+1;		break;
+				if (owner.isEden)
+					plannedTechCount = ++m_BuildEdenResidenceTask.targetCountToMaintain;
+				else
+					plannedTechCount = ++m_BuildPlymouthResidenceTask.targetCountToMaintain;
+
+				--m_BuildResidenceTask.targetCountToMaintain;
 			}
+
+			if (m_BuildResidenceTask.targetCountToMaintain < 0)			m_BuildResidenceTask.targetCountToMaintain = 0;
 		}
 
-		private void BuildMedicalCenter(PlayerState owner)
+		private void UpdateMedicalCenterCount(PlayerState owner)
 		{
-			if (owner.totalMedCenterCapacity >= owner.totalPopulation)
-				return;
+			StructureInfo info = owner.structureInfo[map_id.MedicalCenter];
+			
+			int plannedCapacity = 0;
 
-			// Don't build more medical centers if we aren't using all the ones we have
-			foreach (StructureState medicalCenter in owner.units.medicalCenters)
+			m_BuildMedicalCenterTask.targetCountToMaintain = 0;
+			
+			for (int i=0; plannedCapacity < owner.totalPopulation; ++i)
 			{
-				if (!medicalCenter.isEnabled)
-					return;
+				++m_BuildMedicalCenterTask.targetCountToMaintain;
+				plannedCapacity += info.productionCapacity;
 			}
-
-			m_BuildMedicalCenterTask.targetCountToMaintain = owner.units.medicalCenters.Count+1;
 		}
 
-		private void BuildRecreation(StateSnapshot stateSnapshot, PlayerState owner)
+		private void UpdateRecreationCenterCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
-			if (owner.totalRecreationFacilityCapacity + owner.totalForumCapacity >= owner.totalPopulation)
-				return;
+			StructureInfo recreationInfo = owner.structureInfo[map_id.RecreationFacility];
+			StructureInfo forumInfo = owner.structureInfo[map_id.Forum];
 
-			// Don't build more recreation facilities if we aren't using all the ones we have
-			List<StructureState> recreations = new List<StructureState>(owner.units.recreationFacilities);
-			recreations.AddRange(owner.units.forums);
+			int plannedCapacity = 0;
 
-			foreach (StructureState recreation in recreations)
+			m_BuildRecreationTask.targetCountToMaintain = 0;
+			m_BuildForumTask.targetCountToMaintain = 0;
+
+			for (int i=0; plannedCapacity < owner.totalPopulation; ++i)
 			{
-				if (!recreation.isEnabled)
-					return;
+				if (i % 2 == 1)
+				{
+					// Build forum
+					if (!owner.isEden && owner.HasTechnologyForUnit(stateSnapshot, map_id.Forum))
+					{
+						++m_BuildForumTask.targetCountToMaintain;
+						plannedCapacity += forumInfo.productionCapacity;
+						continue;
+					}
+				}
+
+				++m_BuildRecreationTask.targetCountToMaintain;
+				plannedCapacity += recreationInfo.productionCapacity;
 			}
 
-			// Determine recreation type to build
-			map_id recreationTypeToBuild = map_id.RecreationFacility;
-
-			if (!owner.isEden)
+			// If we have more recreation than planned, subtract from the forums
+			while (owner.units.recreationFacilities.Count > m_BuildRecreationTask.targetCountToMaintain + 1)
 			{
-				if (owner.HasTechnologyForUnit(stateSnapshot, map_id.Forum) && owner.units.recreationFacilities.Count > owner.units.forums.Count * 2)
-					recreationTypeToBuild = map_id.Forum;
+				m_BuildRecreationTask.targetCountToMaintain += 2;
+				--m_BuildForumTask.targetCountToMaintain;
 			}
 
-			switch (recreationTypeToBuild)
+			if (m_BuildForumTask.targetCountToMaintain < 0)
+				m_BuildForumTask.targetCountToMaintain = 0;
+
+			// If we have more forums than planned, subtract from recreation
+			while (owner.units.forums.Count > m_BuildForumTask.targetCountToMaintain)
 			{
-				case map_id.RecreationFacility:		m_BuildRecreationTask.targetCountToMaintain = owner.units.recreationFacilities.Count+1;		break;
-				case map_id.Forum:					m_BuildForumTask.targetCountToMaintain = owner.units.forums.Count+1;						break;
+				++m_BuildForumTask.targetCountToMaintain;
+				--m_BuildRecreationTask.targetCountToMaintain;
 			}
+
+			if (m_BuildRecreationTask.targetCountToMaintain < 0)
+				m_BuildRecreationTask.targetCountToMaintain = 0;
 		}
 
-		private void BuildDIRT(StateSnapshot stateSnapshot, PlayerState owner)
+		private void UpdateDIRTCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			m_BuildDirtTask.targetCountToMaintain = 0;
 

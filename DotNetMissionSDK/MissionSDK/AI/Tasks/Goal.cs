@@ -45,7 +45,7 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// </summary>
 		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
 		/// <param name="structureIDs">The list to add structures to.</param>
-		public void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		public virtual void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
 		{
 			m_Task.GetStructuresToActivate(stateSnapshot, structureIDs);
 		}
