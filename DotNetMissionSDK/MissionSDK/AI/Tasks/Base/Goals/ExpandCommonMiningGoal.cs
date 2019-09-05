@@ -11,10 +11,20 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 	/// </summary>
 	public class ExpandCommonMiningGoal : Goal
 	{
+		private ExpandRareMiningTask m_ExpandRareMiningTask;
+		private SaturateCommonSmelterTask m_TruckSaturationTask;
+
+
 		public ExpandCommonMiningGoal(int ownerID, MiningBaseState miningBaseState, float weight) : base(ownerID, weight)
 		{
 			m_Task = new ExpandCommonMiningTask(ownerID, miningBaseState);
 			m_Task.GeneratePrerequisites();
+
+			m_ExpandRareMiningTask = new ExpandRareMiningTask(ownerID, miningBaseState);
+			m_ExpandRareMiningTask.GeneratePrerequisites();
+
+			m_TruckSaturationTask = new SaturateCommonSmelterTask(ownerID, miningBaseState);
+			m_TruckSaturationTask.GeneratePrerequisites();
 		}
 
 		/// <summary>
@@ -99,6 +109,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		public override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[m_OwnerID];
+
+			// If we need to build trucks and the trucks cost rare metal that we don't have, we need to expand rare instead
+			if (owner.vehicleInfo[map_id.CargoTruck].rareOreCost > owner.rareOre && !m_TruckSaturationTask.IsTaskComplete(stateSnapshot))
+			{
+				if (!m_ExpandRareMiningTask.IsTaskComplete(stateSnapshot))
+					return m_ExpandRareMiningTask.PerformTaskTree(stateSnapshot, unitActions);
+			}
 
 			// Don't expand if smelters are disabled
 			foreach (StructureState structure in owner.units.commonOreSmelters)

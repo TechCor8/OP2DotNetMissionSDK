@@ -21,6 +21,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public RepairRareSmelterTask(int ownerID) : base(ownerID)			{ m_StructureToRepair = map_id.RareOreSmelter;					}
 	}
 
+	public sealed class RepairCommonMineTask : RepairStructureTask
+	{
+		public RepairCommonMineTask(int ownerID) : base(ownerID)			{ m_StructureToRepair = map_id.CommonOreMine;					}
+	}
+
+	public sealed class RepairRareMineTask : RepairStructureTask
+	{
+		public RepairRareMineTask(int ownerID) : base(ownerID)				{ m_StructureToRepair = map_id.RareOreMine;						}
+	}
+
 	public sealed class RepairAgridomeTask : RepairStructureTask
 	{
 		public RepairAgridomeTask(int ownerID) : base(ownerID)				{ m_StructureToRepair = map_id.Agridome;						}

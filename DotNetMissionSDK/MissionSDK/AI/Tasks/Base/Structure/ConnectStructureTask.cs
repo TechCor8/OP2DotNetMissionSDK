@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.State;
+﻿using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
+using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		public override void GeneratePrerequisites()
 		{
+			AddPrerequisite(new BuildEarthworkerTask(ownerID));
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)

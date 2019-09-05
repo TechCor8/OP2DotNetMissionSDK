@@ -100,6 +100,11 @@ namespace DotNetMissionSDK.AI.Managers
 			});
 		}
 
+		private int GetStorageUnitsRequired(int metalToStore, int unitCapacity, int unitsAvailable)
+		{
+			return Math.Min(metalToStore / unitCapacity, unitsAvailable);
+		}
+
 		private void UpdatePriorityList(StateSnapshot stateSnapshot, StructureState[] priorityStructures)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
@@ -109,30 +114,38 @@ namespace DotNetMissionSDK.AI.Managers
 			m_UselessStructures.Clear();
 			m_CrippledStructures.Clear();
 
-			// When power is insufficient, we need to increase structure factory priority to correct it.
-			// If there are no convecs, we need to increase vehicle factory priority to make one.
-			bool addStructureFactoryEarly = owner.amountPowerAvailable < 25;
-			bool addVehicleFactoryEarly = addStructureFactoryEarly && owner.units.convecs.Count == 0;
-
 			// Power should always be on
 			AddPriorityBuilding(stateSnapshot, owner.units.tokamaks, int.MaxValue);
 			AddPriorityBuilding(stateSnapshot, owner.units.mhdGenerators, int.MaxValue);
 			AddPriorityBuilding(stateSnapshot, owner.units.solarPowerArrays, int.MaxValue);
 			AddPriorityBuilding(stateSnapshot, owner.units.geothermalPlants, int.MaxValue);
 
+			// Calculate number of storages required to avoid losing metal
+			int commonMetalLost = owner.ore;
+			int rareMetalLost = owner.rareOre;
+
+			int commonSmeltersRequired = GetStorageUnitsRequired(commonMetalLost, owner.structureInfo[map_id.CommonOreSmelter].storageCapacity, owner.units.commonOreSmelters.Count);
+			int rareSmeltersRequired = GetStorageUnitsRequired(rareMetalLost, owner.structureInfo[map_id.RareOreSmelter].storageCapacity, owner.units.rareOreSmelters.Count);
+
+			commonMetalLost -= commonSmeltersRequired * owner.structureInfo[map_id.CommonOreSmelter].storageCapacity;
+			rareMetalLost -= rareSmeltersRequired * owner.structureInfo[map_id.RareOreSmelter].storageCapacity;
+
+			int commonStoragesRequired = GetStorageUnitsRequired(commonMetalLost, owner.structureInfo[map_id.CommonStorage].storageCapacity, owner.units.commonStorages.Count);
+			int rareStoragesRequired = GetStorageUnitsRequired(rareMetalLost, owner.structureInfo[map_id.RareStorage].storageCapacity, owner.units.rareStorages.Count);
+
+			// Set smelter/storage needs
+			AddPriorityBuilding(stateSnapshot, owner.units.commonOreSmelters, commonSmeltersRequired);
+			AddPriorityBuilding(stateSnapshot, owner.units.rareOreSmelters, rareSmeltersRequired);
+
+			AddPriorityBuilding(stateSnapshot, owner.units.commonStorages, commonStoragesRequired);
+			AddPriorityBuilding(stateSnapshot, owner.units.rareStorages, rareStoragesRequired);
+
+
 			// TODO: Detect if buildings connected to CC are active, if not, mark CC as useless. For now, just make them all high priority
 			AddPriorityBuilding(stateSnapshot, owner.units.commandCenters, owner.units.commandCenters.Count);
 
 			// Labor manager chosen structures are very high priority
 			AddPriorityBuilding(stateSnapshot, priorityStructures, int.MaxValue);
-
-			// Primary smelters should always be online
-			AddPriorityBuilding(stateSnapshot, owner.units.commonOreSmelters, 1);
-
-			if (addVehicleFactoryEarly) AddPriorityBuilding(stateSnapshot, owner.units.vehicleFactories, 1);
-			if (addStructureFactoryEarly) AddPriorityBuilding(stateSnapshot, owner.units.structureFactories, 1);
-
-			AddPriorityBuilding(stateSnapshot, owner.units.rareOreSmelters, 1);
 
 			// Get number of agridomes needed
 			int neededAgridomes = 1;
@@ -150,9 +163,6 @@ namespace DotNetMissionSDK.AI.Managers
 			AddPriorityBuilding(stateSnapshot, owner.units.nurseries, 1, true);
 			AddPriorityBuilding(stateSnapshot, owner.units.universities, 1, true);
 
-			//if (m_StructurePriority.Count > 2 &&
-			//	m_StructurePriority[m_StructurePriority.Count-1].GetUnitType() == map_id.University &&
-			//	m_StructurePriority[m_StructurePriority.Count-2].GetUnitType() == map_id.Nursery)
 			if (stateSnapshot.usesMorale)
 			{
 				// Morale fluctuates, include morale structures
@@ -199,21 +209,17 @@ namespace DotNetMissionSDK.AI.Managers
 			AddPriorityBuilding(stateSnapshot, owner.units.advancedLabs, 1, true);
 			AddPriorityBuilding(stateSnapshot, owner.units.standardLabs, 1, true);
 
-			// Primary factories
-			if (!addStructureFactoryEarly) AddPriorityBuilding(stateSnapshot, owner.units.structureFactories, owner.units.convecs.Count > 0 ? 1 : 0);
-			if (!addVehicleFactoryEarly) AddPriorityBuilding(stateSnapshot, owner.units.vehicleFactories, 1);
-
 			// Low priority structures
 			AddPriorityBuilding(stateSnapshot, owner.units.robotCommands, 1, true);
 			AddPriorityBuilding(stateSnapshot, owner.units.guardPosts, int.MaxValue);
-			AddPriorityBuilding(stateSnapshot, owner.units.arachnidFactories, 1);
-			AddPriorityBuilding(stateSnapshot, owner.units.spaceports, 1);
 			AddPriorityBuilding(stateSnapshot, owner.units.observatories, 1, true);
 			AddPriorityBuilding(stateSnapshot, owner.units.meteorDefenses, 0);
 
-			// Leave storages disabled as they will keep metals
-			//AddPriorityBuilding(owner.units.commonStorages, 0);
-			//AddPriorityBuilding(owner.units.rareStorages, 0);
+			// Factories
+			AddPriorityBuilding(stateSnapshot, owner.units.structureFactories, 0);
+			AddPriorityBuilding(stateSnapshot, owner.units.vehicleFactories, 0);
+			AddPriorityBuilding(stateSnapshot, owner.units.arachnidFactories, 0);
+			AddPriorityBuilding(stateSnapshot, owner.units.spaceports, 0);
 
 			// Unneeded structures
 			AddPriorityBuilding(stateSnapshot, owner.units.consumerFactories, 0, true);
@@ -246,28 +252,34 @@ namespace DotNetMissionSDK.AI.Managers
 			foreach (StructureState building in buildings)
 			{
 				if (!CanBeActivated(stateSnapshot, building))
-					AddPriorityUnique(m_CrippledStructures, building);
+					AddPriorityUnique(m_CrippledStructures, building, 3);
 				else
 				{
 					if (needed > 0)
 					{
-						AddPriorityUnique(m_StructurePriority, building);
+						AddPriorityUnique(m_StructurePriority, building, 0);
 						--needed;
 					}
 					else if (!markExtrasAsUseless)
-						AddPriorityUnique(m_LowPriorityStructures, building);
+						AddPriorityUnique(m_LowPriorityStructures, building, 1);
 					else
-						AddPriorityUnique(m_UselessStructures, building);
+						AddPriorityUnique(m_UselessStructures, building, 2);
 				}
 			}
 		}
 
-		private void AddPriorityUnique(List<StructureState> list, StructureState building)
+		private void AddPriorityUnique(List<StructureState> list, StructureState building, int priority)
 		{
-			if (m_CrippledStructures.Contains(building)) return;
-			if (m_StructurePriority.Contains(building)) return;
-			if (m_LowPriorityStructures.Contains(building)) return;
-			if (m_UselessStructures.Contains(building)) return;
+			// Current priority is higher than requested, skip
+			if (priority >= 0 && m_StructurePriority.Contains(building))		return;
+			if (priority >= 1 && m_LowPriorityStructures.Contains(building))	return;
+			if (priority >= 2 && m_UselessStructures.Contains(building))		return;
+			if (priority >= 3 && m_CrippledStructures.Contains(building))		return;
+
+			// Priority has increased, remove from previous list
+			if (priority < 1) m_LowPriorityStructures.Remove(building);
+			if (priority < 2) m_UselessStructures.Remove(building);
+			if (priority < 3) m_CrippledStructures.Remove(building);
 
 			list.Add(building);
 		}
