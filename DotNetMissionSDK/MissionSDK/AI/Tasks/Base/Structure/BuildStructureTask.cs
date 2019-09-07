@@ -24,6 +24,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		private bool m_OverrideLocation = false;
 		private LOCATION m_TargetLocation;
 
+		public BuildStructureKitTask buildKitTask				{ get; protected set;	}
+
 
 		public BuildStructureTask(int ownerID) : base(ownerID) { }
 
@@ -44,10 +46,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return false;
 		}
 
+		/// <summary>
+		/// Sets the target location to build around.
+		/// </summary>
 		public void SetLocation(LOCATION targetPosition)
 		{
 			m_OverrideLocation = true;
 			m_TargetLocation = targetPosition;
+
+			buildKitTask.SetLocation(targetPosition);
 		}
 
 		public override void GeneratePrerequisites()

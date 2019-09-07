@@ -13,7 +13,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildCommandCenterKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildCommandCenterKitTask(ownerID));
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
@@ -52,7 +52,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildStructureFactoryKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildStructureFactoryKitTask(ownerID));
 		}
 	}
 
@@ -63,7 +63,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildCommonSmelterKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildCommonSmelterKitTask(ownerID));
 		}
 	}
 
@@ -74,7 +74,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildRareSmelterKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildRareSmelterKitTask(ownerID));
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildAgridomeKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildAgridomeKitTask(ownerID));
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildTokamakKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildTokamakKitTask(ownerID));
 		}
 	}
 
@@ -107,7 +107,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildMHDGeneratorKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildMHDGeneratorKitTask(ownerID));
 		}
 	}
 
@@ -118,7 +118,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildSolarArrayKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildSolarArrayKitTask(ownerID));
 		}
 	}
 
@@ -129,7 +129,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildNurseryKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildNurseryKitTask(ownerID));
 		}
 	}
 
@@ -140,7 +140,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildUniversityKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildUniversityKitTask(ownerID));
 		}
 	}
 
@@ -151,7 +151,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildResidenceKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildResidenceKitTask(ownerID));
 		}
 	}
 
@@ -162,7 +162,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildReinforcedResidenceKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildReinforcedResidenceKitTask(ownerID));
 		}
 	}
 
@@ -173,7 +173,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildAdvancedResidenceKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildAdvancedResidenceKitTask(ownerID));
 		}
 	}
 
@@ -184,7 +184,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildMedicalCenterKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildMedicalCenterKitTask(ownerID));
 		}
 	}
 
@@ -195,7 +195,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildDIRTKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildDIRTKitTask(ownerID));
 		}
 	}
 
@@ -206,7 +206,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildRecreationKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildRecreationKitTask(ownerID));
 		}
 	}
 
@@ -217,7 +217,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildForumKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildForumKitTask(ownerID));
 		}
 	}
 
@@ -228,7 +228,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildGORFKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildGORFKitTask(ownerID));
 		}
 	}
 
@@ -239,7 +239,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildVehicleFactoryKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildVehicleFactoryKitTask(ownerID));
 		}
 	}
 
@@ -250,7 +250,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildArachnidFactoryKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildArachnidFactoryKitTask(ownerID));
 		}
 	}
 
@@ -261,7 +261,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildStandardLabKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildStandardLabKitTask(ownerID));
 		}
 	}
 
@@ -272,7 +272,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildAdvancedLabKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildAdvancedLabKitTask(ownerID));
 		}
 	}
 
@@ -283,7 +283,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildRobotCommandKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildRobotCommandKitTask(ownerID));
 		}
 	}
 
@@ -294,7 +294,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildSpaceportKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildSpaceportKitTask(ownerID));
 		}
 	}
 
@@ -305,7 +305,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildObservatoryKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildObservatoryKitTask(ownerID));
 		}
 	}
 
@@ -316,7 +316,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new BuildMeteorDefenseKitTask(ownerID));
+			AddPrerequisite(buildKitTask = new BuildMeteorDefenseKitTask(ownerID));
 		}
 	}
 
@@ -329,7 +329,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(m_KitTask = new BuildGuardPostKitTask(ownerID));
+			AddPrerequisite(buildKitTask = m_KitTask = new BuildGuardPostKitTask(ownerID));
 
 			m_KitTask.RandomizeTurret(GameState.players[ownerID].IsEden());
 		}

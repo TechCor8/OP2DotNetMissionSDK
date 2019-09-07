@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
+using DotNetMissionSDK.Async;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
@@ -19,6 +20,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 		private map_id[] m_SkipConvecsWithKits = new map_id[0];		// Task will not control convecs containing these kits
 
+		private bool m_OverrideLocation = false;
+		private LOCATION m_TargetLocation;
+
+		private BuildConvecTask m_BuildConvecTask;
+
+		private int m_NextTargetCC = -1;
+
+
 		public BuildStructureKitTask(int ownerID) : base(ownerID) { }
 
 		public BuildStructureKitTask Initialize(map_id[] skipConvecsWithKits)
@@ -37,10 +46,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return owner.units.convecs.FirstOrDefault((ConvecState unit) => unit.cargoType == m_KitToBuild) != null;
 		}
 
+		/// <summary>
+		/// Sets the anticipated build location. Used for determining the closest factory.
+		/// </summary>
+		public void SetLocation(LOCATION targetPosition)
+		{
+			m_OverrideLocation = true;
+			m_TargetLocation = targetPosition;
+		}
+
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new MaintainStructureFactoryTask(ownerID));
-			AddPrerequisite(new BuildConvecTask(ownerID));
+			AddPrerequisite(m_BuildConvecTask = new BuildConvecTask(ownerID));
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
@@ -137,12 +155,24 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (factories.Count > 0)
 				return true;
 
+			if (owner.units.commandCenters.Count == 0)
+				return true;
+
+			// Place building at random command center
+			LOCATION targetPosition = owner.units.commandCenters[GetNextCommandCenterTarget(owner)].position;
+
+			if (m_OverrideLocation)
+				targetPosition = m_TargetLocation;
+
+			// Get closest active factory
+			FactoryState factory = (FactoryState)GetClosestActiveStructureOfType(stateSnapshot, owner, map_id.StructureFactory, targetPosition);
+			
 			// Get active structure factory
-			FactoryState factory = owner.units.structureFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled);
+			//FactoryState factory = owner.units.structureFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled);
 
 			// If factory not found, most likely it is not enabled
 			if (factory == null)
-				return false;
+				return true;
 
 			if (factory.isBusy)
 				return true;
@@ -155,6 +185,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			// Build kit
 			ProduceUnit(unitActions, factory.unitID, m_KitToBuild, m_KitToBuildCargo);
+
+			m_NextTargetCC = -1;
 			
 			return true;
 		}
@@ -173,6 +205,70 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			}
 
 			return false;
+		}
+
+		private int GetNextCommandCenterTarget(PlayerState owner)
+		{
+			if (m_NextTargetCC < 0 || m_NextTargetCC >= owner.units.commandCenters.Count)
+				m_NextTargetCC = AsyncRandom.Range(0, owner.units.commandCenters.Count);
+
+			return m_NextTargetCC;
+		}
+
+		public UnitState GetClosestActiveStructureOfType(StateSnapshot stateSnapshot, PlayerState owner, map_id unitType, LOCATION position)
+		{
+			UnitState closestUnit = null;
+			int closestDistance = 999999;
+
+			foreach (UnitState unit in owner.units.GetListForType(unitType))
+			{
+				StructureState structure = (StructureState)unit;
+
+				if (structure.isCritical) continue;
+				if (!stateSnapshot.commandMap.ConnectsTo(owner.playerID, structure.position))
+					continue;
+
+				// Closest distance
+				int distance = position.GetDiagonalDistance(unit.position);
+				if (distance < closestDistance)
+				{
+					closestUnit = unit;
+					closestDistance = distance;
+				}
+			}
+
+			return closestUnit;
+		}
+
+		/// <summary>
+		/// Gets the list of structures to activate.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="structureIDs">The list to add structures to.</param>
+		public override void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		{
+			// If there are not enough convecs, parse its children instead
+			if (!m_BuildConvecTask.IsTaskComplete(stateSnapshot))
+				m_BuildConvecTask.GetStructuresToActivate(stateSnapshot, structureIDs);
+
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			// Can't activate a factory
+			if (owner.units.commandCenters.Count == 0)
+				return;
+
+			LOCATION targetPosition = owner.units.commandCenters[GetNextCommandCenterTarget(owner)].position;
+
+			if (m_OverrideLocation)
+				targetPosition = m_TargetLocation;
+
+			// Get closest active factory
+			FactoryState factory = (FactoryState)GetClosestActiveStructureOfType(stateSnapshot, owner, map_id.StructureFactory, targetPosition);
+
+			if (factory == null)
+				return;
+
+			structureIDs.Add(factory.unitID);
 		}
 	}
 }
