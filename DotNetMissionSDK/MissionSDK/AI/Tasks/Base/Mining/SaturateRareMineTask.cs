@@ -34,7 +34,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 					if (site.beacon.oreType != BeaconType.Rare) continue;
 					if (site.mine == null) continue;
 
-					if (!site.mine.isEnabled)
+					// Don't build at this mine unless it is enabled, or it is being built (but not critical HP, just in case)
+					if (!site.mine.isEnabled && (site.mine.lastCommand != HFL.CommandType.ctMoDevelop || site.mine.isCritical))
 						continue;
 
 					foreach (MiningSmelter smelter in site.smelters)
