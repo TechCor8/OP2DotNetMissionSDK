@@ -334,6 +334,20 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			m_KitTask.RandomizeTurret(GameState.players[ownerID].IsEden());
 		}
 
+		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
+		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			// Get convec with kit
+			if (owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_KitToBuild /*&& unit.cargoType == m_KitTask.turret*/) != null)
+				return true;
+
+			if (owner.CanBuildUnit(stateSnapshot, m_KitToBuild, m_KitTask.turret))
+				return true;
+
+			return false;
+		}
+
 		public void RandomizeTurret(bool isEden, bool lineOfSight=true, bool includeBombs=false)
 		{
 			m_KitTask.RandomizeTurret(isEden, lineOfSight, includeBombs);

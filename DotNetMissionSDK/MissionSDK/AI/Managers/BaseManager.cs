@@ -65,6 +65,7 @@ namespace DotNetMissionSDK.AI.Managers
 				new ExpandRareMiningGoal(ownerID, m_MiningBaseState, 0.97f),
 				m_MaintainArmyGoal = new MaintainArmyGoal(ownerID, 0.98f),
 				new LaunchStarshipGoal(ownerID, 1),
+				new MaintainStructureFactoryGoal(ownerID, 1),
 			};
 
 			// TODO: Fill out goal weights

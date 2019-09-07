@@ -112,6 +112,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 					BuildStructureTask.ClearDeployArea(earthworker, map_id.LightTower, path[i], stateSnapshot, ownerID, unitActions);
 
+					// If a unit is on the tile, don't issue the command. The earthworker will lock up causing it to ignore move commands and other tubes
+					if (stateSnapshot.unitMap.GetUnitOnTile(path[i]) != null)
+						continue;
+
 					unitActions.AddUnitCommand(earthworker.unitID, 1, () => GameState.GetUnit(earthworker.unitID)?.DoBuildWall(map_id.Tube, new MAP_RECT(path[i], new LOCATION(1, 1))));
 					break;
 				}

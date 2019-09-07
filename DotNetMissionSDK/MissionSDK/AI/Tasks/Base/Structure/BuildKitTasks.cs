@@ -137,7 +137,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 	{
 		public BuildGuardPostKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.GuardPost;						}
 
-		public void SetTurret(map_id turret)								{ m_KitToBuildCargo = turret;							}
+		public map_id turret								{ get { return m_KitToBuildCargo; } set { m_KitToBuildCargo = value; }	}
 
 		public void RandomizeTurret(bool isEden, bool includeLineOfSight=true, bool includeBombs=false)
 		{

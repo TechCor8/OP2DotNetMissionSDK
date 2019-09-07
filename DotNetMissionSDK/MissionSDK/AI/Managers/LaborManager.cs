@@ -102,7 +102,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private int GetStorageUnitsRequired(int metalToStore, int unitCapacity, int unitsAvailable)
 		{
-			return Math.Min(metalToStore / unitCapacity, unitsAvailable);
+			return Math.Min((int)Math.Ceiling(metalToStore / (float)unitCapacity), unitsAvailable);
 		}
 
 		private void UpdatePriorityList(StateSnapshot stateSnapshot, StructureState[] priorityStructures)

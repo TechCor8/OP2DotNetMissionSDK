@@ -19,6 +19,7 @@ namespace DotNetMissionSDK.State.Snapshot.Units
 		public bool hasWorkers				{ get; private set; }
 		public bool hasScientists			{ get; private set; }
 		public bool isInfected				{ get; private set; }
+		public bool isCritical				{ get; private set; }
 
 		/// <summary>
 		/// True if structure is enabled.
@@ -61,6 +62,7 @@ namespace DotNetMissionSDK.State.Snapshot.Units
 			hasWorkers			= unit.HasWorkers();
 			hasScientists		= unit.HasScientists();
 			isInfected			= unit.IsInfected();
+			isCritical			= damage / (float)structureInfo.hitPoints >= 0.75f;
 
 			isEnabled			= unit.IsEnabled();
 			isDisabled			= unit.IsDisabled();

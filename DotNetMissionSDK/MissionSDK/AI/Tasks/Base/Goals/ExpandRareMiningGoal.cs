@@ -37,7 +37,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			// Don't expand if smelters are disabled
 			foreach (StructureState structure in owner.units.rareOreSmelters)
 			{
-				if (!structure.isEnabled)
+				if (!structure.isEnabled && !structure.isCritical && stateSnapshot.commandMap.ConnectsTo(m_OwnerID, structure.position))
 					return true;
 			}
 

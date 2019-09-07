@@ -12,6 +12,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 	/// </summary>
 	public abstract class RepairStructureTask : Task
 	{
+		public const float CriticalDamagePercentage = 0.75f;
+
 		protected map_id m_StructureToRepair = map_id.Agridome;
 
 		private BuildRepairUnitTask m_BuildRepairUnitTask;
@@ -36,7 +38,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 					continue;
 
 				// Critical only repairs
-				if (building.damage / (float)info.hitPoints > 0.75f)
+				if (building.damage / (float)info.hitPoints > CriticalDamagePercentage)
 					return false;
 			}
 
@@ -73,7 +75,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				// If damage not critical, skip unit
 				UnitInfoState info = owner.GetUnitInfo(unitToFix.unitType);
 
-				if (unitToFix.damage / (float)info.hitPoints < 0.75f)
+				if (unitToFix.damage / (float)info.hitPoints < CriticalDamagePercentage)
 					continue;
 
 				// Get repair unit

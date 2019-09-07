@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
+﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
+using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
@@ -36,7 +37,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				{
 					UnitInfoState info = owner.GetUnitInfo(building.unitType);
 
-					if (building.damage / (float)info.hitPoints > 0.75f)
+					if (building.damage / (float)info.hitPoints > RepairStructureTask.CriticalDamagePercentage)
 						return false;
 				}
 
@@ -86,7 +87,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					// If damage not critical, skip unit
 					UnitInfoState info = owner.GetUnitInfo(unitToFix.unitType);
 
-					if (unitToFix.damage / (float)info.hitPoints < 0.75f)
+					if (unitToFix.damage / (float)info.hitPoints < RepairStructureTask.CriticalDamagePercentage)
 						continue;
 				}
 				else

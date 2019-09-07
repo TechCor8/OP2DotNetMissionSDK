@@ -59,7 +59,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Get convec with kit
-			return owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_KitToBuild) != null;
+			if (owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_KitToBuild) != null)
+				return true;
+
+			if (owner.CanBuildUnit(stateSnapshot, m_KitToBuild))
+				return true;
+
+			return false;
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

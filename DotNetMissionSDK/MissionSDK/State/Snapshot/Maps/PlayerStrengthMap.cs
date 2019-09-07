@@ -67,6 +67,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		{
 			UnitInfo unitInfo = unit.GetUnitInfo();
 			map_id weaponType = unit.GetWeapon();
+			if (unit.GetUnitType() == map_id.Scorpion) weaponType = map_id.EnergyCannon; // Scorpion GetWeapon returns None
 			UnitInfo weaponInfo = new UnitInfo(weaponType);
 			LOCATION position = unit.GetPosition();
 			int weaponRange = weaponInfo.GetWeaponRange(ownerID);

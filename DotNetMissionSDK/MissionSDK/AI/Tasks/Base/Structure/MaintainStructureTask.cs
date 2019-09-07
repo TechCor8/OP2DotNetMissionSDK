@@ -2,6 +2,7 @@
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
@@ -40,7 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 						continue;
 
 					// If any structures crippled, task is not complete
-					if (building.damage / (float)info.hitPoints >= 0.75f)
+					if (building.damage / (float)info.hitPoints >= RepairStructureTask.CriticalDamagePercentage)
 						continue;
 
 					++targetCountMet;
@@ -59,6 +60,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
+
+			UnitInfoState info = owner.GetUnitInfo(m_StructureToMaintain);
 
 			bool needEarthworker = false;
 			bool needRepairUnit = false;
@@ -80,19 +83,24 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				StructureState building = (StructureState)unit;
 
 				// If any structures crippled, repair unit required
-				UnitInfoState info = owner.GetUnitInfo(m_StructureToMaintain);
-
-				if (building.damage / (float)info.hitPoints >= 0.75f)
+				if (building.damage / (float)info.hitPoints >= RepairStructureTask.CriticalDamagePercentage)
 				{
 					needRepairUnit = true;
 					break;
 				}
 			}
 
-			if (needEarthworker && owner.units.earthWorkers.Count > 0)
+			if (needEarthworker)
+				return owner.units.earthWorkers.Count > 0;
+
+			if (needRepairUnit)
+				return (owner.units.convecs.Count > 0 || owner.units.repairVehicles.Count > 0 || owner.units.spiders.Count > 0);
+
+			// Get convec with kit
+			if (owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_StructureToMaintain) != null)
 				return true;
 
-			if (needRepairUnit && (owner.units.convecs.Count > 0 || owner.units.repairVehicles.Count > 0 || owner.units.spiders.Count > 0))
+			if (owner.CanBuildUnit(stateSnapshot, m_StructureToMaintain))
 				return true;
 
 			return false;
