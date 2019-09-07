@@ -60,6 +60,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Unloading
 				if (truck.curAction == ActionType.moObjDocking)
 					continue;
 
+				if (truck.cargoType != m_CargoToUnload)
+					continue;
+
 				switch (truck.cargoType)
 				{
 					case TruckCargo.CommonMetal:
@@ -125,6 +128,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Unloading
 						}
 						break;
 				}
+
+				// Only do one truck at a time
+				break;
 			}
 
 			return true;
