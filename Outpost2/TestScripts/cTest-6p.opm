@@ -1,0 +1,942 @@
+{
+	"LevelDetails":
+	{
+		"LevelDescription":"Colony Game, Eden",
+		"MapName":"on6_01.map",
+		"TechTreeName":"MULTITEK.TXT",
+		"MissionType":"Colony",
+		"NumPlayers":2,
+		"MaxTechLevel":12,
+		"UnitOnlyMission":false
+	},
+	
+	"TethysGame":
+	{
+		"DaylightEverywhere":true,
+		"DaylightMoves":true,
+		"InitialLightLevel":0,
+		"MusicPlayList":
+		{
+			"RepeatStartIndex":0,
+			"SongIDs":[0,1,2]
+		},
+		"Beacons":
+		[
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":23, "MinY":33, "MaxX":23, "MaxY":33 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Rare",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":33, "MinY":43, "MaxX":33, "MaxY":43 }
+			},
+			{
+				"MapID":"Fumarole",
+				"OreType":"Random",
+				"BarYield":"Random",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":41, "MinY":63, "MaxX":41, "MaxY":63 }
+			},
+			{
+				"MapID":"MagmaVent",
+				"OreType":"Random",
+				"BarYield":"Random",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":18, "MinY":125, "MaxX":18, "MaxY":125 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":28, "MinY":98, "MaxX":28, "MaxY":98 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Rare",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":38, "MinY":98, "MaxX":38, "MaxY":98 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":99, "MinY":88, "MaxX":99, "MaxY":88 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Rare",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":97, "MinY":78, "MaxX":97, "MaxY":78 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":98, "MinY":38, "MaxX":98, "MaxY":38 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Rare",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":98, "MinY":48, "MaxX":98, "MaxY":48 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":73, "MinY":103, "MaxX":73, "MaxY":103 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Rare",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":71, "MinY":98, "MaxX":71, "MaxY":98 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":62, "MinY":28, "MaxX":62, "MaxY":28 }
+			},
+			{
+				"MapID":"MiningBeacon",
+				"OreType":"Rare",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"SpawnRect":{ "MinX":60, "MinY":38, "MaxX":60, "MaxY":38 }
+			}
+		],
+		"Markers":
+		[
+			{
+				"MarkerType":"Circle",
+				"SpawnRect":{ "MinX":1, "MinY":1, "MaxX":1, "MaxY":1 }
+			}
+		],
+		"Wreckage":
+		[
+			{
+				"TechID":8000,
+				"IsVisible":true,
+				"SpawnRect":{ "MinX":2, "MinY":2, "MaxX":2, "MaxY":2 }
+			}
+		],
+		"WallTubes":
+		[
+			{
+				"TypeID":"Tube",
+				"Location": { "X":19, "Y":14 }
+			},
+			{
+				"TypeID":"Tube",
+				"Location": { "X":20, "Y":14 }
+			}
+		]
+	},
+	
+	"Players":
+	[
+		{
+			"ID":0,
+			"TechLevel":13,
+			"MoraleLevel":"Excellent",
+			"FreeMorale":true,
+			"IsEden":true,
+			"IsHuman":true,
+			"BotType":"LaunchStarship",
+			"Color":"Blue",
+			"Allies":[],
+			"CenterView": { "X":27, "Y":38 },
+			
+			"Kids":10,
+			"Workers":44,
+			"Scientists":23,
+			"CommonOre":27000,
+			"RareOre":25000,
+			"Food":7000,
+			"SolarSatellites":1,
+			
+			"CompletedResearch":
+			[
+				5110,
+				5405,
+				8601,
+				3407
+			],
+			
+			"Units":
+			[
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
+					"Direction":"East",
+					"Location": { "X":7, "Y":38 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"StructureFactory",
+					"Direction":"East",
+					"Location": { "X":7, "Y":37 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommonOreSmelter",
+					"Direction":"East",
+					"Location": { "X":7, "Y":36 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Agridome",
+					"Direction":"East",
+					"Location": { "X":7, "Y":35 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Tokamak",
+					"Direction":"East",
+					"Location": { "X":7, "Y":34 }
+				},
+				{
+					"TypeID":"RoboSurveyor",
+					"Direction":"East",
+					"Location": { "X":7, "Y":39 }
+				},
+				{
+					"TypeID":"RoboMiner",
+					"Direction":"East",
+					"Location": { "X":7, "Y":40 }
+				},
+				{
+					"TypeID":"Earthworker",
+					"Direction":"East",
+					"Location": { "X":7, "Y":41 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":7, "Y":42 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":7, "Y":43 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":7, "Y":44 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":7, "Y":45 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":7, "Y":46 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":7, "Y":47 }
+				}
+			]
+		},
+		{
+			"ID":1,
+			"TechLevel":13,
+			"MoraleLevel":"Excellent",
+			"FreeMorale":true,
+			"IsEden":false,
+			"IsHuman":true,
+			"BotType":"LaunchStarship",
+			"Color":"Red",
+			"Allies":[],
+			"CenterView": { "X":27, "Y":38 },
+			
+			"Kids":10,
+			"Workers":44,
+			"Scientists":23,
+			"CommonOre":27000,
+			"RareOre":25000,
+			"Food":7000,
+			"SolarSatellites":1,
+			
+			"CompletedResearch":
+			[
+				5110,
+				5405,
+				8601
+			],
+			
+			"Units":
+			[
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
+					"Direction":"East",
+					"Location": { "X":126, "Y":98 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"StructureFactory",
+					"Direction":"East",
+					"Location": { "X":126, "Y":97 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommonOreSmelter",
+					"Direction":"East",
+					"Location": { "X":126, "Y":96 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Agridome",
+					"Direction":"East",
+					"Location": { "X":126, "Y":95 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Tokamak",
+					"Direction":"East",
+					"Location": { "X":126, "Y":94 }
+				},
+				{
+					"TypeID":"RoboSurveyor",
+					"Direction":"East",
+					"Location": { "X":126, "Y":99 }
+				},
+				{
+					"TypeID":"RoboMiner",
+					"Direction":"East",
+					"Location": { "X":126, "Y":100 }
+				},
+				{
+					"TypeID":"Earthworker",
+					"Direction":"East",
+					"Location": { "X":126, "Y":101 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":126, "Y":102 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":126, "Y":103 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":126, "Y":104 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":126, "Y":105 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":126, "Y":106 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":126, "Y":107 }
+				}
+			]
+		},
+		{
+			"ID":2,
+			"TechLevel":13,
+			"MoraleLevel":"Excellent",
+			"FreeMorale":true,
+			"IsEden":false,
+			"IsHuman":true,
+			"BotType":"LaunchStarship",
+			"Color":"Green",
+			"Allies":[],
+			"CenterView": { "X":27, "Y":38 },
+			
+			"Kids":10,
+			"Workers":44,
+			"Scientists":23,
+			"CommonOre":27000,
+			"RareOre":25000,
+			"Food":7000,
+			"SolarSatellites":1,
+			
+			"CompletedResearch":
+			[
+				5110,
+				5405,
+				8601
+			],
+			
+			"Units":
+			[
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
+					"Direction":"East",
+					"Location": { "X":66, "Y":98 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"StructureFactory",
+					"Direction":"East",
+					"Location": { "X":66, "Y":97 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommonOreSmelter",
+					"Direction":"East",
+					"Location": { "X":66, "Y":96 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Agridome",
+					"Direction":"East",
+					"Location": { "X":66, "Y":95 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Tokamak",
+					"Direction":"East",
+					"Location": { "X":66, "Y":94 }
+				},
+				{
+					"TypeID":"RoboSurveyor",
+					"Direction":"East",
+					"Location": { "X":66, "Y":99 }
+				},
+				{
+					"TypeID":"RoboMiner",
+					"Direction":"East",
+					"Location": { "X":66, "Y":100 }
+				},
+				{
+					"TypeID":"Earthworker",
+					"Direction":"East",
+					"Location": { "X":66, "Y":101 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":102 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":103 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":104 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":105 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":106 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":107 }
+				}
+			]
+		},
+		{
+			"ID":3,
+			"TechLevel":13,
+			"MoraleLevel":"Excellent",
+			"FreeMorale":true,
+			"IsEden":false,
+			"IsHuman":true,
+			"BotType":"LaunchStarship",
+			"Color":"Yellow",
+			"Allies":[],
+			"CenterView": { "X":27, "Y":38 },
+			
+			"Kids":10,
+			"Workers":44,
+			"Scientists":23,
+			"CommonOre":27000,
+			"RareOre":25000,
+			"Food":7000,
+			"SolarSatellites":1,
+			
+			"CompletedResearch":
+			[
+				5110,
+				5405,
+				8601
+			],
+			
+			"Units":
+			[
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
+					"Direction":"East",
+					"Location": { "X":46, "Y":93 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"StructureFactory",
+					"Direction":"East",
+					"Location": { "X":46, "Y":92 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommonOreSmelter",
+					"Direction":"East",
+					"Location": { "X":46, "Y":91 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Agridome",
+					"Direction":"East",
+					"Location": { "X":46, "Y":90 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Tokamak",
+					"Direction":"East",
+					"Location": { "X":46, "Y":89 }
+				},
+				{
+					"TypeID":"RoboSurveyor",
+					"Direction":"East",
+					"Location": { "X":46, "Y":94 }
+				},
+				{
+					"TypeID":"RoboMiner",
+					"Direction":"East",
+					"Location": { "X":46, "Y":95 }
+				},
+				{
+					"TypeID":"Earthworker",
+					"Direction":"East",
+					"Location": { "X":46, "Y":96 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":46, "Y":97 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":46, "Y":98 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":46, "Y":99 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":46, "Y":100 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":46, "Y":101 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":46, "Y":102 }
+				}
+			]
+		},
+		{
+			"ID":4,
+			"TechLevel":13,
+			"MoraleLevel":"Excellent",
+			"FreeMorale":true,
+			"IsEden":false,
+			"IsHuman":true,
+			"BotType":"LaunchStarship",
+			"Color":"Cyan",
+			"Allies":[],
+			"CenterView": { "X":27, "Y":38 },
+			
+			"Kids":10,
+			"Workers":44,
+			"Scientists":23,
+			"CommonOre":27000,
+			"RareOre":25000,
+			"Food":7000,
+			"SolarSatellites":1,
+			
+			"CompletedResearch":
+			[
+				5110,
+				5405,
+				8601
+			],
+			
+			"Units":
+			[
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
+					"Direction":"East",
+					"Location": { "X":66, "Y":38 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"StructureFactory",
+					"Direction":"East",
+					"Location": { "X":66, "Y":37 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommonOreSmelter",
+					"Direction":"East",
+					"Location": { "X":66, "Y":36 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Agridome",
+					"Direction":"East",
+					"Location": { "X":66, "Y":35 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Tokamak",
+					"Direction":"East",
+					"Location": { "X":66, "Y":34 }
+				},
+				{
+					"TypeID":"RoboSurveyor",
+					"Direction":"East",
+					"Location": { "X":66, "Y":39 }
+				},
+				{
+					"TypeID":"RoboMiner",
+					"Direction":"East",
+					"Location": { "X":66, "Y":40 }
+				},
+				{
+					"TypeID":"Earthworker",
+					"Direction":"East",
+					"Location": { "X":66, "Y":41 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":42 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":43 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":44 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":45 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":46 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":66, "Y":47 }
+				}
+			]
+		},
+		{
+			"ID":5,
+			"TechLevel":13,
+			"MoraleLevel":"Excellent",
+			"FreeMorale":true,
+			"IsEden":false,
+			"IsHuman":true,
+			"BotType":"LaunchStarship",
+			"Color":"Magenta",
+			"Allies":[],
+			"CenterView": { "X":27, "Y":38 },
+			
+			"Kids":10,
+			"Workers":44,
+			"Scientists":23,
+			"CommonOre":27000,
+			"RareOre":25000,
+			"Food":7000,
+			"SolarSatellites":1,
+			
+			"CompletedResearch":
+			[
+				5110,
+				5405,
+				8601
+			],
+			
+			"Units":
+			[
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommandCenter",
+					"Direction":"East",
+					"Location": { "X":90, "Y":38 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"StructureFactory",
+					"Direction":"East",
+					"Location": { "X":90, "Y":37 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"CommonOreSmelter",
+					"Direction":"East",
+					"Location": { "X":90, "Y":36 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Agridome",
+					"Direction":"East",
+					"Location": { "X":90, "Y":35 }
+				},
+				{
+					"TypeID":"ConVec",
+					"CargoType":"Tokamak",
+					"Direction":"East",
+					"Location": { "X":90, "Y":34 }
+				},
+				{
+					"TypeID":"RoboSurveyor",
+					"Direction":"East",
+					"Location": { "X":90, "Y":39 }
+				},
+				{
+					"TypeID":"RoboMiner",
+					"Direction":"East",
+					"Location": { "X":90, "Y":40 }
+				},
+				{
+					"TypeID":"Earthworker",
+					"Direction":"East",
+					"Location": { "X":90, "Y":41 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":90, "Y":42 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":90, "Y":43 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":90, "Y":44 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"CommonMetal",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":90, "Y":45 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":90, "Y":46 }
+				},
+				{
+					"TypeID":"CargoTruck",
+					"CargoType":"Food",
+					"CargoAmount":1000,
+					"Direction":"East",
+					"Location": { "X":90, "Y":47 }
+				}
+			]
+		}
+	],
+	
+	"AutoLayouts":
+	[
+	],
+	
+	"Disasters":
+	[
+	],
+	"Triggers":[],
+	"Triggers2":
+	[
+		{
+			"Comment":"Trigger for losing.",
+			"ID":1,
+			"Type":"Operational",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"PlayerID":0,
+			"UnitType":"CommandCenter",
+			"Count":1,
+			"CompareType":"Lower",
+			
+			"Actions":[]
+		},
+		{
+			"Comment":"Random test trigger.",
+			"ID":2,
+			"Type":"VehicleCount",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"PlayerID":0,
+			"Count":2,
+			"CompareType":"GreaterEqual",
+			
+			"Actions":
+			[
+				{ "Type":"AddMessage", "Message":"My Vehicle Message", "PlayerID":0, "SoundID":64 }
+			]
+		},
+		{
+			"Comment":"Trigger for winning.",
+			"ID":3,
+			"Type":"VehicleCount",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"PlayerID":0,
+			"Count":4000,
+			"CompareType":"GreaterEqual",
+			
+			"Actions":[]
+		},
+		{
+			"Comment":"Victory Condition",
+			"ID":4,
+			"Type":"Victory",
+			"Enabled":true,
+			"OneShot":true,
+			
+			"TriggerID":3,
+			"Message":"Create 4000 vehicles",
+			
+			"Actions":[]
+		},
+		{
+			"Comment":"Failure Condition",
+			"ID":5,
+			"Type":"Failure",
+			"Enabled":false,
+			"OneShot":true,
+			
+			"TriggerID":1,
+			
+			"Actions":[]
+		}
+	]
+}
