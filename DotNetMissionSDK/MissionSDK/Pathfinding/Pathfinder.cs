@@ -36,6 +36,19 @@ namespace DotNetMissionSDK.Pathfinding
 		/// <returns>The path from startPt to endPt, or null, if a path could not be found.</returns>
 		public static LOCATION[] GetPath(LOCATION startPt, LOCATION goal, bool allowDiagonal, TileCostCallback tileCostCB)
 		{
+			return GetPath(new LOCATION[] { startPt }, goal, allowDiagonal, tileCostCB);
+		}
+
+		/// <summary>
+		/// Gets an optimal path from a start point to an end point.
+		/// </summary>
+		/// <param name="startPt">The starting points for the path.</param>
+		/// <param name="goal">The target point to reach.</param>
+		/// <param name="allowDiagonal">Can the path move diagonally?</param>
+		/// <param name="tileCostCB">A callback for getting the cost of a tile.</param>
+		/// <returns>The path from startPt to endPt, or null, if a path could not be found.</returns>
+		public static LOCATION[] GetPath(IEnumerable<LOCATION> startPts, LOCATION goal, bool allowDiagonal, TileCostCallback tileCostCB)
+		{
 			if (!goal.IsInMapBounds())
 				return null;
 
@@ -49,10 +62,16 @@ namespace DotNetMissionSDK.Pathfinding
 			if (allowDiagonal)
 				adjacentCount = 8;
 
-			// Add start point
-			PathNode startNode = new PathNode(startPt);
-			openSet.Add(startNode);
-			openSetHash.Add(startNode.GetHashCode(), startNode);
+			// Add start points
+			foreach (LOCATION startPt in startPts)
+			{
+				PathNode node = new PathNode(startPt);
+				if (!openSetHash.ContainsKey(node.GetHashCode()))
+				{
+					openSet.Add(node);
+					openSetHash.Add(node.GetHashCode(), node);
+				}
+			}
 
 			while (openSet.Count > 0)
 			{

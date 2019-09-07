@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace DotNetMissionSDK
 {
@@ -291,6 +290,20 @@ namespace DotNetMissionSDK
 					Math.Max(Math.Min(point.x, xMax), xMin),
 					Math.Max(Math.Min(point.y, yMax), yMin)
 				);
+		}
+
+		public LOCATION[] GetPoints()
+		{
+			LOCATION[] points = new LOCATION[width*height];
+
+			int i=0;
+			for (int x=xMin; x < xMax; ++x)
+			{
+				for (int y=yMin; y < yMax; ++y)
+					points[i++] = new LOCATION(x,y);
+			}
+
+			return points;
 		}
 
 		public override string ToString()

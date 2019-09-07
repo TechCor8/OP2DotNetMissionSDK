@@ -17,16 +17,51 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			/// Bit flags for each player. If flag is set, player has command access.
 			/// </summary>
 			private byte m_HasCommandAccess;
+			private StructureState cc0,cc1,cc2,cc3,cc4,cc5,cc6,cc7;
 
-			public void SetCommandAccess(int playerID, int isActive)
+			public void SetCommandAccess(int playerID, int isActive, StructureState cc)
 			{
 				m_HasCommandAccess &= (byte)~playerID;
 				m_HasCommandAccess |=  (byte)(isActive << playerID);
+
+				// Check if a CC has already claimed this tile
+				// Replace CC only if assigned CC is inactive
+				StructureState assignedCC = GetCommandCenter(playerID);
+				if (assignedCC != null && assignedCC.isEnabled)
+					return;
+
+				switch (playerID)
+				{
+					case 0:		cc0 = cc;		break;
+					case 1:		cc1 = cc;		break;
+					case 2:		cc2 = cc;		break;
+					case 3:		cc3 = cc;		break;
+					case 4:		cc4 = cc;		break;
+					case 5:		cc5 = cc;		break;
+					case 6:		cc6 = cc;		break;
+					case 7:		cc7 = cc;		break;
+				}
 			}
 
 			public bool HasCommandAccess(int playerID)
 			{
 				return (m_HasCommandAccess & (1 << playerID)) != 0;
+			}
+
+			public StructureState GetCommandCenter(int playerID)
+			{
+				switch (playerID)
+				{
+					case 0:		return cc0;
+					case 1:		return cc1;
+					case 2:		return cc2;
+					case 3:		return cc3;
+					case 4:		return cc4;
+					case 5:		return cc5;
+					case 6:		return cc6;
+					case 7:		return cc7;
+				}
+				return null;
 			}
 		}
 
@@ -60,11 +95,11 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			{
 				foreach (StructureState cc in stateSnapshot.players[playerID].units.commandCenters)
 				{
-					Pathfinder.GetClosestValidTile(cc.position, (x,y) => GetTileCost(playerID, x,y), IsValidTile, false);
+					Pathfinder.GetClosestValidTile(cc.position, (x,y) => GetTileCost(playerID, cc, x,y), IsValidTile, false);
 
 					LOCATION gridPoint = GetPointInGridSpace(cc.position);
 
-					m_Grid[gridPoint.x, gridPoint.y].SetCommandAccess(playerID, 1);
+					m_Grid[gridPoint.x, gridPoint.y].SetCommandAccess(playerID, 1, cc);
 				}
 			}
 		}
@@ -122,6 +157,11 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 
 		public bool GetClosestConnectedTile(int playerID, LOCATION pt, out LOCATION closestPt)
 		{
+			return GetClosestConnectedTile(playerID, pt, out closestPt);
+		}
+
+		public bool GetClosestConnectedTile(int playerID, IEnumerable<LOCATION> points, out LOCATION closestPt)
+		{
 			Pathfinder.ValidTileCallback validTileCB = (int x, int y) =>
 			{
 				LOCATION gridPoint = GetPointInGridSpace(new LOCATION(x,y));
@@ -129,7 +169,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 				return m_Grid[gridPoint.x,gridPoint.y].HasCommandAccess(playerID);
 			};
 
-			return Pathfinder.GetClosestValidTile(pt, GetDefaultTileCost, validTileCB, out closestPt, false);
+			return Pathfinder.GetClosestValidTile(points, GetDefaultTileCost, validTileCB, out closestPt, false);
 		}
 
 		public LOCATION[] GetPathToClosestConnectedTile(int playerID, LOCATION pt)
@@ -144,37 +184,21 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 
 		public LOCATION[] GetPathToClosestConnectedTile(int playerID, MAP_RECT area)
 		{
-			LOCATION centerPt = new LOCATION((area.xMin+area.xMax)/2, (area.yMin+area.yMax)/2);
+			LOCATION[] startPts = area.GetPoints();
 			LOCATION closestPt;
 
-			if (!GetClosestConnectedTile(playerID, centerPt, out closestPt))
+			if (!GetClosestConnectedTile(playerID, startPts, out closestPt))
 				return null;
 
-			LOCATION[] path = Pathfinder.GetPath(closestPt, centerPt, false, GetDefaultTileCost);
+			LOCATION[] path = Pathfinder.GetPath(startPts, closestPt, false, GetDefaultTileCost);
 			if (path == null)
 				return path;
 
-			// Remove excess tubing. If path is adjacent to area, we don't need anything after it.
 			List<LOCATION> cullPath = new List<LOCATION>(path);
 
-			area.Inflate(1,1);
-
-			for (int i=0; i < cullPath.Count; ++i)
-			{
-				LOCATION pt = cullPath[i];
-
-				if (area.Contains(pt))
-				{
-					if (pt.x != area.xMin && pt.y != area.yMin &&		// Top left
-						pt.x != area.xMax-1 && pt.y != area.yMin &&		// Top right
-						pt.x != area.xMax-1 && pt.y != area.yMax-1 &&	// Bottom right
-						pt.x != area.xMin && pt.y != area.yMax-1)		// Bottom left
-					{
-						++i;
-						cullPath.RemoveRange(i, cullPath.Count-i);
-					}
-				}
-			}
+			// Remove the start and end points, which are already connected
+			cullPath.RemoveAt(0);
+			cullPath.RemoveAt(cullPath.Count-1);
 
 			return cullPath.ToArray();
 		}
@@ -188,7 +212,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		}
 
 		// Callback for determining tile cost
-		private int GetTileCost(int playerID, int x, int y)
+		private int GetTileCost(int playerID, StructureState cc, int x, int y)
 		{
 			// Out of map bounds is impassable
 			if (!GameMap.bounds.Contains(x, y))
@@ -204,7 +228,7 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 				return Pathfinder.Impassable;
 
 			// If tube or structure, mark grid as connected
-			m_Grid[gridPoint.x,gridPoint.y].SetCommandAccess(playerID, 1);
+			m_Grid[gridPoint.x,gridPoint.y].SetCommandAccess(playerID, 1, cc);
 
 			return 1;
 		}
@@ -259,6 +283,20 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			Pathfinder.GetClosestValidTile(tile, tileCostCB, IsValidTile, false);
 
 			return new List<StructureState>(connectedStructures.Values);
+		}
+
+		/// <summary>
+		/// Returns a command center connected to this tile, or null if tile is not connected.
+		/// If more than one CC connects to this tile, the first one found that is enabled will be returned.
+		/// </summary>
+		public StructureState GetConnectedCommandCenter(int playerID, LOCATION tile)
+		{
+			LOCATION gridPoint;
+
+			tile.ClipToMap();
+			gridPoint = GetPointInGridSpace(tile);
+
+			return m_Grid[gridPoint.x, gridPoint.y].GetCommandCenter(playerID);
 		}
 
 		/// <summary>
