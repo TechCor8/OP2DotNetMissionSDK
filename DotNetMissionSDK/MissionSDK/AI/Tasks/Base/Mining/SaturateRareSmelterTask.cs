@@ -31,6 +31,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 					if (site.beacon.oreType != BeaconType.Rare)
 						continue;
 
+					if (!site.mine.isEnabled)
+						continue;
+
 					foreach (MiningSmelter smelter in site.smelters)
 					{
 						if (!smelter.smelter.isEnabled)
