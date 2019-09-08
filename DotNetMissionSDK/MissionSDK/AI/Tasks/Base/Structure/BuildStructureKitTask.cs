@@ -158,6 +158,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (owner.units.commandCenters.Count == 0)
 				return true;
 
+			// If factory is already building structure, do nothing.
+			// TODO: Only do nothing if factory is making the desired kit
+			if (owner.units.structureFactories.FirstOrDefault((fact) => fact.isBusy) != null)
+				return true;
+
 			// Place building at random command center
 			LOCATION targetPosition = owner.units.commandCenters[GetNextCommandCenterTarget(owner)].position;
 
