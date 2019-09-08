@@ -107,6 +107,10 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private void UpdatePriorityList(StateSnapshot stateSnapshot, StructureState[] priorityStructures)
 		{
+			// We control command center priority internally, so remove any references to them
+			List<StructureState> externalStructurePriority = new List<StructureState>(priorityStructures);
+			externalStructurePriority.RemoveAll((structure) => structure.unitType == map_id.CommandCenter);
+
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			m_StructurePriority.Clear();
@@ -141,11 +145,8 @@ namespace DotNetMissionSDK.AI.Managers
 			AddPriorityBuilding(stateSnapshot, owner.units.rareStorages, rareStoragesRequired);
 
 
-			// TODO: Detect if buildings connected to CC are active, if not, mark CC as useless. For now, just make them all high priority
-			AddPriorityBuilding(stateSnapshot, owner.units.commandCenters, owner.units.commandCenters.Count);
-
-			// Labor manager chosen structures are very high priority
-			AddPriorityBuilding(stateSnapshot, priorityStructures, int.MaxValue);
+			// Base manager chosen structures are very high priority
+			AddPriorityBuilding(stateSnapshot, externalStructurePriority, int.MaxValue);
 
 			// Get number of agridomes needed
 			int neededAgridomes = 1;
@@ -226,6 +227,50 @@ namespace DotNetMissionSDK.AI.Managers
 			AddPriorityBuilding(stateSnapshot, owner.units.garages, 0, true);
 			AddPriorityBuilding(stateSnapshot, owner.units.tradeCenters, 0, true);
 			AddPriorityBuilding(stateSnapshot, owner.units.basicLabs, 0, true);
+
+			// Determine command center priority based on structure priority
+			List<StructureState> unassignedCCs = new List<StructureState>(owner.units.commandCenters);
+
+			// Crippled CCs are always put in the crippled priority
+			for (int i=0; i < unassignedCCs.Count; ++i)
+			{
+				if (!CanBeActivated(stateSnapshot, unassignedCCs[i]))
+				{
+					AddPriorityUnique(m_CrippledStructures, unassignedCCs[i], 3);
+					unassignedCCs.RemoveAt(i--);
+				}
+			}
+
+			AssignCommandCenterPriority(stateSnapshot, unassignedCCs, m_StructurePriority);
+			AssignCommandCenterPriority(stateSnapshot, unassignedCCs, m_LowPriorityStructures);
+			AssignCommandCenterPriority(stateSnapshot, unassignedCCs, m_UselessStructures);
+			m_UselessStructures.AddRange(unassignedCCs); // Remaining CCs are extra useless
+		}
+
+		private void AssignCommandCenterPriority(StateSnapshot stateSnapshot, List<StructureState> unassignedCCs, List<StructureState> priorityList)
+		{
+			for (int i=0; i < priorityList.Count; ++i)
+			{
+				StructureState structure = priorityList[i];
+
+				// Structures that don't need a command center are ignored
+				if (!BuildStructureTask.NeedsTube(structure.unitType))
+					continue;
+
+				StructureState cc = stateSnapshot.commandMap.GetConnectedCommandCenter(ownerID, structure.position);
+				if (cc == null) continue; // Structure not connected
+
+				// Assign CC priority above this structure
+				if (unassignedCCs.Remove(cc))
+				{
+					priorityList.Insert(i--, cc);
+
+					if (unassignedCCs.Count == 0)
+						break;
+
+					continue;
+				}
+			}
 		}
 
 		// Returns remaining capacity
