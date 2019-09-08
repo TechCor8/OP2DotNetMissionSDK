@@ -18,12 +18,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		public override bool IsTaskComplete(StateSnapshot stateSnapshot)
 		{
-			foreach (Task task in m_Prerequisites)
-			{
-				if (!task.IsTaskComplete(stateSnapshot))
-					return false;
-			}
-
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			UnitState ccWithLeastGuards = null;
@@ -66,8 +60,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			if (ccWithLeastGuards != null)
 			{
 				m_MaintainGuardPostTask.targetCountToMaintain = owner.units.guardPosts.Count+1;
-				m_MaintainGuardPostTask.guardKitTask.RandomizeTurret(false);
+				m_MaintainGuardPostTask.guardKitTask.RandomizeTurret(owner.isEden, false);
 				m_MaintainGuardPostTask.buildTask.SetLocation(ccWithLeastGuards.position);
+			}
+
+			foreach (Task task in m_Prerequisites)
+			{
+				if (!task.IsTaskComplete(stateSnapshot))
+					return false;
 			}
 			
 			return true;
@@ -87,7 +87,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				AddPrerequisite(task);
 
 			m_MaintainGuardPostTask.targetCountToMaintain = 0;
-			m_MaintainGuardPostTask.guardKitTask.RandomizeTurret(false);
+			m_MaintainGuardPostTask.guardKitTask.RandomizeTurret(GameState.players[ownerID].IsEden(), false);
 		}
 
 		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)

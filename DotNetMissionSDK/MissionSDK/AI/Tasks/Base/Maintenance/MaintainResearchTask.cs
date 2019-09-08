@@ -9,6 +9,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 	/// </summary>
 	public class MaintainResearchTask : Task
 	{
+		private MaintainStandardLabTask m_MaintainStandardLabTask;
 		private MaintainAdvancedLabTask m_MaintainAdvancedLabTask;
 
 		
@@ -27,12 +28,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			if (scientistsForResearch > 8)
 				m_MaintainAdvancedLabTask.targetCountToMaintain = (int)Math.Ceiling(scientistsForResearch / 16.0f) + 1;
 
-			return owner.units.standardLabs.Count > 0 && owner.units.advancedLabs.Count >= m_MaintainAdvancedLabTask.targetCountToMaintain;
+			return m_MaintainStandardLabTask.IsTaskComplete(stateSnapshot) && m_MaintainAdvancedLabTask.IsTaskComplete(stateSnapshot);
 		}
 
 		public override void GeneratePrerequisites()
 		{
-			AddPrerequisite(new MaintainStandardLabTask(ownerID));
+			AddPrerequisite(m_MaintainStandardLabTask = new MaintainStandardLabTask(ownerID));
 			AddPrerequisite(m_MaintainAdvancedLabTask = new MaintainAdvancedLabTask(ownerID));
 		}
 

@@ -225,13 +225,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		{
 			m_BuildDirtTask.targetCountToMaintain = 0;
 
-			// Don't build more DIRT if we aren't using all the ones we have
-			foreach (StructureState dirt in owner.units.dirts)
-			{
-				if (!dirt.isEnabled)
-					return;
-			}
-
 			StructureInfo dirtInfo = owner.structureInfo[map_id.DIRT];
 			int productionCap = dirtInfo.productionCapacity;
 

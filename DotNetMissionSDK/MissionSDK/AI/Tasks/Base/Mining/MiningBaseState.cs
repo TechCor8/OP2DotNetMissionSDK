@@ -326,7 +326,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 		public void AddSmelter(StructureState smelter)
 		{
-			if (mine == null)
+			if (mine == null || !mine.isEnabled)
 				return;
 
 			int distance = smelter.position.GetDiagonalDistance(mine.position);
@@ -345,6 +345,10 @@ namespace DotNetMissionSDK.AI.Managers
 
 		public void AddTrucks(List<CargoTruckState> unassignedTrucks)
 		{
+			// Don't add trucks to a site that can't provide ore
+			if (mine == null || !mine.isEnabled)
+				return;
+
 			// Update smelter truck assignments
 			foreach (MiningSmelter smelter in smelters)
 				smelter.AddTrucks(unassignedTrucks);
