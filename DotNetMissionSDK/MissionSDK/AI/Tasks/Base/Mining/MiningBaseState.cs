@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Managers
@@ -78,6 +79,19 @@ namespace DotNetMissionSDK.AI.Managers
 				return false;
 			});
 
+			// Determine if we need to prioritize truck assignments
+			StructureInfo vehicleFactoryInfo = owner.structureInfo[map_id.VehicleFactory];
+			VehicleInfo truckInfo = owner.vehicleInfo[map_id.CargoTruck];
+
+			int vehicleFactoryCost = owner.units.vehicleFactories.Count == 0 ? vehicleFactoryInfo.oreCost : 0;
+
+			bool needCommonFirst = owner.ore < truckInfo.oreCost + vehicleFactoryCost;
+			bool needRareFirst = owner.rareOre < truckInfo.rareOreCost && owner.units.vehicleFactories.Count > 0;
+
+			// If we need resources for trucks, we need to reset truck assignments
+			if (needCommonFirst || needRareFirst)
+				ResetTruckAssignments();
+
 			// Remove dead command centers from the current mining bases list
 			miningBases.RemoveAll((MiningBase miningBase) => !m_UnassignedCommandCenters.Contains(miningBase.commandCenter));
 
@@ -106,11 +120,43 @@ namespace DotNetMissionSDK.AI.Managers
 				closestSite.AddSmelter(smelter);
 			}
 
+			// Assign trucks to mines based on ability to create more trucks.
+			// If we can't build more trucks, mining the ore we need is more important.
+			if (needCommonFirst || needRareFirst)
+			{
+				// Prioritize truck assignments
+				foreach (MiningBase miningBase in miningBases)
+				{
+					foreach (MiningSite miningSite in miningBase.miningSites)
+					{
+						if (!needCommonFirst && miningSite.beacon.oreType == BeaconType.Common) continue;
+						if (!needRareFirst && miningSite.beacon.oreType == BeaconType.Rare) continue;
+
+						miningSite.AddTrucks(m_UnassignedTrucks);
+
+						if (miningSite.beacon.oreType == BeaconType.Common) needCommonFirst = false;
+						if (miningSite.beacon.oreType == BeaconType.Rare) needRareFirst = false;
+					}
+				}
+			}
+
 			// Update truck assignments
 			foreach (MiningBase miningBase in miningBases)
 			{
 				foreach (MiningSite miningSite in miningBase.miningSites)
 					miningSite.AddTrucks(m_UnassignedTrucks);
+			}
+		}
+
+		private void ResetTruckAssignments()
+		{
+			foreach (MiningBase miningBase in miningBases)
+			{
+				foreach (MiningSite miningSite in miningBase.miningSites)
+				{
+					foreach (MiningSmelter smelter in miningSite.smelters)
+						smelter.trucks.Clear();
+				}
 			}
 		}
 
