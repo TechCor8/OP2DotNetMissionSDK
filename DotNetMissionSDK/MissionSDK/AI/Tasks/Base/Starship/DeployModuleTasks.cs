@@ -33,14 +33,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			AddPrerequisite(new DeployPhoenixModuleTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			if (owner.foodStored < 10000)
-				return true;
+			if (owner.foodStored < 10000 || IsRequirementRestricted(restrictedRequirements, TaskRequirements.Food))
+				return new TaskResult(TaskRequirements.Food);
 
-			return base.PerformTask(stateSnapshot, unitActions);
+			return base.PerformTask(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 

@@ -34,9 +34,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(new CreateCommonMiningBaseTask(ownerID, m_MiningBaseState), true);	// Put bases on all unoccupied beacons
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 	}
 }

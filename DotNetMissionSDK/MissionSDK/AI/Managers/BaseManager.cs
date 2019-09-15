@@ -5,7 +5,6 @@ using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.Async;
 using System.Collections.Generic;
 using DotNetMissionSDK.AI.Tasks.Base.Goals;
-using DotNetMissionSDK.State.Snapshot.Units;
 using System.Collections.ObjectModel;
 
 namespace DotNetMissionSDK.AI.Managers
@@ -15,6 +14,23 @@ namespace DotNetMissionSDK.AI.Managers
 	/// </summary>
 	public class BaseManager
 	{
+		/// <summary>
+		/// Used for passing params from the async task to the async completion callback.
+		/// </summary>
+		private class AsyncParams
+		{
+			public BotCommands botCommands			{ get; private set; }
+			public List<int> structureIDLaborOrder	{ get; private set; }
+			public TaskResult goalResults			{ get; private set; }
+
+			public AsyncParams(BotCommands botCommands, List<int> structureIDLaborOrder, TaskResult goalResults)
+			{
+				this.botCommands = botCommands;
+				this.structureIDLaborOrder = structureIDLaborOrder;
+				this.goalResults = goalResults;
+			}
+		}
+
 		// This manager's top-level goals.
 		private Goal[] m_Goals;
 
@@ -38,6 +54,14 @@ namespace DotNetMissionSDK.AI.Managers
 			ThreadAssert.MainThreadRequired();
 
 			return m_StructureLaborOrder;
+		}
+
+		private ReadOnlyCollection<int> m_ResearchTopicPriority;
+		public ReadOnlyCollection<int> GetResearchTopicPriority()
+		{
+			ThreadAssert.MainThreadRequired();
+
+			return m_ResearchTopicPriority;
 		}
 
 		
@@ -112,19 +136,17 @@ namespace DotNetMissionSDK.AI.Managers
 			// Get data that requires main thread
 			m_MaintainArmyGoal.SetVehicleGroupSlots(botPlayer.combatManager.GetUnassignedSlots());
 
-			// Variables that should only be used in async callbacks
-			List<int> structureIDLaborOrder = new List<int>();
-
 			stateSnapshot.Retain();
 
 			AsyncPump.Run(() =>
 			{
 				BotCommands botCommands = new BotCommands();
+				List<int> structureIDLaborOrder = new List<int>();
 
 				// Get goals and perform goal tasks
 				List<Goal> goals = GetPrioritizedGoals(stateSnapshot);
-				PerformGoalTasks(goals, stateSnapshot, botCommands);
-				m_ResetVehicleTask.PerformTaskTree(stateSnapshot, botCommands); // Fix stuck vehicles
+				TaskResult goalResults = PerformGoalTasks(goals, stateSnapshot, botCommands);
+				m_ResetVehicleTask.PerformTaskTree(stateSnapshot, goalResults.missingRequirements, botCommands); // Fix stuck vehicles
 
 				m_DebugMessage = goals[0].GetType().Name; // DEBUG
 
@@ -132,26 +154,27 @@ namespace DotNetMissionSDK.AI.Managers
 				foreach (Goal goal in goals)
 					goal.GetStructuresToActivate(stateSnapshot, structureIDLaborOrder);
 
-				return botCommands;
+				return new AsyncParams(botCommands, structureIDLaborOrder, goalResults);
 			},
 			(object returnState) =>
 			{
 				m_IsProcessing = false;
 
 				// Execute all completed actions
-				BotCommands botCommands = (BotCommands)returnState;
+				AsyncParams asyncParams = (AsyncParams)returnState;
 
-				botCommands.Execute();
+				asyncParams.botCommands.Execute();
 
 				// Store data
-				m_StructureLaborOrder = structureIDLaborOrder.AsReadOnly();
+				m_StructureLaborOrder = asyncParams.structureIDLaborOrder.AsReadOnly();
+				m_ResearchTopicPriority = asyncParams.goalResults.neededResearchTopics;
 				
 				stateSnapshot.Release();
 
 				// DEBUG:
 				if (ownerID == TethysGame.LocalPlayer())
 				{
-					TethysGame.AddMessage(ownerID, m_DebugMessage, ownerID, 0);
+					//TethysGame.AddMessage(ownerID, m_DebugMessage, ownerID, 0);
 				}
 			});
 		}
@@ -172,22 +195,25 @@ namespace DotNetMissionSDK.AI.Managers
 			return goals;
 		}
 
-		private void PerformGoalTasks(IEnumerable<Goal> goals, StateSnapshot stateSnapshot, BotCommands botCommands)
+		private TaskResult PerformGoalTasks(IEnumerable<Goal> goals, StateSnapshot stateSnapshot, BotCommands botCommands)
 		{
+			TaskResult result = new TaskResult(TaskRequirements.None);
+
 			foreach (Goal goal in goals)
 			{
 				// Goals that approach zero importance should not be performed at all.
 				if (goal.importance < 0.0001f)
 					continue;
 
-				// If task failed, do not perform lower priority tasks, as they may prevent acquisition of resources to complete this task.
-				if (!goal.PerformTask(stateSnapshot, botCommands))
-					break;
-
+				// Perform the task. Combine the results.
+				result += goal.PerformTask(stateSnapshot, result.missingRequirements, botCommands);
+				
 				// If true, this goal always blocks lower priority goals, regardless of whether the goal's task was completed successfully.
 				if (goal.blockLowerPriority)
 					break;
 			}
+
+			return result;
 		}
 	}
 }

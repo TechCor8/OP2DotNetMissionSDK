@@ -28,9 +28,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		/// <summary>
 		/// Performs this goal's task.
 		/// </summary>
-		public override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return m_Task.PerformTaskTree(stateSnapshot, unitActions);
+			return m_Task.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 }

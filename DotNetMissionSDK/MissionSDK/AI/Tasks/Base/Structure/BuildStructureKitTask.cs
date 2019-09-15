@@ -90,16 +90,16 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return owner.CanBuildUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Fail Check: Research
 			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuild))
-				return true;
+				return new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(m_KitToBuild).researchTopic);
 
 			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuildCargo))
-				return true;
+				return new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(m_KitToBuildCargo).researchTopic);
 
 			// Get structure factories with kit
 			List<FactoryState> factories = owner.units.structureFactories.Where((FactoryState unit) => unit.HasBayWithCargo(m_KitToBuild)).ToList();
@@ -114,10 +114,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				{
 					// Wait if docking is in progress
 					if (convec.curAction != ActionType.moDone)
-						return true;
+						return new TaskResult(TaskRequirements.None);
 
 					unitActions.AddUnitCommand(convec.unitID, 1, () => GameState.GetUnit(factoryWithKit.unitID)?.DoTransferCargo(factoryWithKit.GetBayWithCargo(m_KitToBuild)));
-					return true;
+					return new TaskResult(TaskRequirements.None);
 				}
 
 				// Get closest convec that isn't doing anything
@@ -139,7 +139,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				}
 
 				if (convec == null)
-					return true;
+					return new TaskResult(TaskRequirements.None);
 
 				// Send convec to dock
 				unitActions.AddUnitCommand(convec.unitID, 1, () =>
@@ -149,19 +149,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 						GameState.GetUnit(convec.unitID)?.DoDock(facWithKit);
 				});
 
-				return true;
+				return new TaskResult(TaskRequirements.None);
 			}
 
 			if (factories.Count > 0)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			if (owner.units.commandCenters.Count == 0)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			// If factory is already building structure, do nothing.
 			// TODO: Only do nothing if factory is making the desired kit
 			if (owner.units.structureFactories.FirstOrDefault((fact) => fact.isBusy) != null)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			// Place building at random command center
 			LOCATION targetPosition = owner.units.commandCenters[GetNextCommandCenterTarget(owner)].position;
@@ -177,23 +177,25 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			// If factory not found, most likely it is not enabled
 			if (factory == null)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			if (factory.isBusy)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			if (!factory.HasEmptyBay())
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
-			if (!owner.CanAffordUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo))
-				return false;
-
+			// Fail Check: Kit Cost
+			TaskResult buildResult;
+			if (!TaskResult.CanBuildUnit(out buildResult, stateSnapshot, owner, restrictedRequirements, m_KitToBuild, m_KitToBuildCargo))
+				return buildResult;
+			
 			// Build kit
 			ProduceUnit(unitActions, factory.unitID, m_KitToBuild, m_KitToBuildCargo);
 
 			m_NextTargetCC = -1;
 			
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id kitToBuild, map_id kitToBuildCargo)

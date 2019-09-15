@@ -46,17 +46,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(new BuildMinerTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Get miner
-			if (owner.units.roboMiners.Count == 0) return true;
+			//if (owner.units.roboMiners.Count == 0) return true;
 			VehicleState miner = owner.units.roboMiners[0];
 			
 			// Check if miner is being deployed (Both exist at the same time for a moment and triggers a bug)
 			if (owner.units.rareOreMines.FirstOrDefault((StructureState mine) => mine.position.Equals(miner.position)) != null)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 			
 			// Find closest unoccupied rare beacon
 			MiningBeaconState beacon = GetClosestUnusedBeacon(miner);
@@ -71,7 +71,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				if (!miner.position.Equals(beaconPosition) && miner.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
 					unitActions.AddUnitCommand(miner.unitID, 1, () => GameState.GetUnit(miner.unitID)?.DoDeployMiner(beaconPosition.x, beaconPosition.y));
 
-				return true;
+				return new TaskResult(TaskRequirements.None);
 			}
 			
 			// Move miner involved in expansion close to beacon for efficiency
@@ -79,15 +79,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				unitActions.AddUnitCommand(miner.unitID, 1, () => GameState.GetUnit(miner.unitID)?.DoMove(beaconPosition.x-1, beaconPosition.y+1));
 			
 			// Survey beacon
-			if (owner.units.roboSurveyors.Count == 0)
-				return true;
+			//if (owner.units.roboSurveyors.Count == 0)
+			//	return true;
 			
 			VehicleState surveyor = owner.units.roboSurveyors[0];
 
 			if (!surveyor.position.Equals(beaconPosition) && surveyor.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
 				unitActions.AddUnitCommand(surveyor.unitID, 1, () => GameState.GetUnit(surveyor.unitID)?.DoMove(beaconPosition.x, beaconPosition.y));
 			
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private MiningBeaconState GetClosestUnusedBeacon(VehicleState miner)

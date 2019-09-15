@@ -62,9 +62,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				AddPrerequisite(task);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		public void UpdateRequirements(StateSnapshot stateSnapshot)

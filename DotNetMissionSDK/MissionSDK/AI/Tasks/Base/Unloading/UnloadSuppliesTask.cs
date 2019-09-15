@@ -44,7 +44,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Unloading
 		{
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -133,7 +133,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Unloading
 				break;
 			}
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private void FixTruckUnloading(StateSnapshot stateSnapshot, BotCommands unitActions, CargoTruckState truck)

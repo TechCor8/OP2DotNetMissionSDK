@@ -49,7 +49,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				AddPrerequisite(task);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -62,14 +62,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			foreach (StructureState powerPlant in powerPlants)
 			{
 				if (!powerPlant.isEnabled)
-					return true;
+					return new TaskResult(TaskRequirements.None);
 			}
 
 			// Build new power plant
 			if (!BuildGeothermalPlant(stateSnapshot, owner, unitActions))
 				BuildPowerPlant(stateSnapshot, owner);
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private void BuildPowerPlant(StateSnapshot stateSnapshot, PlayerState owner)

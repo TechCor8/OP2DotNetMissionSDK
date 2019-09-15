@@ -63,9 +63,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(m_MaintainSmelterTask = new MaintainRareSmelterTask(ownerID), true);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private bool SetSmelterLocation(StateSnapshot stateSnapshot)

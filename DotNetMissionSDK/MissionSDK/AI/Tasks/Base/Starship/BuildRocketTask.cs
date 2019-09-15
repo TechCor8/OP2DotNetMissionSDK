@@ -25,8 +25,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			AddPrerequisite(new MaintainSpaceportTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
+			TaskResult result = new TaskResult(TaskRequirements.None);
+
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Get active spaceport
@@ -34,26 +36,31 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 
 			// If spaceport not found, most likely it is not enabled, but may have EMP missile instead
 			if (spaceport == null)
-				return true;
+				return result;
 
 			// Do nothing if we are waiting for RLV to return
 			if (owner.rlvCount > 0)
-				return true;
+				return result;
 
 			if (spaceport.isBusy)
-				return true;
+				return result;
 
 			map_id rocketToBuild = map_id.SULV;
 
 			// Build an RLV if we have the technology
 			if (owner.HasTechnologyForUnit(stateSnapshot, map_id.RLV))
 				rocketToBuild = map_id.RLV;
+			else if (owner.CanColonyUseUnit(stateSnapshot, map_id.RLV))
+				result = new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(map_id.RLV).researchTopic);
 
 			// Fail Check: Rocket cost
-			if (owner.CanBuildUnit(stateSnapshot, rocketToBuild))
-				unitActions.AddUnitCommand(spaceport.unitID, 1, () => GameState.GetUnit(spaceport.unitID)?.DoDevelop(rocketToBuild));
+			TaskResult buildResult;
+			if (!TaskResult.CanBuildUnit(out buildResult, stateSnapshot, owner, restrictedRequirements, rocketToBuild))
+				return result + buildResult;
 
-			return true;
+			unitActions.AddUnitCommand(spaceport.unitID, 1, () => GameState.GetUnit(spaceport.unitID)?.DoDevelop(rocketToBuild));
+
+			return result;
 		}
 	}
 }

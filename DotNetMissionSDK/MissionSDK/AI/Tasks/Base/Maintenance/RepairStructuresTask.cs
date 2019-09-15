@@ -61,7 +61,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			//m_BuildRepairUnitTask.GeneratePrerequisites();
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -69,8 +69,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			//	m_BuildRepairUnitTask.PerformTaskTree(stateSnapshot, unitActions);
 
 			// Fail Check: Not enough ore for repairs
-			if (owner.ore < 50)
-				return false;
+			if (owner.ore < 50 || IsRequirementRestricted(restrictedRequirements, TaskRequirements.Common))
+				return new TaskResult(TaskRequirements.Common);
 
 			int damagedStructureCount = 0;
 
@@ -82,11 +82,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					unitToFix.lastCommand == CommandType.ctMoUnDevelop)
 					continue;
 
+				UnitInfoState info = owner.GetUnitInfo(unitToFix.unitType);
+
 				if (repairCriticalOnly)
 				{
 					// If damage not critical, skip unit
-					UnitInfoState info = owner.GetUnitInfo(unitToFix.unitType);
-
 					if (unitToFix.damage / (float)info.hitPoints < RepairStructureTask.CriticalDamagePercentage)
 						continue;
 				}
@@ -101,6 +101,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 					else if (unitToFix.damage <= 0)
 						continue;
 				}
+
+				// Fail Check: Not enough rare ore for repairs
+				if (info.rareOreCost > 0 && (owner.rareOre < 50 || IsRequirementRestricted(restrictedRequirements, TaskRequirements.Rare)))
+					return new TaskResult(TaskRequirements.Rare);
 
 				++damagedStructureCount;
 
@@ -128,7 +132,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			if (damagedStructureCount/4 + 1 > owner.units.GetListForType(m_BuildRepairUnitTask.repairUnitType).Count)
 				m_BuildRepairUnitTask.targetCountToBuild = damagedStructureCount/4 + 1;
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 	}
 }

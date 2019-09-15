@@ -75,7 +75,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return false;
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -86,11 +86,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			});
 
 			if (convec == null)
-				return false;
+				return new TaskResult(TaskRequirements.None);
 
 			// Wait for docking or building to complete
 			if (convec.curAction != ActionType.moDone)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			// If we can build earthworkers or have one, we can deploy disconnected structures
 			m_CanBuildDisconnected = owner.units.earthWorkers.Count > 0 || owner.units.vehicleFactories.Count > 0 || !NeedsTube(m_KitToBuild);
@@ -109,8 +109,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			// Find open location near CC
 			LOCATION foundPt;
-			if (!Pathfinder.GetClosestValidTile(m_TargetLocation, (x,y) => GetTileCost(stateSnapshot, x,y), (x,y) => IsValidTile(stateSnapshot, x,y), out foundPt))
-				return false;
+			if (!Pathfinder.GetClosestValidTile(m_TargetLocation, (x, y) => GetTileCost(stateSnapshot, x, y), (x, y) => IsValidTile(stateSnapshot, x, y), out foundPt))
+				return new TaskResult(TaskRequirements.None);
 
 			// TODO: Run GetClosestValidTile asynchronously? ^^^
 
@@ -119,7 +119,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			// Build structure
 			unitActions.AddUnitCommand(convec.unitID, 2, () => GameState.GetUnit(convec.unitID)?.DoBuild(m_KitToBuild, foundPt.x, foundPt.y));
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		public static void ClearDeployArea(UnitState deployUnit, map_id buildingType, LOCATION deployPt, StateSnapshot stateSnapshot, int ownerID, BotCommands unitActions)

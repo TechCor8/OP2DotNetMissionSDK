@@ -28,16 +28,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_BuildEarthworkerTask = new BuildEarthworkerTask(ownerID);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
+			TaskResult result = new TaskResult(TaskRequirements.None);
+
 			if (!m_BuildEarthworkerTask.IsTaskComplete(stateSnapshot))
-				m_BuildEarthworkerTask.PerformTaskTree(stateSnapshot, unitActions);
+				result += m_BuildEarthworkerTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 
 			// Fail Check: Not enough ore for walls
-			if (owner.ore < 50)
-				return false;
+			if (owner.ore < 50 || IsRequirementRestricted(restrictedRequirements, TaskRequirements.Common))
+				return result + new TaskResult(TaskRequirements.Common);
 
 			int structuresThatNeedWalls = 0;
 
@@ -86,7 +88,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			if (structuresThatNeedWalls/4 + 1 > owner.units.earthWorkers.Count)
 				m_BuildEarthworkerTask.targetCountToBuild = structuresThatNeedWalls/4 + 1;
 
-			return true;
+			return result;
 		}
 
 		private bool GetEmptyTileAroundRect(StateSnapshot stateSnapshot, MAP_RECT area, out LOCATION tile)

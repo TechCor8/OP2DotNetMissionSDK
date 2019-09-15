@@ -16,7 +16,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			AddPrerequisite(buildKitTask = new BuildCommandCenterKitTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -41,7 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				}
 			}
 
-			return base.PerformTask(stateSnapshot, unitActions);
+			return base.PerformTask(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 

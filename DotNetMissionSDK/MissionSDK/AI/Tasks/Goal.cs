@@ -31,13 +31,13 @@ namespace DotNetMissionSDK.AI.Tasks
 		/// <summary>
 		/// Performs this goal's task.
 		/// </summary>
-		/// <returns>Returns true if the task was performed and the next goal should be executed.</returns>
-		public virtual bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		/// <returns>TaskResult that provides info about the task state.</returns>
+		public virtual TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			if (!m_Task.IsTaskComplete(stateSnapshot))
-				return m_Task.PerformTaskTree(stateSnapshot, unitActions);
+				return m_Task.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		/// <summary>

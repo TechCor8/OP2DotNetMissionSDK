@@ -74,10 +74,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		/// <summary>
 		/// Performs this goal's task.
 		/// </summary>
-		public override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			if (m_Task.IsTaskComplete(stateSnapshot))
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			PlayerState owner = stateSnapshot.players[m_OwnerID];
 
@@ -97,7 +97,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 				m_MaintainTask.buildTask.SetLocation(ccWithoutFactory[0].position);
 			}
 
-			return m_Task.PerformTaskTree(stateSnapshot, unitActions);
+			return m_Task.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 }

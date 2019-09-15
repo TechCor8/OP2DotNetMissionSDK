@@ -39,22 +39,24 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return owner.CanBuildUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			if (!CanPerformTask(stateSnapshot))
-				return owner.CanAffordUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
-
+			// Fail Check: Research and Cost
+			TaskResult buildResult;
+			if (!TaskResult.CanBuildUnit(out buildResult, stateSnapshot, owner, restrictedRequirements, m_VehicleToBuild, m_VehicleToBuildCargo))
+				return buildResult;
+			
 			// Get factory to produce
 			FactoryState factory = owner.units.vehicleFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 			
 			if (factory == null)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			ProduceUnit(unitActions, factory.unitID, m_VehicleToBuild, m_VehicleToBuildCargo);
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
@@ -75,22 +77,24 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			AddPrerequisite(new MaintainArachnidFactoryTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			if (!CanPerformTask(stateSnapshot))
-				return owner.CanAffordUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
+			// Fail Check: Research and Cost
+			TaskResult buildResult;
+			if (!TaskResult.CanBuildUnit(out buildResult, stateSnapshot, owner, restrictedRequirements, m_VehicleToBuild, m_VehicleToBuildCargo))
+				return buildResult;
 
 			// Get factory to produce
 			FactoryState factory = owner.units.arachnidFactories.FirstOrDefault((FactoryState unit) => unit.isEnabled && !unit.isBusy);
 			
 			if (factory == null)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			ProduceUnit(unitActions, factory.unitID, m_VehicleToBuild, m_VehicleToBuildCargo);
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)

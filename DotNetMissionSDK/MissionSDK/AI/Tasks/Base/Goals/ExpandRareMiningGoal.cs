@@ -30,7 +30,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		/// <summary>
 		/// Performs this goal's task.
 		/// </summary>
-		public override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[m_OwnerID];
 
@@ -38,10 +38,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			foreach (StructureState structure in owner.units.rareOreSmelters)
 			{
 				if (!structure.isEnabled && !structure.isCritical && stateSnapshot.commandMap.ConnectsTo(m_OwnerID, structure.position))
-					return true;
+					return new TaskResult(TaskRequirements.None);
 			}
 
-			return base.PerformTask(stateSnapshot, unitActions);
+			return base.PerformTask(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 }

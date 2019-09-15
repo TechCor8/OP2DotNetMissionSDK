@@ -24,7 +24,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			AddPrerequisite(m_BuildAgridomeTask = new MaintainAgridomeTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -32,7 +32,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			foreach (StructureState agridome in owner.units.agridomes)
 			{
 				if (!agridome.isEnabled)
-					return true;
+					return new TaskResult(TaskRequirements.None);
 			}
 
 			// Calculate number of agridomes needed for net positive
@@ -47,7 +47,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			m_BuildAgridomeTask.targetCountToMaintain = neededAgridomes;
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 	}
 }

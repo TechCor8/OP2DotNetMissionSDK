@@ -52,15 +52,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		/// <summary>
 		/// Performs this goal's task.
 		/// </summary>
-		public override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[m_OwnerID];
 
 			// Don't perform this task if metals will be lost
 			if (owner.rareOre > owner.maxRareOre - 1000)
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
-			return base.PerformTask(stateSnapshot, unitActions);
+			return base.PerformTask(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 }

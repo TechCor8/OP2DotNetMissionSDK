@@ -49,7 +49,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			return true;
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -93,7 +93,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 					if (!hasAvailableFactory)
 						continue;
 
-					if (vehicleTask.PerformTaskTree(stateSnapshot, unitActions))
+					TaskResult result = vehicleTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+
+					if (result.didSucceed)
 					{
 						// If we successfully performed the task, remove the factory from the available count
 						if (vehicleTask == m_BuildSingleVehicleTask)
@@ -107,7 +109,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 				}
 			}
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		/// <summary>

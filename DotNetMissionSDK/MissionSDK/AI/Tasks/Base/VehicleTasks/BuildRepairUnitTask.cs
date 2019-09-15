@@ -84,9 +84,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			AddPrerequisite(m_BuildConvecTask = new BuildConvecTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return m_BuildVehicleTask.PerformTaskTree(stateSnapshot, unitActions);
+			return m_BuildVehicleTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 }

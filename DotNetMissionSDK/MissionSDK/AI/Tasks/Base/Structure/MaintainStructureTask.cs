@@ -106,9 +106,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return false;
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		/// <summary>

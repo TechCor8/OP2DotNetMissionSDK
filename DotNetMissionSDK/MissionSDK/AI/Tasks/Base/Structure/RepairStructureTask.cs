@@ -51,7 +51,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			AddPrerequisite(m_BuildRepairUnitTask = new BuildRepairUnitTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -59,8 +59,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			//	m_BuildRepairUnitTask.PerformTaskTree(stateSnapshot, unitActions);
 
 			// Fail Check: Not enough ore for repairs
-			if (owner.ore < 50)
-				return false;
+			if (owner.ore < 50 || IsRequirementRestricted(restrictedRequirements, TaskRequirements.Common))
+				return new TaskResult(TaskRequirements.Common);
 
 			// Find damaged structures
 			foreach (UnitState unit in owner.units.GetListForType(m_StructureToRepair))
@@ -77,6 +77,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 				if (unitToFix.damage / (float)info.hitPoints < CriticalDamagePercentage)
 					continue;
+
+				// Fail Check: Not enough rare ore for repairs
+				if (info.rareOreCost > 0 && (owner.rareOre < 50 || IsRequirementRestricted(restrictedRequirements, TaskRequirements.Rare)))
+					return new TaskResult(TaskRequirements.Rare);
 
 				// Get repair unit
 				UnitState repairUnit = owner.units.GetClosestUnitOfType(m_BuildRepairUnitTask.repairUnitType, unitToFix.position);
@@ -96,7 +100,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				});
 			}
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 	}
 }

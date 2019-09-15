@@ -51,7 +51,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		/// <summary>
 		/// Performs this goal's task.
 		/// </summary>
-		public override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[m_OwnerID];
 
@@ -62,10 +62,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 
 			// Build factory
 			if (!m_MaintainVehicleFactoryTask.IsTaskComplete(stateSnapshot))
-				m_MaintainVehicleFactoryTask.PerformTaskTree(stateSnapshot, unitActions);
+				return m_MaintainVehicleFactoryTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 
 			// Build army
-			return m_Task.PerformTaskTree(stateSnapshot, unitActions);
+			return m_Task.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 		}
 
 		/// <summary>

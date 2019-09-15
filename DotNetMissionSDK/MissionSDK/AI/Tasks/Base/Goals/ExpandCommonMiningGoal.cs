@@ -106,7 +106,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		/// <summary>
 		/// Performs this goal's task.
 		/// </summary>
-		public override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[m_OwnerID];
 
@@ -114,17 +114,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			if (owner.vehicleInfo[map_id.CargoTruck].rareOreCost > owner.rareOre && !m_TruckSaturationTask.IsTaskComplete(stateSnapshot))
 			{
 				if (!m_ExpandRareMiningTask.IsTaskComplete(stateSnapshot))
-					return m_ExpandRareMiningTask.PerformTaskTree(stateSnapshot, unitActions);
+					return m_ExpandRareMiningTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 			}
 
 			// Don't expand if smelters are disabled
 			foreach (StructureState structure in owner.units.commonOreSmelters)
 			{
 				if (!structure.isEnabled && !structure.isCritical && stateSnapshot.commandMap.ConnectsTo(m_OwnerID, structure.position))
-					return true;
+					return new TaskResult(TaskRequirements.None);
 			}
 
-			return base.PerformTask(stateSnapshot, unitActions);
+			return base.PerformTask(stateSnapshot, restrictedRequirements, unitActions);
 		}
 	}
 }

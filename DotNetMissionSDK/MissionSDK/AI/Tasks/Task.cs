@@ -67,35 +67,48 @@ namespace DotNetMissionSDK.AI.Tasks
 		{
 			return true;
 		}
-
+		
 		/// <summary>
 		/// Performs this task and any underlying prerequisite tasks.
 		/// You must call this method every update until the task is complete or no longer needed.
 		/// </summary>
 		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
 		/// <param name="unitActions">Actions to be performed by units are added to this list rather than executed directly.</param>
-		/// <returns>True, if task is running. False, if task cannot be performed.</returns>
-		public bool PerformTaskTree(StateSnapshot stateSnapshot, BotCommands unitActions)
+		/// <returns>TaskResult that provides info about the task state.</returns>
+		//public TaskResult PerformTaskTree(StateSnapshot stateSnapshot, BotCommands unitActions)
+		//{
+		//	return PerformTaskTree(stateSnapshot, TaskRequirements.None, unitActions);
+		//}
+
+		/// <summary>
+		/// Performs this task and any underlying prerequisite tasks.
+		/// You must call this method every update until the task is complete or no longer needed.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="restrictedRequirements">Task materials that the task cannot use.</param>
+		/// <param name="unitActions">Actions to be performed by units are added to this list rather than executed directly.</param>
+		/// <returns>TaskResult that provides info about the task state.</returns>
+		public TaskResult PerformTaskTree(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			bool prerequisitesComplete = false;
 
-			if (!PerformPrerequisites(stateSnapshot, unitActions, out prerequisitesComplete))
-				return false;
-
+			TaskResult result = PerformPrerequisites(stateSnapshot, restrictedRequirements, unitActions, out prerequisitesComplete);
+			
 			if (prerequisitesComplete)
-				return PerformTask(stateSnapshot, unitActions);
+				return PerformTask(stateSnapshot, restrictedRequirements, unitActions);
 
-			return true;
+			return result;
 		}
 
-		protected abstract bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions);
+		protected abstract TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions);
 
 		/// <summary>
 		/// Performs prerequisite tasks. If a task cannot be performed, returns false.
 		/// </summary>
-		/// <returns>False, if the task cannot be performed.</returns>
-		private bool PerformPrerequisites(StateSnapshot stateSnapshot, BotCommands unitActions, out bool prerequisitesComplete)
+		/// <returns>TaskResult that provides info about the task state.</returns>
+		private TaskResult PerformPrerequisites(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions, out bool prerequisitesComplete)
 		{
+			TaskResult result = new TaskResult(TaskRequirements.None);
 			prerequisitesComplete = true;
 
 			for (int i=0; i < m_Prerequisites.Count; ++i)
@@ -110,12 +123,11 @@ namespace DotNetMissionSDK.AI.Tasks
 
 				prerequisitesComplete = false;
 
-				// Perform the task. Fail out if it can't be done.
-				if (!m_Prerequisites[i].PerformTaskTree(stateSnapshot, unitActions))
-					return false;
+				// Perform the task. Combine the results.
+				result += m_Prerequisites[i].PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 			}
 
-			return true;
+			return result;
 		}
 
 		/// <summary>
@@ -166,28 +178,11 @@ namespace DotNetMissionSDK.AI.Tasks
 			// Process all children
 			for (int i=0; i < m_Prerequisites.Count; ++i)
 				m_Prerequisites[i].GetStructuresToActivate(stateSnapshot, structureIDs);
+		}
 
-			/*if (IsTaskComplete(stateSnapshot))
-				return;
-
-			bool prerequisitesComplete = true;
-
-			for (int i=0; i < m_Prerequisites.Count; ++i)
-			{
-				// Skip completed tasks
-				if (m_Prerequisites[i].IsTaskComplete(stateSnapshot))
-					continue;
-
-				// If task has been set to wait for siblings, skip remaining prerequisites.
-				if (m_Prerequisites[i].waitForSiblingPrerequisites && !prerequisitesComplete)
-					break;
-
-				prerequisitesComplete = false;
-
-				// Perform the task. Fail out if it can't be done.
-				if (!m_Prerequisites[i].PerformTaskTree(stateSnapshot, unitActions))
-					return false;
-			}*/
+		protected bool IsRequirementRestricted(TaskRequirements restrictedRequirements, TaskRequirements neededRequirement)
+		{
+			return (restrictedRequirements & neededRequirement) != 0;
 		}
 	}
 }

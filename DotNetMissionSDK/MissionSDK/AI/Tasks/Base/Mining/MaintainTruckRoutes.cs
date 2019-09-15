@@ -4,8 +4,6 @@ using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
-using System;
-using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 {
@@ -28,9 +26,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(m_BuildCargoTruckTask = new BuildCargoTruckTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		public void UpdateNeededTrucks(StateSnapshot stateSnapshot)

@@ -32,7 +32,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		{
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
@@ -47,7 +47,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 							return;
 
 						unit.DoStop();
-						TethysGame.AddMessage(unit, "Destination unreachable", ownerID, 0);
+						//TethysGame.AddMessage(unit, "Destination unreachable", ownerID, 0);
 					});
 				}
 			}
@@ -55,7 +55,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			// Remove unused vehicle IDs
 			//m_VehicleStates.Remove(unitID);
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private int GetVehicleStuckDuration(UnitState vehicle, int time)

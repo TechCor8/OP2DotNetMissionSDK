@@ -58,17 +58,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return true;
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
 			// Skip task if structure does not need tubes
 			if (!BuildStructureTask.NeedsTube(m_StructureToConnect))
-				return true;
+				return new TaskResult(TaskRequirements.None);
 
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Fail Check: Not enough ore for tubes
-			if (owner.ore < 50)
-				return false;
+			if (owner.ore < 50 || IsRequirementRestricted(restrictedRequirements, TaskRequirements.Common))
+				return new TaskResult(TaskRequirements.Common);
 
 			List<UnitState> disconnectedStructures = new List<UnitState>();
 
@@ -122,7 +122,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				}
 			}
 
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 
 		private UnitState GetClosestUnit(IEnumerable<UnitState> list, LOCATION position)

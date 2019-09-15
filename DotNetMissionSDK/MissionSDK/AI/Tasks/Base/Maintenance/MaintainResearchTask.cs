@@ -37,9 +37,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			AddPrerequisite(m_MaintainAdvancedLabTask = new MaintainAdvancedLabTask(ownerID));
 		}
 
-		protected override bool PerformTask(StateSnapshot stateSnapshot, BotCommands unitActions)
+		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			return true;
+			return new TaskResult(TaskRequirements.None);
 		}
 	}
 }
