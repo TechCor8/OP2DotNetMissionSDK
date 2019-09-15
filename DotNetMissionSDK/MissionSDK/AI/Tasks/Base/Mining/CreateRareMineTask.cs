@@ -50,6 +50,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
+			// Fail Check: Research
+			if (!owner.HasTechnologyForUnit(stateSnapshot, map_id.RareOreSmelter))
+				return new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(map_id.RareOreSmelter).researchTopic);
+
 			// Get miner
 			//if (owner.units.roboMiners.Count == 0) return true;
 			VehicleState miner = owner.units.roboMiners[0];
@@ -82,7 +86,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			//if (owner.units.roboSurveyors.Count == 0)
 			//	return true;
 			
-			VehicleState surveyor = owner.units.roboSurveyors[0];
+			VehicleState surveyor = (VehicleState)owner.units.GetClosestUnitOfType(map_id.RoboSurveyor, beaconPosition);
 
 			if (!surveyor.position.Equals(beaconPosition) && surveyor.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
 				unitActions.AddUnitCommand(surveyor.unitID, 1, () => GameState.GetUnit(surveyor.unitID)?.DoMove(beaconPosition.x, beaconPosition.y));

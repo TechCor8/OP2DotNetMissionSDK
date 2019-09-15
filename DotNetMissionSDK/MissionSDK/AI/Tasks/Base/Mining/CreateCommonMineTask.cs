@@ -82,7 +82,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			//if (owner.units.roboSurveyors.Count == 0)
 			//	return false;
 
-			VehicleState surveyor = owner.units.roboSurveyors[0];
+			VehicleState surveyor = (VehicleState)owner.units.GetClosestUnitOfType(map_id.RoboSurveyor, beaconPosition);
 
 			if (!surveyor.position.Equals(beaconPosition) && surveyor.curAction == ActionType.moDone) // WARNING: If unit is EMP'd, it will get stuck
 				unitActions.AddUnitCommand(surveyor.unitID, 1, () => GameState.GetUnit(surveyor.unitID)?.DoMove(beaconPosition.x, beaconPosition.y));
