@@ -34,8 +34,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			int highestStrength = 0;
 			foreach (PlayerState player in stateSnapshot.players)
 			{
-				if (player.playerID == m_OwnerID)
-					continue;
+				if (player.playerID == m_OwnerID) continue;
+				if (owner.allyPlayerIDs.Contains(player.playerID)) continue;
 
 				if (player.totalOffensiveStrength > highestStrength)
 					highestStrength = player.totalOffensiveStrength;
