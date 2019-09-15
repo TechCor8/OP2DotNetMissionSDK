@@ -19,6 +19,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private MaintainRecreationTask m_BuildRecreationTask;
 		private MaintainForumTask m_BuildForumTask;
 		private MaintainDIRTTask m_BuildDirtTask;
+		private MaintainGORFTask m_BuildGorfTask;
 		
 
 		public MaintainMoraleTask(int ownerID) : base(ownerID) { }
@@ -47,7 +48,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_Prerequisites.Add(m_BuildRecreationTask = new MaintainRecreationTask(ownerID));
 			m_Prerequisites.Add(m_BuildForumTask = new MaintainForumTask(ownerID));
 			m_Prerequisites.Add(m_BuildDirtTask = new MaintainDIRTTask(ownerID));
-			m_Prerequisites.Add(new MaintainGORFTask(ownerID));
+			m_Prerequisites.Add(m_BuildGorfTask = new MaintainGORFTask(ownerID));
 
 			m_BuildAgridomeTask.targetCountToMaintain = 0;
 			m_BuildResidenceTask.targetCountToMaintain = 0;
@@ -57,6 +58,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			m_BuildRecreationTask.targetCountToMaintain = 0;
 			m_BuildForumTask.targetCountToMaintain = 0;
 			m_BuildDirtTask.targetCountToMaintain = 0;
+			m_BuildGorfTask.targetCountToMaintain = 0;
 
 			foreach (MaintainStructureTask task in m_Prerequisites)
 				AddPrerequisite(task);
@@ -76,6 +78,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			UpdateMedicalCenterCount(owner);
 			UpdateRecreationCenterCount(stateSnapshot, owner);
 			UpdateDIRTCount(stateSnapshot, owner);
+			UpdateGORFCount(stateSnapshot, owner);
 		}
 
 		private void UpdateAgridomeCount(StateSnapshot stateSnapshot, PlayerState owner)
@@ -175,6 +178,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		private void UpdateRecreationCenterCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
+			// Don't encourage researching recreation facilities until we have a sizable population
+			if (owner.totalPopulation < 140 && !owner.HasTechnologyForUnit(stateSnapshot, map_id.RecreationFacility))
+				return;
+
 			StructureInfo recreationInfo = owner.structureInfo[map_id.RecreationFacility];
 			StructureInfo forumInfo = owner.structureInfo[map_id.Forum];
 
@@ -223,6 +230,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 		private void UpdateDIRTCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
+			// Don't encourage researching DIRT until we have a sizable population
+			if (owner.totalPopulation < 140 && !owner.HasTechnologyForUnit(stateSnapshot, map_id.DIRT))
+				return;
+
 			m_BuildDirtTask.targetCountToMaintain = 0;
 
 			StructureInfo dirtInfo = owner.structureInfo[map_id.DIRT];
@@ -260,6 +271,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				m_BuildDirtTask.buildTask.SetLocation(cc.position);
 				shouldBuildDIRT = true;
 			}
+		}
+
+		private void UpdateGORFCount(StateSnapshot stateSnapshot, PlayerState owner)
+		{
+			// Don't encourage researching GORF until we have a sizable population
+			if (owner.totalPopulation < 100 && !owner.HasTechnologyForUnit(stateSnapshot, map_id.GORF))
+				return;
+
+			m_BuildGorfTask.targetCountToMaintain = 1;
 		}
 	}
 }

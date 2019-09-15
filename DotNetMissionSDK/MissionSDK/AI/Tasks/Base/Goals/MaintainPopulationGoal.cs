@@ -32,6 +32,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 				case MoraleLevel.Terrible:		importance = 0.95f;		break;
 			}
 
+			// Importance skyrockets when we don't have baby and slave factories
+			if (owner.units.nurseries.Count == 0 || owner.units.universities.Count == 0)
+				importance = 1.0f;
+
 			// Importance increases as spare labor dwindles
 			importance = Math.Max(1 - Clamp(owner.numAvailableWorkers / 100.0f), importance);
 

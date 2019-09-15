@@ -35,6 +35,7 @@ namespace DotNetMissionSDK.AI.Managers
 		private Goal[] m_Goals;
 
 		private MaintainArmyGoal m_MaintainArmyGoal;
+		private MaintainResearchGoal m_MaintainResearchGoal;
 
 		private MiningBaseState m_MiningBaseState;
 
@@ -83,7 +84,7 @@ namespace DotNetMissionSDK.AI.Managers
 				new RepairStructuresGoal(ownerID, 1),
 				new MaintainFoodGoal(ownerID, 0.99f),
 				new MaintainPopulationGoal(ownerID, 1),
-				new MaintainResearchGoal(ownerID, 1),
+				m_MaintainResearchGoal = new MaintainResearchGoal(ownerID, 1),
 				new MaintainDefenseGoal(ownerID, 0.75f),
 				new MaintainWallsGoal(ownerID, 0.1f),
 				new ExpandRareMiningGoal(ownerID, m_MiningBaseState, 0.97f),
@@ -200,6 +201,8 @@ namespace DotNetMissionSDK.AI.Managers
 		{
 			TaskResult result = new TaskResult(TaskRequirements.None);
 
+			bool didPerformResearchGoal = false;
+
 			foreach (Goal goal in goals)
 			{
 				// Goals that approach zero importance should not be performed at all.
@@ -208,6 +211,12 @@ namespace DotNetMissionSDK.AI.Managers
 
 				// Perform the task. Combine the results.
 				result += goal.PerformTask(stateSnapshot, result.missingRequirements, botCommands);
+
+				if (!didPerformResearchGoal && result.missingRequirements == TaskRequirements.Research)
+				{
+					result += m_MaintainResearchGoal.PerformTask(stateSnapshot, result.missingRequirements, botCommands);
+					didPerformResearchGoal = true;
+				}
 				
 				// If true, this goal always blocks lower priority goals, regardless of whether the goal's task was completed successfully.
 				if (goal.blockLowerPriority)
