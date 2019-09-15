@@ -46,6 +46,7 @@ public:
 	char* GetDescription();
 	char* GetTeaser();
 	char* GetImproveDesc();
+	int GetRequiredTechIndex(int index);
 	//int* GetRequiredTechNum(); // (pointer to array of techNums that are required for this tech)
 	// void* GetUpgradeInfo();
 	//int GetNumDependentTech(); // (number of techs that depend on this one) (below is a pointer to an int? list of this many elements)

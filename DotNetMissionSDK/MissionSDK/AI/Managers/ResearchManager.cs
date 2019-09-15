@@ -14,9 +14,9 @@ namespace DotNetMissionSDK.AI.Managers
 	/// </summary>
 	public class ResearchManager
 	{
-		private Dictionary<int, List<TechInfo>> m_TechLevels = new Dictionary<int, List<TechInfo>>();
+		private Dictionary<int, int> m_TechIDToTopicLookup = new Dictionary<int, int>();
 
-		private int m_CurrentTechLevel = 1;
+		private List<int> m_PriorityResearchTopics = new List<int>();
 
 		private bool m_IsProcessing;
 
@@ -35,15 +35,8 @@ namespace DotNetMissionSDK.AI.Managers
 			{
 				TechInfo info = Research.GetTechInfo(i);
 
-				List<TechInfo> techList;
-
-				if (!m_TechLevels.TryGetValue(info.GetTechLevel(), out techList))
-				{
-					techList = new List<TechInfo>();
-					m_TechLevels.Add(info.GetTechLevel(), techList);
-				}
-
-				techList.Add(info);
+				// Add tech ID and index to lookup table
+				m_TechIDToTopicLookup.Add(info.GetTechID(), i);
 			}
 		}
 
@@ -56,6 +49,9 @@ namespace DotNetMissionSDK.AI.Managers
 
 			m_IsProcessing = true;
 
+			// Get data that requires main thread
+			List<int> topPriorityResearchTopics = new List<int>(botPlayer.baseManager.GetResearchTopicPriority());
+
 			stateSnapshot.Retain();
 
 			AsyncPump.Run(() =>
@@ -64,9 +60,12 @@ namespace DotNetMissionSDK.AI.Managers
 
 				PlayerState owner = stateSnapshot.players[ownerID];
 
-				// Check if tech level has been completed
-				if (IsTechLevelResearched(owner, m_CurrentTechLevel))
-					++m_CurrentTechLevel;
+				// Process top-level priority research topics into required topics
+				m_PriorityResearchTopics.Clear();
+
+				foreach (int topic in topPriorityResearchTopics)
+					m_PriorityResearchTopics.AddRange(GetRequiredResearchTopics(owner, topic));
+
 
 				int availableScientists = owner.numAvailableScientists;
 
@@ -91,6 +90,36 @@ namespace DotNetMissionSDK.AI.Managers
 			});
 		}
 
+		private List<int> GetRequiredResearchTopics(PlayerState owner, int desiredTopic)
+		{
+			if (owner.HasTechnologyByIndex(desiredTopic))
+				return new List<int>();
+
+			TechInfo info = Research.GetTechInfo(desiredTopic);
+
+			List<int> requiredTopics = new List<int>();
+
+			// Check all required topics
+			int requiredCount = info.GetNumRequiredTechs();
+			for (int i=0; i < requiredCount; ++i)
+			{
+				int topic = info.GetRequiredTechIndex(i);
+				if (owner.HasTechnologyByIndex(topic))
+					continue;
+
+				// Get all required topics in unresearched topic
+				requiredTopics.AddRange(GetRequiredResearchTopics(owner, topic));
+			}
+
+			// If there are topics to research before this one, return those...
+			if (requiredTopics.Count > 0)
+				return requiredTopics;
+
+			// Otherwise, we return this topic.
+			requiredTopics.Add(desiredTopic);
+			return requiredTopics;
+		}
+
 		private void SetTopicForLabs(StateSnapshot stateSnapshot, List<Action> buildingActions, ReadOnlyCollection<LabState> labs, LabType labType, ref int availableScientists)
 		{
 			foreach (LabState lab in labs)
@@ -98,13 +127,14 @@ namespace DotNetMissionSDK.AI.Managers
 				if (availableScientists == 0)
 					break;
 
+				// Find lab that isn't doing anything
 				if (lab.isEnabled && !lab.isBusy)
 				{
 					int topic = GetNextResearchTopic(stateSnapshot, labType);
-					if (topic <= 0)
+					if (topic < 0)
 						break;
 
-					buildingActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(GetTechIndex(topic), 1));
+					buildingActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(topic, 1));
 					--availableScientists;
 				}
 			}
@@ -114,96 +144,71 @@ namespace DotNetMissionSDK.AI.Managers
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			List<TechInfo> techList;
-			if (!m_TechLevels.TryGetValue(m_CurrentTechLevel, out techList))
-				return 0;
-
-			// Find tech for this lab type that hasn't been research
-			foreach (TechInfo info in techList)
+			// Get priority technology
+			for (int i=0; i < m_PriorityResearchTopics.Count; ++i)
 			{
-				int techID = info.GetTechID();
+				int topic = m_PriorityResearchTopics[i];
+
+				TechInfo info = Research.GetTechInfo(topic);
 
 				// Skip tech that isn't available for this lab type
 				if (info.GetLab() != labType)
 					continue;
 
-				// Skip tech if it is not available for this colony
-				if (owner.isEden)
-				{
-					if (info.GetEdenCost() <= 0)
-						continue;
-				}
-				else
-				{
-					if (info.GetPlymouthCost() <= 0)
-						continue;
-				}
+				m_PriorityResearchTopics.RemoveAt(i--);
 
-				// Skip tech if this player has already researched this tech
-				if (owner.HasTechnology(techID))
+				// Skip tech if it is not available for this colony
+				if (!CanColonyResearchTopic(owner.isEden, info))
 					continue;
 
 				// Make sure another lab isn't researching this topic
-				bool isBeingResearched = false;
-				switch (labType)
-				{
-					case LabType.ltAdvanced:	isBeingResearched = IsLabResearchingTopic(owner.units.advancedLabs, techID);	break;
-					case LabType.ltStandard:	isBeingResearched = IsLabResearchingTopic(owner.units.standardLabs, techID);	break;
-					case LabType.ltBasic:		isBeingResearched = IsLabResearchingTopic(owner.units.basicLabs, techID);		break;
-				}
-
-				if (isBeingResearched)
+				if (IsLabResearchingTopic(owner, topic))
 					continue;
 
-				// Found topic!
-				return techID;
+				return topic;
 			}
-
-			return 0;
+			
+			return -1;
 		}
 
-		private bool IsLabResearchingTopic(ReadOnlyCollection<LabState> labs, int techID)
+		private bool CanColonyResearchTopic(bool isEden, TechInfo info)
+		{
+			if (isEden)
+				return info.GetEdenCost() > 0;
+			else
+				return info.GetPlymouthCost() > 0;
+		}
+
+		private bool IsLabResearchingTopic(PlayerState owner, int techIndex)
+		{
+			TechInfo info = Research.GetTechInfo(techIndex);
+			LabType labType = info.GetLab();
+			
+			switch (labType)
+			{
+				case LabType.ltAdvanced:	return IsLabResearchingTopic(owner.units.advancedLabs, techIndex);
+				case LabType.ltStandard:	return IsLabResearchingTopic(owner.units.standardLabs, techIndex);
+				case LabType.ltBasic:		return IsLabResearchingTopic(owner.units.basicLabs, techIndex);
+			}
+
+			return false;
+		}
+
+		private bool IsLabResearchingTopic(ReadOnlyCollection<LabState> labs, int techIndex)
 		{
 			foreach (LabState lab in labs)
 			{
 				if (lab.curAction != ActionType.moDoResearch)
 					continue;
 
-				if (Research.GetTechInfo(lab.labCurrentTopic).GetTechID() == techID)
+				if (lab.labCurrentTopic == techIndex)
 					return true;
 			}
 
 			return false;
 		}
 
-		private bool IsTechLevelResearched(PlayerState owner, int techLevel)
-		{
-			List<TechInfo> techList;
-			if (!m_TechLevels.TryGetValue(m_CurrentTechLevel, out techList))
-				return true;
-
-			foreach (TechInfo info in techList)
-			{
-				// Skip tech if it is not available for this colony
-				if (owner.isEden)
-				{
-					if (info.GetEdenCost() <= 0)
-						continue;
-				}
-				else
-				{
-					if (info.GetPlymouthCost() <= 0)
-						continue;
-				}
-
-				if (!owner.HasTechnology(info.GetTechID()))
-					return false;
-			}
-
-			return true;
-		}
-
-		private int GetTechIndex(int techID)
+		/*private int GetTechIndex(int techID)
 		{
 			int techCount = Research.GetTechCount();
 			for (int i=0; i < techCount; ++i)
@@ -214,6 +219,6 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 
 			return -1;
-		}
+		}*/
 	}
 }

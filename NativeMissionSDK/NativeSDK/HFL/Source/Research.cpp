@@ -186,3 +186,12 @@ char* TechInfo::GetImproveDesc()
 	OP2TechInfo *p = (OP2TechInfo*)internalPtr;
 	return p->improveDesc;
 }
+
+int TechInfo::GetRequiredTechIndex(int index)
+{
+	if (!isInited)
+		return HFLNOTINITED;
+
+	OP2TechInfo *p = (OP2TechInfo*)internalPtr;
+	return p->requiredTechNum[index];
+}

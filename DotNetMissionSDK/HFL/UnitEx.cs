@@ -37,7 +37,7 @@ namespace DotNetMissionSDK.HFL
 		public void DoUnloadCargo()													{ ThreadAssert.MainThreadRequired();	UnitEx_DoUnloadCargo(m_StubIndex);															}
 		public void DoDumpCargo()													{ ThreadAssert.MainThreadRequired();	UnitEx_DoDumpCargo(m_StubIndex);															}
 
-		public void DoResearch(int techID, int numScientists)						{ ThreadAssert.MainThreadRequired();	UnitEx_DoResearch(m_StubIndex, techID, numScientists);										}
+		public void DoResearch(int techIndex, int numScientists)					{ ThreadAssert.MainThreadRequired();	UnitEx_DoResearch(m_StubIndex, techIndex, numScientists);										}
 		public void DoTrainScientists(int numScientists)							{ ThreadAssert.MainThreadRequired();	UnitEx_DoTrainScientists(m_StubIndex, numScientists);										}
 
 		public void DoRepair(Unit targetUnit)										{ ThreadAssert.MainThreadRequired();	UnitEx_DoRepair(m_StubIndex, targetUnit.GetStubIndex());									}

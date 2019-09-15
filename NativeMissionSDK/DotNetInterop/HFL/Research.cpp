@@ -130,4 +130,11 @@ extern "C"
 
 		return info.GetImproveDesc();
 	}
+	extern EXPORT int __stdcall TechInfo_GetRequiredTechIndex(void* handle, int index)
+	{
+		TechInfo info;
+		info.internalPtr = handle;
+
+		return info.GetRequiredTechIndex(index);
+	}
 }

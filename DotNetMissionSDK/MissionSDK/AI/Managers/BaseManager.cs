@@ -111,6 +111,7 @@ namespace DotNetMissionSDK.AI.Managers
 			m_ResetVehicleTask = new ResetVehicleTask(ownerID);
 
 			m_StructureLaborOrder = new ReadOnlyCollection<int>(new int[0]);
+			m_ResearchTopicPriority = new ReadOnlyCollection<int>(new int[0]);
 		}
 
 		public void Update(StateSnapshot stateSnapshot)

@@ -66,6 +66,7 @@ namespace DotNetMissionSDK.HFL
 		public string GetDescription()								{ return Marshal.PtrToStringAnsi(TechInfo_GetDescription(m_Handle));					}
 		public string GetTeaser()									{ return Marshal.PtrToStringAnsi(TechInfo_GetTeaser(m_Handle));							}
 		public string GetImproveDesc()								{ return Marshal.PtrToStringAnsi(TechInfo_GetImproveDesc(m_Handle));					}
+		public int GetRequiredTechIndex(int index)					{ return TechInfo_GetRequiredTechIndex(m_Handle, index);								}
 
 
 		[DllImport("DotNetInterop.dll")] private static extern int TechInfo_IsValid(IntPtr handle);
@@ -83,5 +84,6 @@ namespace DotNetMissionSDK.HFL
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr TechInfo_GetDescription(IntPtr handle);
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr TechInfo_GetTeaser(IntPtr handle);
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr TechInfo_GetImproveDesc(IntPtr handle);
+		[DllImport("DotNetInterop.dll")] private static extern int TechInfo_GetRequiredTechIndex(IntPtr handle, int index);
 	}
 }
