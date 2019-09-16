@@ -44,6 +44,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			AddPrerequisite(new RepairRareMineTask(ownerID));
 			AddPrerequisite(new BuildSurveyorTask(ownerID), true);
 			AddPrerequisite(new BuildMinerTask(ownerID));
+			AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(map_id.RareOreSmelter).GetResearchTopic()));
 		}
 
 		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)

@@ -1,7 +1,24 @@
-﻿using DotNetMissionSDK.State.Snapshot;
+﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
+using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.State.Snapshot;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 {
+	public class BuildResearchedVehicleTask : BuildVehicleTask
+	{
+		public BuildResearchedVehicleTask(int ownerID) : base(ownerID)		{ 	}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+
+			AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_VehicleToBuild).GetResearchTopic()));
+
+			if (m_VehicleToBuildCargo != map_id.None)
+				AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_VehicleToBuildCargo).GetResearchTopic()));
+		}
+	}
+
 	public class BuildSurveyorTask : BuildVehicleTask
 	{
 		public BuildSurveyorTask(int ownerID) : base(ownerID)				{ m_VehicleToBuild = map_id.RoboSurveyor;				}
@@ -42,12 +59,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		public BuildEvacTransportTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.EvacuationTransport;		}
 	}
 
-	public class BuildGeoConTask : BuildVehicleTask
+	public class BuildGeoConTask : BuildResearchedVehicleTask
 	{
 		public BuildGeoConTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.GeoCon;						}
 	}
 
-	public class BuildRepairVehicleTask : BuildVehicleTask
+	public class BuildRepairVehicleTask : BuildResearchedVehicleTask
 	{
 		public BuildRepairVehicleTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.RepairVehicle;				}
 	}
@@ -73,169 +90,169 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 	}
 
 	// *** Military Units - Lynx ***
-	public class BuildLynxAcidCloudTask : BuildVehicleTask
+	public class BuildLynxAcidCloudTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxAcidCloudTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.AcidCloud;		}
 	}
 
-	public class BuildLynxEMPTask : BuildVehicleTask
+	public class BuildLynxEMPTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxEMPTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.EMP;			}
 	}
 
-	public class BuildLynxLaserTask : BuildVehicleTask
+	public class BuildLynxLaserTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxLaserTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Laser;			}
 	}
 
-	public class BuildLynxMicrowaveTask : BuildVehicleTask
+	public class BuildLynxMicrowaveTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxMicrowaveTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Microwave;		}
 	}
 
-	public class BuildLynxRailGunTask : BuildVehicleTask
+	public class BuildLynxRailGunTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxRailGunTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.RailGun;		}
 	}
 
-	public class BuildLynxRPGTask : BuildVehicleTask
+	public class BuildLynxRPGTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxRPGTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.RPG;			}
 	}
 
-	public class BuildLynxStarflareTask : BuildVehicleTask
+	public class BuildLynxStarflareTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxStarflareTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Starflare;		}
 	}
 
-	public class BuildLynxSupernovaTask : BuildVehicleTask
+	public class BuildLynxSupernovaTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxSupernovaTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Supernova;		}
 	}
 
-	public class BuildLynxESGTask : BuildVehicleTask
+	public class BuildLynxESGTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxESGTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.ESG;			}
 	}
 
-	public class BuildLynxStickyfoamTask : BuildVehicleTask
+	public class BuildLynxStickyfoamTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxStickyfoamTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Stickyfoam;	}
 	}
 
-	public class BuildLynxThorsHammerTask : BuildVehicleTask
+	public class BuildLynxThorsHammerTask : BuildResearchedVehicleTask
 	{
 		public BuildLynxThorsHammerTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.ThorsHammer;	}
 	}
 
 	// *** Military Units - Panther ***
-	public class BuildPantherAcidCloudTask : BuildVehicleTask
+	public class BuildPantherAcidCloudTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherAcidCloudTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.AcidCloud;		}
 	}
 
-	public class BuildPantherEMPTask : BuildVehicleTask
+	public class BuildPantherEMPTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherEMPTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.EMP;			}
 	}
 
-	public class BuildPantherLaserTask : BuildVehicleTask
+	public class BuildPantherLaserTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherLaserTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Laser;			}
 	}
 
-	public class BuildPantherMicrowaveTask : BuildVehicleTask
+	public class BuildPantherMicrowaveTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherMicrowaveTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Microwave;		}
 	}
 
-	public class BuildPantherRailGunTask : BuildVehicleTask
+	public class BuildPantherRailGunTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherRailGunTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.RailGun;		}
 	}
 
-	public class BuildPantherRPGTask : BuildVehicleTask
+	public class BuildPantherRPGTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherRPGTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.RPG;			}
 	}
 
-	public class BuildPantherStarflareTask : BuildVehicleTask
+	public class BuildPantherStarflareTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherStarflareTask(int ownerID) : base(ownerID)		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Starflare;		}
 	}
 
-	public class BuildPantherSupernovaTask : BuildVehicleTask
+	public class BuildPantherSupernovaTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherSupernovaTask(int ownerID) : base(ownerID)		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Supernova;		}
 	}
 
-	public class BuildPantherESGTask : BuildVehicleTask
+	public class BuildPantherESGTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherESGTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.ESG;			}
 	}
 
-	public class BuildPantherStickyfoamTask : BuildVehicleTask
+	public class BuildPantherStickyfoamTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherStickyfoamTask(int ownerID) : base(ownerID)		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Stickyfoam;	}
 	}
 
-	public class BuildPantherThorsHammerTask : BuildVehicleTask
+	public class BuildPantherThorsHammerTask : BuildResearchedVehicleTask
 	{
 		public BuildPantherThorsHammerTask(int ownerID) : base(ownerID) 	{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.ThorsHammer;	}
 	}
 
 	// *** Military Units - Tiger ***
-	public class BuildTigerAcidCloudTask : BuildVehicleTask
+	public class BuildTigerAcidCloudTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerAcidCloudTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.AcidCloud;		}
 	}
 
-	public class BuildTigerEMPTask : BuildVehicleTask
+	public class BuildTigerEMPTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerEMPTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.EMP;			}
 	}
 
-	public class BuildTigerLaserTask : BuildVehicleTask
+	public class BuildTigerLaserTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerLaserTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Laser;			}
 	}
 
-	public class BuildTigerMicrowaveTask : BuildVehicleTask
+	public class BuildTigerMicrowaveTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerMicrowaveTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Microwave;		}
 	}
 
-	public class BuildTigerRailGunTask : BuildVehicleTask
+	public class BuildTigerRailGunTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerRailGunTask(int ownerID) : base(ownerID) 			{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.RailGun;		}
 	}
 
-	public class BuildTigerRPGTask : BuildVehicleTask
+	public class BuildTigerRPGTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerRPGTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.RPG;			}
 	}
 
-	public class BuildTigerStarflareTask : BuildVehicleTask
+	public class BuildTigerStarflareTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerStarflareTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Starflare;		}
 	}
 
-	public class BuildTigerSupernovaTask : BuildVehicleTask
+	public class BuildTigerSupernovaTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerSupernovaTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Supernova;		}
 	}
 
-	public class BuildTigerESGTask : BuildVehicleTask
+	public class BuildTigerESGTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerESGTask(int ownerID) : base(ownerID) 				{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.ESG;			}
 	}
 
-	public class BuildTigerStickyfoamTask : BuildVehicleTask
+	public class BuildTigerStickyfoamTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerStickyfoamTask(int ownerID) : base(ownerID) 		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.Stickyfoam;	}
 	}
 
-	public class BuildTigerThorsHammerTask : BuildVehicleTask
+	public class BuildTigerThorsHammerTask : BuildResearchedVehicleTask
 	{
 		public BuildTigerThorsHammerTask(int ownerID) : base(ownerID)		{ m_VehicleToBuild = map_id.Lynx; m_VehicleToBuildCargo = map_id.ThorsHammer;	}
 	}

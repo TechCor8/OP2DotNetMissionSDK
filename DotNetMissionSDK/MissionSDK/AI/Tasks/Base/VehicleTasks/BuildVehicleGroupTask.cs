@@ -88,7 +88,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 					}
 
 					// Must set this before the "continue" or AddFactory may break when types are set to "none".
-					vehicleTask.SetVehicle(unitWithWeaponType.unit, unitWithWeaponType.weapon);
+					vehicleTask.SetVehicle(stateSnapshot, unitWithWeaponType.unit, unitWithWeaponType.weapon);
 
 					if (!hasAvailableFactory)
 						continue;

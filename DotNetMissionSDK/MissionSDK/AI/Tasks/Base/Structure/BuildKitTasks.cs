@@ -1,8 +1,23 @@
 ﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
+	public class BuildResearchedStructureKitTask : BuildStructureKitTask
+	{
+		public BuildResearchedStructureKitTask(int ownerID) : base(ownerID)		{	}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+			AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_KitToBuild).GetResearchTopic()));
+
+			if (m_KitToBuildCargo != map_id.None)
+				AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_KitToBuildCargo).GetResearchTopic()));
+		}
+	}
+
 	public sealed class BuildCommandCenterKitTask : BuildStructureKitTask
 	{
 		public BuildCommandCenterKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.CommandCenter;					}
@@ -18,7 +33,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildCommonSmelterKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.CommonOreSmelter;				}
 	}
 
-	public sealed class BuildRareSmelterKitTask : BuildStructureKitTask
+	public sealed class BuildRareSmelterKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildRareSmelterKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.RareOreSmelter;					}
 	}
@@ -33,22 +48,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildTokamakKitTask(int ownerID) : base(ownerID)				{ m_KitToBuild = map_id.Tokamak;						}
 	}
 
-	public sealed class BuildMHDGeneratorKitTask : BuildStructureKitTask
+	public sealed class BuildMHDGeneratorKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildMHDGeneratorKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.MHDGenerator;					}
 	}
 
-	public sealed class BuildSolarArrayKitTask : BuildStructureKitTask
+	public sealed class BuildSolarArrayKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildSolarArrayKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.SolarPowerArray;				}
 	}
 
-	public sealed class BuildNurseryKitTask : BuildStructureKitTask
+	public sealed class BuildNurseryKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildNurseryKitTask(int ownerID) : base(ownerID)				{ m_KitToBuild = map_id.Nursery;						}
 	}
 
-	public sealed class BuildUniversityKitTask : BuildStructureKitTask
+	public sealed class BuildUniversityKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildUniversityKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.University;						}
 	}
@@ -58,49 +73,54 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildResidenceKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.Residence;						}
 	}
 
-	public sealed class BuildReinforcedResidenceKitTask : BuildStructureKitTask
+	public sealed class BuildReinforcedResidenceKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildReinforcedResidenceKitTask(int ownerID) : base(ownerID)	{ m_KitToBuild = map_id.ReinforcedResidence;			}
 	}
 
-	public sealed class BuildAdvancedResidenceKitTask : BuildStructureKitTask
+	public sealed class BuildAdvancedResidenceKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildAdvancedResidenceKitTask(int ownerID) : base(ownerID)	{ m_KitToBuild = map_id.AdvancedResidence;				}
 	}
 
-	public sealed class BuildMedicalCenterKitTask : BuildStructureKitTask
+	public sealed class BuildMedicalCenterKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildMedicalCenterKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.MedicalCenter;					}
 	}
 
-	public sealed class BuildDIRTKitTask : BuildStructureKitTask
+	public sealed class BuildDIRTKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildDIRTKitTask(int ownerID) : base(ownerID)				{ m_KitToBuild = map_id.DIRT;							}
 	}
 
-	public sealed class BuildRecreationKitTask : BuildStructureKitTask
+	public sealed class BuildRecreationKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildRecreationKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.RecreationFacility;				}
 	}
 
-	public sealed class BuildForumKitTask : BuildStructureKitTask
+	public sealed class BuildForumKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildForumKitTask(int ownerID) : base(ownerID)				{ m_KitToBuild = map_id.Forum;							}
 	}
 
-	public sealed class BuildGORFKitTask : BuildStructureKitTask
+	public sealed class BuildGORFKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildGORFKitTask(int ownerID) : base(ownerID)				{ m_KitToBuild = map_id.GORF;							}
 	}
 
-	public sealed class BuildVehicleFactoryKitTask : BuildStructureKitTask
+	public sealed class BuildVehicleFactoryKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildVehicleFactoryKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.VehicleFactory;					}
 	}
 
-	public sealed class BuildArachnidFactoryKitTask : BuildStructureKitTask
+	public sealed class BuildArachnidFactoryKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildArachnidFactoryKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.ArachnidFactory;				}
+	}
+
+	public sealed class BuildBasicLabKitTask : BuildStructureKitTask
+	{
+		public BuildBasicLabKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.BasicLab;						}
 	}
 
 	public sealed class BuildStandardLabKitTask : BuildStructureKitTask
@@ -108,32 +128,32 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public BuildStandardLabKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.StandardLab;					}
 	}
 
-	public sealed class BuildAdvancedLabKitTask : BuildStructureKitTask
+	public sealed class BuildAdvancedLabKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildAdvancedLabKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.AdvancedLab;					}
 	}
 
-	public sealed class BuildRobotCommandKitTask : BuildStructureKitTask
+	public sealed class BuildRobotCommandKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildRobotCommandKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.RobotCommand;					}
 	}
 
-	public sealed class BuildSpaceportKitTask : BuildStructureKitTask
+	public sealed class BuildSpaceportKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildSpaceportKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.Spaceport;						}
 	}
 
-	public sealed class BuildObservatoryKitTask : BuildStructureKitTask
+	public sealed class BuildObservatoryKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildObservatoryKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.Observatory;					}
 	}
 
-	public sealed class BuildMeteorDefenseKitTask : BuildStructureKitTask
+	public sealed class BuildMeteorDefenseKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildMeteorDefenseKitTask(int ownerID) : base(ownerID)		{ m_KitToBuild = map_id.MeteorDefense;					}
 	}
 
-	public sealed class BuildGuardPostKitTask : BuildStructureKitTask
+	public sealed class BuildGuardPostKitTask : BuildResearchedStructureKitTask
 	{
 		public BuildGuardPostKitTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.GuardPost;						}
 

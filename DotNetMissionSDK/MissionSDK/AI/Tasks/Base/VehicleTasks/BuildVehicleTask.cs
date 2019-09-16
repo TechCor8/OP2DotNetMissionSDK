@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
@@ -75,6 +76,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new MaintainArachnidFactoryTask(ownerID));
+			AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_VehicleToBuild).GetResearchTopic()));
+			//AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_VehicleToBuildCargo).GetResearchTopic()));
 		}
 
 		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)

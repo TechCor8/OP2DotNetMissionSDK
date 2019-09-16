@@ -96,6 +96,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public ConnectArachnidFactoryTask(int ownerID) : base(ownerID)		{ m_StructureToConnect = map_id.ArachnidFactory;				}
 	}
 
+	public sealed class ConnectBasicLabTask : ConnectStructureTask
+	{
+		public ConnectBasicLabTask(int ownerID) : base(ownerID)				{ m_StructureToConnect = map_id.BasicLab;						}
+	}
+
 	public sealed class ConnectStandardLabTask : ConnectStructureTask
 	{
 		public ConnectStandardLabTask(int ownerID) : base(ownerID)			{ m_StructureToConnect = map_id.StandardLab;					}

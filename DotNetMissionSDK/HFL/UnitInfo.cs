@@ -94,7 +94,18 @@ namespace DotNetMissionSDK.HFL
 		/// Gets the unit's research topic.
 		/// Returns the TechInfo array index NOT the techID.
 		/// </summary>
-		public int GetResearchTopic()								{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetResearchTopic(m_UnitType);						}
+		public int GetResearchTopic()
+		{
+			ThreadAssert.MainThreadRequired();
+
+			// Unit types that don't have topics return -1.
+			switch (m_UnitType)
+			{
+				case map_id.None:		return -1;
+			}
+
+			return UnitInfo_GetResearchTopic(m_UnitType);
+		}
 		public void SetResearchTopic(int techIndex)					{ ThreadAssert.MainThreadRequired();	UnitInfo_SetResearchTopic(m_UnitType, techIndex);					}
 		
 		public TrackType GetTrackType()								{ ThreadAssert.MainThreadRequired();	return UnitInfo_GetTrackType(m_UnitType);							}

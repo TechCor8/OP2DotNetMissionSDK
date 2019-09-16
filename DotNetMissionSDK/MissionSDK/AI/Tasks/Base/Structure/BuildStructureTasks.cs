@@ -254,6 +254,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		}
 	}
 
+	public sealed class BuildBasicLabTask : BuildStructureTask
+	{
+		public BuildBasicLabTask(int ownerID) : base(ownerID)				{ m_KitToBuild = map_id.BasicLab;	m_DesiredDistance = 2;		}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+			AddPrerequisite(buildKitTask = new BuildBasicLabKitTask(ownerID));
+		}
+	}
+
 	public sealed class BuildStandardLabTask : BuildStructureTask
 	{
 		public BuildStandardLabTask(int ownerID) : base(ownerID)			{ m_KitToBuild = map_id.StandardLab;	m_DesiredDistance = 2;	}

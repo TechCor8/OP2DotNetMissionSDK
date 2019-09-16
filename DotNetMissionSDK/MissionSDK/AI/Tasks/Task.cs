@@ -10,7 +10,14 @@ namespace DotNetMissionSDK.AI.Tasks
 		private bool waitForSiblingPrerequisites;
 		
 		protected int ownerID								{ get; private set; }
-		protected IReadOnlyCollection<Task> prerequisites	{ get { return m_Prerequisites.AsReadOnly(); } }
+		protected IReadOnlyCollection<Task> prerequisites	{ get { return m_Prerequisites.AsReadOnly();	}	}
+
+		/// <summary>
+		/// ID used to determine if this task performs the same thing as another task of the same class type.
+		/// If the class type and type IDs match between two tasks, they are considered to be the same task.
+		/// A task of a given type cannot be a child of a task of the same type. This is to avoid circular dependencies.
+		/// </summary>
+		protected virtual int typeID						{ get { return 0;								}	}
 
 
 		/// <summary>
@@ -162,7 +169,7 @@ namespace DotNetMissionSDK.AI.Tasks
 			if (m_Parent == null)
 				return false;
 
-			if (task.GetType() == m_Parent.GetType())
+			if (task.GetType() == m_Parent.GetType() && task.typeID == m_Parent.typeID)
 				return true;
 
 			return m_Parent.IsAncestorTask(task);

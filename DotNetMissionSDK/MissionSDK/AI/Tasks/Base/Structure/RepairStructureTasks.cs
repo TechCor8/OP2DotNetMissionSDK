@@ -111,6 +111,11 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public RepairArachnidFactoryTask(int ownerID) : base(ownerID)		{ m_StructureToRepair = map_id.ArachnidFactory;					}
 	}
 
+	public sealed class RepairBasicLabTask : RepairStructureTask
+	{
+		public RepairBasicLabTask(int ownerID) : base(ownerID)				{ m_StructureToRepair = map_id.BasicLab;						}
+	}
+
 	public sealed class RepairStandardLabTask : RepairStructureTask
 	{
 		public RepairStandardLabTask(int ownerID) : base(ownerID)			{ m_StructureToRepair = map_id.StandardLab;						}

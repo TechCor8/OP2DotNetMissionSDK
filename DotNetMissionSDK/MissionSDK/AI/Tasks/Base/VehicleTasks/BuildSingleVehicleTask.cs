@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
@@ -14,6 +15,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		protected map_id m_VehicleToBuild;
 		protected map_id m_VehicleToBuildCargo;
 
+		protected ResearchTask m_ResearchVehicleTask;
+		protected ResearchTask m_ResearchVehicleCargoTask;
+
 
 		public BuildSingleVehicleTask(int ownerID) : base(ownerID) { }
 
@@ -26,6 +30,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new MaintainVehicleFactoryTask(ownerID));
+			AddPrerequisite(m_ResearchVehicleTask = new ResearchTask(ownerID, new UnitInfo(m_VehicleToBuild).GetResearchTopic()));
+			AddPrerequisite(m_ResearchVehicleCargoTask = new ResearchTask(ownerID, new UnitInfo(m_VehicleToBuildCargo).GetResearchTopic()));
 		}
 
 		protected override bool CanPerformTask(StateSnapshot stateSnapshot)
@@ -63,10 +69,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		/// <summary>
 		/// Sets the vehicle to build.
 		/// </summary>
-		public void SetVehicle(map_id vehicleToBuild, map_id vehicleToBuildCargo)
+		public void SetVehicle(StateSnapshot stateSnapshot, map_id vehicleToBuild, map_id vehicleToBuildCargo)
 		{
 			m_VehicleToBuild = vehicleToBuild;
 			m_VehicleToBuildCargo = vehicleToBuildCargo;
+
+			// Set research requirements
+			m_ResearchVehicleTask.topicToResearch = stateSnapshot.GetGlobalUnitInfo(vehicleToBuild).researchTopic;
+			if (vehicleToBuildCargo != map_id.None)
+				m_ResearchVehicleCargoTask.topicToResearch = stateSnapshot.GetGlobalUnitInfo(vehicleToBuildCargo).researchTopic;
 		}
 	}
 
@@ -80,6 +91,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		public override void GeneratePrerequisites()
 		{
 			AddPrerequisite(new MaintainArachnidFactoryTask(ownerID));
+			AddPrerequisite(m_ResearchVehicleTask = new ResearchTask(ownerID, new UnitInfo(m_VehicleToBuild).GetResearchTopic()));
 		}
 
 		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)

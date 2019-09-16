@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.HFL;
+﻿using DotNetMissionSDK.AI.Tasks.Base.Structure;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
@@ -17,6 +18,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 
 		public override void GeneratePrerequisites()
 		{
+			AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_StarshipModule).GetResearchTopic()));
 			AddPrerequisite(new BuildRocketTask(ownerID));
 		}
 

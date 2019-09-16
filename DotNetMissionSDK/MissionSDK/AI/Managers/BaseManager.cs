@@ -57,14 +57,6 @@ namespace DotNetMissionSDK.AI.Managers
 			return m_StructureLaborOrder;
 		}
 
-		private ReadOnlyCollection<int> m_ResearchTopicPriority;
-		public ReadOnlyCollection<int> GetResearchTopicPriority()
-		{
-			ThreadAssert.MainThreadRequired();
-
-			return m_ResearchTopicPriority;
-		}
-
 		
 		public BaseManager(BotPlayer botPlayer, int ownerID)
 		{
@@ -112,7 +104,6 @@ namespace DotNetMissionSDK.AI.Managers
 			m_ResetVehicleTask = new ResetVehicleTask(ownerID);
 
 			m_StructureLaborOrder = new ReadOnlyCollection<int>(new int[0]);
-			m_ResearchTopicPriority = new ReadOnlyCollection<int>(new int[0]);
 		}
 
 		public void Update(StateSnapshot stateSnapshot)
@@ -169,7 +160,6 @@ namespace DotNetMissionSDK.AI.Managers
 
 				// Store data
 				m_StructureLaborOrder = asyncParams.structureIDLaborOrder.AsReadOnly();
-				m_ResearchTopicPriority = asyncParams.goalResults.neededResearchTopics;
 				
 				stateSnapshot.Release();
 
@@ -212,6 +202,7 @@ namespace DotNetMissionSDK.AI.Managers
 				// Perform the task. Combine the results.
 				result += goal.PerformTask(stateSnapshot, result.missingRequirements, botCommands);
 
+				// If this goal is waiting on research, trigger maintain research goal to get labs up and running.
 				if (!didPerformResearchGoal && result.missingRequirements == TaskRequirements.Research)
 				{
 					result += m_MaintainResearchGoal.PerformTask(stateSnapshot, result.missingRequirements, botCommands);

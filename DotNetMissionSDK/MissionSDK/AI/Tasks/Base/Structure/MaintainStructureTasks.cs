@@ -260,6 +260,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		}
 	}
 
+	public sealed class MaintainBasicLabTask : MaintainStructureTask
+	{
+		public MaintainBasicLabTask(int ownerID) : base(ownerID)				{ m_StructureToMaintain = map_id.BasicLab;						}
+
+		public override void GeneratePrerequisites()
+		{
+			base.GeneratePrerequisites();
+			AddPrerequisite(connectTask = new ConnectBasicLabTask(ownerID));
+			AddPrerequisite(new RepairBasicLabTask(ownerID));
+			AddPrerequisite(buildTask = new BuildBasicLabTask(ownerID), true);
+		}
+	}
+
 	public sealed class MaintainStandardLabTask : MaintainStructureTask
 	{
 		public MaintainStandardLabTask(int ownerID) : base(ownerID)				{ m_StructureToMaintain = map_id.StandardLab;					}
