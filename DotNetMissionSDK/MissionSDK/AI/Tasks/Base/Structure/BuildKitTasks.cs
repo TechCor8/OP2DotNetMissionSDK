@@ -1,4 +1,5 @@
-﻿using DotNetMissionSDK.Async;
+﻿using System.Collections.Generic;
+using DotNetMissionSDK.Async;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
 
@@ -6,15 +7,35 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 {
 	public class BuildResearchedStructureKitTask : BuildStructureKitTask
 	{
+		private ResearchTask m_ResearchKitTask;
+		private ResearchTask m_ResearchKitCargoTask;
+
 		public BuildResearchedStructureKitTask(int ownerID) : base(ownerID)		{	}
 
 		public override void GeneratePrerequisites()
 		{
 			base.GeneratePrerequisites();
-			AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_KitToBuild).GetResearchTopic()));
+			AddPrerequisite(m_ResearchKitTask = new ResearchTask(ownerID, new UnitInfo(m_KitToBuild).GetResearchTopic()));
 
 			if (m_KitToBuildCargo != map_id.None)
-				AddPrerequisite(new ResearchTask(ownerID, new UnitInfo(m_KitToBuildCargo).GetResearchTopic()));
+				AddPrerequisite(m_ResearchKitCargoTask = new ResearchTask(ownerID, new UnitInfo(m_KitToBuildCargo).GetResearchTopic()));
+		}
+
+		/// <summary>
+		/// Gets the list of structures to activate.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="structureIDs">The list to add structures to.</param>
+		public override void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		{
+			// Assign scientists to labs to complete required research
+			if (!m_ResearchKitTask.IsTaskComplete(stateSnapshot))
+				m_ResearchKitTask.GetStructuresToActivate(stateSnapshot, structureIDs);
+
+			if (m_ResearchKitCargoTask != null && !m_ResearchKitCargoTask.IsTaskComplete(stateSnapshot))
+				m_ResearchKitCargoTask.GetStructuresToActivate(stateSnapshot, structureIDs);
+
+			base.GetStructuresToActivate(stateSnapshot, structureIDs);
 		}
 	}
 

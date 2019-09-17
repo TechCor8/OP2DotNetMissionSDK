@@ -366,6 +366,9 @@ namespace DotNetMissionSDK.AI.Managers
 		/// </summary>
 		private void UpdateActivations(StateSnapshot stateSnapshot, List<Action> buildingActions)
 		{
+			List<Action> idleActions = new List<Action>();
+			List<Action> enableActions = new List<Action>();
+
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			m_AvailableWorkers = owner.workers;
@@ -388,23 +391,28 @@ namespace DotNetMissionSDK.AI.Managers
 				if (structure.hasScientists) m_AvailableScientists -= info.scientistsRequired;
 				if (structure.isEnabled)
 				{
-					m_StructurePriority.Remove(structure);
-					m_LowPriorityStructures.Remove(structure);
-					m_UselessStructures.Remove(structure);
+					LabState lab = structure as LabState;
+					if (lab != null)
+					{
+						// Scientists should take refuge from the collapsing structure!
+						if (lab.isCritical)
+							idleActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, 0));
+					}
+					else
+					{
+						// Non-lab structures won't have labor assignments changed.
+						m_StructurePriority.Remove(structure);
+						m_LowPriorityStructures.Remove(structure);
+						m_UselessStructures.Remove(structure);
+					}
+
+					// All busy crippled structures won't have labor assignments changed.
 					m_CrippledStructures.Remove(structure);
 				}
 			}
 
-			List<Action> idleActions = new List<Action>();
-			List<Action> enableActions = new List<Action>();
-
 			// Activate high priority structures
 			ActivateList(enableActions, idleActions, m_StructurePriority, true);
-
-			// Assign all spare scientists to research
-			AddScientistsToLabs(enableActions, idleActions, owner.units.advancedLabs);
-			AddScientistsToLabs(enableActions, idleActions, owner.units.standardLabs);
-			AddScientistsToLabs(enableActions, idleActions, owner.units.basicLabs);
 
 			// Assign workers to training, but only if no scientists are assigned as workers
 			if (owner.numScientistsAsWorkers == 0)
@@ -472,39 +480,38 @@ namespace DotNetMissionSDK.AI.Managers
 
 					if (!building.isEnabled)
 						enableActions.Add(() => GameState.GetUnit(building.unitID)?.DoUnIdle());
+
+					// If building is a lab
+					if (building is LabState)
+						AddScientistsToLab(enableActions, idleActions, (LabState)building);
 				}
 			}
 		}
 
 		/// <summary>
-		/// Adds scientists until labs are maxed or there are not enough scientists available.
+		/// Adds scientists until lab is maxed or there are not enough scientists available.
 		/// </summary>
-		private void AddScientistsToLabs(List<Action> addActions, List<Action> removeActions, ReadOnlyCollection<LabState> labs)
+		private void AddScientistsToLab(List<Action> addActions, List<Action> removeActions, LabState lab)
 		{
-			for (int i=0; i < labs.Count; ++i)
+			// Get max assigned
+			TechInfo info = Research.GetTechInfo(lab.labCurrentTopic);
+			int maxScientists = info.GetMaxScientists();
+
+			int scientistsAssigned = Math.Min(maxScientists, m_AvailableScientists);
+
+			m_AvailableScientists -= scientistsAssigned;
+
+			if (scientistsAssigned < lab.labScientistCount)
 			{
-				LabState lab = labs[i];
-
-				// Get max assigned
-				TechInfo info = Research.GetTechInfo(lab.labCurrentTopic);
-				int maxScientists = info.GetMaxScientists();
-
-				int scientistsAssigned = Math.Min(maxScientists, m_AvailableScientists);
-
-				m_AvailableScientists -= scientistsAssigned;
-
-				if (scientistsAssigned < lab.labScientistCount)
+				// Removing scientists
+				removeActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, scientistsAssigned));//SetLabScientistCount(scientistsAssigned));
+			}
+			else if (scientistsAssigned > lab.labScientistCount)
+			{
+				// Adding scientists
+				if (lab.isEnabled && lab.isBusy)
 				{
-					// Removing scientists
 					removeActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, scientistsAssigned));//SetLabScientistCount(scientistsAssigned));
-				}
-				else if (scientistsAssigned > lab.labScientistCount)
-				{
-					// Adding scientists
-					if (lab.isEnabled && lab.isBusy)
-					{
-						removeActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, scientistsAssigned));//SetLabScientistCount(scientistsAssigned));
-					}
 				}
 			}
 		}

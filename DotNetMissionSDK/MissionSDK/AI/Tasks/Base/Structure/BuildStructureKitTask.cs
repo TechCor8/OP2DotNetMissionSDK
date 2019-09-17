@@ -275,7 +275,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (factory == null)
 				return;
 
-			structureIDs.Add(factory.unitID);
+			if (!structureIDs.Contains(factory.unitID))
+				structureIDs.Add(factory.unitID);
 		}
 	}
 }
