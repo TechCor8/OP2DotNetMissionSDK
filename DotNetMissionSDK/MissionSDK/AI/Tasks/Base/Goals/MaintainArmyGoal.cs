@@ -1,8 +1,8 @@
 ﻿using DotNetMissionSDK.AI.Combat.Groups;
 using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +14,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 	public class MaintainArmyGoal : Goal
 	{
 		private MaintainVehicleFactoryTask m_MaintainVehicleFactoryTask;
+		private ResearchTask m_ResearchTask;
+
+		private List<int> m_TopicsToResearch = new List<int>();
 
 
 		public MaintainArmyGoal(int ownerID, float weight) : base(ownerID, weight)
@@ -23,6 +26,36 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 
 			m_MaintainVehicleFactoryTask = new MaintainVehicleFactoryTask(ownerID);
 			m_MaintainVehicleFactoryTask.GeneratePrerequisites();
+
+			m_ResearchTask = new ResearchTask(ownerID, -1);
+			m_ResearchTask.GeneratePrerequisites();
+
+			// Set research topics
+			m_TopicsToResearch = new List<int>(new int[]
+			{
+				GetUnitResearchTopic(map_id.Lynx),
+				GetUnitResearchTopic(map_id.Laser),
+				GetUnitResearchTopic(map_id.Microwave),
+				GetUnitResearchTopic(map_id.EMP),
+				GetUnitResearchTopic(map_id.RailGun),
+				GetUnitResearchTopic(map_id.RPG),
+				GetUnitResearchTopic(map_id.Spider),
+				GetUnitResearchTopic(map_id.Panther),
+				GetUnitResearchTopic(map_id.Starflare),
+				GetUnitResearchTopic(map_id.Stickyfoam),
+				GetUnitResearchTopic(map_id.Scorpion),
+				GetUnitResearchTopic(map_id.ESG),
+				GetUnitResearchTopic(map_id.Tiger),
+				GetUnitResearchTopic(map_id.Supernova),
+				GetUnitResearchTopic(map_id.AcidCloud),
+				GetUnitResearchTopic(map_id.ThorsHammer)
+			});
+			// TODO: Add upgrade topics
+		}
+
+		private int GetUnitResearchTopic(map_id unitToResearch)
+		{
+			return new UnitInfo(unitToResearch).GetResearchTopic();
 		}
 
 		/// <summary>
@@ -55,6 +88,19 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		{
 			PlayerState owner = stateSnapshot.players[m_OwnerID];
 
+			// Research weapon systems
+			if (m_ResearchTask.IsTaskComplete(stateSnapshot))
+			{
+				int newTopic = GetNewResearchTopic(owner);
+				if (newTopic >= 0)
+					m_ResearchTask.topicToResearch = newTopic;
+			}
+			else
+			{
+				// Perform research
+				m_ResearchTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+			}
+
 			// If all factories are occupied, increase number maintained
 			int numBusy = owner.units.vehicleFactories.Count((factory) => factory.isEnabled && factory.isBusy);
 			
@@ -78,6 +124,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			base.GetStructuresToActivate(stateSnapshot, structureIDs);
 
 			m_MaintainVehicleFactoryTask.GetStructuresToActivate(stateSnapshot, structureIDs);
+
+			m_ResearchTask.GetStructuresToActivate(stateSnapshot, structureIDs);
 		}
 
 		public void SetVehicleGroupSlots(List<VehicleGroup.UnitSlot> unassignedCombatSlots)
@@ -86,6 +134,33 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 
 			// Unassigned slots are returned in a prioritized order based on the ThreatZone.
 			combatGroupTask.SetVehicleGroupSlots(unassignedCombatSlots);
+		}
+
+		private int GetNewResearchTopic(PlayerState owner)
+		{
+			int topic = -1;
+
+			// Go through topics until we find one we can research
+			while (m_TopicsToResearch.Count > 0 && !CanColonyResearchTopic(owner.isEden, topic))
+			{
+				topic = m_TopicsToResearch[0];
+				m_TopicsToResearch.RemoveAt(0);
+			}
+
+			return topic;
+		}
+
+		private bool CanColonyResearchTopic(bool isEden, int topic)
+		{
+			if (topic < 0)
+				return false;
+
+			TechInfo info = Research.GetTechInfo(topic);
+
+			if (isEden)
+				return info.GetEdenCost() > 0;
+			else
+				return info.GetPlymouthCost() > 0;
 		}
 	}
 }

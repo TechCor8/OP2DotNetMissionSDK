@@ -49,10 +49,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (m_MaintainMeteorDefenseTask != null)
 				{
 					int meteorDefenses = connectedStructures.FindAll((StructureState unit) => unit.unitType == map_id.MeteorDefense).Count;
-					if (meteorDefenses >= (connectedStructures.Count / 7) + 1)
-						continue;
-
-					m_MaintainMeteorDefenseTask.targetCountToMaintain = m_MaintainMeteorDefenseTask.targetCountToMaintain+1;
+					int desiredMeteorDefenses = (connectedStructures.Count / 12) + 1;
+					
+					m_MaintainMeteorDefenseTask.targetCountToMaintain = desiredMeteorDefenses;
 					m_MaintainMeteorDefenseTask.buildTask.SetLocation(cc.position);
 				}
 			}
@@ -79,7 +78,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 			
 			if (GameState.players[ownerID].IsEden())
 			{
-				m_Prerequisites.Add(new BuildObservatoryTask(ownerID));
+				m_Prerequisites.Add(new MaintainObservatoryTask(ownerID));
 				m_Prerequisites.Add(m_MaintainMeteorDefenseTask = new MaintainMeteorDefenseTask(ownerID));
 			}
 

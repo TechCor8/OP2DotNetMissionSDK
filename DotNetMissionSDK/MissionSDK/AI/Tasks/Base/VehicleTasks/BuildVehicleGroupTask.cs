@@ -63,11 +63,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 				// Supported unit types are in a prioritized order
 				//foreach (VehicleGroup.UnitWithWeaponType unitWithWeaponType in combatSlot.supportedSlotTypes)
 
-				for (int i=0; i < 4; ++i) // Attempt up to X passes to find slot
+				List<VehicleGroup.UnitWithWeaponType> slotTypes = new List<VehicleGroup.UnitWithWeaponType>(combatSlot.supportedSlotTypes);
+
+				while (slotTypes.Count > 0)
 				{
 					// Randomly select a unit from supported slot types
-					int index = AsyncRandom.Range(0, combatSlot.supportedSlotTypes.Count);
-					VehicleGroup.UnitWithWeaponType unitWithWeaponType = combatSlot.supportedSlotTypes[index];
+					int index = AsyncRandom.Range(0, slotTypes.Count);
+					VehicleGroup.UnitWithWeaponType unitWithWeaponType = slotTypes[index];
 
 					// Use correct factory task to build unit
 					BuildSingleVehicleTask vehicleTask;
@@ -91,7 +93,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 					vehicleTask.SetVehicle(stateSnapshot, unitWithWeaponType.unit, unitWithWeaponType.weapon);
 
 					if (!hasAvailableFactory)
+					{
+						slotTypes.RemoveAt(index);
 						continue;
+					}
+
+					// Try a different unit if the tech is not available
+					if (!owner.HasTechnologyForUnit(stateSnapshot, unitWithWeaponType.unit) ||
+						!owner.HasTechnologyForUnit(stateSnapshot, unitWithWeaponType.weapon))
+					{
+						slotTypes.RemoveAt(index);
+						continue;
+					}
 
 					TaskResult result = vehicleTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
 
@@ -106,6 +119,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 						// We are done with this slot, move to the next one
 						break;
 					}
+
+					// Task failed. Try another unit.
+					slotTypes.RemoveAt(index);
 				}
 			}
 
