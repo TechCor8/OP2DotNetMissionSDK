@@ -381,34 +381,38 @@ namespace DotNetMissionSDK.AI.Managers
 			// Since we cannot remove workers from busy structures, substract from available labor pool.
 			foreach (UnitState unit in owner.units.GetStructures())
 			{
-				if (!unit.isBusy)
-					continue;
-
 				StructureState structure = (StructureState)unit;
 				StructureInfo info = owner.structureInfo[unit.unitType];
 
-				if (structure.hasWorkers) m_AvailableWorkers -= info.workersRequired;
-				if (structure.hasScientists) m_AvailableScientists -= info.scientistsRequired;
-				if (structure.isEnabled)
-				{
-					LabState lab = structure as LabState;
-					if (lab != null)
-					{
-						// Scientists should take refuge from the collapsing structure!
-						if (lab.isCritical)
-							idleActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, 0));
-					}
-					else
-					{
-						// Non-lab structures won't have labor assignments changed.
-						m_StructurePriority.Remove(structure);
-						m_LowPriorityStructures.Remove(structure);
-						m_UselessStructures.Remove(structure);
-					}
+				if (!unit.isBusy)			continue;
+				if (!structure.isEnabled)	continue;
 
-					// All busy crippled structures won't have labor assignments changed.
-					m_CrippledStructures.Remove(structure);
+				if (structure.hasWorkers)
+				{
+					int scientistsAsWorkers = GetScientistsAsWorkers(info.workersRequired);
+
+					m_AvailableWorkers -= (info.workersRequired - scientistsAsWorkers);
+					m_AvailableScientists -= scientistsAsWorkers;
 				}
+				if (structure.hasScientists) m_AvailableScientists -= info.scientistsRequired;
+
+				LabState lab = structure as LabState;
+				if (lab != null)
+				{
+					// Scientists should take refuge from the collapsing structure!
+					if (lab.isCritical)
+						idleActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, 0));
+				}
+				else
+				{
+					// Non-lab structures won't have labor assignments changed.
+					m_StructurePriority.Remove(structure);
+					m_LowPriorityStructures.Remove(structure);
+					m_UselessStructures.Remove(structure);
+				}
+
+				// All busy crippled structures won't have labor assignments changed.
+				m_CrippledStructures.Remove(structure);
 			}
 
 			// Activate high priority structures
@@ -455,20 +459,18 @@ namespace DotNetMissionSDK.AI.Managers
 				StructureState building = buildingsToActivate[i];
 				StructureInfo info = building.structureInfo;
 
-				int scientistsAsWorkers = 0;
-
 				// If there are not enough workers, pull from scientists
-				if (m_AvailableWorkers < info.workersRequired && canUseScientistsAsWorkers)
-				{
-					int workersNeeded = info.workersRequired - m_AvailableWorkers;
-					if (workersNeeded <= m_AvailableScientists)
-						scientistsAsWorkers = workersNeeded;
-				}
+				int scientistsAsWorkers = canUseScientistsAsWorkers ? GetScientistsAsWorkers(info.workersRequired) : 0;
 
-				// Not enough labor, idle building
-				if (m_AvailableWorkers+scientistsAsWorkers < info.workersRequired || 
+				if (building is LabState && building.isBusy && building.isEnabled)
+				{
+					// Add scientists to busy lab, worker already added during "busy" assignment phase
+					AddScientistsToLab(enableActions, idleActions, (LabState)building);
+				}
+				else if (m_AvailableWorkers+scientistsAsWorkers < info.workersRequired || 
 					m_AvailableScientists-scientistsAsWorkers < info.scientistsRequired)
 				{
+					// Not enough labor, idle building
 					if (building.lastCommand != CommandType.ctMoIdle)
 						idleActions.Add(() => GameState.GetUnit(building.unitID)?.DoIdle());
 				}
@@ -480,12 +482,21 @@ namespace DotNetMissionSDK.AI.Managers
 
 					if (!building.isEnabled)
 						enableActions.Add(() => GameState.GetUnit(building.unitID)?.DoUnIdle());
-
-					// If building is a lab
-					if (building is LabState)
-						AddScientistsToLab(enableActions, idleActions, (LabState)building);
 				}
 			}
+		}
+
+		private int GetScientistsAsWorkers(int workersRequired)
+		{
+			// If there are not enough workers, pull from scientists
+			if (m_AvailableWorkers < workersRequired)
+			{
+				int workersNeeded = workersRequired - m_AvailableWorkers;
+				if (workersNeeded <= m_AvailableScientists)
+					return workersNeeded;
+			}
+
+			return 0;
 		}
 
 		/// <summary>
@@ -511,7 +522,7 @@ namespace DotNetMissionSDK.AI.Managers
 				// Adding scientists
 				if (lab.isEnabled && lab.isBusy)
 				{
-					removeActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, scientistsAssigned));//SetLabScientistCount(scientistsAssigned));
+					addActions.Add(() => GameState.GetUnit(lab.unitID)?.DoResearch(lab.labCurrentTopic, scientistsAssigned));//SetLabScientistCount(scientistsAssigned));
 				}
 			}
 		}
