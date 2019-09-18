@@ -193,7 +193,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			List<int> researchTopics = m_RequiredResearchTopics;
 
-			//Get labs that are researching our topics
+			bool isLabResearchingOurTopic = false;
+
+			// Get labs that are researching our topics
 			for (int i=0; i < researchTopics.Count; ++i)
 			{
 				int topic = researchTopics[i];
@@ -208,9 +210,37 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				if (labAssignedTopic == null)
 					continue;
 
+				isLabResearchingOurTopic = true;
+
 				// Only add the lab if it isn't already being activated
 				if (!structureIDs.Contains(labAssignedTopic.unitID))
 					structureIDs.Add(labAssignedTopic.unitID);
+			}
+
+			if (!isLabResearchingOurTopic)
+			{
+				// Find a busy lab that we need and prioritize that one
+				for (int i=0; i < researchTopics.Count; ++i)
+				{
+					int topic = researchTopics[i];
+					TechInfo info = Research.GetTechInfo(topic);
+					LabType labType = info.GetLab();
+
+					// Get labs of type for topic
+					ReadOnlyCollection<LabState> labsForTopic = GetLabsByType(owner, labType);
+
+					if (labsForTopic.Count == 0)
+						continue;
+
+					// Get busy lab
+					LabState busyLab = labsForTopic.FirstOrDefault((lab) => lab.isEnabled && lab.isBusy);
+					if (busyLab == null)
+						continue;
+
+					// Only add the lab if it isn't already being activated
+					if (!structureIDs.Contains(busyLab.unitID))
+						structureIDs.Add(busyLab.unitID);
+				}
 			}
 
 			// Parse prerequisites
