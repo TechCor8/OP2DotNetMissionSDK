@@ -1,5 +1,8 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.Units;
+using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Goals
@@ -36,8 +39,30 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			if (owner.units.nurseries.Count == 0 || owner.units.universities.Count == 0)
 				importance = 1.0f;
 
-			// Importance increases as spare labor dwindles
-			importance = Math.Max(1 - Clamp(owner.numAvailableWorkers / 100.0f), importance);
+			// Importance increases as labor shortage increases
+			int workersNeeded = 0;
+			int scientistsNeeded = 0;
+
+			// Get labor needed for structures
+			foreach (StructureState structure in owner.units.GetStructures())
+			{
+				StructureInfo info = owner.structureInfo[structure.unitType];
+
+				if (!structure.hasWorkers) workersNeeded += info.workersRequired;
+				if (!structure.hasScientists) scientistsNeeded += info.scientistsRequired;
+
+				LabState lab = structure as LabState;
+				if (lab != null && lab.isEnabled && lab.isBusy)
+					scientistsNeeded += Research.GetTechInfo(lab.labCurrentTopic).GetMaxScientists();
+			}
+
+			workersNeeded -= owner.numAvailableWorkers;
+			scientistsNeeded -= owner.numAvailableScientists;
+
+			const int desiredUnemployment = 6;
+			const float criticalShortage = 16;
+
+			importance = Math.Max((workersNeeded + scientistsNeeded + desiredUnemployment) / criticalShortage, importance);
 
 			importance = Clamp(importance * weight);
 		}
