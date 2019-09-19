@@ -41,6 +41,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 		private int m_AvailableWorkers;
 		private int m_AvailableScientists;
+		private int m_AvailablePower;
 
 		private bool m_IsProcessing;
 
@@ -373,6 +374,7 @@ namespace DotNetMissionSDK.AI.Managers
 
 			m_AvailableWorkers = owner.workers;
 			m_AvailableScientists = owner.scientists;
+			m_AvailablePower = owner.amountPowerGenerated;
 
 			// Remove workers in training
 			foreach (UniversityState university in owner.units.universities)
@@ -395,6 +397,7 @@ namespace DotNetMissionSDK.AI.Managers
 					m_AvailableScientists -= scientistsAsWorkers;
 				}
 				if (structure.hasScientists) m_AvailableScientists -= info.scientistsRequired;
+				if (structure.hasPower) m_AvailablePower -= info.powerRequired;
 
 				LabState lab = structure as LabState;
 				if (lab != null)
@@ -468,7 +471,8 @@ namespace DotNetMissionSDK.AI.Managers
 					AddScientistsToLab(enableActions, idleActions, (LabState)building);
 				}
 				else if (m_AvailableWorkers+scientistsAsWorkers < info.workersRequired || 
-					m_AvailableScientists-scientistsAsWorkers < info.scientistsRequired)
+					m_AvailableScientists-scientistsAsWorkers < info.scientistsRequired ||
+					m_AvailablePower < info.powerRequired)
 				{
 					// Not enough labor, idle building
 					if (building.lastCommand != CommandType.ctMoIdle)
@@ -479,6 +483,7 @@ namespace DotNetMissionSDK.AI.Managers
 					// Found labor, activate building
 					m_AvailableWorkers -= (info.workersRequired - scientistsAsWorkers);
 					m_AvailableScientists -= (info.scientistsRequired + scientistsAsWorkers);
+					m_AvailablePower -= info.powerRequired;
 
 					if (!building.isEnabled)
 						enableActions.Add(() => GameState.GetUnit(building.unitID)?.DoUnIdle());
