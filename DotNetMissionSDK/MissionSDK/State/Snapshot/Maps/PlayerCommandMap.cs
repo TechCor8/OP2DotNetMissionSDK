@@ -109,13 +109,13 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		/// </summary>
 		/// <param name="area">The area to check.</param>
 		/// <returns>True, if the area connects to a command center.</returns>
-		public bool ConnectsTo(int playerID, MAP_RECT area)
+		public bool ConnectsTo(int playerID, MAP_RECT area, bool includeDisabledCCs=true)
 		{
 			for (int x=area.xMin; x < area.xMax; ++x)
 			{
 				for (int y=area.yMin; y < area.yMax; ++y)
 				{
-					if (ConnectsTo(playerID, new LOCATION(x,y)))
+					if (ConnectsTo(playerID, new LOCATION(x,y), includeDisabledCCs))
 						return true;
 				}
 			}
@@ -123,36 +123,51 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			return false;
 		}
 
-		public bool ConnectsTo(int playerID, LOCATION point)
+		public bool ConnectsTo(int playerID, LOCATION point, bool includeDisabledCCs=true)
 		{
 			LOCATION gridPoint;
 
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
+			if (HasCommandAccess(gridPoint, playerID, includeDisabledCCs)) return true;
 
 			point.x -= 1;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
+			if (HasCommandAccess(gridPoint, playerID, includeDisabledCCs)) return true;
 
 			point.x += 2;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
+			if (HasCommandAccess(gridPoint, playerID, includeDisabledCCs)) return true;
 
 			point.x -= 1;
 			point.y -= 1;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
+			if (HasCommandAccess(gridPoint, playerID, includeDisabledCCs)) return true;
 
 			point.y += 2;
 			point.ClipToMap();
 			gridPoint = GetPointInGridSpace(point);
-			if (m_Grid[gridPoint.x, gridPoint.y].HasCommandAccess(playerID)) return true;
+			if (HasCommandAccess(gridPoint, playerID, includeDisabledCCs)) return true;
 
 			return false;
+		}
+
+		private bool HasCommandAccess(LOCATION tile, int playerID, bool includeDisabledCCs)
+		{
+			if (includeDisabledCCs)
+				return m_Grid[tile.x, tile.y].HasCommandAccess(playerID);
+			else
+			{
+				// Only considered to have command access if command center is enabled
+				StructureState cc = m_Grid[tile.x, tile.y].GetCommandCenter(playerID);
+				if (cc == null)
+					return false;
+
+				return cc.isEnabled;
+			}
 		}
 
 		public bool GetClosestConnectedTile(int playerID, LOCATION pt, out LOCATION closestPt)

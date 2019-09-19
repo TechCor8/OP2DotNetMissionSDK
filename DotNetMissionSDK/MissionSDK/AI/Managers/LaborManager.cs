@@ -419,15 +419,15 @@ namespace DotNetMissionSDK.AI.Managers
 			}
 
 			// Activate high priority structures
-			ActivateList(enableActions, idleActions, m_StructurePriority, true);
+			ActivateList(stateSnapshot, enableActions, idleActions, m_StructurePriority, true);
 
 			// Assign workers to training, but only if no scientists are assigned as workers
 			if (owner.numScientistsAsWorkers == 0)
 				AddWorkersToTraining(owner, enableActions);
 
 			// Activate low priority structures
-			ActivateList(enableActions, idleActions, m_LowPriorityStructures, false);
-			ActivateList(enableActions, idleActions, m_UselessStructures, false);
+			ActivateList(stateSnapshot,enableActions, idleActions, m_LowPriorityStructures, false);
+			ActivateList(stateSnapshot,enableActions, idleActions, m_UselessStructures, false);
 
 			// Deactivate crippled structures
 			foreach (StructureState building in m_CrippledStructures)
@@ -454,7 +454,7 @@ namespace DotNetMissionSDK.AI.Managers
 			buildingActions.AddRange(enableActions);
 		}
 
-		private void ActivateList(List<Action> enableActions, List<Action> idleActions, List<StructureState> buildingsToActivate, bool canUseScientistsAsWorkers)
+		private void ActivateList(StateSnapshot stateSnapshot, List<Action> enableActions, List<Action> idleActions, List<StructureState> buildingsToActivate, bool canUseScientistsAsWorkers)
 		{
 			// Attempt to activate all buildings in priority order
 			for (int i=0; i < buildingsToActivate.Count; ++i)
@@ -470,23 +470,24 @@ namespace DotNetMissionSDK.AI.Managers
 					// Add scientists to busy lab, worker already added during "busy" assignment phase
 					AddScientistsToLab(enableActions, idleActions, (LabState)building);
 				}
-				else if (m_AvailableWorkers+scientistsAsWorkers < info.workersRequired || 
-					m_AvailableScientists-scientistsAsWorkers < info.scientistsRequired ||
-					m_AvailablePower < info.powerRequired)
+				else if (m_AvailableWorkers+scientistsAsWorkers >= info.workersRequired && 
+					m_AvailableScientists-scientistsAsWorkers >= info.scientistsRequired &&
+					m_AvailablePower >= info.powerRequired &&
+					(!BuildStructureTask.NeedsTube(building.unitType) || stateSnapshot.commandMap.ConnectsTo(ownerID, building.GetRect(), false)))
 				{
-					// Not enough labor, idle building
-					if (building.lastCommand != CommandType.ctMoIdle)
-						idleActions.Add(() => GameState.GetUnit(building.unitID)?.DoIdle());
-				}
-				else
-				{
-					// Found labor, activate building
+					// Found labor, power and cc access. Activate building.
 					m_AvailableWorkers -= (info.workersRequired - scientistsAsWorkers);
 					m_AvailableScientists -= (info.scientistsRequired + scientistsAsWorkers);
 					m_AvailablePower -= info.powerRequired;
 
 					if (!building.isEnabled)
 						enableActions.Add(() => GameState.GetUnit(building.unitID)?.DoUnIdle());
+				}
+				else
+				{
+					// Not enough labor, power or cc access. Idle building.
+					if (building.lastCommand != CommandType.ctMoIdle)
+						idleActions.Add(() => GameState.GetUnit(building.unitID)?.DoIdle());
 				}
 			}
 		}
