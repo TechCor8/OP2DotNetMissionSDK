@@ -38,7 +38,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
 
-			return owner.CanBuildUnit(stateSnapshot, m_VehicleToBuild, m_VehicleToBuildCargo);
+			return owner.CanBuildUnit(m_VehicleToBuild, m_VehicleToBuildCargo);
 		}
 
 		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)

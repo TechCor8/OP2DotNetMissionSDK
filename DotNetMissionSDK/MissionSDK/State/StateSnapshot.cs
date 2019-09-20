@@ -1,5 +1,7 @@
 ﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot.Maps;
+using DotNetMissionSDK.State.Snapshot.ResearchInfo;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using DotNetMissionSDK.Utility;
@@ -25,6 +27,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		private static ReadOnlyDictionary<map_id, GlobalStructureInfo> m_StructureInfo;
 		private static ReadOnlyDictionary<map_id, GlobalWeaponInfo> m_WeaponInfo;
 		private static ReadOnlyDictionary<map_id, GlobalUnitInfo> m_StarshipInfo;
+		private static ReadOnlyCollection<GlobalTechInfo> m_TechInfo;
 
 		private Dictionary<int, UnitState> m_Units = new Dictionary<int, UnitState>();
 
@@ -42,6 +45,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		public ReadOnlyDictionary<map_id, GlobalStructureInfo> structureInfo	{ get; private set; }
 		public ReadOnlyDictionary<map_id, GlobalWeaponInfo> weaponInfo			{ get; private set; }
 		public ReadOnlyDictionary<map_id, GlobalUnitInfo> starshipInfo			{ get; private set; }
+		public ReadOnlyCollection<GlobalTechInfo> techInfo						{ get; private set; }
 
 		// Player / Unit State
 		public GaiaState gaia													{ get; private set; }
@@ -108,6 +112,7 @@ namespace DotNetMissionSDK.State.Snapshot
 			structureInfo = m_StructureInfo;
 			weaponInfo = m_WeaponInfo;
 			starshipInfo = m_StarshipInfo;
+			techInfo = m_TechInfo;
 
 			// Gaia state
 			if (gaia != null) gaia.Initialize();	else gaia = new GaiaState();
@@ -214,6 +219,15 @@ namespace DotNetMissionSDK.State.Snapshot
 			m_StructureInfo = new ReadOnlyDictionary<map_id, GlobalStructureInfo>(structureInfo);
 			m_WeaponInfo = new ReadOnlyDictionary<map_id, GlobalWeaponInfo>(weaponInfo);
 			m_StarshipInfo = new ReadOnlyDictionary<map_id, GlobalUnitInfo>(starshipInfo);
+
+			// Research
+			int techCount = Research.GetTechCount();
+			List<GlobalTechInfo> techInfo = new List<GlobalTechInfo>(techCount);
+
+			for (int i=0; i < techCount; ++i)
+				techInfo.Add(new GlobalTechInfo(Research.GetTechInfo(i)));
+
+			m_TechInfo = new ReadOnlyCollection<GlobalTechInfo>(techInfo);
 		}
 	}
 }

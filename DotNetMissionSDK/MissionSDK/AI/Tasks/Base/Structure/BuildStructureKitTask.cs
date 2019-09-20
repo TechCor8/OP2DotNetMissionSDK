@@ -87,7 +87,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				return true;
 
 			// colony type, tech, metal requirements
-			return owner.CanBuildUnit(stateSnapshot, m_KitToBuild, m_KitToBuildCargo);
+			return owner.CanBuildUnit(m_KitToBuild, m_KitToBuildCargo);
 		}
 
 		protected override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
@@ -95,10 +95,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Fail Check: Research
-			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuild))
+			if (!owner.HasTechnologyForUnit(m_KitToBuild))
 				return new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(m_KitToBuild).researchTopic);
 
-			if (!owner.HasTechnologyForUnit(stateSnapshot, m_KitToBuildCargo))
+			if (!owner.HasTechnologyForUnit(m_KitToBuildCargo))
 				return new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(m_KitToBuildCargo).researchTopic);
 
 			// Get structure factories with kit

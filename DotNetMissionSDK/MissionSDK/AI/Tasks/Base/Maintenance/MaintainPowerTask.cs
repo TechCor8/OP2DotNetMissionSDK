@@ -67,22 +67,22 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 
 			// Build new power plant
 			if (!BuildGeothermalPlant(stateSnapshot, owner, unitActions))
-				BuildPowerPlant(stateSnapshot, owner);
+				BuildPowerPlant(owner);
 
 			return new TaskResult(TaskRequirements.None);
 		}
 
-		private void BuildPowerPlant(StateSnapshot stateSnapshot, PlayerState owner)
+		private void BuildPowerPlant(PlayerState owner)
 		{
 			// Determine power plant type to build. Default to Tokamak.
 			map_id powerPlantTypeToBuild = map_id.Tokamak;
 
 			// Build MHD if available
-			if (owner.CanBuildUnit(stateSnapshot, map_id.MHDGenerator))
+			if (owner.CanBuildUnit(map_id.MHDGenerator))
 				powerPlantTypeToBuild = map_id.MHDGenerator;
 
 			// Build Solar Power Array if available and satellite in orbit
-			if (owner.CanBuildUnit(stateSnapshot, map_id.SolarPowerArray) && owner.units.solarPowerArrays.Count < owner.units.solarSatelliteCount)
+			if (owner.CanBuildUnit(map_id.SolarPowerArray) && owner.units.solarPowerArrays.Count < owner.units.solarSatelliteCount)
 				powerPlantTypeToBuild = map_id.SolarPowerArray;
 			
 			// Convecs with loaded power kits get priority

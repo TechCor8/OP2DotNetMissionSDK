@@ -99,8 +99,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 					}
 
 					// Try a different unit if the tech is not available
-					if (!owner.HasTechnologyForUnit(stateSnapshot, unitWithWeaponType.unit) ||
-						!owner.HasTechnologyForUnit(stateSnapshot, unitWithWeaponType.weapon))
+					if (!owner.HasTechnologyForUnit(unitWithWeaponType.unit) ||
+						!owner.HasTechnologyForUnit(unitWithWeaponType.weapon))
 					{
 						slotTypes.RemoveAt(index);
 						continue;

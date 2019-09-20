@@ -68,21 +68,21 @@ namespace DotNetMissionSDK.AI.Tasks
 			result = new TaskResult(TaskRequirements.None);
 
 			// Fail Check: Colony Type
-			if (!owner.CanColonyUseUnit(stateSnapshot, unitType))
+			if (!owner.CanColonyUseUnit(unitType))
 				return false;
 
 			// Fail Check: Research
-			if (!owner.HasTechnologyForUnit(stateSnapshot, unitType))
+			if (!owner.HasTechnologyForUnit(unitType))
 				result += new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(unitType).researchTopic);
 
 			if (cargoOrWeaponType != map_id.None)
 			{
 				// Fail Check: Cargo Colony Type
-				if (!owner.CanColonyUseUnit(stateSnapshot, cargoOrWeaponType))
+				if (!owner.CanColonyUseUnit(cargoOrWeaponType))
 					return false;
 
 				// Fail Check: Cargo Research
-				if (!owner.HasTechnologyForUnit(stateSnapshot, cargoOrWeaponType))
+				if (!owner.HasTechnologyForUnit(cargoOrWeaponType))
 					result += new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(cargoOrWeaponType).researchTopic);
 
 				UnitInfoState unitInfo = owner.GetUnitInfo(unitType);

@@ -3,6 +3,7 @@ using DotNetMissionSDK.Async;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.ResearchInfo;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System;
@@ -468,7 +469,7 @@ namespace DotNetMissionSDK.AI.Managers
 				if (building is LabState && building.isBusy && building.isEnabled)
 				{
 					// Add scientists to busy lab, worker already added during "busy" assignment phase
-					AddScientistsToLab(enableActions, idleActions, (LabState)building);
+					AddScientistsToLab(stateSnapshot, enableActions, idleActions, (LabState)building);
 				}
 				else if (m_AvailableWorkers+scientistsAsWorkers >= info.workersRequired && 
 					m_AvailableScientists-scientistsAsWorkers >= info.scientistsRequired &&
@@ -508,13 +509,12 @@ namespace DotNetMissionSDK.AI.Managers
 		/// <summary>
 		/// Adds scientists until lab is maxed or there are not enough scientists available.
 		/// </summary>
-		private void AddScientistsToLab(List<Action> addActions, List<Action> removeActions, LabState lab)
+		private void AddScientistsToLab(StateSnapshot stateSnapshot, List<Action> addActions, List<Action> removeActions, LabState lab)
 		{
 			// Get max assigned
-			TechInfo info = Research.GetTechInfo(lab.labCurrentTopic);
-			int maxScientists = info.GetMaxScientists();
-
-			int scientistsAssigned = Math.Min(maxScientists, m_AvailableScientists);
+			GlobalTechInfo info = stateSnapshot.techInfo[lab.labCurrentTopic];
+			
+			int scientistsAssigned = Math.Min(info.maxScientists, m_AvailableScientists);
 
 			m_AvailableScientists -= scientistsAssigned;
 

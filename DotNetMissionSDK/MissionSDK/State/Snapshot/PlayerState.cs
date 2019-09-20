@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.HFL;
+using DotNetMissionSDK.State.Snapshot.ResearchInfo;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace DotNetMissionSDK.State.Snapshot
 	/// </summary>
 	public class PlayerState
 	{
+		private StateSnapshot m_StateSnapshot;
+
 		private List<int> m_Allies		= new List<int>();
 		private List<int> m_Enemies		= new List<int>();
 
@@ -103,33 +106,31 @@ namespace DotNetMissionSDK.State.Snapshot
 		/// <param name="techIndex">The tech index of the technology based on the tech info array.</param>
 		public bool HasTechnologyByIndex(int techIndex)
 		{
-			TechInfo techInfo = Research.GetTechInfo(techIndex);
-			return m_HasTechnology[techInfo.GetTechID()];
+			GlobalTechInfo techInfo = m_StateSnapshot.techInfo[techIndex];
+			return m_HasTechnology[techInfo.techID];
 		}
 
 		/// <summary>
 		/// Returns true, if the player has the technology required to build this unit.
 		/// </summary>
-		/// <param name="stateSnapshot">The state to pull unit info from.</param>
 		/// <param name="unitTypeID">The unit type to check if technology requirements have been met.</param>
-		public bool HasTechnologyForUnit(StateSnapshot stateSnapshot, map_id unitTypeID)
+		public bool HasTechnologyForUnit(map_id unitTypeID)
 		{
 			if (unitTypeID == map_id.None)
 				return true;
 
-			GlobalUnitInfo globalUnitInfo = stateSnapshot.GetGlobalUnitInfo(unitTypeID);
+			GlobalUnitInfo globalUnitInfo = m_StateSnapshot.GetGlobalUnitInfo(unitTypeID);
 			return HasTechnologyByIndex(globalUnitInfo.researchTopic);
 		}
 
 		/// <summary>
 		/// Returns true if the player's colony type can build this unit at some point regardless of technology or metal requirements.
 		/// </summary>
-		/// <param name="stateSnapshot">The state to pull unit info from.</param>
 		/// <param name="unitTypeID">The unit type to check for usability.</param>
 		/// <returns></returns>
-		public bool CanColonyUseUnit(StateSnapshot stateSnapshot, map_id unitTypeID)
+		public bool CanColonyUseUnit(map_id unitTypeID)
 		{
-			GlobalUnitInfo globalUnitInfo = stateSnapshot.GetGlobalUnitInfo(unitTypeID);
+			GlobalUnitInfo globalUnitInfo = m_StateSnapshot.GetGlobalUnitInfo(unitTypeID);
 			return globalUnitInfo.CanColonyUseUnit(isEden);
 		}
 
@@ -149,24 +150,24 @@ namespace DotNetMissionSDK.State.Snapshot
 		/// <summary>
 		/// Checks if this player is the correct colony type, has completed the required research, and has the required resources to build a unit.
 		/// </summary>
-		public bool CanBuildUnit(StateSnapshot stateSnapshot, map_id unitType, map_id cargoOrWeaponType=map_id.None)
+		public bool CanBuildUnit(map_id unitType, map_id cargoOrWeaponType=map_id.None)
 		{
 			// Fail Check: Colony Type
-			if (!CanColonyUseUnit(stateSnapshot, unitType))
+			if (!CanColonyUseUnit(unitType))
 				return false;
 
 			// Fail Check: Research
-			if (!HasTechnologyForUnit(stateSnapshot, unitType))
+			if (!HasTechnologyForUnit(unitType))
 				return false;
 
 			if (cargoOrWeaponType != map_id.None)
 			{
 				// Fail Check: Cargo Colony Type
-				if (!CanColonyUseUnit(stateSnapshot, cargoOrWeaponType))
+				if (!CanColonyUseUnit(cargoOrWeaponType))
 					return false;
 
 				// Fail Check: Cargo Research
-				if (!HasTechnologyForUnit(stateSnapshot, cargoOrWeaponType))
+				if (!HasTechnologyForUnit(cargoOrWeaponType))
 					return false;
 
 				UnitInfoState unitInfo = GetUnitInfo(unitType);
@@ -192,7 +193,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		/// Checks if this player can afford to build the unit.
 		/// Does not check if player has the technology to build the unit.
 		/// </summary>
-		public bool CanAffordUnit(StateSnapshot stateSnapshot, map_id unitType, map_id cargoOrWeaponType=map_id.None)
+		public bool CanAffordUnit(map_id unitType, map_id cargoOrWeaponType=map_id.None)
 		{
 			if (cargoOrWeaponType != map_id.None)
 			{
@@ -230,6 +231,7 @@ namespace DotNetMissionSDK.State.Snapshot
 		/// </summary>
 		internal void Initialize(StateSnapshot stateSnapshot, PlayerEx player, PlayerState prevPlayerState)
 		{
+			m_StateSnapshot = stateSnapshot;
 			playerID = player.playerID;
 
 			// Set alliances
@@ -323,7 +325,7 @@ namespace DotNetMissionSDK.State.Snapshot
 
 			for (int i=0; i < techCount; ++i)
 			{
-				int techID = Research.GetTechInfo(i).GetTechID();
+				int techID = stateSnapshot.techInfo[i].techID;
 				hasTech.Add(techID, player.HasTechnology(techID));
 			}
 

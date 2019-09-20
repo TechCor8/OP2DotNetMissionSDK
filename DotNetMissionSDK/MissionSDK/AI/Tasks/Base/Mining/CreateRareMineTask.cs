@@ -52,7 +52,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Fail Check: Research
-			if (!owner.HasTechnologyForUnit(stateSnapshot, map_id.RareOreSmelter))
+			if (!owner.HasTechnologyForUnit(map_id.RareOreSmelter))
 				return new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(map_id.RareOreSmelter).researchTopic);
 
 			// Get miner

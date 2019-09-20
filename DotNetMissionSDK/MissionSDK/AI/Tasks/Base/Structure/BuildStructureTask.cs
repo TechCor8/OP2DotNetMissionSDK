@@ -69,7 +69,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_KitToBuild) != null)
 				return true;
 
-			if (owner.CanBuildUnit(stateSnapshot, m_KitToBuild))
+			if (owner.CanBuildUnit(m_KitToBuild))
 				return true;
 
 			return false;

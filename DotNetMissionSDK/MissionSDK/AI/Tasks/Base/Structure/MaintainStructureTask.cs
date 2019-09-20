@@ -100,7 +100,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_StructureToMaintain) != null)
 				return true;
 
-			if (owner.CanBuildUnit(stateSnapshot, m_StructureToMaintain))
+			if (owner.CanBuildUnit(m_StructureToMaintain))
 				return true;
 
 			return false;

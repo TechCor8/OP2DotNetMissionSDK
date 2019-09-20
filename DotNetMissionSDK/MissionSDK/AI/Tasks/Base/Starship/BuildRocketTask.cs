@@ -48,9 +48,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			map_id rocketToBuild = map_id.SULV;
 
 			// Build an RLV if we have the technology
-			if (owner.HasTechnologyForUnit(stateSnapshot, map_id.RLV))
+			if (owner.HasTechnologyForUnit(map_id.RLV))
 				rocketToBuild = map_id.RLV;
-			else if (owner.CanColonyUseUnit(stateSnapshot, map_id.RLV))
+			else if (owner.CanColonyUseUnit(map_id.RLV))
 				result = new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(map_id.RLV).researchTopic);
 
 			// Fail Check: Rocket cost

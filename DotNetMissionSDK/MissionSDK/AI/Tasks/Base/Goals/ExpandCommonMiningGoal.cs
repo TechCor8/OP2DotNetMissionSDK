@@ -89,7 +89,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			{
 				excessOre -= owner.structureInfo[map_id.VehicleFactory].oreCost;
 
-				if (!owner.HasTechnologyForUnit(stateSnapshot, map_id.VehicleFactory))
+				if (!owner.HasTechnologyForUnit(map_id.VehicleFactory))
 					excessOre -= owner.structureInfo[map_id.StandardLab].oreCost;
 			}
 

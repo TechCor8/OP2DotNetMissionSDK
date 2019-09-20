@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.ResearchInfo;
 using DotNetMissionSDK.State.Snapshot.Units;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				return true;
 
 			// Get required topics to research that are currently available
-			m_RequiredResearchTopics = GetRequiredResearchTopics(owner, topicToResearch);
+			m_RequiredResearchTopics = GetRequiredResearchTopics(stateSnapshot, owner, topicToResearch);
 
 			// Make sure we maintain any labs required for topics
 			/*m_MaintainBasicLab.targetCountToMaintain = 0;
@@ -85,11 +86,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			for (int i=0; i < researchTopics.Count; ++i)
 			{
 				int topic = researchTopics[i];
-				TechInfo info = Research.GetTechInfo(topic);
-				LabType labType = info.GetLab();
-
+				GlobalTechInfo info = stateSnapshot.techInfo[topic];
+				
 				// Get labs of type for topic
-				ReadOnlyCollection<LabState> labsForTopic = GetLabsByType(owner, labType);
+				ReadOnlyCollection<LabState> labsForTopic = GetLabsByType(owner, info.labType);
 
 				if (labsForTopic.Count == 0)
 					return new TaskResult(TaskRequirements.Research, topic);
@@ -110,13 +110,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return new TaskResult(TaskRequirements.None);
 		}
 
-		private List<int> GetRequiredResearchTopics(PlayerState owner, int desiredTopic)
+		private List<int> GetRequiredResearchTopics(StateSnapshot stateSnapshot, PlayerState owner, int desiredTopic)
 		{
 			// If topic has already been researched, there are no required topics
 			if (owner.HasTechnologyByIndex(desiredTopic))
 				return new List<int>();
 
-			TechInfo info = Research.GetTechInfo(desiredTopic);
+			GlobalTechInfo info = stateSnapshot.techInfo[desiredTopic];
 
 			// If topic can't be researched, don't bother with it
 			if (!CanColonyResearchTopic(owner.isEden, info))
@@ -125,13 +125,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			List<int> requiredTopics = new List<int>();
 
 			// Check all required topics
-			int requiredCount = info.GetNumRequiredTechs();
+			int requiredCount = info.requiredTopics.Length;
 			for (int i=0; i < requiredCount; ++i)
 			{
-				int topic = info.GetRequiredTechIndex(i);
+				int topic = info.requiredTopics[i];
 				
 				// Get all required topics in unresearched topic
-				requiredTopics.AddRange(GetRequiredResearchTopics(owner, topic));
+				requiredTopics.AddRange(GetRequiredResearchTopics(stateSnapshot, owner, topic));
 			}
 
 			// If there are topics to research before this one, return those...
@@ -143,12 +143,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			return requiredTopics;
 		}
 
-		private bool CanColonyResearchTopic(bool isEden, TechInfo info)
+		private bool CanColonyResearchTopic(bool isEden, GlobalTechInfo info)
 		{
 			if (isEden)
-				return info.GetEdenCost() > 0;
+				return info.edenCost > 0;
 			else
-				return info.GetPlymouthCost() > 0;
+				return info.plymouthCost > 0;
 		}
 
 		private ReadOnlyCollection<LabState> GetLabsByType(PlayerState owner, LabType labType)
@@ -199,11 +199,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			for (int i=0; i < researchTopics.Count; ++i)
 			{
 				int topic = researchTopics[i];
-				TechInfo info = Research.GetTechInfo(topic);
-				LabType labType = info.GetLab();
-
+				GlobalTechInfo info = stateSnapshot.techInfo[topic];
+				
 				// Get labs of type for topic
-				ReadOnlyCollection<LabState> labsForTopic = GetLabsByType(owner, labType);
+				ReadOnlyCollection<LabState> labsForTopic = GetLabsByType(owner, info.labType);
 
 				// Get lab with topic. If topic is not being researched, there is no lab to activate
 				LabState labAssignedTopic = GetLabResearchingTopic(labsForTopic, topic);
@@ -223,11 +222,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				for (int i=0; i < researchTopics.Count; ++i)
 				{
 					int topic = researchTopics[i];
-					TechInfo info = Research.GetTechInfo(topic);
-					LabType labType = info.GetLab();
-
+					GlobalTechInfo info = stateSnapshot.techInfo[topic];
+					
 					// Get labs of type for topic
-					ReadOnlyCollection<LabState> labsForTopic = GetLabsByType(owner, labType);
+					ReadOnlyCollection<LabState> labsForTopic = GetLabsByType(owner, info.labType);
 
 					if (labsForTopic.Count == 0)
 						continue;

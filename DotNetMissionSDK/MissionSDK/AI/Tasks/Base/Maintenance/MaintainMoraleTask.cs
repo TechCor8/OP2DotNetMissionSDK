@@ -113,13 +113,13 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (i % 3 == 2)
 				{
 					// Build tech residence
-					if (owner.isEden && owner.HasTechnologyForUnit(stateSnapshot, map_id.AdvancedResidence))
+					if (owner.isEden && owner.HasTechnologyForUnit(map_id.AdvancedResidence))
 					{
 						++m_BuildEdenResidenceTask.targetCountToMaintain;
 						plannedCapacity += advancedInfo.productionCapacity;
 						continue;
 					}
-					else if (!owner.isEden && owner.HasTechnologyForUnit(stateSnapshot, map_id.ReinforcedResidence))
+					else if (!owner.isEden && owner.HasTechnologyForUnit(map_id.ReinforcedResidence))
 					{
 						++m_BuildPlymouthResidenceTask.targetCountToMaintain;
 						plannedCapacity += reinforcedInfo.productionCapacity;
@@ -179,7 +179,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private void UpdateRecreationCenterCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			// Don't encourage researching recreation facilities until we have a sizable population
-			if (owner.totalPopulation < 140 && !owner.HasTechnologyForUnit(stateSnapshot, map_id.RecreationFacility))
+			if (owner.totalPopulation < 140 && !owner.HasTechnologyForUnit(map_id.RecreationFacility))
 				return;
 
 			StructureInfo recreationInfo = owner.structureInfo[map_id.RecreationFacility];
@@ -195,7 +195,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (i % 2 == 1)
 				{
 					// Build forum
-					if (!owner.isEden && owner.HasTechnologyForUnit(stateSnapshot, map_id.Forum))
+					if (!owner.isEden && owner.HasTechnologyForUnit(map_id.Forum))
 					{
 						++m_BuildForumTask.targetCountToMaintain;
 						plannedCapacity += forumInfo.productionCapacity;
@@ -231,7 +231,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private void UpdateDIRTCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			// Don't encourage researching DIRT until we have a sizable population
-			if (owner.totalPopulation < 140 && !owner.HasTechnologyForUnit(stateSnapshot, map_id.DIRT))
+			if (owner.totalPopulation < 140 && !owner.HasTechnologyForUnit(map_id.DIRT))
 				return;
 
 			m_BuildDirtTask.targetCountToMaintain = 0;
@@ -276,7 +276,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 		private void UpdateGORFCount(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			// Don't encourage researching GORF until we have a sizable population
-			if (owner.totalPopulation < 100 && !owner.HasTechnologyForUnit(stateSnapshot, map_id.GORF))
+			if (owner.totalPopulation < 100 && !owner.HasTechnologyForUnit(map_id.GORF))
 				return;
 
 			m_BuildGorfTask.targetCountToMaintain = 1;

@@ -27,7 +27,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Starship
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			// Fail Check: Research
-			if (!owner.HasTechnologyForUnit(stateSnapshot, m_StarshipModule))
+			if (!owner.HasTechnologyForUnit(m_StarshipModule))
 				return new TaskResult(TaskRequirements.Research, stateSnapshot.GetGlobalUnitInfo(m_StarshipModule).researchTopic);
 			
 			// Get spaceports with rocket

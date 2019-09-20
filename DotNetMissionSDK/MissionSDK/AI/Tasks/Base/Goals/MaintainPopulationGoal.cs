@@ -53,7 +53,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 
 				LabState lab = structure as LabState;
 				if (lab != null && lab.isEnabled && lab.isBusy)
-					scientistsNeeded += Research.GetTechInfo(lab.labCurrentTopic).GetMaxScientists();
+					scientistsNeeded += stateSnapshot.techInfo[lab.labCurrentTopic].maxScientists;
 			}
 
 			workersNeeded -= owner.numAvailableWorkers;

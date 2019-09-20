@@ -353,7 +353,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (owner.units.convecs.FirstOrDefault((unit) => unit.cargoType == m_KitToBuild /*&& unit.cargoType == m_KitTask.turret*/) != null)
 				return true;
 
-			if (owner.CanBuildUnit(stateSnapshot, m_KitToBuild, m_KitTask.turret))
+			if (owner.CanBuildUnit(m_KitToBuild, m_KitTask.turret))
 				return true;
 
 			return false;

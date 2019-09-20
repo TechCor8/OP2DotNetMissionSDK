@@ -32,7 +32,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				if (gaiaUnit.unitType != map_id.MiningBeacon && gaiaUnit.unitType != map_id.MagmaVent)
 					continue;
 
-				if (gaiaUnit.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
+				if (gaiaUnit.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(map_id.MagmaWell) || !owner.HasTechnologyForUnit(map_id.MagmaWell)))
 					continue;
 
 				MiningBeaconState beacon = gaiaUnit as MiningBeaconState;
@@ -146,7 +146,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Mining
 				if (gaiaUnit.unitType != map_id.MiningBeacon && gaiaUnit.unitType != map_id.MagmaVent)
 					continue;
 
-				if (gaiaUnit.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(stateSnapshot, map_id.MagmaWell) || !owner.HasTechnologyForUnit(stateSnapshot, map_id.MagmaWell)))
+				if (gaiaUnit.unitType == map_id.MagmaVent && (!owner.CanColonyUseUnit(map_id.MagmaWell) || !owner.HasTechnologyForUnit(map_id.MagmaWell)))
 					continue;
 
 				MiningBeaconState beacon = gaiaUnit as MiningBeaconState;

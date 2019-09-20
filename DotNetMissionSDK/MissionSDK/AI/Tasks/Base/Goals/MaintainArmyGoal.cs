@@ -3,6 +3,7 @@ using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.AI.Tasks.Base.VehicleTasks;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
+using DotNetMissionSDK.State.Snapshot.ResearchInfo;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -91,7 +92,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			// Research weapon systems
 			if (m_ResearchTask.IsTaskComplete(stateSnapshot))
 			{
-				int newTopic = GetNewResearchTopic(owner);
+				int newTopic = GetNewResearchTopic(stateSnapshot, owner);
 				if (newTopic >= 0)
 					m_ResearchTask.topicToResearch = newTopic;
 			}
@@ -136,12 +137,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			combatGroupTask.SetVehicleGroupSlots(unassignedCombatSlots);
 		}
 
-		private int GetNewResearchTopic(PlayerState owner)
+		private int GetNewResearchTopic(StateSnapshot stateSnapshot, PlayerState owner)
 		{
 			int topic = -1;
 
 			// Go through topics until we find one we can research
-			while (m_TopicsToResearch.Count > 0 && !CanColonyResearchTopic(owner.isEden, topic))
+			while (m_TopicsToResearch.Count > 0 && !CanColonyResearchTopic(stateSnapshot, owner.isEden, topic))
 			{
 				topic = m_TopicsToResearch[0];
 				m_TopicsToResearch.RemoveAt(0);
@@ -150,17 +151,17 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			return topic;
 		}
 
-		private bool CanColonyResearchTopic(bool isEden, int topic)
+		private bool CanColonyResearchTopic(StateSnapshot stateSnapshot, bool isEden, int topic)
 		{
 			if (topic < 0)
 				return false;
 
-			TechInfo info = Research.GetTechInfo(topic);
+			GlobalTechInfo info = stateSnapshot.techInfo[topic];
 
 			if (isEden)
-				return info.GetEdenCost() > 0;
+				return info.edenCost > 0;
 			else
-				return info.GetPlymouthCost() > 0;
+				return info.plymouthCost > 0;
 		}
 	}
 }
