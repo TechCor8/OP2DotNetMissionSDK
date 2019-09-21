@@ -16,6 +16,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 	public class ResearchTask : Task
 	{
 		public int topicToResearch;
+		public bool shouldResearchPrerequisites = true;
 
 		private List<int> m_RequiredResearchTopics = new List<int>();
 
@@ -40,8 +41,21 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 			if (owner.HasTechnologyByIndex(topicToResearch))
 				return true;
 
-			// Get required topics to research that are currently available
-			m_RequiredResearchTopics = GetRequiredResearchTopics(stateSnapshot, owner, topicToResearch);
+			if (shouldResearchPrerequisites)
+			{
+				// Get required topics to research that are currently available
+				m_RequiredResearchTopics = GetRequiredResearchTopics(stateSnapshot, owner, topicToResearch);
+			}
+			else
+			{
+				// Set this topic to be researched, if there are no required topics to research
+				List<int> requiredTopics = GetRequiredResearchTopics(stateSnapshot, owner, topicToResearch);
+				if (requiredTopics.Count > 0 && requiredTopics[0] == topicToResearch)
+				{
+					m_RequiredResearchTopics.Clear();
+					m_RequiredResearchTopics.Add(topicToResearch);
+				}
+			}
 
 			// Make sure we maintain any labs required for topics
 			/*m_MaintainBasicLab.targetCountToMaintain = 0;
@@ -146,9 +160,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		private bool CanColonyResearchTopic(bool isEden, GlobalTechInfo info)
 		{
 			if (isEden)
-				return info.edenCost > 0;
+				return info.edenCost >= 0;
 			else
-				return info.plymouthCost > 0;
+				return info.plymouthCost >= 0;
 		}
 
 		private ReadOnlyCollection<LabState> GetLabsByType(PlayerState owner, LabType labType)

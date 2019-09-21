@@ -166,7 +166,7 @@ namespace DotNetMissionSDK.AI.Managers
 				// DEBUG:
 				if (ownerID == TethysGame.LocalPlayer())
 				{
-					//TethysGame.AddMessage(ownerID, m_DebugMessage, ownerID, 0);
+					TethysGame.AddMessage(ownerID, m_DebugMessage, ownerID, 0);
 				}
 			});
 		}
@@ -205,7 +205,7 @@ namespace DotNetMissionSDK.AI.Managers
 				// If this goal is waiting on research, trigger maintain research goal to get labs up and running.
 				if (!didPerformResearchGoal && result.missingRequirements == TaskRequirements.Research)
 				{
-					result += m_MaintainResearchGoal.PerformTask(stateSnapshot, result.missingRequirements, botCommands);
+					result += m_MaintainResearchGoal.PerformTaskNoResearch(stateSnapshot, result.missingRequirements, botCommands);
 					didPerformResearchGoal = true;
 				}
 				

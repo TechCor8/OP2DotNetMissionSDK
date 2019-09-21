@@ -195,7 +195,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Maintenance
 				if (i % 2 == 1)
 				{
 					// Build forum
-					if (!owner.isEden && owner.HasTechnologyForUnit(map_id.Forum))
+					if (!owner.isEden)// && owner.HasTechnologyForUnit(map_id.Forum))
 					{
 						++m_BuildForumTask.targetCountToMaintain;
 						plannedCapacity += forumInfo.productionCapacity;

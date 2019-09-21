@@ -40,6 +40,19 @@ namespace DotNetMissionSDK.HFL
 		public static TechInfo GetTechInfo(int index)				{ return new TechInfo(Research_GetTechInfo(index));						}
 		public static int GetMaxTechID()							{ return Research_GetMaxTechID();										}
 
+		public static int GetTechIndexByTechID(int techID)
+		{
+			int count = GetTechCount();
+			for (int i=0; i < count; ++i)
+			{
+				TechInfo info = GetTechInfo(i);
+				if (info.GetTechID() == techID)
+					return i;
+			}
+
+			return -1;
+		}
+
 		[DllImport("DotNetInterop.dll")] private static extern int Research_GetTechCount();
 		[DllImport("DotNetInterop.dll")] private static extern IntPtr Research_GetTechInfo(int index);
 		[DllImport("DotNetInterop.dll")] private static extern int Research_GetMaxTechID();

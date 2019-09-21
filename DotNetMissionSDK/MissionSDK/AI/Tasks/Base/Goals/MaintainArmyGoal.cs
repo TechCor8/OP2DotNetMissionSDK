@@ -15,11 +15,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 	public class MaintainArmyGoal : Goal
 	{
 		private MaintainVehicleFactoryTask m_MaintainVehicleFactoryTask;
-		private ResearchTask m_ResearchTask;
+		private ResearchSetTask m_ResearchSetTask;
 
-		private List<int> m_TopicsToResearch = new List<int>();
-
-
+		
 		public MaintainArmyGoal(int ownerID, float weight) : base(ownerID, weight)
 		{
 			m_Task = new BuildVehicleGroupTask(ownerID);
@@ -28,36 +26,50 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			m_MaintainVehicleFactoryTask = new MaintainVehicleFactoryTask(ownerID);
 			m_MaintainVehicleFactoryTask.GeneratePrerequisites();
 
-			m_ResearchTask = new ResearchTask(ownerID, -1);
-			m_ResearchTask.GeneratePrerequisites();
-
 			// Set research topics
-			m_TopicsToResearch = new List<int>(new int[]
+			int[] topicsToResearch = new int[]
 			{
 				GetUnitResearchTopic(map_id.Lynx),
 				GetUnitResearchTopic(map_id.Laser),
 				GetUnitResearchTopic(map_id.Microwave),
+				GetTopicFromTechID(05111),	// Independent Turret Power Systems
+				GetTopicFromTechID(07206),	// Scout-class Drive Train Refit
 				GetUnitResearchTopic(map_id.EMP),
 				GetUnitResearchTopic(map_id.RailGun),
+				GetTopicFromTechID(07403),	// Increased Capacitance Circuitry
 				GetUnitResearchTopic(map_id.RPG),
 				GetUnitResearchTopic(map_id.Spider),
 				GetUnitResearchTopic(map_id.Panther),
+				GetTopicFromTechID(08319),	// Spider Maintenance Software Revision
+				GetTopicFromTechID(08309),	// Reinforced Panther Construction
 				GetUnitResearchTopic(map_id.Starflare),
 				GetUnitResearchTopic(map_id.Stickyfoam),
+				GetTopicFromTechID(08320),	// Reduced Foam Evaporation
 				GetUnitResearchTopic(map_id.Scorpion),
+				GetTopicFromTechID(08321),	// Arachnid Durability
+				GetTopicFromTechID(07405),	// Scorpion Power Systems
 				GetUnitResearchTopic(map_id.ESG),
 				GetUnitResearchTopic(map_id.Tiger),
+				GetTopicFromTechID(10303),	// Advanced Armoring Systems
 				GetUnitResearchTopic(map_id.Supernova),
 				GetUnitResearchTopic(map_id.AcidCloud),
-				GetUnitResearchTopic(map_id.ThorsHammer)
-			});
-			// TODO: Add upgrade topics
+				GetUnitResearchTopic(map_id.ThorsHammer),
+				GetTopicFromTechID(12201),	// Rocket Atmospheric Re-entry System
+				GetTopicFromTechID(05601),	// Heat Dissipation Systems
+				GetTopicFromTechID(12101),	// Heat Dissipation Systems
+				GetTopicFromTechID(07211),	// Extended-Range Projectile Launcher
+				GetTopicFromTechID(07212),	// Extended-Range Projectile Launcher
+				GetTopicFromTechID(10306),	// Grenade Loading Mechanism
+				GetTopicFromTechID(10305),	// Grenade Loading Mechanism
+				GetTopicFromTechID(05318),	// Robotic Image Processing
+			};
+
+			m_ResearchSetTask = new ResearchSetTask(ownerID, topicsToResearch);
+			m_ResearchSetTask.GeneratePrerequisites();
 		}
 
-		private int GetUnitResearchTopic(map_id unitToResearch)
-		{
-			return new UnitInfo(unitToResearch).GetResearchTopic();
-		}
+		private int GetUnitResearchTopic(map_id unitToResearch)		{ return new UnitInfo(unitToResearch).GetResearchTopic();			}
+		private int GetTopicFromTechID(int techID)					{ return Research.GetTechIndexByTechID(techID);						}
 
 		/// <summary>
 		/// Updates the importance of this goal.
@@ -87,20 +99,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 		/// </summary>
 		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
 		{
-			PlayerState owner = stateSnapshot.players[m_OwnerID];
+			TaskResult result;
 
-			// Research weapon systems
-			if (m_ResearchTask.IsTaskComplete(stateSnapshot))
-			{
-				int newTopic = GetNewResearchTopic(stateSnapshot, owner);
-				if (newTopic >= 0)
-					m_ResearchTask.topicToResearch = newTopic;
-			}
-			else
-			{
-				// Perform research
-				m_ResearchTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
-			}
+			PlayerState owner = stateSnapshot.players[m_OwnerID];
 
 			// If all factories are occupied, increase number maintained
 			int numBusy = owner.units.vehicleFactories.Count((factory) => factory.isEnabled && factory.isBusy);
@@ -109,10 +110,18 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 
 			// Build factory
 			if (!m_MaintainVehicleFactoryTask.IsTaskComplete(stateSnapshot))
-				return m_MaintainVehicleFactoryTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+				result = m_MaintainVehicleFactoryTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+			else
+			{
+				// Build army
+				result = m_Task.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+			}
 
-			// Build army
-			return m_Task.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+			// Perform research
+			if (!m_ResearchSetTask.IsTaskComplete(stateSnapshot))
+				m_ResearchSetTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+
+			return result;
 		}
 
 		/// <summary>
@@ -126,7 +135,7 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 
 			m_MaintainVehicleFactoryTask.GetStructuresToActivate(stateSnapshot, structureIDs);
 
-			m_ResearchTask.GetStructuresToActivate(stateSnapshot, structureIDs);
+			m_ResearchSetTask.GetStructuresToActivate(stateSnapshot, structureIDs);
 		}
 
 		public void SetVehicleGroupSlots(List<VehicleGroup.UnitSlot> unassignedCombatSlots)
@@ -135,33 +144,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 
 			// Unassigned slots are returned in a prioritized order based on the ThreatZone.
 			combatGroupTask.SetVehicleGroupSlots(unassignedCombatSlots);
-		}
-
-		private int GetNewResearchTopic(StateSnapshot stateSnapshot, PlayerState owner)
-		{
-			int topic = -1;
-
-			// Go through topics until we find one we can research
-			while (m_TopicsToResearch.Count > 0 && !CanColonyResearchTopic(stateSnapshot, owner.isEden, topic))
-			{
-				topic = m_TopicsToResearch[0];
-				m_TopicsToResearch.RemoveAt(0);
-			}
-
-			return topic;
-		}
-
-		private bool CanColonyResearchTopic(StateSnapshot stateSnapshot, bool isEden, int topic)
-		{
-			if (topic < 0)
-				return false;
-
-			GlobalTechInfo info = stateSnapshot.techInfo[topic];
-
-			if (isEden)
-				return info.edenCost > 0;
-			else
-				return info.plymouthCost > 0;
 		}
 	}
 }

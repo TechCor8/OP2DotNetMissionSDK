@@ -1,9 +1,11 @@
 ﻿using DotNetMissionSDK.AI.Tasks.Base.Maintenance;
+using DotNetMissionSDK.AI.Tasks.Base.Structure;
 using DotNetMissionSDK.HFL;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using DotNetMissionSDK.State.Snapshot.UnitTypeInfo;
 using System;
+using System.Collections.Generic;
 
 namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 {
@@ -12,11 +14,33 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 	/// </summary>
 	public class MaintainPopulationGoal : Goal
 	{
+		private ResearchSetTask m_ResearchSetTask;
+
+
 		public MaintainPopulationGoal(int ownerID, float weight) : base(ownerID, weight)
 		{
 			m_Task = new MaintainMoraleTask(ownerID);
 			m_Task.GeneratePrerequisites();
+
+			// Set research topics
+			ResearchSetTask.ResearchTopic[] topicsToResearch = new ResearchSetTask.ResearchTopic[]
+			{
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05307), false),	// Automated Diagnostic Examinations
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(03406), false),	// Environmental Psychology
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(03403), false),	// Hydroponic Growing Media
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05305), false),	// DIRT Procedural Review
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05408), false),	// Forum Reconfiguration
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(08307), false),	// Multitainment Console Upgrade
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(08105), false),	// Disaster-Resistant Housing
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(08104), false),	// Expanded Housing
+			};
+
+			m_ResearchSetTask = new ResearchSetTask(ownerID, topicsToResearch);
+			m_ResearchSetTask.GeneratePrerequisites();
 		}
+
+		private int GetUnitResearchTopic(map_id unitToResearch)		{ return new UnitInfo(unitToResearch).GetResearchTopic();			}
+		private int GetTopicFromTechID(int techID)					{ return Research.GetTechIndexByTechID(techID);						}
 
 		/// <summary>
 		/// Updates the importance of this goal.
@@ -65,6 +89,32 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			importance = Math.Max((workersNeeded + scientistsNeeded + desiredUnemployment) / criticalShortage, importance);
 
 			importance = Clamp(importance * weight);
+		}
+
+		/// <summary>
+		/// Performs this goal's task.
+		/// </summary>
+		public override TaskResult PerformTask(StateSnapshot stateSnapshot, TaskRequirements restrictedRequirements, BotCommands unitActions)
+		{
+			TaskResult result = base.PerformTask(stateSnapshot, restrictedRequirements, unitActions);
+
+			// Perform research
+			if (!m_ResearchSetTask.IsTaskComplete(stateSnapshot))
+				m_ResearchSetTask.PerformTaskTree(stateSnapshot, restrictedRequirements, unitActions);
+
+			return result;
+		}
+
+		/// <summary>
+		/// Gets the list of structures to activate.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="structureIDs">The list to add structures to.</param>
+		public override void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		{
+			base.GetStructuresToActivate(stateSnapshot, structureIDs);
+
+			m_ResearchSetTask.GetStructuresToActivate(stateSnapshot, structureIDs);
 		}
 	}
 }

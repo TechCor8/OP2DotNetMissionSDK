@@ -91,7 +91,23 @@ namespace DotNetMissionSDK.State.Snapshot
 
 
 		private Dictionary<int, bool> m_HasTechnology;
-		
+
+		/// <summary>
+		/// Returns true, if the player's colony can research the technology.
+		/// Does not check if player already has the technology.
+		/// NOTE: techIndex is the array index value returned by GetResearchTopic.
+		/// </summary>
+		/// <param name="techIndex">The tech index of the technology based on the tech info array.</param>
+		public bool CanColonyResearchTechnology(int techIndex)
+		{
+			GlobalTechInfo techInfo = m_StateSnapshot.techInfo[techIndex];
+
+			if (isEden)
+				return techInfo.edenCost >= 0;
+			else
+				return techInfo.plymouthCost >= 0;
+		}
+
 		/// <summary>
 		/// Returns true, if player has the technology.
 		/// NOTE: techID is NOT the array index value returned by GetResearchTopic. Use GetTechInfo().GetTechID().
