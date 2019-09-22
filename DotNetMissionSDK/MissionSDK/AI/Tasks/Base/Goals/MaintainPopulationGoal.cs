@@ -76,8 +76,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 				if (!structure.hasScientists) scientistsNeeded += info.scientistsRequired;
 
 				LabState lab = structure as LabState;
-				if (lab != null && lab.isEnabled && lab.isBusy)
-					scientistsNeeded += stateSnapshot.techInfo[lab.labCurrentTopic].maxScientists;
+				if (lab != null)// && lab.isEnabled && lab.isBusy)
+					scientistsNeeded += 10; // Use static amount to prevent priority "bounce"
 			}
 
 			workersNeeded -= owner.numAvailableWorkers;

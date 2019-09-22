@@ -39,7 +39,6 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public void SetTopicsToResearch(ResearchTopic[] researchTopics)
 		{
 			m_TopicsToResearch = new List<ResearchTopic>(researchTopics);
-			m_TopicsToResearch.AddRange(researchTopics);
 		}
 
 		

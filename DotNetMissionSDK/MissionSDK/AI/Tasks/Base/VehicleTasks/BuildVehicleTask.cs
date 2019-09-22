@@ -25,7 +25,9 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 			PlayerState owner = stateSnapshot.players[ownerID];
 
 			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_VehicleToBuild);
-			return units.Count >= targetCountToBuild;
+			int unitCount = units.Count((unit) => unit.weapon == m_VehicleToBuildCargo);
+
+			return unitCount >= targetCountToBuild;
 		}
 
 		public override void GeneratePrerequisites()
@@ -63,6 +65,23 @@ namespace DotNetMissionSDK.AI.Tasks.Base.VehicleTasks
 		private static void ProduceUnit(BotCommands unitActions, int factoryID, map_id vehicleToBuild, map_id vehicleToBuildCargo)
 		{
 			unitActions.AddUnitCommand(factoryID, 1, () => GameState.GetUnit(factoryID)?.DoProduce(vehicleToBuild, vehicleToBuildCargo));
+		}
+
+		/// <summary>
+		/// Gets the list of structures to activate.
+		/// </summary>
+		/// <param name="stateSnapshot">The state snapshot to use for performing task calculations.</param>
+		/// <param name="structureIDs">The list to add structures to.</param>
+		public override void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
+		{
+			PlayerState owner = stateSnapshot.players[ownerID];
+
+			// If there are not enough structures of this type, parse priorities in children
+			IReadOnlyCollection<UnitState> units = owner.units.GetListForType(m_VehicleToBuild);
+			int unitCount = units.Count((unit) => unit.weapon == m_VehicleToBuildCargo);
+
+			if (unitCount < targetCountToBuild)
+				base.GetStructuresToActivate(stateSnapshot, structureIDs);
 		}
 	}
 

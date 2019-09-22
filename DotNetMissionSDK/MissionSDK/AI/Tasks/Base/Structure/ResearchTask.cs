@@ -39,7 +39,10 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 
 			// If player has the technology, task is complete.
 			if (owner.HasTechnologyByIndex(topicToResearch))
+			{
+				m_RequiredResearchTopics.Clear();
 				return true;
+			}
 
 			if (shouldResearchPrerequisites)
 			{
@@ -54,6 +57,12 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 				{
 					m_RequiredResearchTopics.Clear();
 					m_RequiredResearchTopics.Add(topicToResearch);
+				}
+				else if (requiredTopics.Count == 0)
+				{
+					// Topic is unresearchable
+					m_RequiredResearchTopics.Clear();
+					return true;
 				}
 			}
 
@@ -204,6 +213,14 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Structure
 		public override void GetStructuresToActivate(StateSnapshot stateSnapshot, List<int> structureIDs)
 		{
 			PlayerState owner = stateSnapshot.players[ownerID];
+
+			// If player has the technology, do default
+			if (topicToResearch < 0 || owner.HasTechnologyByIndex(topicToResearch))
+			{
+				// Parse prerequisites
+				base.GetStructuresToActivate(stateSnapshot, structureIDs);
+				return;
+			}
 
 			List<int> researchTopics = m_RequiredResearchTopics;
 
