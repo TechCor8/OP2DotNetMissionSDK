@@ -21,5 +21,15 @@ namespace DotNetMissionSDK
 				return root;
 			}
 		}
+
+		public static void WriteMissionData(string filePath, MissionRoot root)
+		{
+			using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+			{
+				// Write mission file
+				DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(MissionRoot));
+				serializer.WriteObject(fs, root);
+			}
+		}
 	}
 }

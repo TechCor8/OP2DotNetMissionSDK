@@ -5,8 +5,8 @@ namespace DotNetMissionSDK.Json
 	[DataContract]
 	public class DataLocation
 	{
-		[DataMember(Name = "X")]		public int x			{ get; private set; }
-		[DataMember(Name = "Y")]		public int y			{ get; private set; }
+		[DataMember(Name = "X")]		public int x			{ get; set; }
+		[DataMember(Name = "Y")]		public int y			{ get; set; }
 
 
 		public DataLocation(LOCATION location)

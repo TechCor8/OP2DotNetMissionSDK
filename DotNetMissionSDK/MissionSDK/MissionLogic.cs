@@ -466,12 +466,12 @@ namespace DotNetMissionSDK
 
 			switch (disaster.type)
 			{
-				case "Meteor":			TethysGame.SetMeteor(spawnPt.x, spawnPt.y, disaster.size);								break;
-				case "Earthquake":		TethysGame.SetEarthquake(spawnPt.x, spawnPt.y, disaster.size);							break;
-				case "Lightning":		TethysGame.SetLightning(spawnPt.x, spawnPt.y, disaster.duration, destPt.x, destPt.y);	break;
-				case "Tornado":			TethysGame.SetTornado(spawnPt.x, spawnPt.y, disaster.duration, destPt.x, destPt.y, 0);	break;
-				case "Eruption":		TethysGame.SetEruption(spawnPt.x, spawnPt.y, disaster.duration);						break;
-				case "Blight":
+				case DisasterType.Meteor:		TethysGame.SetMeteor(spawnPt.x, spawnPt.y, disaster.size);								break;
+				case DisasterType.Earthquake:	TethysGame.SetEarthquake(spawnPt.x, spawnPt.y, disaster.size);							break;
+				case DisasterType.Lightning:	TethysGame.SetLightning(spawnPt.x, spawnPt.y, disaster.duration, destPt.x, destPt.y);	break;
+				case DisasterType.Tornado:		TethysGame.SetTornado(spawnPt.x, spawnPt.y, disaster.duration, destPt.x, destPt.y, 0);	break;
+				case DisasterType.Eruption:		TethysGame.SetEruption(spawnPt.x, spawnPt.y, disaster.duration);						break;
+				case DisasterType.Blight:
 					GameMap.SetVirusUL(spawnPt.x, spawnPt.y, true);
 					TethysGame.SetMicrobeSpreadSpeed(disaster.duration);
 					break;

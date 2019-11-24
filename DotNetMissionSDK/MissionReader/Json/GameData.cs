@@ -6,23 +6,23 @@ namespace DotNetMissionSDK.Json
 	public class GameData
 	{
 		// [Data Accessors]
-		[DataMember(Name = "DaylightEverywhere")]		public bool daylightEverywhere			{ get; private set; }
-		[DataMember(Name = "DaylightMoves")]			public bool daylightMoves				{ get; private set; }
-		[DataMember(Name = "InitialLightLevel")]		public int initialLightLevel			{ get; private set; }
+		[DataMember(Name = "DaylightEverywhere")]		public bool daylightEverywhere			{ get; set; }
+		[DataMember(Name = "DaylightMoves")]			public bool daylightMoves				{ get; set; }
+		[DataMember(Name = "InitialLightLevel")]		public int initialLightLevel			{ get; set; }
 
-		[DataMember(Name = "MusicPlayList")]			public MusicPlayList musicPlayList		{ get; private set; }
-		[DataMember(Name = "Beacons")]					public Beacon[] beacons					{ get; private set; }
-		[DataMember(Name = "Markers")]					public Marker[] markers					{ get; private set; }
-		[DataMember(Name = "Wreckage")]					public Wreckage[] wreckage				{ get; private set; }
-		[DataMember(Name = "WallTubes")]				public WallTube[] wallTubes				{ get; private set; }
+		[DataMember(Name = "MusicPlayList")]			public MusicPlayList musicPlayList		{ get; set; }
+		[DataMember(Name = "Beacons")]					public Beacon[] beacons					{ get; set; }
+		[DataMember(Name = "Markers")]					public Marker[] markers					{ get; set; }
+		[DataMember(Name = "Wreckage")]					public Wreckage[] wreckage				{ get; set; }
+		[DataMember(Name = "WallTubes")]				public WallTube[] wallTubes				{ get; set; }
 
 
 		// [Data Classes]
 		[DataContract]
 		public class MusicPlayList
 		{
-			[DataMember(Name = "RepeatStartIndex")]		public int repeatStartIndex				{ get; private set; }
-			[DataMember(Name = "SongIDs")]				public int[] songIDs					{ get; private set; }
+			[DataMember(Name = "RepeatStartIndex")]		public int repeatStartIndex				{ get; set; }
+			[DataMember(Name = "SongIDs")]				public int[] songIDs					{ get; set; }
 		}
 
 		[DataContract]
@@ -32,38 +32,38 @@ namespace DotNetMissionSDK.Json
 			[DataMember(Name = "OreType")]				private string m_OreType				{ get; set; }
 			[DataMember(Name = "BarYield")]				private string m_BarYield				{ get; set; }
 			[DataMember(Name = "BarVariant")]			private string m_BarVariant				{ get; set; }
-			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; private set; }
+			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; set; }
 
-			public map_id mapID						{ get { return GetEnum<map_id>(m_MapID);					} }
-			public BeaconType oreType				{ get { return GetEnum<BeaconType>(m_OreType);				} }
-			public Yield barYield					{ get { return GetEnum<Yield>(m_BarYield);					} }
-			public Variant barVariant				{ get { return GetEnum<Variant>(m_BarVariant);				} }
+			public map_id mapID						{ get { return GetEnum<map_id>(m_MapID);					} set { m_MapID = value.ToString();			} }
+			public BeaconType oreType				{ get { return GetEnum<BeaconType>(m_OreType);				} set { m_OreType = value.ToString();		} }
+			public Yield barYield					{ get { return GetEnum<Yield>(m_BarYield);					} set { m_BarYield = value.ToString();		} }
+			public Variant barVariant				{ get { return GetEnum<Variant>(m_BarVariant);				} set { m_BarVariant = value.ToString();	} }
 		}
 
 		[DataContract]
 		public class Marker
 		{
 			[DataMember(Name = "MarkerType")]			private string m_MarkerType				{ get; set; }
-			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; private set; }
+			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; set; }
 
-			public MarkerType markerType			{ get { return GetEnum<MarkerType>(m_MarkerType);			} }
+			public MarkerType markerType			{ get { return GetEnum<MarkerType>(m_MarkerType);			} set { m_MarkerType = value.ToString();	} }
 		}
 
 		[DataContract]
 		public class Wreckage
 		{
-			[DataMember(Name = "TechID")]				public map_id techID					{ get; private set; }
-			[DataMember(Name = "IsVisible")]			public bool isVisible					{ get; private set; }
-			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; private set; }
+			[DataMember(Name = "TechID")]				public map_id techID					{ get; set; }
+			[DataMember(Name = "IsVisible")]			public bool isVisible					{ get; set; }
+			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; set; }
 		}
 
 		[DataContract]
 		public class WallTube
 		{
 			[DataMember(Name = "TypeID")]				private string m_TypeID					{ get; set; }
-			[DataMember(Name = "Location")]				public DataLocation location			{ get; private set; }
+			[DataMember(Name = "Location")]				public DataLocation location			{ get; set; }
 
-			public map_id typeID					{ get { return GetEnum<map_id>(m_TypeID);					} }
+			public map_id typeID					{ get { return GetEnum<map_id>(m_TypeID);					} set { m_TypeID = value.ToString();		} }
 		}
 
 		private static T GetEnum<T>(string val) where T : struct
@@ -71,6 +71,17 @@ namespace DotNetMissionSDK.Json
 			T result;
 			System.Enum.TryParse(val, out result);
 			return result;
+		}
+
+		public GameData()
+		{
+			daylightMoves = true;
+			musicPlayList = new MusicPlayList();
+			musicPlayList.songIDs = new int[] { 0 };
+			beacons = new Beacon[0];
+			markers = new Marker[0];
+			wreckage = new Wreckage[0];
+			wallTubes = new WallTube[0];
 		}
 	}
 }

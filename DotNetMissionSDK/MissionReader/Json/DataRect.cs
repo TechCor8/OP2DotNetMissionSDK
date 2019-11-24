@@ -5,10 +5,10 @@ namespace DotNetMissionSDK.Json
 	[DataContract]
 	public class DataRect
 	{
-		[DataMember(Name = "MinX")]		public int xMin			{ get; private set; }
-		[DataMember(Name = "MinY")]		public int yMin			{ get; private set; }
-		[DataMember(Name = "MaxX")]		public int xMax			{ get; private set; }
-		[DataMember(Name = "MaxY")]		public int yMax			{ get; private set; }
+		[DataMember(Name = "MinX")]		public int xMin			{ get; set; }
+		[DataMember(Name = "MinY")]		public int yMin			{ get; set; }
+		[DataMember(Name = "MaxX")]		public int xMax			{ get; set; }
+		[DataMember(Name = "MaxY")]		public int yMax			{ get; set; }
 
 		/// <summary>
 		/// Gets random point in rect. Does not clip.

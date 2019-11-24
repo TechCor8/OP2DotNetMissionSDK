@@ -8,31 +8,31 @@ namespace DotNetMissionSDK.Json
 		// Standard info
 		[DataMember(Name = "TypeID")]		private string m_TypeID				{ get; set; }
 		[DataMember(Name = "CargoType")]	private string m_CargoType			{ get; set; }
-		[DataMember(Name = "CargoAmount")]	public int cargoAmount				{ get; private set; }
+		[DataMember(Name = "CargoAmount")]	public int cargoAmount				{ get; set; }
 		[DataMember(Name = "Direction")]	private string m_Direction			{ get; set; }
-		[DataMember(Name = "Location")]		public DataLocation location		{ get; private set; }
+		[DataMember(Name = "Location")]		public DataLocation location		{ get; set; }
 
 		// Used for ore mines
 		[DataMember(Name = "BarYield")]		private string m_BarYield			{ get; set; }
 		[DataMember(Name = "BarVariant")]	private string m_BarVariant			{ get; set; }
 
 		// AutoLayout
-		[DataMember(Name = "IgnoreLayout")]	public bool ignoreLayout			{ get; private set; }
-		[DataMember(Name = "MinDistance")]	public int minDistance				{ get; private set; }
-		[DataMember(Name = "SpawnDistance")]public int spawnDistance			{ get; private set; }
-		[DataMember(Name = "CreateWall")]	public bool createWall				{ get; private set; }
+		[DataMember(Name = "IgnoreLayout")]	public bool ignoreLayout			{ get; set; }
+		[DataMember(Name = "MinDistance")]	public int minDistance				{ get; set; }
+		[DataMember(Name = "SpawnDistance")]public int spawnDistance			{ get; set; }
+		[DataMember(Name = "CreateWall")]	public bool createWall				{ get; set; }
 		[DataMember(Name = "MaxTubes")]		private int? m_MaxTubes				{ get; set; }
 
-		public map_id typeID				{ get { return GetEnum<map_id>(m_TypeID);			} }
-		public int cargoType				{ get { return GetCargoType(m_CargoType);			} }
-		public UnitDirection direction		{ get { return GetEnum<UnitDirection>(m_Direction);	} }
+		public map_id typeID				{ get { return GetEnum<map_id>(m_TypeID);			} set { m_TypeID = value.ToString();		} }
+		public int cargoType				{ get { return GetCargoType(m_CargoType);			} set { m_CargoType = GetCargoType(value);	} }
+		public UnitDirection direction		{ get { return GetEnum<UnitDirection>(m_Direction);	} set { m_Direction = value.ToString();		} }
 
 		// Used for ore mines
-		public Yield barYield				{ get { return GetEnum<Yield>(m_BarYield);			} }
-		public Variant barVariant			{ get { return GetEnum<Variant>(m_BarVariant);		} }
+		public Yield barYield				{ get { return GetEnum<Yield>(m_BarYield);			} set { m_BarYield = value.ToString();		} }
+		public Variant barVariant			{ get { return GetEnum<Variant>(m_BarVariant);		} set { m_BarVariant = value.ToString();	} }
 
 		// AutoLayout
-		public int maxTubes					{ get { return m_MaxTubes != null ? m_MaxTubes.Value : -1; } }
+		public int maxTubes					{ get { return m_MaxTubes != null ? m_MaxTubes.Value : -1; } set { m_MaxTubes = value;			} }
 
 
 		/// <summary>
