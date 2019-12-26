@@ -23,109 +23,126 @@
 		"Beacons":
 		[
 			{
+				"ID":1,
 				"MapID":"MiningBeacon",
 				"OreType":"Common",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":23, "MinY":33, "MaxX":23, "MaxY":33 }
+				"Position":{ "X":23, "Y":33 }
+			},
+			{
+				"ID":1,
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"Position":{ "X":24, "Y":33 }
+			},
+			{
+				"ID":1,
+				"MapID":"MiningBeacon",
+				"OreType":"Common",
+				"BarYield":"Bar3",
+				"BarVariant":"Random",
+				"Position":{ "X":25, "Y":33 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Rare",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":33, "MinY":43, "MaxX":33, "MaxY":43 }
+				"Position":{ "X":33, "Y":43 }
 			},
 			{
 				"MapID":"Fumarole",
 				"OreType":"Random",
 				"BarYield":"Random",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":41, "MinY":63, "MaxX":41, "MaxY":63 }
+				"Position":{ "X":41, "Y":63 }
 			},
 			{
 				"MapID":"MagmaVent",
 				"OreType":"Random",
 				"BarYield":"Random",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":18, "MinY":125, "MaxX":18, "MaxY":125 }
+				"Position":{ "X":18, "Y":125 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Common",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":28, "MinY":98, "MaxX":28, "MaxY":98 }
+				"Position":{ "X":28, "Y":98 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Rare",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":38, "MinY":98, "MaxX":38, "MaxY":98 }
+				"Position":{ "X":38, "Y":98 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Common",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":99, "MinY":88, "MaxX":99, "MaxY":88 }
+				"Position":{ "X":99, "Y":88 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Rare",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":97, "MinY":78, "MaxX":97, "MaxY":78 }
+				"Position":{ "X":97, "Y":78 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Common",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":98, "MinY":38, "MaxX":98, "MaxY":38 }
+				"Position":{ "X":98, "Y":38 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Rare",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":98, "MinY":48, "MaxX":98, "MaxY":48 }
+				"Position":{ "X":98, "Y":48 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Common",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":73, "MinY":103, "MaxX":73, "MaxY":103 }
+				"Position":{ "X":73, "Y":103 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Rare",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":71, "MinY":98, "MaxX":71, "MaxY":98 }
+				"Position":{ "X":71, "Y":98 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Common",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":62, "MinY":28, "MaxX":62, "MaxY":28 }
+				"Position":{ "X":62, "Y":28 }
 			},
 			{
 				"MapID":"MiningBeacon",
 				"OreType":"Rare",
 				"BarYield":"Bar3",
 				"BarVariant":"Random",
-				"SpawnRect":{ "MinX":60, "MinY":38, "MaxX":60, "MaxY":38 }
+				"Position":{ "X":60, "Y":38 }
 			}
 		],
 		"Markers":
 		[
 			{
 				"MarkerType":"Circle",
-				"SpawnRect":{ "MinX":1, "MinY":1, "MaxX":1, "MaxY":1 }
+				"Position":{ "X":1, "Y":1 }
 			}
 		],
 		"Wreckage":
@@ -133,7 +150,7 @@
 			{
 				"TechID":8000,
 				"IsVisible":true,
-				"SpawnRect":{ "MinX":2, "MinY":2, "MaxX":2, "MaxY":2 }
+				"Position":{ "X":2, "Y":2 }
 			}
 		],
 		"WallTubes":

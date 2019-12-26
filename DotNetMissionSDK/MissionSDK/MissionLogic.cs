@@ -5,6 +5,7 @@ using DotNetMissionSDK.State;
 using System;
 using System.Collections.Generic;
 using DotNetMissionSDK.State.Snapshot;
+using System.Linq;
 
 namespace DotNetMissionSDK
 {
@@ -66,29 +67,71 @@ namespace DotNetMissionSDK
 
 			TethysGame.SetMusicPlayList(root.tethysGame.musicPlayList.songIDs.Length, root.tethysGame.musicPlayList.repeatStartIndex, root.tethysGame.musicPlayList.songIDs);
 
-			// Beacons
-			foreach (GameData.Beacon beacon in root.tethysGame.beacons)
+			// Select Beacons
+			List<GameData.Beacon> beacons = new List<GameData.Beacon>();
+			foreach (var group in new List<GameData.Beacon>(root.tethysGame.beacons).GroupBy(b => b.id))
 			{
-				LOCATION spawnPt = beacon.spawnRect.GetRandomPointInRect();
-				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
+				List<GameData.Beacon> groupBeacons = group.ToList();
+				if (groupBeacons[0].id <= 0)
+					beacons.AddRange(groupBeacons);
+				else
+				{
+					// Get a random beacon for this group ID
+					int randomIndex = TethysGame.GetRandomRange(0, groupBeacons.Count);
+					beacons.Add(groupBeacons[randomIndex]);
+				}
+			}
+
+			// Create beacons
+			foreach (GameData.Beacon beacon in beacons)
+			{
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(beacon.position);
 
 				TethysGame.CreateBeacon(beacon.mapID, spawnPt.x, spawnPt.y, beacon.oreType, beacon.barYield, beacon.barVariant);
 			}
 
-			// Markers
-			foreach (GameData.Marker marker in root.tethysGame.markers)
+			// Select markers
+			List<GameData.Marker> markers = new List<GameData.Marker>();
+			foreach (var group in new List<GameData.Marker>(root.tethysGame.markers).GroupBy(m => m.id))
 			{
-				LOCATION spawnPt = marker.spawnRect.GetRandomPointInRect();
-				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
+				List<GameData.Marker> groupMarkers = group.ToList();
+				if (groupMarkers[0].id <= 0)
+					markers.AddRange(groupMarkers);
+				else
+				{
+					// Get a random marker for this group ID
+					int randomIndex = TethysGame.GetRandomRange(0, groupMarkers.Count);
+					markers.Add(groupMarkers[randomIndex]);
+				}
+			}
+
+			// Create markers
+			foreach (GameData.Marker marker in markers)
+			{
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(marker.position);
 
 				Unit unit = TethysGame.PlaceMarker(spawnPt.x, spawnPt.y, marker.markerType);
 			}
 
-			// Wreckage
+			// Select wreckage
+			List<GameData.Wreckage> wreckages = new List<GameData.Wreckage>();
+			foreach (var group in new List<GameData.Wreckage>(root.tethysGame.wreckage).GroupBy(w => w.id))
+			{
+				List<GameData.Wreckage> groupWreckage = group.ToList();
+				if (groupWreckage[0].id <= 0)
+					wreckages.AddRange(groupWreckage);
+				else
+				{
+					// Get a random wreckage for this group ID
+					int randomIndex = TethysGame.GetRandomRange(0, groupWreckage.Count);
+					wreckages.Add(groupWreckage[randomIndex]);
+				}
+			}
+
+			// Create wreckage
 			foreach (GameData.Wreckage wreck in root.tethysGame.wreckage)
 			{
-				LOCATION spawnPt = wreck.spawnRect.GetRandomPointInRect();
-				spawnPt = TethysGame.GetMapCoordinates(spawnPt);
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.position);
 
 				TethysGame.CreateWreck(spawnPt.x, spawnPt.y, wreck.techID, wreck.isVisible);
 			}

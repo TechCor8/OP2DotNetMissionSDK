@@ -28,11 +28,12 @@ namespace DotNetMissionSDK.Json
 		[DataContract]
 		public class Beacon
 		{
+			[DataMember(Name = "ID")]					public int id							{ get; set; }
 			[DataMember(Name = "MapID")]				private string m_MapID					{ get; set; }
 			[DataMember(Name = "OreType")]				private string m_OreType				{ get; set; }
 			[DataMember(Name = "BarYield")]				private string m_BarYield				{ get; set; }
 			[DataMember(Name = "BarVariant")]			private string m_BarVariant				{ get; set; }
-			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; set; }
+			[DataMember(Name = "Position")]				public DataLocation position			{ get; set; }
 
 			public map_id mapID						{ get { return GetEnum<map_id>(m_MapID);					} set { m_MapID = value.ToString();			} }
 			public BeaconType oreType				{ get { return GetEnum<BeaconType>(m_OreType);				} set { m_OreType = value.ToString();		} }
@@ -43,8 +44,9 @@ namespace DotNetMissionSDK.Json
 		[DataContract]
 		public class Marker
 		{
+			[DataMember(Name = "ID")]					public int id							{ get; set; }
 			[DataMember(Name = "MarkerType")]			private string m_MarkerType				{ get; set; }
-			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; set; }
+			[DataMember(Name = "Position")]				public DataLocation position			{ get; set; }
 
 			public MarkerType markerType			{ get { return GetEnum<MarkerType>(m_MarkerType);			} set { m_MarkerType = value.ToString();	} }
 		}
@@ -52,9 +54,10 @@ namespace DotNetMissionSDK.Json
 		[DataContract]
 		public class Wreckage
 		{
+			[DataMember(Name = "ID")]					public int id							{ get; set; }
 			[DataMember(Name = "TechID")]				public map_id techID					{ get; set; }
 			[DataMember(Name = "IsVisible")]			public bool isVisible					{ get; set; }
-			[DataMember(Name = "SpawnRect")]			public DataRect spawnRect				{ get; set; }
+			[DataMember(Name = "Position")]				public DataLocation position			{ get; set; }
 		}
 
 		[DataContract]
