@@ -198,14 +198,28 @@ namespace DotNetMissionSDK
 				foreach (int techID in data.completedResearch)
 					player.MarkResearchComplete(techID);
 
-				// Units
-				foreach (UnitData unitData in data.units)
+				// Select units
+				List<UnitData> units = new List<UnitData>();
+				foreach (var group in new List<UnitData>(data.units).GroupBy(u => u.id))
 				{
-					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.location);
+					List<UnitData> groupUnits = group.ToList();
+					if (groupUnits[0].id <= 0)
+						units.AddRange(groupUnits);
+					else
+					{
+						// Get a random unit for this group ID
+						int randomIndex = TethysGame.GetRandomRange(0, groupUnits.Count);
+						units.Add(groupUnits[randomIndex]);
+					}
+				}
+
+				// Create units
+				foreach (UnitData unitData in units)
+				{
+					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.position);
 
 					Unit unit = unitData.CreateUnit(data.id, spawnPt);
-					unit.DoSetLights(true);
-
+					
 					createdUnits.Add(unit);
 				}
 			}
@@ -215,11 +229,24 @@ namespace DotNetMissionSDK
 
 			foreach (AutoLayout layout in root.layouts)
 			{
-				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), layout.baseCenterPt, layout.units);
-			}
+				// Select units
+				List<UnitData> units = new List<UnitData>();
+				foreach (var group in new List<UnitData>(layout.units).GroupBy(u => u.id))
+				{
+					List<UnitData> groupUnits = group.ToList();
+					if (groupUnits[0].id <= 0)
+						units.AddRange(groupUnits);
+					else
+					{
+						// Get a random unit for this group ID
+						int randomIndex = TethysGame.GetRandomRange(0, groupUnits.Count);
+						units.Add(groupUnits[randomIndex]);
+					}
+				}
 
-			foreach (Unit unit in baseGenerator.generatedUnits)
-				unit.DoSetLights(true);
+				// Generate autolayout base
+				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), layout.baseCenterPt, units.ToArray());
+			}
 
 			// Setup Disasters
 			InitializeDisasters();

@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.AI;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace DotNetMissionSDK.Json
@@ -27,7 +28,7 @@ namespace DotNetMissionSDK.Json
 
 		[DataMember(Name = "CompletedResearch")]public int[] completedResearch		{ get; set; }
 
-		[DataMember(Name = "Units")]			public UnitData[] units				{ get; set; }
+		[DataMember(Name = "Units")]			public List<UnitData> units			{ get; set; }
 
 		public MoraleLevel moraleLevel			{ get { return GetEnum<MoraleLevel>(m_MoraleLevel);	} set { m_MoraleLevel = value.ToString();	} }
 		public BotType botType					{ get { return GetEnum<BotType>(m_BotType);			} set { m_BotType = value.ToString();		} }
@@ -56,7 +57,7 @@ namespace DotNetMissionSDK.Json
 			scientists = 8;
 			food = 1000;
 			completedResearch = new int[0];
-			units = new UnitData[0];
+			units = new List<UnitData>();
 		}
 	}
 }

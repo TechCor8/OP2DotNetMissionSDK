@@ -196,90 +196,92 @@
 			[
 				{
 					"TypeID":"ConVec",
+					"Health":0.5,
+					"Lights":false,
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":7, "Y":38 }
+					"Position": { "X":7, "Y":38 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"StructureFactory",
 					"Direction":"East",
-					"Location": { "X":7, "Y":37 }
+					"Position": { "X":7, "Y":37 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"CommonOreSmelter",
 					"Direction":"East",
-					"Location": { "X":7, "Y":36 }
+					"Position": { "X":7, "Y":36 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Agridome",
 					"Direction":"East",
-					"Location": { "X":7, "Y":35 }
+					"Position": { "X":7, "Y":35 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Tokamak",
 					"Direction":"East",
-					"Location": { "X":7, "Y":34 }
+					"Position": { "X":7, "Y":34 }
 				},
 				{
 					"TypeID":"RoboSurveyor",
 					"Direction":"East",
-					"Location": { "X":7, "Y":39 }
+					"Position": { "X":7, "Y":39 }
 				},
 				{
 					"TypeID":"RoboMiner",
 					"Direction":"East",
-					"Location": { "X":7, "Y":40 }
+					"Position": { "X":7, "Y":40 }
 				},
 				{
 					"TypeID":"Earthworker",
 					"Direction":"East",
-					"Location": { "X":7, "Y":41 }
+					"Position": { "X":7, "Y":41 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":7, "Y":42 }
+					"Position": { "X":7, "Y":42 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":7, "Y":43 }
+					"Position": { "X":7, "Y":43 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":7, "Y":44 }
+					"Position": { "X":7, "Y":44 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":7, "Y":45 }
+					"Position": { "X":7, "Y":45 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":7, "Y":46 }
+					"Position": { "X":7, "Y":46 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":7, "Y":47 }
+					"Position": { "X":7, "Y":47 }
 				}
 			]
 		},
@@ -313,88 +315,88 @@
 					"TypeID":"ConVec",
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":126, "Y":98 }
+					"Position": { "X":126, "Y":98 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"StructureFactory",
 					"Direction":"East",
-					"Location": { "X":126, "Y":97 }
+					"Position": { "X":126, "Y":97 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"CommonOreSmelter",
 					"Direction":"East",
-					"Location": { "X":126, "Y":96 }
+					"Position": { "X":126, "Y":96 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Agridome",
 					"Direction":"East",
-					"Location": { "X":126, "Y":95 }
+					"Position": { "X":126, "Y":95 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Tokamak",
 					"Direction":"East",
-					"Location": { "X":126, "Y":94 }
+					"Position": { "X":126, "Y":94 }
 				},
 				{
 					"TypeID":"RoboSurveyor",
 					"Direction":"East",
-					"Location": { "X":126, "Y":99 }
+					"Position": { "X":126, "Y":99 }
 				},
 				{
 					"TypeID":"RoboMiner",
 					"Direction":"East",
-					"Location": { "X":126, "Y":100 }
+					"Position": { "X":126, "Y":100 }
 				},
 				{
 					"TypeID":"Earthworker",
 					"Direction":"East",
-					"Location": { "X":126, "Y":101 }
+					"Position": { "X":126, "Y":101 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":126, "Y":102 }
+					"Position": { "X":126, "Y":102 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":126, "Y":103 }
+					"Position": { "X":126, "Y":103 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":126, "Y":104 }
+					"Position": { "X":126, "Y":104 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":126, "Y":105 }
+					"Position": { "X":126, "Y":105 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":126, "Y":106 }
+					"Position": { "X":126, "Y":106 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":126, "Y":107 }
+					"Position": { "X":126, "Y":107 }
 				}
 			]
 		},
@@ -428,88 +430,88 @@
 					"TypeID":"ConVec",
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":66, "Y":98 }
+					"Position": { "X":66, "Y":98 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"StructureFactory",
 					"Direction":"East",
-					"Location": { "X":66, "Y":97 }
+					"Position": { "X":66, "Y":97 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"CommonOreSmelter",
 					"Direction":"East",
-					"Location": { "X":66, "Y":96 }
+					"Position": { "X":66, "Y":96 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Agridome",
 					"Direction":"East",
-					"Location": { "X":66, "Y":95 }
+					"Position": { "X":66, "Y":95 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Tokamak",
 					"Direction":"East",
-					"Location": { "X":66, "Y":94 }
+					"Position": { "X":66, "Y":94 }
 				},
 				{
 					"TypeID":"RoboSurveyor",
 					"Direction":"East",
-					"Location": { "X":66, "Y":99 }
+					"Position": { "X":66, "Y":99 }
 				},
 				{
 					"TypeID":"RoboMiner",
 					"Direction":"East",
-					"Location": { "X":66, "Y":100 }
+					"Position": { "X":66, "Y":100 }
 				},
 				{
 					"TypeID":"Earthworker",
 					"Direction":"East",
-					"Location": { "X":66, "Y":101 }
+					"Position": { "X":66, "Y":101 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":102 }
+					"Position": { "X":66, "Y":102 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":103 }
+					"Position": { "X":66, "Y":103 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":104 }
+					"Position": { "X":66, "Y":104 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":105 }
+					"Position": { "X":66, "Y":105 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":106 }
+					"Position": { "X":66, "Y":106 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":107 }
+					"Position": { "X":66, "Y":107 }
 				}
 			]
 		},
@@ -543,88 +545,88 @@
 					"TypeID":"ConVec",
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":46, "Y":93 }
+					"Position": { "X":46, "Y":93 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"StructureFactory",
 					"Direction":"East",
-					"Location": { "X":46, "Y":92 }
+					"Position": { "X":46, "Y":92 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"CommonOreSmelter",
 					"Direction":"East",
-					"Location": { "X":46, "Y":91 }
+					"Position": { "X":46, "Y":91 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Agridome",
 					"Direction":"East",
-					"Location": { "X":46, "Y":90 }
+					"Position": { "X":46, "Y":90 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Tokamak",
 					"Direction":"East",
-					"Location": { "X":46, "Y":89 }
+					"Position": { "X":46, "Y":89 }
 				},
 				{
 					"TypeID":"RoboSurveyor",
 					"Direction":"East",
-					"Location": { "X":46, "Y":94 }
+					"Position": { "X":46, "Y":94 }
 				},
 				{
 					"TypeID":"RoboMiner",
 					"Direction":"East",
-					"Location": { "X":46, "Y":95 }
+					"Position": { "X":46, "Y":95 }
 				},
 				{
 					"TypeID":"Earthworker",
 					"Direction":"East",
-					"Location": { "X":46, "Y":96 }
+					"Position": { "X":46, "Y":96 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":46, "Y":97 }
+					"Position": { "X":46, "Y":97 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":46, "Y":98 }
+					"Position": { "X":46, "Y":98 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":46, "Y":99 }
+					"Position": { "X":46, "Y":99 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":46, "Y":100 }
+					"Position": { "X":46, "Y":100 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":46, "Y":101 }
+					"Position": { "X":46, "Y":101 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":46, "Y":102 }
+					"Position": { "X":46, "Y":102 }
 				}
 			]
 		},
@@ -658,88 +660,88 @@
 					"TypeID":"ConVec",
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":66, "Y":38 }
+					"Position": { "X":66, "Y":38 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"StructureFactory",
 					"Direction":"East",
-					"Location": { "X":66, "Y":37 }
+					"Position": { "X":66, "Y":37 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"CommonOreSmelter",
 					"Direction":"East",
-					"Location": { "X":66, "Y":36 }
+					"Position": { "X":66, "Y":36 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Agridome",
 					"Direction":"East",
-					"Location": { "X":66, "Y":35 }
+					"Position": { "X":66, "Y":35 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Tokamak",
 					"Direction":"East",
-					"Location": { "X":66, "Y":34 }
+					"Position": { "X":66, "Y":34 }
 				},
 				{
 					"TypeID":"RoboSurveyor",
 					"Direction":"East",
-					"Location": { "X":66, "Y":39 }
+					"Position": { "X":66, "Y":39 }
 				},
 				{
 					"TypeID":"RoboMiner",
 					"Direction":"East",
-					"Location": { "X":66, "Y":40 }
+					"Position": { "X":66, "Y":40 }
 				},
 				{
 					"TypeID":"Earthworker",
 					"Direction":"East",
-					"Location": { "X":66, "Y":41 }
+					"Position": { "X":66, "Y":41 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":42 }
+					"Position": { "X":66, "Y":42 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":43 }
+					"Position": { "X":66, "Y":43 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":44 }
+					"Position": { "X":66, "Y":44 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":45 }
+					"Position": { "X":66, "Y":45 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":46 }
+					"Position": { "X":66, "Y":46 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":66, "Y":47 }
+					"Position": { "X":66, "Y":47 }
 				}
 			]
 		},
@@ -773,88 +775,88 @@
 					"TypeID":"ConVec",
 					"CargoType":"CommandCenter",
 					"Direction":"East",
-					"Location": { "X":90, "Y":38 }
+					"Position": { "X":90, "Y":38 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"StructureFactory",
 					"Direction":"East",
-					"Location": { "X":90, "Y":37 }
+					"Position": { "X":90, "Y":37 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"CommonOreSmelter",
 					"Direction":"East",
-					"Location": { "X":90, "Y":36 }
+					"Position": { "X":90, "Y":36 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Agridome",
 					"Direction":"East",
-					"Location": { "X":90, "Y":35 }
+					"Position": { "X":90, "Y":35 }
 				},
 				{
 					"TypeID":"ConVec",
 					"CargoType":"Tokamak",
 					"Direction":"East",
-					"Location": { "X":90, "Y":34 }
+					"Position": { "X":90, "Y":34 }
 				},
 				{
 					"TypeID":"RoboSurveyor",
 					"Direction":"East",
-					"Location": { "X":90, "Y":39 }
+					"Position": { "X":90, "Y":39 }
 				},
 				{
 					"TypeID":"RoboMiner",
 					"Direction":"East",
-					"Location": { "X":90, "Y":40 }
+					"Position": { "X":90, "Y":40 }
 				},
 				{
 					"TypeID":"Earthworker",
 					"Direction":"East",
-					"Location": { "X":90, "Y":41 }
+					"Position": { "X":90, "Y":41 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":90, "Y":42 }
+					"Position": { "X":90, "Y":42 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":90, "Y":43 }
+					"Position": { "X":90, "Y":43 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":90, "Y":44 }
+					"Position": { "X":90, "Y":44 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"CommonMetal",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":90, "Y":45 }
+					"Position": { "X":90, "Y":45 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":90, "Y":46 }
+					"Position": { "X":90, "Y":46 }
 				},
 				{
 					"TypeID":"CargoTruck",
 					"CargoType":"Food",
 					"CargoAmount":1000,
 					"Direction":"East",
-					"Location": { "X":90, "Y":47 }
+					"Position": { "X":90, "Y":47 }
 				}
 			]
 		}

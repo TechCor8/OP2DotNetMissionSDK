@@ -51,7 +51,7 @@ namespace DotNetMissionSDK
 		public static void SetDaylightMoves(bool isOn)		{ ThreadAssert.MainThreadRequired();	TethysGame_SetDaylightMoves(isOn ? 1 : 0);		}
 
 		// Unit Creation  [Returns: int numUnitsCreated]
-		public static Unit CreateUnit(map_id unitType, int tileX, int tileY, int playerID, int weaponCargoType, UnitDirection direction)
+		public static UnitEx CreateUnit(map_id unitType, int tileX, int tileY, int playerID, int weaponCargoType, UnitDirection direction)
 		{
 			ThreadAssert.MainThreadRequired();
 

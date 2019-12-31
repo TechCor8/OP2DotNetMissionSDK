@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace DotNetMissionSDK.Json
 {
@@ -11,10 +12,10 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "InitialLightLevel")]		public int initialLightLevel			{ get; set; }
 
 		[DataMember(Name = "MusicPlayList")]			public MusicPlayList musicPlayList		{ get; set; }
-		[DataMember(Name = "Beacons")]					public Beacon[] beacons					{ get; set; }
-		[DataMember(Name = "Markers")]					public Marker[] markers					{ get; set; }
-		[DataMember(Name = "Wreckage")]					public Wreckage[] wreckage				{ get; set; }
-		[DataMember(Name = "WallTubes")]				public WallTube[] wallTubes				{ get; set; }
+		[DataMember(Name = "Beacons")]					public List<Beacon> beacons				{ get; set; }
+		[DataMember(Name = "Markers")]					public List<Marker> markers				{ get; set; }
+		[DataMember(Name = "Wreckage")]					public List<Wreckage> wreckage			{ get; set; }
+		[DataMember(Name = "WallTubes")]				public List<WallTube> wallTubes			{ get; set; }
 
 
 		// [Data Classes]
@@ -81,10 +82,10 @@ namespace DotNetMissionSDK.Json
 			daylightMoves = true;
 			musicPlayList = new MusicPlayList();
 			musicPlayList.songIDs = new int[] { 0 };
-			beacons = new Beacon[0];
-			markers = new Marker[0];
-			wreckage = new Wreckage[0];
-			wallTubes = new WallTube[0];
+			beacons = new List<Beacon>();
+			markers = new List<Marker>();
+			wreckage = new List<Wreckage>();
+			wallTubes = new List<WallTube>();
 		}
 	}
 }

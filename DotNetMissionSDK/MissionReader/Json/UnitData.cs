@@ -6,11 +6,14 @@ namespace DotNetMissionSDK.Json
 	public class UnitData
 	{
 		// Standard info
+		[DataMember(Name = "ID")]			public int id						{ get; set; }
 		[DataMember(Name = "TypeID")]		private string m_TypeID				{ get; set; }
+		[DataMember(Name = "Health")]		public float health					{ get; set; }
+		[DataMember(Name = "Lights")]		public bool lights					{ get; set; }
 		[DataMember(Name = "CargoType")]	private string m_CargoType			{ get; set; }
 		[DataMember(Name = "CargoAmount")]	public int cargoAmount				{ get; set; }
 		[DataMember(Name = "Direction")]	private string m_Direction			{ get; set; }
-		[DataMember(Name = "Location")]		public DataLocation location		{ get; set; }
+		[DataMember(Name = "Position")]		public DataLocation position		{ get; set; }
 
 		// Used for ore mines
 		[DataMember(Name = "BarYield")]		private string m_BarYield			{ get; set; }
@@ -34,6 +37,14 @@ namespace DotNetMissionSDK.Json
 		// AutoLayout
 		public int maxTubes					{ get { return m_MaxTubes != null ? m_MaxTubes.Value : -1; } set { m_MaxTubes = value;			} }
 
+		[OnDeserializing]
+		private void OnDeserializing(StreamingContext context)
+		{
+			health = 1;
+			lights = true;
+		}
+
+		public UnitData() { }
 
 		/// <summary>
 		/// Constructor for manual layout unit.
@@ -79,10 +90,11 @@ namespace DotNetMissionSDK.Json
 								bool ignoreLayout, int minDistance, int spawnDistance, bool createWall, int maxTubes)
 		{
 			m_TypeID = typeID.ToString();
+			lights = true;
 			m_CargoType = GetCargoType(cargoType);
 			this.cargoAmount = cargoAmount;
 			m_Direction = direction.ToString();
-			location = position;
+			this.position = position;
 			m_BarYield = barYield.ToString();
 			m_BarVariant = barVariant.ToString();
 			this.ignoreLayout = ignoreLayout;
@@ -120,7 +132,16 @@ namespace DotNetMissionSDK.Json
 					return truck;
 			}
 
-			return TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
+			HFL.UnitEx unit = TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
+
+			int hp = unit.GetUnitInfo().GetHitPoints(playerID);
+			int damage = (int)(hp * (1.0f - health));
+			unit.SetDamage(damage);
+
+			if (unit.IsVehicle())
+				unit.DoSetLights(lights);
+
+			return unit;
 		}
 
 		private int GetCargoType(string val)

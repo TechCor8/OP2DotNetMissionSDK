@@ -109,7 +109,7 @@ namespace DotNetMissionSDK
 				if (data.ignoreLayout)
 				{
 					// Create unit that ignores layout
-					LOCATION loc = TethysGame.GetMapCoordinates(data.location);
+					LOCATION loc = TethysGame.GetMapCoordinates(data.position);
 					Unit unit = data.CreateUnit(owner.playerID, loc);
 					CreatedUnitData createdUnitData = new CreatedUnitData(data);
 
