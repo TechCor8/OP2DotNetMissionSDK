@@ -1,4 +1,3 @@
-// TethysGameEx.cpp
 #include "HFL.h"
 
 #pragma pack(push,1)
@@ -41,8 +40,9 @@ int TethysGameEx::CreateUnitEx(map_id unitType, int pixelX, int pixelY, int crea
 {
 	// todo: move to UnitInfo.cpp some time?
 
-	if (!isInited)
+	if (!isInited) {
 		return HFLNOTINITED;
+	}
 
 	int (__fastcall *func)(void *classPtr, int dummy, int unitType, int pixelX, int pixelY, int creatorId, int cargoWeapon, int unitIndex, int centerInTile) = (int (__fastcall *)(void*,int,int,int,int,int,int,int,int))(imageBase + 0x467C0);
 
@@ -51,8 +51,9 @@ int TethysGameEx::CreateUnitEx(map_id unitType, int pixelX, int pixelY, int crea
 
 void TethysGameEx::ReloadSheets()
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	void (__fastcall *func)(void *classPtr) = (void (__fastcall *)(void*))(imageBase + 0x45180);
 
@@ -61,8 +62,9 @@ void TethysGameEx::ReloadSheets()
 
 void TethysGameEx::LoadTechtree(char *fileName, int maxTechLevel)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	void (__fastcall *func)(void *classPtr, int dummy, char *fileName, int maxTechLevel) = (void (__fastcall *)(void*,int,char*,int))(imageBase + 0x73470);
 
@@ -71,8 +73,9 @@ void TethysGameEx::LoadTechtree(char *fileName, int maxTechLevel)
 
 int TethysGameEx::NumHumanPlayers()
 {
-	if (!isInited)
+	if (!isInited) {
 		return HFLNOTINITED;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -81,8 +84,9 @@ int TethysGameEx::NumHumanPlayers()
 
 void TethysGameEx::SetCheatFastProductionEx(int boolOn)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -91,8 +95,9 @@ void TethysGameEx::SetCheatFastProductionEx(int boolOn)
 
 void TethysGameEx::SetCheatFastUnitsEx(int boolOn)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -101,8 +106,9 @@ void TethysGameEx::SetCheatFastUnitsEx(int boolOn)
 
 void TethysGameEx::SetCheatProduceAllEx(int boolOn)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -111,8 +117,9 @@ void TethysGameEx::SetCheatProduceAllEx(int boolOn)
 
 void TethysGameEx::SetCheatUnlimitedResourcesEx(int boolOn)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -121,8 +128,9 @@ void TethysGameEx::SetCheatUnlimitedResourcesEx(int boolOn)
 
 void TethysGameEx::SetShowVehicleRoutes(int boolOn)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -131,8 +139,9 @@ void TethysGameEx::SetShowVehicleRoutes(int boolOn)
 
 void TethysGameEx::SetEnableMoraleLog(int boolOn)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -141,8 +150,9 @@ void TethysGameEx::SetEnableMoraleLog(int boolOn)
 
 void TethysGameEx::SetDamage4X(int boolOn)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -151,8 +161,9 @@ void TethysGameEx::SetDamage4X(int boolOn)
 
 void TethysGameEx::SetRCCEffect(RCCEffectState setting)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 
@@ -176,8 +187,9 @@ void TethysGameEx::SetRCCEffect(RCCEffectState setting)
 
 void TethysGameEx::SetTopStatusBar(char *text)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	void (__fastcall *func)(void *classPtr, int dummy, char *text, int unknown) = (void (__fastcall *)(void*,int,char*,int))(imageBase + 0x11CE0);
 
@@ -186,8 +198,9 @@ void TethysGameEx::SetTopStatusBar(char *text)
 
 void TethysGameEx::SetBottomStatusBar(char *text, COLORREF color)
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	void (__fastcall *func)(void *classPtr, int dummy, char *text, COLORREF color) = (void (__fastcall *)(void*,int,char*,COLORREF))(imageBase + 0x9BFE0);
 
@@ -196,8 +209,9 @@ void TethysGameEx::SetBottomStatusBar(char *text, COLORREF color)
 
 int TethysGameEx::MsgBox(HWND hwnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
-	if (!isInited)
+	if (!isInited) {
 		return HFLNOTINITED;
+	}
 
 	int (__fastcall *func)(HWND hwnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType) = (int (__fastcall *)(HWND,LPCTSTR,LPCTSTR,UINT))(imageBase + 0x1E0E0);
 
@@ -206,8 +220,9 @@ int TethysGameEx::MsgBox(HWND hwnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uTyp
 
 void TethysGameEx::ResetCheatedGame()
 {
-	if (!isInited)
+	if (!isInited) {
 		return;
+	}
 
 	OP2Game *p = (OP2Game*)gameObj;
 

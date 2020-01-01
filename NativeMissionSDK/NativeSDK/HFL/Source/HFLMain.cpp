@@ -2,19 +2,21 @@
 
 #include "HFL.h"
 
-// Global vars
+// Global variables
 bool isInited = false;
 DWORD imageBase; // = 0x00400000;
 
 int HFLInit()
 {
-	if (isInited)
+	if (isInited) {
 		return HFLALREADYINITED;
+	}
 
 	// get the image base
 	imageBase = (DWORD)GetModuleHandle("Outpost2.exe");
-	if (!imageBase)
+	if (!imageBase) {
 		return HFLCANTINIT;
+	}
 
 	unitArray = (OP2Unit**)(imageBase + 0x14F848);
 	playerArray = (OP2Player*)(imageBase + 0x16EF1C);

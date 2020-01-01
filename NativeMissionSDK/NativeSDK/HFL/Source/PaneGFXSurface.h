@@ -1,8 +1,6 @@
-// PaneGFXSurface.h
-// Graphics rendering surface (as well as Text Rendering interface)
-#ifndef _PANEGFXSURFACE_H_
-#define _PANEGFXSURFACE_H_
+#pragma once
 
+// Graphics rendering surface (as well as Text Rendering interface)
 class PaneGFXSurface
 {
 public:
@@ -28,5 +26,3 @@ public:
 
 extern void *graphicsObj;
 extern void *textRenderObj;
-
-#endif // _PANEGFXSURFACE_H_

@@ -1,13 +1,14 @@
-// PaneButton.h
-// Definition of Outpost2 pane button / control, as well as report button.
-#ifndef _PANEBUTTON_H_
-#define _PANEBUTTON_H_
+#pragma once
 
+struct OP2Button;
+struct OP2ButtonVtbl;
+
+// Definition of Outpost2 pane button / control, as well as report button.
 class PaneButton
 {
 public:
 	PaneButton();
-	PaneButton(void *internalPtr);
+	PaneButton(OP2Button *internalPtr);
 	~PaneButton();
 
 	virtual void Paint(PaneGFXSurface gfxSurface);
@@ -28,8 +29,8 @@ public:
 	void SetAcceleratorKey(int asciiCode);
 	RECT* GetBoundingBox();
 
-	void *internalVtbl;
-	void *internalBtn;
+	OP2ButtonVtbl *internalVtbl;
+	OP2Button *internalBtn;
 	int isInternalObj;
 };
 
@@ -37,9 +38,7 @@ class ReportButton : public PaneButton
 {
 public:
 	ReportButton();
-	ReportButton(void *internalPtr);
+	ReportButton(OP2Button *internalPtr);
 	PaneReport GetAttachedReport();
 	void SetAttachedReport(PaneReport *newReport);
 };
-
-#endif // _PANEBUTTON_H_

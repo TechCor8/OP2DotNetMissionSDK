@@ -435,20 +435,4 @@ extern "C"
 
 		unit.SetLabScientistCount(numScientists);
 	}
-
-	extern EXPORT int __stdcall UnitEx_GetUnknownValue(int unitID, int index)
-	{
-		UnitEx unit;
-		unit.unitID = unitID;
-
-		return unit.GetUnknownValue(index);
-	}
-
-	extern EXPORT void __stdcall UnitEx_SetUnknownValue(int unitID, int index, int value)
-	{
-		UnitEx unit;
-		unit.unitID = unitID;
-
-		return unit.SetUnknownValue(index, value);
-	}
 }

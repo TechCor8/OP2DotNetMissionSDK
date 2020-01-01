@@ -1,7 +1,4 @@
-// HFLTypes.h
-// Defines basic types such as command packet types, unit action types, etc
-#ifndef _HFLTYPES_H_
-#define _HFLTYPES_H_
+#pragma once
 
 // Command types, these are used in the command packet headers, they also indicate what
 // a unit has been ordered to do.
@@ -290,5 +287,3 @@ typedef void (__cdecl *TRIGCB)(void);
 #define HFLALREADYINITED (-998)	// error: HFL already inited
 #define HFLLOADED (-997)		// HFL inited OK
 #define HFLCANTINIT (-996)		// error: HFLInit() failed
-
-#endif // _HFLTYPES_H_

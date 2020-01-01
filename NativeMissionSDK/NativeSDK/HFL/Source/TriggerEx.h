@@ -1,7 +1,6 @@
-// TriggerEx.h
-#ifndef _TRIGGEREX_H_
-#define _TRIGGEREX_H_
+#pragma once
 
+// Extends the Trigger class contained in Outpost2DLL
 class TriggerEx : public Trigger
 {
 	void SetHasFired(int playerId, int boolSet);
@@ -18,5 +17,3 @@ class TriggerEx : public Trigger
 	// todo: extra functions for each type of trigger
 	// todo: any other get/set type of functions
 };
-
-#endif _TRIGGEREX_H_

@@ -1,8 +1,6 @@
-// PlayerEx.h
-// Extra / useful player stuff
-#ifndef _PLAYEREX_H_
-#define _PLAYEREX_H_
+#pragma once
 
+// Extends the Player class defined in Outpost2DLL
 class PlayerEx : public _Player
 {
 public:
@@ -52,5 +50,3 @@ extern PlayerEx *ExtPlayer;
 
 struct OP2Player;
 extern OP2Player *playerArray;
-
-#endif // _PLAYEREX_H_

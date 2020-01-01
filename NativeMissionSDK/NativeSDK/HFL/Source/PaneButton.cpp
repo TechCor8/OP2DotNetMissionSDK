@@ -1,7 +1,6 @@
-// PaneButton.cpp
 #include "HFL.h"
 
-// fwd declares needed here
+
 struct OP2Button;
 
 struct OP2ButtonVtbl
@@ -20,28 +19,28 @@ struct OP2ButtonVtbl
 #pragma pack(push, 1)
 struct OP2ButtonData
 {
-    int animId;
-    short normalFrameId;
-    short activeFrameId;
-    short disabledFrameId;
-    short unknown1;
-    char *helpText;
+	int animId;
+	short normalFrameId;
+	short activeFrameId;
+	short disabledFrameId;
+	short unknown1;
+	char *helpText;
 	char *buttonLabel;
-    int unknown2[3];
+	int unknown2[3];
 };
 
 struct OP2Button
 {
-    OP2ButtonVtbl *vtbl;
-    unsigned int flags;
-    RECT rect;
-    int accelKey;
-    int unknown[3];
-    int hasButtonText; // set to 4 if the button has text drawn on it, 0 if not
-    int unknown2[22];
-    OP2ButtonData data;
-	void *report; // all buttons are 'report buttons' but we won't use them that way necessarily
-    int unknown3;
+	OP2ButtonVtbl *vtbl;
+	unsigned int flags;
+	RECT rect;
+	int accelKey;
+	int unknown[3];
+	int hasButtonText; // set to 4 if the button has text drawn on it, 0 if not
+	int unknown2[22];
+	OP2ButtonData data;
+	OP2Report *report; // all buttons are 'report buttons' but we won't use them that way necessarily
+	int unknown3;
 	int fillingSpace[10]; // maybe more stuff that OP2 depends on here..
 	PaneButton *btnPtr; // our PaneButton
 };
@@ -57,8 +56,9 @@ void __fastcall ButtonPaintDispatcher(OP2Button *classPtr, int dummy, void *gfxS
 {
 	PaneButton *pb = classPtr->btnPtr;
 
-	if (pb)
+	if (pb) {
 		pb->Paint(PaneGFXSurface(gfxSurface));
+	}
 
 	// call default implementation
 	void (__fastcall *func)(OP2Button *classPtr, int dummy, void *gfxSurface) = (void (__fastcall *)(OP2Button*,int,void*))(imageBase + 0xAFD0);
@@ -69,8 +69,9 @@ LRESULT __fastcall ButtonOnUIEventDispatcher(OP2Button *classPtr, int dummy, voi
 {
 	PaneButton *pb = classPtr->btnPtr;
 
-	if (pb)
+	if (pb) {
 		pb->OnUIEvent(msg, wParam, lParam);
+	}
 
 	// call default implementation
 	// (must always take place since it does things with filters and such that we don't)
@@ -82,8 +83,9 @@ void __fastcall ButtonOnAddDispatcher(OP2Button *classPtr, int dummy, void *pane
 {
 	PaneButton *pb = classPtr->btnPtr;
 
-	if (pb)
+	if (pb) {
 		pb->OnAdd();
+	}
 
 	// call default implementation
 	void (__fastcall *func)(OP2Button *classPtr, int dummy, void *pane) = (void (__fastcall *)(OP2Button*,int,void*))(imageBase + 0xA920);
@@ -94,8 +96,9 @@ void __fastcall ButtonOnRemoveDispatcher(OP2Button *classPtr, int dummy, void *p
 {
 	PaneButton *pb = classPtr->btnPtr;
 
-	if (pb)
+	if (pb) {
 		pb->OnRemove();
+	}
 
 	// call default implementation
 	void (__fastcall *func)(OP2Button *classPtr, int dummy, void *pane) = (void (__fastcall *)(OP2Button*,int,void*))(imageBase + 0xA950);
@@ -106,8 +109,9 @@ void __fastcall ButtonSetEnabledDispatcher(OP2Button *classPtr, int dummy, int b
 {
 	PaneButton *pb = classPtr->btnPtr;
 
-	if (pb)
+	if (pb) {
 		pb->SetEnabled(boolEnabled);
+	}
 
 	// call default implementation
 	void (__fastcall *func)(OP2Button *classPtr, int dummy, int boolEnabled) = (void (__fastcall *)(OP2Button*,int,int))(imageBase + 0xA9B0);
@@ -118,8 +122,9 @@ void __fastcall ButtonOnClickDispatcher(OP2Button *classPtr)
 {
 	PaneButton *pb = classPtr->btnPtr;
 
-	if (pb)
+	if (pb) {
 		pb->OnClick();
+	}
 
 	// no harm done if they didn't provide an OnClick, better than exiting with 'pure virtual function call'
 }
@@ -141,7 +146,7 @@ PaneButton::PaneButton()
 	// set up button object
 	internalBtn = new OP2Button;
 
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 	memset(p, 0, sizeof(OP2Button));
 	// save a pointer so the dispatcher function can redirect the call to the right object
 	p->btnPtr = this;
@@ -149,7 +154,7 @@ PaneButton::PaneButton()
 	// set up vtbl
 	internalVtbl = new OP2ButtonVtbl;
 	
-	OP2ButtonVtbl *vp = (OP2ButtonVtbl*)internalVtbl;
+	OP2ButtonVtbl *vp = internalVtbl;
 	p->vtbl = vp;
 
 	vp->Destructor = (void* (__fastcall *)(OP2Button*,int,int))(imageBase + 0xA8F0);
@@ -167,7 +172,7 @@ PaneButton::PaneButton()
 	p->hasButtonText = 4;
 }
 
-PaneButton::PaneButton(void *internalPtr)
+PaneButton::PaneButton(OP2Button *internalPtr)
 {
 	internalBtn = NULL;
 	internalVtbl = NULL;
@@ -181,10 +186,8 @@ PaneButton::PaneButton(void *internalPtr)
 		}
 	}
 
-	int *p = (int*)internalPtr;
-
 	internalBtn = internalPtr;
-	internalVtbl = (void*)*p;
+	internalVtbl = internalPtr->vtbl;
 	isInternalObj = 1;
 }
 
@@ -230,10 +233,11 @@ void PaneButton::OnClick()
 
 void PaneButton::SetParams(int pixelX, int pixelY, int animId, int normalFrameId, int activeFrameId, int disabledFrameId, char *helpText, char *label)
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return;
+	}
 
 	OP2ButtonData data;
 	memset(&data, 0, sizeof(data));
@@ -252,93 +256,104 @@ void PaneButton::SetParams(int pixelX, int pixelY, int animId, int normalFrameId
 
 void PaneButton::SetHelpText(char *helpText)
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) {// not inited if this is null
 		return;
+	}
 
 	p->data.helpText = helpText;
 }
 
 char* PaneButton::GetHelpText()
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return (char*)HFLNOTINITED;
+	}
 
 	return p->data.helpText;
 }
 
 void PaneButton::SetLabel(char *label)
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return;
+	}
 
 	p->data.buttonLabel = label;
 }
 
 char* PaneButton::GetLabel()
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return (char*)HFLNOTINITED;
+	}
 
 	return p->data.buttonLabel;
 }
 
 int PaneButton::GetPushedIn()
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return HFLNOTINITED;
+	}
 
 	return (p->flags & 0x40);
 }
 
 void PaneButton::SetPushedIn(int boolPushed)
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return;
+	}
 
-	if (boolPushed)
+	if (boolPushed) {
 		p->flags |= 0x40;
-	else
+	}
+	else {
 		p->flags &= ~0x40;
+	}
 }
 
 int PaneButton::GetAcceleratorKey()
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return HFLNOTINITED;
+	}
 
 	return p->accelKey;
 }
 
 void PaneButton::SetAcceleratorKey(int asciiCode)
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return;
+	}
 
 	p->accelKey = asciiCode;
 }
 
 RECT* PaneButton::GetBoundingBox()
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return NULL;
+	}
 
 	return &p->rect;
 }
@@ -347,27 +362,28 @@ ReportButton::ReportButton()
 {
 }
 
-ReportButton::ReportButton(void *internalPtr) : PaneButton(internalPtr)
+ReportButton::ReportButton(OP2Button *internalPtr) : PaneButton(internalPtr)
 {
 }
 
 PaneReport ReportButton::GetAttachedReport()
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return PaneReport(0);
+	}
 
 	return PaneReport(p->report);
 }
 
 void ReportButton::SetAttachedReport(PaneReport *newReport)
 {
-	OP2Button *p = (OP2Button*)internalBtn;
+	OP2Button *p = internalBtn;
 
-	if (!p) // not inited if this is null
+	if (!p) { // not inited if this is null
 		return;
+	}
 
 	p->report = newReport->internalRpt;
 }
-

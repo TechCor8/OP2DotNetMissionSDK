@@ -1,7 +1,4 @@
-// StdPanes.h
-// CommandPane etc.
-#ifndef _STDPANES_H_
-#define _STDPANES_H_
+#pragma once
 
 class CommandPane
 {
@@ -21,5 +18,3 @@ extern void *cmdPane; // internal pointer
 extern CommandPane gCommandPane;
 
 // todo: other panes if useful?
-
-#endif // _STDPANES_H_

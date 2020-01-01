@@ -1,8 +1,6 @@
-// TethysGameEx.h
-// Extensions to TethysGame
-#ifndef _TETHYSGAMEEX_H_
-#define _TETHYSGAMEEX_H_
+#pragma once
 
+// Extensions to TethysGame
 class TethysGameEx : public TethysGame
 {
 public:
@@ -33,5 +31,3 @@ extern void *gameObj;
 
 extern void *frameObj;
 extern void *statusBarObj;
-
-#endif // _TETHYSGAMEEX_H_

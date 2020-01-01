@@ -1,8 +1,7 @@
-// PaneReport.cpp
 #include "HFL.h"
 #include <stdarg.h> // var args on CreateStdButtons
 
-// forward declare
+
 struct OP2Report;
 
 #pragma pack(push,1)
@@ -36,8 +35,9 @@ void __fastcall ReportUpdateDispatcher(OP2Report *classPtr)
 {
 	PaneReport *p = classPtr->rptPtr;
 
-	if (p)
+	if (p) {
 		p->Update();
+	}
 
 	// call default implementation
 	void (__fastcall *func)(OP2Report *classPtr) = (void (__fastcall *)(OP2Report*))(imageBase + 0x59F10);
@@ -48,8 +48,9 @@ void __fastcall ReportInitDispatcher(OP2Report *classPtr)
 {
 	PaneReport *p = classPtr->rptPtr;
 
-	if (p)
+	if (p) {
 		p->Initialize();
+	}
 
 	// call default implementation
 	void (__fastcall *func)(OP2Report *classPtr) = (void (__fastcall *)(OP2Report*))(imageBase + 0x59F20);
@@ -60,8 +61,9 @@ void __fastcall ReportPaintDispatcher(OP2Report *classPtr, int dummy, RECT *upda
 {
 	PaneReport *p = classPtr->rptPtr;
 
-	if (p)
+	if (p) {
 		p->Paint(updateRect, PaneGFXSurface(gfxSurface));
+	}
 
 	// there is no default implementation!
 }
@@ -70,8 +72,9 @@ int __fastcall ReportGetButtonIdDispatcher(OP2Report *classPtr)
 {
 	PaneReport *p = classPtr->rptPtr;
 
-	if (p)
+	if (p) {
 		return p->GetLinkedButtonId();
+	}
 
 	// call default implementation
 	int (__fastcall *func)(OP2Report *classPtr) = (int (__fastcall *)(OP2Report*))(imageBase + 0x59F70);
@@ -95,7 +98,7 @@ PaneReport::PaneReport()
 	// set up report object
 	internalRpt = new OP2Report;
 
-	OP2Report *p = (OP2Report*)internalRpt;
+	OP2Report *p = internalRpt;
 	memset(p, 0, sizeof(OP2Report));
 	// save a pointer so the dispatcher function can redirect the call to the right object
 	p->rptPtr = this;
@@ -103,7 +106,7 @@ PaneReport::PaneReport()
 	// set up vtbl
 	internalVtbl = new OP2ReportVtbl;
 
-	OP2ReportVtbl *vp = (OP2ReportVtbl*)internalVtbl;
+	OP2ReportVtbl *vp = internalVtbl;
 	p->vtbl = vp;
 
 	// todo: some vtbl entries need changing for reports with lists
@@ -118,19 +121,18 @@ PaneReport::PaneReport()
 	vp->GetButtonId = ReportGetButtonIdDispatcher;
 }
 
-PaneReport::PaneReport(void *internalPtr)
+PaneReport::PaneReport(OP2Report *internalPtr)
 {
 	isInternalObj = 0;
 	internalRpt = NULL;
 	internalVtbl = NULL;
 
-	if (!isInited)
+	if (!isInited) {
 		return;
-
-	int *p = (int*)internalPtr;
+	}
 
 	internalRpt = internalPtr;
-	internalVtbl = (void*)*p;
+	internalVtbl = internalPtr->vtbl;
 	isInternalObj = 1;
 }
 
@@ -164,10 +166,11 @@ int PaneReport::GetLinkedButtonId()
 
 void PaneReport::DrawTitle(RECT *updateRect, PaneGFXSurface gfxSurface, char *title)
 {
-	OP2Report *p = (OP2Report*)internalRpt;
+	OP2Report *p = internalRpt;
 
-	if (!p)
+	if (!p) {
 		return;
+	}
 
 	void (__fastcall *func)(OP2Report *p, int dummy, RECT *updateRect, void *gfxSurface, char *title) = (void (__fastcall *)(OP2Report*,int,RECT*,void*,char*))(imageBase + 0x59CA0);
 	func(p, 0, updateRect, gfxSurface.internalSurface, title);
@@ -179,10 +182,11 @@ void PaneReport::CreateStdButtons(int numButtons, PaneButton *button1, char *but
 	// act as if the user passed parameters for all 4 buttons (the stack will balance out okay)
 	// Performance hit but it will prevent having to deal with passing parameters manually
 
-	OP2Report *p = (OP2Report*)internalRpt;
+	OP2Report *p = internalRpt;
 
-	if (!p)
+	if (!p) {
 		return;
+	}
 
 	void *buttons[4] = {NULL, NULL, NULL, NULL};
 
@@ -209,20 +213,22 @@ void PaneReport::CreateStdButtons(int numButtons, PaneButton *button1, char *but
 
 int PaneReport::GetCurrentPage()
 {
-	OP2Report *p = (OP2Report*)internalRpt;
+	OP2Report *p = internalRpt;
 
-	if (!p)
+	if (!p) {
 		return HFLNOTINITED;
+	}
 
 	return p->curPage;
 }
 
 void PaneReport::SetCurrentPage(int pageNum)
 {
-	OP2Report *p = (OP2Report*)internalRpt;
+	OP2Report *p = internalRpt;
 
-	if (!p)
+	if (!p) {
 		return;
+	}
 
 	p->curPage = pageNum;
 }

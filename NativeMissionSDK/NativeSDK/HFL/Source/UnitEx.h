@@ -1,8 +1,6 @@
-// UnitEx.h
-// Extra / useful unit stuff
-#ifndef _UNITEX_H_
-#define _UNITEX_H_
+#pragma once
 
+// Extends the Unit class defined in Outpost2DLL
 class UnitEx : public Unit
 {
 public:
@@ -66,12 +64,7 @@ public:
 	int GetLabCurrentTopic();
 	int GetLabScientistCount();
 	void SetLabScientistCount(int numScientists);
-	
-	int GetUnknownValue(int index);
-	void SetUnknownValue(int index, int value);
 };
 
 struct OP2Unit;
 extern OP2Unit **unitArray;
-
-#endif // _UNITEX_H_
