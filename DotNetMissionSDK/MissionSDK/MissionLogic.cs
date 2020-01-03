@@ -62,7 +62,9 @@ namespace DotNetMissionSDK
 			TethysGame.SetDaylightEverywhere(root.tethysGame.daylightEverywhere);
 			TethysGame.SetDaylightMoves(root.tethysGame.daylightMoves);
 			GameMap.SetInitialLightLevel(root.tethysGame.initialLightLevel);
-			if (!TethysGame.UsesDayNight())
+
+			// If this is a multiplayer game, use the game-specified light settings
+			if ((int)root.levelDetails.missionType <= -4 && (int)root.levelDetails.missionType >= -8 && !TethysGame.UsesDayNight())
 				TethysGame.SetDaylightEverywhere(true);
 
 			TethysGame.SetMusicPlayList(root.tethysGame.musicPlayList.songIDs.Length, root.tethysGame.musicPlayList.repeatStartIndex, root.tethysGame.musicPlayList.songIDs);
