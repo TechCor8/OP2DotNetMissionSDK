@@ -47,7 +47,7 @@ int Research::GetTechCount()
 TechInfo Research::GetTechInfo(int index)
 {
 	TechInfo info;
-	info.internalPtr = (void*)HFLNOTINITED;
+	info.internalPtr = nullptr;
 
 	if (!isInited)
 		return info;
@@ -71,7 +71,7 @@ int TechInfo::IsValid()
 	if (!isInited)
 		return HFLNOTINITED;
 
-	return (internalPtr != NULL);
+	return (internalPtr != nullptr);
 }
 int TechInfo::GetTechID()
 {
