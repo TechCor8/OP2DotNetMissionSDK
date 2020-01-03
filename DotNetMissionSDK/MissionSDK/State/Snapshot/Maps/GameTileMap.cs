@@ -32,8 +32,8 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		/// </summary>
 		public GameTileMap()
 		{
-			m_Width = GameMap.bounds.width;
-			m_Height = GameMap.bounds.height;
+			m_Width = GameMapEx.GetMapWidth();
+			m_Height = GameMapEx.GetMapHeight();
 
 			m_Grid = new uint[m_Width*m_Height];
 
@@ -49,22 +49,19 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			GameMapEx.CopyTileMap(m_Grid);
 		}
 
-		private static LOCATION GetPointInGridSpace(LOCATION pt)
-		{
-			pt.x = pt.x - GameMap.bounds.xMin;
-			pt.y = pt.y - GameMap.bounds.yMin;
-
-			return pt;
-		}
-
 		/// <summary>
 		/// Returns the cell type at the specified tile.
 		/// </summary>
 		public CellType GetCellType(LOCATION tilePosition)
 		{
-			tilePosition = GetPointInGridSpace(tilePosition);
+			int x = GameMap.doesWrap ? tilePosition.x % m_Width : tilePosition.x;
 
-			return (CellType)(m_Grid[tilePosition.x + tilePosition.y * m_Width] & TileMask.CellType);
+			const int columnWidth = 32;
+			int column = x / columnWidth;
+			int columnStartIndex = column * (m_Height * columnWidth);
+			int tileIndex = columnStartIndex + (x % columnWidth) + (tilePosition.y * columnWidth);
+
+			return (CellType)(m_Grid[tileIndex] & TileMask.CellType);
 		}
 
 		public bool IsTilePassable(int x, int y)
