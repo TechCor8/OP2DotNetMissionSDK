@@ -114,6 +114,8 @@ namespace DotNetMissionSDK.Json
 		{
 			UnitData data = this;
 
+			HFL.UnitEx unit = null;
+
 			// Must create the beacon for mines
 			switch (data.typeID)
 			{
@@ -124,15 +126,24 @@ namespace DotNetMissionSDK.Json
 				case map_id.RareOreMine:
 					// Game has a bug where rare ore mines can't be created. Common ore mines will turn into the rare mine instead.
 					TethysGame.CreateBeacon(map_id.MiningBeacon, pt.x, pt.y, BeaconType.Rare, data.barYield, data.barVariant);
-					return TethysGame.CreateUnit(map_id.CommonOreMine, pt.x, pt.y, playerID, data.cargoType, data.direction);
+					unit = TethysGame.CreateUnit(map_id.CommonOreMine, pt.x, pt.y, playerID, data.cargoType, data.direction);
+					break;
 
 				case map_id.CargoTruck:
-					Unit truck = TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
-					truck.SetTruckCargo((TruckCargo)data.cargoType, data.cargoAmount);
-					return truck;
-			}
+					unit = TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
+					unit.SetTruckCargo((TruckCargo)data.cargoType, data.cargoAmount);
+					break;
 
-			HFL.UnitEx unit = TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
+				case map_id.ConVec:
+					unit = TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
+					unit.SetCargo((map_id)data.cargoType, (map_id)data.cargoAmount);
+					break;
+
+				default:
+					// All other units
+					unit = TethysGame.CreateUnit(data.typeID, pt.x, pt.y, playerID, data.cargoType, data.direction);
+					break;
+			}
 
 			int hp = unit.GetUnitInfo().GetHitPoints(playerID);
 			int damage = (int)(hp * (1.0f - health));
