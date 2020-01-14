@@ -32,8 +32,8 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 		/// </summary>
 		public GameTileMap()
 		{
-			m_Width = GameMapEx.GetMapWidth();
-			m_Height = GameMapEx.GetMapHeight();
+			m_Width = GameMap.bounds.width;
+			m_Height = GameMap.bounds.height;
 
 			m_Grid = new uint[m_Width*m_Height];
 
@@ -49,11 +49,21 @@ namespace DotNetMissionSDK.State.Snapshot.Maps
 			GameMapEx.CopyTileMap(m_Grid);
 		}
 
+		private static LOCATION GetPointInGridSpace(LOCATION pt)
+		{
+			pt.x = pt.x - GameMap.bounds.xMin;
+			pt.y = pt.y - GameMap.bounds.yMin;
+
+			return pt;
+		}
+
 		/// <summary>
 		/// Returns the cell type at the specified tile.
 		/// </summary>
 		public CellType GetCellType(LOCATION tilePosition)
 		{
+			tilePosition = GetPointInGridSpace(tilePosition);
+
 			int x = GameMap.doesWrap ? tilePosition.x % m_Width : tilePosition.x;
 
 			const int columnWidth = 32;

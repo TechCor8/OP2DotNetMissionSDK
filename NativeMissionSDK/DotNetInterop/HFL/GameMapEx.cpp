@@ -68,7 +68,7 @@ extern "C"
 		return GameMapEx::LoadMap(fileName);
 	}
 
-	extern EXPORT void __stdcall GameMapEx_CopyTileMap(int* tileMap)
+	extern EXPORT void __stdcall GameMapEx_CopyTileMap(MapTile* tileMap)
 	{
 		GameMapEx::CopyTileMap(tileMap);
 	}

@@ -12,7 +12,7 @@ public:
 	static int GetMapHeight();
 	static int GetNumUnits();
 	static int LoadMap(char *fileName);
-	static void CopyTileMap(int* tileMap);
+	static void CopyTileMap(MapTile* destTileMap);
 };
 
 extern GameMapEx gMap;
