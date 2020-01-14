@@ -178,8 +178,9 @@ namespace DotNetMissionSDK
 		public void Detach()
 		{
 			m_MissionLogic.Dispose();
-			
 			m_SaveBuffer.Dispose();
+			StateSnapshot.Destroy();
+			AsyncPump.Release();
 
 			// Dispose log file
 			if (m_LogFileStream != null)

@@ -108,5 +108,18 @@ namespace DotNetMissionSDK.Async
 			foreach (AsyncOperation operation in completedOperations)
 				operation.completedCB?.Invoke(operation.returnState);
 		}
+
+		/// <summary>
+		/// Releases all pending and completed operations.
+		/// Should be called when the mission is terminated.
+		/// </summary>
+		public static void Release()
+		{
+			lock (m_SyncCompleted)
+			{
+				m_PendingOperations.Clear();
+				m_CompletedOperations.Clear();
+			}
+		}
 	}
 }

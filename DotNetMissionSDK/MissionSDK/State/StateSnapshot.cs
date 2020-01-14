@@ -191,6 +191,25 @@ namespace DotNetMissionSDK.State.Snapshot
 		}
 
 		/// <summary>
+		/// Destroys all snapshots.
+		/// Should be called when the mission is terminated.
+		/// </summary>
+		public static void Destroy()
+		{
+			ThreadAssert.MainThreadRequired();
+
+			m_SnapshotPool = new ObjectPool<StateSnapshot>();
+			m_LastSnapshot = null;
+
+			// Clear info
+			m_VehicleInfo = null;
+			m_StructureInfo = null;
+			m_WeaponInfo = null;
+			m_StarshipInfo = null;
+			m_TechInfo = null;
+		}
+
+		/// <summary>
 		/// Global info is usually set at mission start and does not update frequently.
 		/// Call this whenever the global info changes.
 		/// </summary>
