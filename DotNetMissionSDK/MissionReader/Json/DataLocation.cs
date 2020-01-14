@@ -3,7 +3,7 @@
 namespace DotNetMissionSDK.Json
 {
 	[DataContract]
-	public class DataLocation
+	public struct DataLocation
 	{
 		[DataMember(Name = "X")]		public int x			{ get; set; }
 		[DataMember(Name = "Y")]		public int y			{ get; set; }
