@@ -22,6 +22,15 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 			// Set research topics
 			ResearchSetTask.ResearchTopic[] topicsToResearch = new ResearchSetTask.ResearchTopic[]
 			{
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05307), false),	// Automated Diagnostic Examinations
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(03406), false),	// Environmental Psychology
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(03403), false),	// Hydroponic Growing Media
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05305), false),	// DIRT Procedural Review
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05408), false),	// Forum Reconfiguration
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(08307), false),	// Multitainment Console Upgrade
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(08105), false),	// Disaster-Resistant Housing
+				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(08104), false),	// Expanded Housing
+
 				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05309), false),	// Hypnopaedia
 				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(05310), false),	// Hypnopaedia
 				new ResearchSetTask.ResearchTopic(GetTopicFromTechID(03201), false),	// Seismology

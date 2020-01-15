@@ -166,7 +166,7 @@ namespace DotNetMissionSDK.AI.Managers
 				// DEBUG:
 				if (ownerID == TethysGame.LocalPlayer())
 				{
-					TethysGame.AddMessage(ownerID, m_DebugMessage, ownerID, 0);
+					//TethysGame.AddMessage(ownerID, m_DebugMessage, ownerID, 0);
 				}
 			});
 		}

@@ -87,8 +87,8 @@ namespace DotNetMissionSDK.AI.Tasks.Base.Goals
 					highestStrength = player.totalOffensiveStrength;
 			}
 
-			float minRange = highestStrength - 2;		// How much less strength than our opponent before we take things seriously
-			float maxRange = highestStrength + 20;		// How much extra strength than our opponent before we stop caring
+			float minRange = System.Math.Max(0, highestStrength - 2);	// How much less strength than our opponent before we take things seriously
+			float maxRange = highestStrength + 20;						// How much extra strength than our opponent before we stop caring
 			importance = 1 - Clamp((owner.totalOffensiveStrength - minRange) / (maxRange - minRange));
 
 			importance = Clamp(importance * weight);
