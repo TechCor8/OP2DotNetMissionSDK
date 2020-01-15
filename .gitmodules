@@ -1,0 +1,3 @@
+[submodule "NativeMissionSDK/NativeSDK"]
+	path = NativeMissionSDK/NativeSDK
+	url = https://github.com/OutpostUniverse/OP2MissionSDK.git
