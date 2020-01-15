@@ -1,6 +1,0 @@
-image: Visual Studio 2017
-configuration:
-  - Release
-  - Debug
-build:
-  project: Outpost2DLL.sln
