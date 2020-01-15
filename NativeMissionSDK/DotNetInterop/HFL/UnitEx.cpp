@@ -209,12 +209,12 @@ extern "C"
 
 		return unit.CreatorID();
 	}
-	extern EXPORT int __stdcall UnitEx_IsEMPedEx(int unitID)
+	extern EXPORT int __stdcall UnitEx_GetTimeEMPed(int unitID)
 	{
 		UnitEx unit;
 		unit.unitID = unitID;
 
-		return unit.IsEMPedEx();
+		return unit.GetTimeEMPed();
 	}
 	extern EXPORT int __stdcall UnitEx_IsStickyfoamed(int unitID)
 	{

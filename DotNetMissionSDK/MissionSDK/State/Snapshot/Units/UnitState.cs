@@ -31,7 +31,7 @@ namespace DotNetMissionSDK.State.Snapshot.Units
 		public int creatorID				{ get; private set; }
 
 		public bool isEMPed					{ get; private set; }
-		public bool isEMPedEx				{ get; private set; }
+		public int timeEMPed				{ get; private set; }
 
 		public int damage					{ get; private set; }
 
@@ -78,7 +78,7 @@ namespace DotNetMissionSDK.State.Snapshot.Units
 			creatorID		= unit.CreatorID();
 
 			isEMPed			= unit.IsEMPed();
-			isEMPedEx		= unit.IsEMPedEx();
+			timeEMPed		= unit.GetTimeEMPed();
 
 			damage			= unit.GetDamage();
 

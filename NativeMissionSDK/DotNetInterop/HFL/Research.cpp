@@ -25,112 +25,112 @@ extern "C"
 		return Research::GetMaxTechID();
 	}
 
-	extern EXPORT int __stdcall TechInfo_IsValid(void* handle)
+	extern EXPORT int __stdcall TechInfo_IsValid(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.IsValid();
 	}
-	extern EXPORT int __stdcall TechInfo_GetTechID(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetTechID(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetTechID();
 	}
-	extern EXPORT TechCategory __stdcall TechInfo_GetCategory(void* handle)
+	extern EXPORT TechCategory __stdcall TechInfo_GetCategory(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetCategory();
 	}
-	extern EXPORT int __stdcall TechInfo_GetTechLevel(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetTechLevel(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetTechLevel();
 	}
-	extern EXPORT int __stdcall TechInfo_GetPlymouthCost(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetPlymouthCost(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetPlymouthCost();
 	}
-	extern EXPORT int __stdcall TechInfo_GetEdenCost(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetEdenCost(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetEdenCost();
 	}
-	extern EXPORT int __stdcall TechInfo_GetMaxScientists(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetMaxScientists(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetMaxScientists();
 	}
-	extern EXPORT LabType __stdcall TechInfo_GetLab(void* handle)
+	extern EXPORT LabType __stdcall TechInfo_GetLab(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetLab();
 	}
-	extern EXPORT int __stdcall TechInfo_GetPlayerHasTech(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetPlayerHasTech(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetPlayerHasTech();
 	}
-	extern EXPORT int __stdcall TechInfo_GetNumUpgrades(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetNumUpgrades(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetNumUpgrades();
 	}
-	extern EXPORT int __stdcall TechInfo_GetNumRequiredTechs(void* handle)
+	extern EXPORT int __stdcall TechInfo_GetNumRequiredTechs(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetNumRequiredTechs();
 	}
-	extern EXPORT char* __stdcall TechInfo_GetTechName(void* handle)
+	extern EXPORT char* __stdcall TechInfo_GetTechName(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetTechName();
 	}
-	extern EXPORT char* __stdcall TechInfo_GetDescription(void* handle)
+	extern EXPORT char* __stdcall TechInfo_GetDescription(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetDescription();
 	}
-	extern EXPORT char* __stdcall TechInfo_GetTeaser(void* handle)
+	extern EXPORT char* __stdcall TechInfo_GetTeaser(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetTeaser();
 	}
-	extern EXPORT char* __stdcall TechInfo_GetImproveDesc(void* handle)
+	extern EXPORT char* __stdcall TechInfo_GetImproveDesc(OP2TechInfo* handle)
 	{
 		TechInfo info;
 		info.internalPtr = handle;
 
 		return info.GetImproveDesc();
 	}
-	extern EXPORT int __stdcall TechInfo_GetRequiredTechIndex(void* handle, int index)
+	extern EXPORT int __stdcall TechInfo_GetRequiredTechIndex(OP2TechInfo* handle, int index)
 	{
 		TechInfo info;
 		info.internalPtr = handle;

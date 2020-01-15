@@ -53,7 +53,7 @@ namespace DotNetMissionSDK.HFL
 
 		public int CreatorID()														{ ThreadAssert.MainThreadRequired();	return UnitEx_CreatorID(m_StubIndex);														}
 
-		public bool IsEMPedEx()														{ ThreadAssert.MainThreadRequired();	return UnitEx_IsEMPedEx(m_StubIndex) > 0;													}
+		public int GetTimeEMPed()													{ ThreadAssert.MainThreadRequired();	return UnitEx_GetTimeEMPed(m_StubIndex);													}
 		public bool IsStickyfoamed()												{ ThreadAssert.MainThreadRequired();	return UnitEx_IsStickyfoamed(m_StubIndex) > 0;												}
 		public bool IsESGed()														{ ThreadAssert.MainThreadRequired();	return UnitEx_IsESGed(m_StubIndex) > 0;														}
 
@@ -232,7 +232,7 @@ namespace DotNetMissionSDK.HFL
 
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_CreatorID(int unitID);
 
-		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_IsEMPedEx(int unitID);
+		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_GetTimeEMPed(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_IsStickyfoamed(int unitID);
 		[DllImport("DotNetInterop.dll")] private static extern int UnitEx_IsESGed(int unitID);
 
