@@ -19,6 +19,9 @@ namespace DotNetMissionSDK
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)] // Maximum supported players
 		public PlayerStarshipSaveData[] playerStarship;
 
+		// Json Data
+		public byte missionVariantIndex;
+
 		// Custom Mission Data
 		[MarshalAs(UnmanagedType.LPStr, SizeConst = 50)]
 		public string testStr;

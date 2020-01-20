@@ -45,6 +45,26 @@ namespace DotNetMissionSDK.Json
 		}
 
 		public UnitData() { }
+		public UnitData(UnitData clone)
+		{
+			id = clone.id;
+			m_TypeID = clone.m_TypeID;
+			health = clone.health;
+			lights = clone.lights;
+			m_CargoType = clone.m_CargoType;
+			cargoAmount = clone.cargoAmount;
+			m_Direction = clone.m_Direction;
+			position = clone.position;
+
+			m_BarYield = clone.m_BarYield;
+			m_BarVariant = clone.m_BarVariant;
+
+			ignoreLayout = clone.ignoreLayout;
+			minDistance = clone.minDistance;
+			spawnDistance = clone.spawnDistance;
+			createWall = clone.createWall;
+			m_MaxTubes = clone.m_MaxTubes;
+		}
 
 		/// <summary>
 		/// Constructor for manual layout unit.

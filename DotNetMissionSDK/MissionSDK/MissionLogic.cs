@@ -58,20 +58,26 @@ namespace DotNetMissionSDK
 
 			List<Unit> createdUnits = new List<Unit>();
 
+			// Select mission variant (random)
+			m_SaveData.missionVariantIndex = (byte)TethysGame.GetRandomRange(1, root.missionVariants.Count);
+
+			// Combine master variant (index 0) with selected variant. The master variant is always used as a base.
+			MissionVariant missionVariant = MissionVariant.Concat(root.missionVariants[0], root.missionVariants[m_SaveData.missionVariantIndex]);
+
 			// Setup Game
-			TethysGame.SetDaylightEverywhere(root.tethysGame.daylightEverywhere);
-			TethysGame.SetDaylightMoves(root.tethysGame.daylightMoves);
-			GameMap.SetInitialLightLevel(root.tethysGame.initialLightLevel);
+			TethysGame.SetDaylightEverywhere(missionVariant.tethysGame.daylightEverywhere);
+			TethysGame.SetDaylightMoves(missionVariant.tethysGame.daylightMoves);
+			GameMap.SetInitialLightLevel(missionVariant.tethysGame.initialLightLevel);
 
 			// If this is a multiplayer game, use the game-specified light settings
 			if ((int)root.levelDetails.missionType <= -4 && (int)root.levelDetails.missionType >= -8 && !TethysGame.UsesDayNight())
 				TethysGame.SetDaylightEverywhere(true);
 
-			TethysGame.SetMusicPlayList(root.tethysGame.musicPlayList.songIDs.Length, root.tethysGame.musicPlayList.repeatStartIndex, root.tethysGame.musicPlayList.songIDs);
+			TethysGame.SetMusicPlayList(missionVariant.tethysGame.musicPlayList.songIDs.Length, missionVariant.tethysGame.musicPlayList.repeatStartIndex, missionVariant.tethysGame.musicPlayList.songIDs);
 
 			// Select Beacons
 			List<GameData.Beacon> beacons = new List<GameData.Beacon>();
-			foreach (var group in new List<GameData.Beacon>(root.tethysGame.beacons).GroupBy(b => b.id))
+			foreach (var group in new List<GameData.Beacon>(missionVariant.tethysGame.beacons).GroupBy(b => b.id))
 			{
 				List<GameData.Beacon> groupBeacons = group.ToList();
 				if (groupBeacons[0].id <= 0)
@@ -94,7 +100,7 @@ namespace DotNetMissionSDK
 
 			// Select markers
 			List<GameData.Marker> markers = new List<GameData.Marker>();
-			foreach (var group in new List<GameData.Marker>(root.tethysGame.markers).GroupBy(m => m.id))
+			foreach (var group in new List<GameData.Marker>(missionVariant.tethysGame.markers).GroupBy(m => m.id))
 			{
 				List<GameData.Marker> groupMarkers = group.ToList();
 				if (groupMarkers[0].id <= 0)
@@ -117,7 +123,7 @@ namespace DotNetMissionSDK
 
 			// Select wreckage
 			List<GameData.Wreckage> wreckages = new List<GameData.Wreckage>();
-			foreach (var group in new List<GameData.Wreckage>(root.tethysGame.wreckage).GroupBy(w => w.id))
+			foreach (var group in new List<GameData.Wreckage>(missionVariant.tethysGame.wreckage).GroupBy(w => w.id))
 			{
 				List<GameData.Wreckage> groupWreckage = group.ToList();
 				if (groupWreckage[0].id <= 0)
@@ -131,7 +137,7 @@ namespace DotNetMissionSDK
 			}
 
 			// Create wreckage
-			foreach (GameData.Wreckage wreck in root.tethysGame.wreckage)
+			foreach (GameData.Wreckage wreck in missionVariant.tethysGame.wreckage)
 			{
 				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.position);
 
@@ -139,20 +145,28 @@ namespace DotNetMissionSDK
 			}
 
 			// Tubes
-			foreach (GameData.WallTube wallTube in root.tethysGame.wallTubes)
+			foreach (GameData.WallTube wallTube in missionVariant.tethysGame.wallTubes)
 			{
 				LOCATION location = TethysGame.GetMapCoordinates(wallTube.location);
 				TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.typeID);
 			}
 
 			// Setup Players
-			foreach (PlayerData data in root.players)
+			foreach (PlayerData data in missionVariant.players)
 			{
 				Player player = TethysGame.GetPlayer(data.id);
 
-				player.SetTechLevel(data.techLevel);
+				// Get difficulty, and limit it to the hardest available.
+				int difficulty = player.Difficulty();
+				if (difficulty >= data.difficulties.Count)
+					difficulty = data.difficulties.Count-1;
 
-				switch ((MoraleLevel)data.moraleLevel)
+				PlayerData.ResourceData resourceData = data.difficulties[difficulty];
+
+				// Process resources
+				player.SetTechLevel(resourceData.techLevel);
+
+				switch ((MoraleLevel)resourceData.moraleLevel)
 				{
 					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.id);		break;
 					case MoraleLevel.Good:			TethysGame.ForceMoraleGood(data.id);		break;
@@ -161,7 +175,7 @@ namespace DotNetMissionSDK
 					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.id);		break;
 				}
 
-				if ((TethysGame.UsesMorale() || root.levelDetails.missionType == MissionType.Colony) && data.freeMorale)
+				if ((TethysGame.UsesMorale() || root.levelDetails.missionType == MissionType.Colony) && resourceData.freeMorale)
 					TethysGame.FreeMoraleLevel(data.id);
 
 				// Only set player colony type and color if playing single player
@@ -186,23 +200,23 @@ namespace DotNetMissionSDK
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
 
-				LOCATION centerView = TethysGame.GetMapCoordinates(data.centerView);
+				LOCATION centerView = TethysGame.GetMapCoordinates(resourceData.centerView);
 				player.CenterViewOn(centerView.x, centerView.y);
 
-				player.SetKids(data.kids);
-				player.SetWorkers(data.workers);
-				player.SetScientists(data.scientists);
-				player.SetOre(data.commonOre);
-				player.SetRareOre(data.rareOre);
-				player.SetFoodStored(data.food);
-				player.SetSolarSat(data.solarSatellites);
+				player.SetKids(resourceData.kids);
+				player.SetWorkers(resourceData.workers);
+				player.SetScientists(resourceData.scientists);
+				player.SetOre(resourceData.commonOre);
+				player.SetRareOre(resourceData.rareOre);
+				player.SetFoodStored(resourceData.food);
+				player.SetSolarSat(resourceData.solarSatellites);
 
-				foreach (int techID in data.completedResearch)
+				foreach (int techID in resourceData.completedResearch)
 					player.MarkResearchComplete(techID);
 
 				// Select units
 				List<UnitData> units = new List<UnitData>();
-				foreach (var group in new List<UnitData>(data.units).GroupBy(u => u.id))
+				foreach (var group in new List<UnitData>(resourceData.units).GroupBy(u => u.id))
 				{
 					List<UnitData> groupUnits = group.ToList();
 					if (groupUnits[0].id <= 0)
@@ -229,7 +243,7 @@ namespace DotNetMissionSDK
 			// Setup Autolayout bases
 			BaseGenerator baseGenerator = new BaseGenerator(createdUnits);
 
-			foreach (AutoLayout layout in root.layouts)
+			foreach (AutoLayout layout in missionVariant.layouts)
 			{
 				// Select units
 				List<UnitData> units = new List<UnitData>();
@@ -463,13 +477,14 @@ namespace DotNetMissionSDK
 		protected virtual void StartMission()
 		{
 			MissionRoot root = m_Root;
+			MissionVariant missionVariant = MissionVariant.Concat(root.missionVariants[0], root.missionVariants[m_SaveData.missionVariantIndex]);
 
-			for (int i=0; i < root.players.Length; ++i)
+			for (int i=0; i < missionVariant.players.Count; ++i)
 			{
-				if (root.players[i].botType == BotType.None)
+				if (missionVariant.players[i].botType == BotType.None)
 					continue;
 
-				m_BotPlayer[i] = new BotPlayer(root.players[i].botType, i);
+				m_BotPlayer[i] = new BotPlayer(missionVariant.players[i].botType, i);
 				m_BotPlayer[i].Start();
 			}
 		}
