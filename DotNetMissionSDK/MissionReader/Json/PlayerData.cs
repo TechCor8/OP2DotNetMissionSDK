@@ -13,6 +13,7 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "BotType")]				private string m_BotType				{ get; set; }
 		[DataMember(Name = "Color")]				private string m_Color					{ get; set; }
 		[DataMember(Name = "Allies")]				public int[] allies						{ get; set; }
+		[DataMember(Name = "Resources")]			public ResourceData resources			{ get; set; }
 		[DataMember(Name = "DifficultyResources")]	public List<ResourceData> difficulties	{ get; set; }
 
 		public BotType botType					{ get { return GetEnum<BotType>(m_BotType);			} set { m_BotType = value.ToString();		} }
@@ -99,6 +100,13 @@ namespace DotNetMissionSDK.Json
 				foreach (UnitData unit in dataToConcat.units)
 					units.Add(new UnitData(unit));
 			}
+
+			public static ResourceData Concat(ResourceData a, ResourceData b)
+			{
+				ResourceData result = new ResourceData(a);
+				result.Concat(b);
+				return result;
+			}
 		}
 
 		private static T GetEnum<T>(string val) where T : struct
@@ -117,8 +125,8 @@ namespace DotNetMissionSDK.Json
 			color = (PlayerColor)id;
 			allies = new int[0];
 
+			resources = new ResourceData();
 			difficulties = new List<ResourceData>();
-			difficulties.Add(new ResourceData());
 		}
 
 		public PlayerData(PlayerData clone)
@@ -130,6 +138,8 @@ namespace DotNetMissionSDK.Json
 			m_Color = clone.m_Color;
 			allies = new int[clone.allies.Length];
 			System.Array.Copy(clone.allies, allies, allies.Length);
+
+			resources = new ResourceData(clone.resources);
 			difficulties = new List<ResourceData>(clone.difficulties.Count);
 
 			for (int i=0; i < clone.difficulties.Count; ++i)
@@ -144,6 +154,8 @@ namespace DotNetMissionSDK.Json
 			color = dataToConcat.color;
 			allies = new int[dataToConcat.allies.Length];
 			System.Array.Copy(dataToConcat.allies, allies, allies.Length);
+
+			resources = ResourceData.Concat(resources, dataToConcat.resources);
 
 			for (int i=0; i < dataToConcat.difficulties.Count; ++i)
 				difficulties[i].Concat(dataToConcat.difficulties[i]);

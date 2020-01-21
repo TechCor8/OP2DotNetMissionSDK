@@ -58,26 +58,37 @@ namespace DotNetMissionSDK
 
 			List<Unit> createdUnits = new List<Unit>();
 
-			// Select mission variant (random)
-			m_SaveData.missionVariantIndex = (byte)TethysGame.GetRandomRange(1, root.missionVariants.Count);
+			// Startup Flags
+			bool isMultiplayer = (int)root.levelDetails.missionType <= -4 && (int)root.levelDetails.missionType >= -8;
+			int localDifficulty = TethysGame.GetPlayer(TethysGame.LocalPlayer()).Difficulty();
 
-			// Combine master variant (index 0) with selected variant. The master variant is always used as a base.
-			MissionVariant missionVariant = MissionVariant.Concat(root.missionVariants[0], root.missionVariants[m_SaveData.missionVariantIndex]);
+			// Select mission variant (random)
+			m_SaveData.missionVariantIndex = (byte)TethysGame.GetRandomRange(0, root.missionVariants.Count);
+
+			// Combine master variant with selected variant. The master variant is always used as a base.
+			MissionVariant missionVariant = root.masterVariant;
+			if (root.missionVariants.Count > 0)
+				missionVariant = MissionVariant.Concat(root.masterVariant, root.missionVariants[m_SaveData.missionVariantIndex]);
+
+			// Combine master gaia resources with difficulty gaia resources
+			GameData tethysGame = missionVariant.tethysGame;
+			if (!isMultiplayer && localDifficulty < missionVariant.tethysDifficulties.Count)
+				tethysGame = GameData.Concat(tethysGame, missionVariant.tethysDifficulties[localDifficulty]);
 
 			// Setup Game
-			TethysGame.SetDaylightEverywhere(missionVariant.tethysGame.daylightEverywhere);
-			TethysGame.SetDaylightMoves(missionVariant.tethysGame.daylightMoves);
-			GameMap.SetInitialLightLevel(missionVariant.tethysGame.initialLightLevel);
+			TethysGame.SetDaylightEverywhere(tethysGame.daylightEverywhere);
+			TethysGame.SetDaylightMoves(tethysGame.daylightMoves);
+			GameMap.SetInitialLightLevel(tethysGame.initialLightLevel);
 
 			// If this is a multiplayer game, use the game-specified light settings
-			if ((int)root.levelDetails.missionType <= -4 && (int)root.levelDetails.missionType >= -8 && !TethysGame.UsesDayNight())
+			if (isMultiplayer && !TethysGame.UsesDayNight())
 				TethysGame.SetDaylightEverywhere(true);
 
-			TethysGame.SetMusicPlayList(missionVariant.tethysGame.musicPlayList.songIDs.Length, missionVariant.tethysGame.musicPlayList.repeatStartIndex, missionVariant.tethysGame.musicPlayList.songIDs);
+			TethysGame.SetMusicPlayList(tethysGame.musicPlayList.songIDs.Length, tethysGame.musicPlayList.repeatStartIndex, tethysGame.musicPlayList.songIDs);
 
 			// Select Beacons
 			List<GameData.Beacon> beacons = new List<GameData.Beacon>();
-			foreach (var group in new List<GameData.Beacon>(missionVariant.tethysGame.beacons).GroupBy(b => b.id))
+			foreach (var group in new List<GameData.Beacon>(tethysGame.beacons).GroupBy(b => b.id))
 			{
 				List<GameData.Beacon> groupBeacons = group.ToList();
 				if (groupBeacons[0].id <= 0)
@@ -100,7 +111,7 @@ namespace DotNetMissionSDK
 
 			// Select markers
 			List<GameData.Marker> markers = new List<GameData.Marker>();
-			foreach (var group in new List<GameData.Marker>(missionVariant.tethysGame.markers).GroupBy(m => m.id))
+			foreach (var group in new List<GameData.Marker>(tethysGame.markers).GroupBy(m => m.id))
 			{
 				List<GameData.Marker> groupMarkers = group.ToList();
 				if (groupMarkers[0].id <= 0)
@@ -123,7 +134,7 @@ namespace DotNetMissionSDK
 
 			// Select wreckage
 			List<GameData.Wreckage> wreckages = new List<GameData.Wreckage>();
-			foreach (var group in new List<GameData.Wreckage>(missionVariant.tethysGame.wreckage).GroupBy(w => w.id))
+			foreach (var group in new List<GameData.Wreckage>(tethysGame.wreckage).GroupBy(w => w.id))
 			{
 				List<GameData.Wreckage> groupWreckage = group.ToList();
 				if (groupWreckage[0].id <= 0)
@@ -137,7 +148,7 @@ namespace DotNetMissionSDK
 			}
 
 			// Create wreckage
-			foreach (GameData.Wreckage wreck in missionVariant.tethysGame.wreckage)
+			foreach (GameData.Wreckage wreck in tethysGame.wreckage)
 			{
 				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.position);
 
@@ -145,7 +156,7 @@ namespace DotNetMissionSDK
 			}
 
 			// Tubes
-			foreach (GameData.WallTube wallTube in missionVariant.tethysGame.wallTubes)
+			foreach (GameData.WallTube wallTube in tethysGame.wallTubes)
 			{
 				LOCATION location = TethysGame.GetMapCoordinates(wallTube.location);
 				TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.typeID);
@@ -155,13 +166,19 @@ namespace DotNetMissionSDK
 			foreach (PlayerData data in missionVariant.players)
 			{
 				Player player = TethysGame.GetPlayer(data.id);
-
-				// Get difficulty, and limit it to the hardest available.
+				
+				// Get difficulty
 				int difficulty = player.Difficulty();
-				if (difficulty >= data.difficulties.Count)
-					difficulty = data.difficulties.Count-1;
 
-				PlayerData.ResourceData resourceData = data.difficulties[difficulty];
+				// If playing single player, all players get assigned the local player's difficulty
+				if (!isMultiplayer && data.id != TethysGame.LocalPlayer())
+					difficulty = localDifficulty;
+
+				PlayerData.ResourceData resourceData = data.resources;
+
+				// Add difficulty resources
+				if (difficulty < data.difficulties.Count)
+					resourceData = PlayerData.ResourceData.Concat(data.resources, data.difficulties[difficulty]);
 
 				// Process resources
 				player.SetTechLevel(resourceData.techLevel);
@@ -175,14 +192,11 @@ namespace DotNetMissionSDK
 					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.id);		break;
 				}
 
-				if ((TethysGame.UsesMorale() || root.levelDetails.missionType == MissionType.Colony) && resourceData.freeMorale)
+				if ((TethysGame.UsesMorale() || !isMultiplayer) && resourceData.freeMorale)
 					TethysGame.FreeMoraleLevel(data.id);
 
 				// Only set player colony type and color if playing single player
-				if (!data.isHuman ||
-					root.levelDetails.missionType == MissionType.Colony ||
-					root.levelDetails.missionType == MissionType.Tutorial ||
-					root.levelDetails.missionType == MissionType.AutoDemo)
+				if (!data.isHuman || !isMultiplayer)
 				{
 					if (data.isEden)
 						player.GoEden();
@@ -477,7 +491,11 @@ namespace DotNetMissionSDK
 		protected virtual void StartMission()
 		{
 			MissionRoot root = m_Root;
-			MissionVariant missionVariant = MissionVariant.Concat(root.missionVariants[0], root.missionVariants[m_SaveData.missionVariantIndex]);
+
+			// Combine master variant with selected variant. The master variant is always used as a base.
+			MissionVariant missionVariant = root.masterVariant;
+			if (root.missionVariants.Count > 0)
+				missionVariant = MissionVariant.Concat(root.masterVariant, root.missionVariants[m_SaveData.missionVariantIndex]);
 
 			for (int i=0; i < missionVariant.players.Count; ++i)
 			{

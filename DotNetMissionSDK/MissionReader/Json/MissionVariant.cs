@@ -10,16 +10,18 @@ namespace DotNetMissionSDK.Json
 	public class MissionVariant
 	{
 		// The internal name of this variant to aid the mission designer.
-		[DataMember(Name = "Name")]				public string name						{ get; set; }
+		[DataMember(Name = "Name")]					public string name							{ get; set; }
 
-		[DataMember(Name = "TethysGame")]		public GameData tethysGame				{ get; set; }
-		[DataMember(Name = "Players")]			public List<PlayerData> players			{ get; set; }
-		[DataMember(Name = "AutoLayouts")]		public List<AutoLayout> layouts			{ get; set; }
+		[DataMember(Name = "TethysGame")]			public GameData tethysGame					{ get; set; }
+		[DataMember(Name = "TethysDifficulties")]	public List<GameData> tethysDifficulties	{ get; set; }
+		[DataMember(Name = "Players")]				public List<PlayerData> players				{ get; set; }
+		[DataMember(Name = "AutoLayouts")]			public List<AutoLayout> layouts				{ get; set; }
 
 
 		public MissionVariant()
 		{
 			tethysGame = new GameData();
+			tethysDifficulties = new List<GameData>();
 			players = new List<PlayerData>(2);
 			layouts = new List<AutoLayout>();
 
@@ -32,8 +34,12 @@ namespace DotNetMissionSDK.Json
 			name = clone.name;
 
 			tethysGame = new GameData(clone.tethysGame);
+			tethysDifficulties = new List<GameData>(clone.tethysDifficulties.Count);
 			players = new List<PlayerData>(clone.players.Count);
 			layouts = new List<AutoLayout>(clone.layouts.Count);
+
+			for (int i=0; i < clone.tethysDifficulties.Count; ++i)
+				tethysDifficulties.Add(new GameData(clone.tethysDifficulties[i]));
 
 			for (int i=0; i < clone.players.Count; ++i)
 				players.Add(new PlayerData(clone.players[i]));
@@ -53,6 +59,9 @@ namespace DotNetMissionSDK.Json
 		{
 			MissionVariant result = new MissionVariant(a);
 			result.tethysGame.Concat(b.tethysGame);
+
+			for (int i=0; i < b.tethysDifficulties.Count; ++i)
+				result.tethysDifficulties[i].Concat(b.tethysDifficulties[i]);
 
 			for (int i=0; i < b.layouts.Count; ++i)
 				result.layouts.Add(new AutoLayout(b.layouts[i]));

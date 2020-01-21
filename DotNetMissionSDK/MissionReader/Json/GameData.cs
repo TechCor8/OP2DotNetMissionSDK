@@ -138,10 +138,19 @@ namespace DotNetMissionSDK.Json
 			initialLightLevel = clone.initialLightLevel;
 
 			musicPlayList = new MusicPlayList(clone.musicPlayList);
-			beacons = new List<Beacon>(clone.beacons);
-			markers = new List<Marker>(clone.markers);
-			wreckage = new List<Wreckage>(clone.wreckage);
-			wallTubes = new List<WallTube>(clone.wallTubes);
+			beacons = new List<Beacon>(clone.beacons.Count);
+			markers = new List<Marker>(clone.markers.Count);
+			wreckage = new List<Wreckage>(clone.wreckage.Count);
+			wallTubes = new List<WallTube>(clone.wallTubes.Count);
+
+			foreach (Beacon beacon in clone.beacons)
+				beacons.Add(new Beacon(beacon));
+			foreach (Marker marker in clone.markers)
+				markers.Add(new Marker(marker));
+			foreach (Wreckage wreck in clone.wreckage)
+				wreckage.Add(new Wreckage(wreck));
+			foreach (WallTube wallTube in clone.wallTubes)
+				wallTubes.Add(new WallTube(wallTube));
 		}
 
 		public void Concat(GameData dataToConcat)
@@ -165,6 +174,13 @@ namespace DotNetMissionSDK.Json
 				wreckage.Add(new Wreckage(wreck));
 			foreach (WallTube wallTube in dataToConcat.wallTubes)
 				wallTubes.Add(new WallTube(wallTube));
+		}
+
+		public static GameData Concat(GameData a, GameData b)
+		{
+			GameData result = new GameData(a);
+			result.Concat(b);
+			return result;
 		}
 	}
 }
