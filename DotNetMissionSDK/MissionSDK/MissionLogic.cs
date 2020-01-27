@@ -155,13 +155,6 @@ namespace DotNetMissionSDK
 				TethysGame.CreateWreck(spawnPt.x, spawnPt.y, wreck.techID, wreck.isVisible);
 			}
 
-			// Tubes
-			foreach (GameData.WallTube wallTube in tethysGame.wallTubes)
-			{
-				LOCATION location = TethysGame.GetMapCoordinates(wallTube.location);
-				TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.typeID);
-			}
-
 			// Setup Players
 			foreach (PlayerData data in missionVariant.players)
 			{
@@ -214,9 +207,11 @@ namespace DotNetMissionSDK
 				foreach (int allyID in data.allies)
 					player.AllyWith(allyID);
 
+				// Set camera position
 				LOCATION centerView = TethysGame.GetMapCoordinates(resourceData.centerView);
 				player.CenterViewOn(centerView.x, centerView.y);
 
+				// Set population
 				player.SetKids(resourceData.kids);
 				player.SetWorkers(resourceData.workers);
 				player.SetScientists(resourceData.scientists);
@@ -225,6 +220,7 @@ namespace DotNetMissionSDK
 				player.SetFoodStored(resourceData.food);
 				player.SetSolarSat(resourceData.solarSatellites);
 
+				// Set completed research
 				foreach (int techID in resourceData.completedResearch)
 					player.MarkResearchComplete(techID);
 
@@ -251,6 +247,13 @@ namespace DotNetMissionSDK
 					Unit unit = unitData.CreateUnit(data.id, spawnPt);
 					
 					createdUnits.Add(unit);
+				}
+
+				// Create walls and tubes
+				foreach (WallTubeData wallTube in resourceData.wallTubes)
+				{
+					LOCATION location = TethysGame.GetMapCoordinates(wallTube.position);
+					TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.typeID);
 				}
 			}
 

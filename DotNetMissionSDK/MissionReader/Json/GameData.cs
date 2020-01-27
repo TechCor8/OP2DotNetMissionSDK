@@ -15,7 +15,6 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "Beacons")]					public List<Beacon> beacons				{ get; set; }
 		[DataMember(Name = "Markers")]					public List<Marker> markers				{ get; set; }
 		[DataMember(Name = "Wreckage")]					public List<Wreckage> wreckage			{ get; set; }
-		[DataMember(Name = "WallTubes")]				public List<WallTube> wallTubes			{ get; set; }
 
 
 		// [Data Classes]
@@ -97,22 +96,6 @@ namespace DotNetMissionSDK.Json
 			}
 		}
 
-		[DataContract]
-		public class WallTube
-		{
-			[DataMember(Name = "TypeID")]				private string m_TypeID					{ get; set; }
-			[DataMember(Name = "Location")]				public DataLocation location			{ get; set; }
-
-			public map_id typeID					{ get { return GetEnum<map_id>(m_TypeID);					} set { m_TypeID = value.ToString();		} }
-
-			public WallTube() { }
-			public WallTube(WallTube clone)
-			{
-				m_TypeID = clone.m_TypeID;
-				location = clone.location;
-			}
-		}
-
 		private static T GetEnum<T>(string val) where T : struct
 		{
 			T result;
@@ -128,7 +111,6 @@ namespace DotNetMissionSDK.Json
 			beacons = new List<Beacon>();
 			markers = new List<Marker>();
 			wreckage = new List<Wreckage>();
-			wallTubes = new List<WallTube>();
 		}
 
 		public GameData(GameData clone)
@@ -141,7 +123,6 @@ namespace DotNetMissionSDK.Json
 			beacons = new List<Beacon>(clone.beacons.Count);
 			markers = new List<Marker>(clone.markers.Count);
 			wreckage = new List<Wreckage>(clone.wreckage.Count);
-			wallTubes = new List<WallTube>(clone.wallTubes.Count);
 
 			foreach (Beacon beacon in clone.beacons)
 				beacons.Add(new Beacon(beacon));
@@ -149,8 +130,6 @@ namespace DotNetMissionSDK.Json
 				markers.Add(new Marker(marker));
 			foreach (Wreckage wreck in clone.wreckage)
 				wreckage.Add(new Wreckage(wreck));
-			foreach (WallTube wallTube in clone.wallTubes)
-				wallTubes.Add(new WallTube(wallTube));
 		}
 
 		public void Concat(GameData dataToConcat)
@@ -164,7 +143,6 @@ namespace DotNetMissionSDK.Json
 			beacons.Capacity = beacons.Count + dataToConcat.beacons.Count;
 			markers.Capacity = markers.Count + dataToConcat.markers.Count;
 			wreckage.Capacity = wreckage.Count + dataToConcat.wreckage.Count;
-			wallTubes.Capacity = wallTubes.Count + dataToConcat.wallTubes.Count;
 
 			foreach (Beacon beacon in dataToConcat.beacons)
 				beacons.Add(new Beacon(beacon));
@@ -172,8 +150,6 @@ namespace DotNetMissionSDK.Json
 				markers.Add(new Marker(marker));
 			foreach (Wreckage wreck in dataToConcat.wreckage)
 				wreckage.Add(new Wreckage(wreck));
-			foreach (WallTube wallTube in dataToConcat.wallTubes)
-				wallTubes.Add(new WallTube(wallTube));
 		}
 
 		public static GameData Concat(GameData a, GameData b)

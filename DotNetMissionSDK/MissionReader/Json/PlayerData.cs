@@ -39,6 +39,7 @@ namespace DotNetMissionSDK.Json
 			[DataMember(Name = "CompletedResearch")]public int[] completedResearch			{ get; set; }
 
 			[DataMember(Name = "Units")]			public List<UnitData> units				{ get; set; }
+			[DataMember(Name = "WallTubes")]		public List<WallTubeData> wallTubes		{ get; set; }
 
 			public MoraleLevel moraleLevel			{ get { return GetEnum<MoraleLevel>(m_MoraleLevel);	} set { m_MoraleLevel = value.ToString();	} }
 
@@ -52,6 +53,13 @@ namespace DotNetMissionSDK.Json
 				food = 1000;
 				completedResearch = new int[0];
 				units = new List<UnitData>();
+				wallTubes = new List<WallTubeData>();
+			}
+
+			[OnDeserializing]
+			private void OnDeserializing(StreamingContext context)
+			{
+				wallTubes = new List<WallTubeData>();
 			}
 
 			public ResourceData(ResourceData clone)
@@ -73,8 +81,12 @@ namespace DotNetMissionSDK.Json
 				System.Array.Copy(clone.completedResearch, completedResearch, completedResearch.Length);
 
 				units = new List<UnitData>(clone.units.Count);
+				wallTubes = new List<WallTubeData>(clone.wallTubes.Count);
+
 				for (int i=0; i < clone.units.Count; ++i)
 					units.Add(new UnitData(clone.units[i]));
+				foreach (WallTubeData wallTube in clone.wallTubes)
+				wallTubes.Add(new WallTubeData(wallTube));
 			}
 
 			public void Concat(ResourceData dataToConcat)
@@ -97,8 +109,13 @@ namespace DotNetMissionSDK.Json
 				System.Array.Copy(dataToConcat.completedResearch, 0, newArr, completedResearch.Length, dataToConcat.techLevel);
 				completedResearch = newArr;
 
+				units.Capacity = units.Count + dataToConcat.units.Count;
+				wallTubes.Capacity = wallTubes.Count + dataToConcat.wallTubes.Count;
+
 				foreach (UnitData unit in dataToConcat.units)
 					units.Add(new UnitData(unit));
+				foreach (WallTubeData wallTube in dataToConcat.wallTubes)
+				wallTubes.Add(new WallTubeData(wallTube));
 			}
 
 			public static ResourceData Concat(ResourceData a, ResourceData b)
