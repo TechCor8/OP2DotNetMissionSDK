@@ -28,7 +28,7 @@ namespace DotNetMissionSDK.Json
 	}
 
 	[DataContract]
-	public class TriggerData
+	public class OP2TriggerData
 	{
 		[DataMember(Name = "ID")]					public int id						{ get; set; }
 		[DataMember(Name = "Type")]					private string m_Type				{ get; set; }

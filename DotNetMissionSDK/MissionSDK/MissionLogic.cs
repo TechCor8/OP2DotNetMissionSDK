@@ -18,7 +18,7 @@ namespace DotNetMissionSDK
 		private TriggerManager m_TriggerManager;
 
 		private List<DisasterData> m_Disasters = new List<DisasterData>();
-		private Dictionary<int, TriggerData> m_TriggerData = new Dictionary<int, TriggerData>();
+		private Dictionary<int, OP2TriggerData> m_TriggerData = new Dictionary<int, OP2TriggerData>();
 
 		
 		/// <summary>
@@ -285,7 +285,7 @@ namespace DotNetMissionSDK
 			InitializeDisasters();
 
 			// Setup Triggers
-			List<TriggerData> triggers = new List<TriggerData>(root.triggers);
+			List<OP2TriggerData> triggers = new List<OP2TriggerData>(root.triggers);
 			Dictionary<int, TriggerStub> triggerLookup = new Dictionary<int, TriggerStub>();
 			int previousCount = 0;
 
@@ -304,7 +304,7 @@ namespace DotNetMissionSDK
 				// Perform a processing pass on the triggers
 				for (int i=0; i < triggers.Count; ++i)
 				{
-					TriggerData data = triggers[i];
+					OP2TriggerData data = triggers[i];
 
 					// Get parent trigger if there is one
 					TriggerStub parentTrigger = null;
@@ -484,7 +484,7 @@ namespace DotNetMissionSDK
 		{
 			m_TriggerData.Clear();
 
-			foreach (TriggerData data in m_Root.triggers)
+			foreach (OP2TriggerData data in m_Root.triggers)
 				m_TriggerData.Add(data.id, data);
 		}
 
@@ -516,7 +516,7 @@ namespace DotNetMissionSDK
 		/// <param name="trigger">The trigger that was executed.</param>
 		protected virtual void OnTriggerExecuted(TriggerStub trigger)
 		{
-			TriggerData data;
+			OP2TriggerData data;
 			if (!m_TriggerData.TryGetValue(trigger.id, out data))
 			{
 				if (trigger.id < TriggerStub.ReservedIDStart)
