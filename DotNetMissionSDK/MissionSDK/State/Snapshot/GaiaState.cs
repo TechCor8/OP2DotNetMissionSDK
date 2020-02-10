@@ -15,12 +15,12 @@ namespace DotNetMissionSDK.State.Snapshot
 		private List<MiningBeaconState> m_Beacons = new List<MiningBeaconState>();
 		private List<MiningBeaconState> m_MagmaVents = new List<MiningBeaconState>();
 		private List<GaiaUnitState> m_Fumaroles = new List<GaiaUnitState>();
-		private List<GaiaUnitState> m_Wreckages = new List<GaiaUnitState>();
+		private List<WreckageState> m_Wreckages = new List<WreckageState>();
 
 		public ReadOnlyCollection<MiningBeaconState> miningBeacons	{ get; private set; }
 		public ReadOnlyCollection<MiningBeaconState> magmaVents		{ get; private set; }
 		public ReadOnlyCollection<GaiaUnitState> fumaroles			{ get; private set; }
-		public ReadOnlyCollection<GaiaUnitState> wreckages			{ get; private set; }
+		public ReadOnlyCollection<WreckageState> wreckages			{ get; private set; }
 
 
 		/// <summary>

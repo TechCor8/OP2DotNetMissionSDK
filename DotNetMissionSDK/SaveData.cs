@@ -21,9 +21,10 @@ namespace DotNetMissionSDK
 
 		// Json Data
 		public byte missionVariantIndex;
+		public EventSystemData eventData;
 
 		// Custom Mission Data
-		[MarshalAs(UnmanagedType.LPStr, SizeConst = 50)]
-		public string testStr;
+		//[MarshalAs(UnmanagedType.LPStr, SizeConst = 50)]
+		//public string testStr;
 	}
 }

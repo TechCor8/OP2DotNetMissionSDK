@@ -10,7 +10,8 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "MasterVariant")]	public MissionVariant masterVariant			{ get; set; }
 		[DataMember(Name = "MissionVariants")]	public List<MissionVariant> missionVariants	{ get; set; }
 		[DataMember(Name = "Disasters")]		public DisasterData[] disasters				{ get; set; }
-		[DataMember(Name = "Triggers")]			public OP2TriggerData[] triggers				{ get; set; }
+		[DataMember(Name = "Triggers")]			public OP2TriggerData[] triggers			{ get; set; }
+		[DataMember(Name = "Regions")]			public List<RegionData> regions				{ get; set; }
 
 		public MissionRoot()
 		{
@@ -19,6 +20,7 @@ namespace DotNetMissionSDK.Json
 			missionVariants = new List<MissionVariant>();
 			disasters = new DisasterData[0];
 			triggers = new OP2TriggerData[0];
+			regions = new List<RegionData>();
 		}
 	}
 }

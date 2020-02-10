@@ -26,6 +26,16 @@ namespace DotNetMissionSDK.State.Snapshot
 		public byte childrenModuleCount		{ get; private set; }
 
 		/// <summary>
+		/// Does not include satellites.
+		/// </summary>
+		public ushort moduleCount			{ get; private set; }
+
+		/// <summary>
+		/// Module and satellite count.
+		/// </summary>
+		public ushort count					{ get; private set; }
+
+		/// <summary>
 		/// A 0-1 value of how close the starship is to completion. Does not include children module.
 		/// </summary>
 		public float progress				{ get; private set; }
@@ -53,6 +63,27 @@ namespace DotNetMissionSDK.State.Snapshot
 			foodCargoCount					= starship.foodCargoCount;
 			evacuationModuleCount			= starship.evacuationModuleCount;
 			childrenModuleCount				= starship.childrenModuleCount;
+
+			moduleCount = ionDriveModuleCount;
+			moduleCount += fusionDriveModuleCount;
+			moduleCount += commandModuleCount;
+			moduleCount += fuelingSystemsCount;
+			moduleCount += habitatRingCount;
+			moduleCount += sensorPackageCount;
+			moduleCount += skydockCount;
+			moduleCount += stasisSystemsCount;
+			moduleCount += orbitalPackageCount;
+			moduleCount += phoenixModuleCount;
+
+			moduleCount += rareMetalsCargoCount;
+			moduleCount += commonMetalsCargoCount;
+			moduleCount += foodCargoCount;
+			moduleCount += evacuationModuleCount;
+			moduleCount += childrenModuleCount;
+
+			count = moduleCount;
+			count += EDWARDSatelliteCount;
+			count += solarSatelliteCount;
 
 			int partsCount = Math.Min(ionDriveModuleCount, (byte)1);
 			partsCount += Math.Min(fusionDriveModuleCount, (byte)1);
