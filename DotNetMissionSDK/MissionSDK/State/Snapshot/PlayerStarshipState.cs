@@ -102,7 +102,33 @@ namespace DotNetMissionSDK.State.Snapshot
 			partsCount += Math.Min(evacuationModuleCount, (byte)1);
 
 			progress = partsCount / 14.0f;
+		}
 
+		public byte GetCountByID(map_id moduleID)
+		{
+			switch (moduleID)
+			{
+				case map_id.EDWARDSatellite:	return EDWARDSatelliteCount;
+				case map_id.SolarSatellite:		return solarSatelliteCount;
+				case map_id.IonDriveModule:		return ionDriveModuleCount;
+				case map_id.FusionDriveModule:	return fusionDriveModuleCount;
+				case map_id.CommandModule:		return commandModuleCount;
+				case map_id.FuelingSystems:		return fuelingSystemsCount;
+				case map_id.HabitatRing:		return habitatRingCount;
+				case map_id.SensorPackage:		return sensorPackageCount;
+				case map_id.Skydock:			return skydockCount;
+				case map_id.StasisSystems:		return stasisSystemsCount;
+				case map_id.OrbitalPackage:		return orbitalPackageCount;
+				case map_id.PhoenixModule:		return phoenixModuleCount;
+
+				case map_id.RareMetalsCargo:	return rareMetalsCargoCount;
+				case map_id.CommonMetalsCargo:	return commonMetalsCargoCount;
+				case map_id.FoodCargo:			return foodCargoCount;
+				case map_id.EvacuationModule:	return evacuationModuleCount;
+				case map_id.ChildrenModule:		return childrenModuleCount;
+			}
+
+			return 0;
 		}
 	}
 }

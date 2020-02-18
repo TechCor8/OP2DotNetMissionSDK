@@ -16,6 +16,7 @@ namespace DotNetMissionSDK
 		private BotPlayer[] m_BotPlayer = new BotPlayer[8];
 
 		private TriggerManager m_TriggerManager;
+		private EventSystem m_EventSystem;
 
 		private List<DisasterData> m_Disasters = new List<DisasterData>();
 		private Dictionary<int, OP2TriggerData> m_TriggerData = new Dictionary<int, OP2TriggerData>();
@@ -37,6 +38,8 @@ namespace DotNetMissionSDK
 
 			// Initialize game state
 			GameState.Initialize(triggerManager, saveData);
+
+			m_EventSystem = new EventSystem(saveData, root);
 		}
 
 		/// <summary>
@@ -66,14 +69,8 @@ namespace DotNetMissionSDK
 			m_SaveData.missionVariantIndex = (byte)TethysGame.GetRandomRange(0, root.missionVariants.Count);
 
 			// Combine master variant with selected variant. The master variant is always used as a base.
-			MissionVariant missionVariant = root.masterVariant;
-			if (root.missionVariants.Count > 0)
-				missionVariant = MissionVariant.Concat(root.masterVariant, root.missionVariants[m_SaveData.missionVariantIndex]);
-
-			// Combine master gaia resources with difficulty gaia resources
+			MissionVariant missionVariant = GetCombinedDifficultyVariant(root);
 			GameData tethysGame = missionVariant.tethysGame;
-			if (!isMultiplayer && localDifficulty < missionVariant.tethysDifficulties.Count)
-				tethysGame = GameData.Concat(tethysGame, missionVariant.tethysDifficulties[localDifficulty]);
 
 			// Setup Game
 			TethysGame.SetDaylightEverywhere(tethysGame.daylightEverywhere);
@@ -106,7 +103,8 @@ namespace DotNetMissionSDK
 			{
 				LOCATION spawnPt = TethysGame.GetMapCoordinates(beacon.position);
 
-				TethysGame.CreateBeacon(beacon.mapID, spawnPt.x, spawnPt.y, beacon.oreType, beacon.barYield, beacon.barVariant);
+				int stubIndex = TethysGame.CreateBeacon(beacon.mapID, spawnPt.x, spawnPt.y, beacon.oreType, beacon.barYield, beacon.barVariant);
+				SetUnitID(beacon.id, stubIndex);
 			}
 
 			// Select markers
@@ -130,6 +128,7 @@ namespace DotNetMissionSDK
 				LOCATION spawnPt = TethysGame.GetMapCoordinates(marker.position);
 
 				Unit unit = TethysGame.PlaceMarker(spawnPt.x, spawnPt.y, marker.markerType);
+				SetUnitID(marker.id, unit.GetStubIndex());
 			}
 
 			// Select wreckage
@@ -159,20 +158,8 @@ namespace DotNetMissionSDK
 			foreach (PlayerData data in missionVariant.players)
 			{
 				Player player = TethysGame.GetPlayer(data.id);
-				
-				// Get difficulty
-				int difficulty = player.Difficulty();
-
-				// If playing single player, all players get assigned the local player's difficulty
-				if (!isMultiplayer && data.id != TethysGame.LocalPlayer())
-					difficulty = localDifficulty;
-
 				PlayerData.ResourceData resourceData = data.resources;
-
-				// Add difficulty resources
-				if (difficulty < data.difficulties.Count)
-					resourceData = PlayerData.ResourceData.Concat(data.resources, data.difficulties[difficulty]);
-
+				
 				// Process resources
 				player.SetTechLevel(resourceData.techLevel);
 
@@ -245,7 +232,7 @@ namespace DotNetMissionSDK
 					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.position);
 
 					Unit unit = unitData.CreateUnit(data.id, spawnPt);
-					
+					SetUnitID(data.id, unit.GetStubIndex());
 					createdUnits.Add(unit);
 				}
 
@@ -442,9 +429,23 @@ namespace DotNetMissionSDK
 
 			CreateTriggerDataLookupTable();
 
+			m_EventSystem.NewMission(missionVariant);
+
 			StartMission();
 
 			return true;
+		}
+
+		private void SetUnitID(int triggerUnitID, int stubIndex)
+		{
+			if (triggerUnitID < 0) return;
+			if (triggerUnitID >= m_SaveData.eventData.unitIDs.Length)
+			{
+				Console.WriteLine("Unit ID out of range: " + triggerUnitID);
+				return;
+			}
+
+			m_SaveData.eventData.unitIDs[triggerUnitID] = stubIndex;
 		}
 
 		/// <summary>
@@ -456,6 +457,10 @@ namespace DotNetMissionSDK
 
 			InitializeDisasters();
 			CreateTriggerDataLookupTable();
+
+			MissionVariant missionVariant = GetCombinedDifficultyVariant(m_Root);
+
+			m_EventSystem.LoadMission(missionVariant);
 
 			StartMission();
 		}
@@ -488,18 +493,48 @@ namespace DotNetMissionSDK
 				m_TriggerData.Add(data.id, data);
 		}
 
-		/// <summary>
-		/// Called when the mission has finished initializing, regardless of whether it is a new game or saved game.
-		/// </summary>
-		protected virtual void StartMission()
+		private MissionVariant GetCombinedDifficultyVariant(MissionRoot root)
 		{
-			MissionRoot root = m_Root;
-
 			// Combine master variant with selected variant. The master variant is always used as a base.
 			MissionVariant missionVariant = root.masterVariant;
 			if (root.missionVariants.Count > 0)
 				missionVariant = MissionVariant.Concat(root.masterVariant, root.missionVariants[m_SaveData.missionVariantIndex]);
 
+			// Startup Flags
+			bool isMultiplayer = (int)root.levelDetails.missionType <= -4 && (int)root.levelDetails.missionType >= -8;
+			int localDifficulty = TethysGame.GetPlayer(TethysGame.LocalPlayer()).Difficulty();
+
+			// Combine master gaia resources with difficulty gaia resources
+			if (!isMultiplayer && localDifficulty < missionVariant.tethysDifficulties.Count)
+				missionVariant.tethysGame = GameData.Concat(missionVariant.tethysGame, missionVariant.tethysDifficulties[localDifficulty]);
+
+			foreach (PlayerData data in missionVariant.players)
+			{
+				Player player = TethysGame.GetPlayer(data.id);
+
+				// Get difficulty
+				int difficulty = player.Difficulty();
+
+				// If playing single player, all players get assigned the local player's difficulty
+				if (!isMultiplayer && data.id != TethysGame.LocalPlayer())
+					difficulty = localDifficulty;
+
+				// Add difficulty resources
+				if (difficulty < data.difficulties.Count)
+					data.resources = PlayerData.ResourceData.Concat(data.resources, data.difficulties[difficulty]);
+			}
+
+			return missionVariant;
+		}
+
+		/// <summary>
+		/// Called when the mission has finished initializing, regardless of whether it is a new game or saved game.
+		/// </summary>
+		protected virtual void StartMission()
+		{
+			MissionVariant missionVariant = GetCombinedDifficultyVariant(m_Root);
+
+			// Initialize bots
 			for (int i=0; i < missionVariant.players.Count; ++i)
 			{
 				if (missionVariant.players[i].botType == BotType.None)
@@ -508,6 +543,9 @@ namespace DotNetMissionSDK
 				m_BotPlayer[i] = new BotPlayer(missionVariant.players[i].botType, i);
 				m_BotPlayer[i].Start();
 			}
+
+			// Start event system
+			m_EventSystem.StartMission(StateSnapshot.Create(), m_BotPlayer);
 		}
 
 		/// <summary>

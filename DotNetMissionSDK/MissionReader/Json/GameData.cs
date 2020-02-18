@@ -16,6 +16,8 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "Markers")]					public List<Marker> markers				{ get; set; }
 		[DataMember(Name = "Wreckage")]					public List<Wreckage> wreckage			{ get; set; }
 
+		[DataMember(Name = "Triggers")]					public List<TriggerData> triggers		{ get; set; }
+
 
 		// [Data Classes]
 		[DataContract]
@@ -111,6 +113,13 @@ namespace DotNetMissionSDK.Json
 			beacons = new List<Beacon>();
 			markers = new List<Marker>();
 			wreckage = new List<Wreckage>();
+			triggers = new List<TriggerData>();
+		}
+
+		[OnDeserializing]
+		private void OnDeserializing(StreamingContext context)
+		{
+			triggers = new List<TriggerData>();
 		}
 
 		public GameData(GameData clone)
@@ -123,6 +132,7 @@ namespace DotNetMissionSDK.Json
 			beacons = new List<Beacon>(clone.beacons.Count);
 			markers = new List<Marker>(clone.markers.Count);
 			wreckage = new List<Wreckage>(clone.wreckage.Count);
+			triggers = new List<TriggerData>(clone.triggers.Count);
 
 			foreach (Beacon beacon in clone.beacons)
 				beacons.Add(new Beacon(beacon));
@@ -130,6 +140,8 @@ namespace DotNetMissionSDK.Json
 				markers.Add(new Marker(marker));
 			foreach (Wreckage wreck in clone.wreckage)
 				wreckage.Add(new Wreckage(wreck));
+			foreach (TriggerData trigger in clone.triggers)
+				triggers.Add(new TriggerData(trigger));
 		}
 
 		public void Concat(GameData dataToConcat)
@@ -143,6 +155,7 @@ namespace DotNetMissionSDK.Json
 			beacons.Capacity = beacons.Count + dataToConcat.beacons.Count;
 			markers.Capacity = markers.Count + dataToConcat.markers.Count;
 			wreckage.Capacity = wreckage.Count + dataToConcat.wreckage.Count;
+			triggers.Capacity = triggers.Count + dataToConcat.triggers.Count;
 
 			foreach (Beacon beacon in dataToConcat.beacons)
 				beacons.Add(new Beacon(beacon));
@@ -150,6 +163,8 @@ namespace DotNetMissionSDK.Json
 				markers.Add(new Marker(marker));
 			foreach (Wreckage wreck in dataToConcat.wreckage)
 				wreckage.Add(new Wreckage(wreck));
+			foreach (TriggerData trigger in dataToConcat.triggers)
+				triggers.Add(new TriggerData(trigger));
 		}
 
 		public static GameData Concat(GameData a, GameData b)

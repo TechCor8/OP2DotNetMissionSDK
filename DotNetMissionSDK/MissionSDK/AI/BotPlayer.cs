@@ -23,7 +23,7 @@ namespace DotNetMissionSDK.AI
 
 	public class BotPlayer
 	{
-		public BotType botType						{ get; private set; }
+		public BotType botType						{ get; set; }
 		/*
 		// Customizable Flags - Can be changed while bot is active.
 		public bool canResearchOptionalStructures = true;   // If true, bot will research recreational/forum, GORF, DIRT, consumer factory and other optional structures.

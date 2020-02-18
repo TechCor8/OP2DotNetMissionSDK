@@ -22,5 +22,11 @@ namespace DotNetMissionSDK.Json
 			triggers = new OP2TriggerData[0];
 			regions = new List<RegionData>();
 		}
+
+		[OnDeserializing]
+		private void OnDeserializing(StreamingContext context)
+		{
+			regions = new List<RegionData>();
+		}
 	}
 }

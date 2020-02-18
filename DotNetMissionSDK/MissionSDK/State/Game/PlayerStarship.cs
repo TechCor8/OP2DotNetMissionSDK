@@ -59,8 +59,8 @@ namespace DotNetMissionSDK.State.Game
 		private int m_PlayerID;
 
 		// Starship module counts
-		public byte EDWARDSatelliteCount	{ get { return m_SaveData.EDWARDSatelliteCount;		} }
-		public byte solarSatelliteCount		{ get { return m_SaveData.solarSatelliteCount;		} }
+		public byte EDWARDSatelliteCount	{ get { return (byte)GameState.players[m_PlayerID].GetEDWARDSatelliteCount();		} }
+		public byte solarSatelliteCount		{ get { return (byte)GameState.players[m_PlayerID].GetSolarSatelliteCount();		} }
 		public byte ionDriveModuleCount		{ get { return m_SaveData.ionDriveModuleCount;		} }
 		public byte fusionDriveModuleCount	{ get { return m_SaveData.fusionDriveModuleCount;	} }
 		public byte commandModuleCount		{ get { return m_SaveData.commandModuleCount;		} }

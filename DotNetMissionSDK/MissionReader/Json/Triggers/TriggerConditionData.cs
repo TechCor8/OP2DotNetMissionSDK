@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using DotNetMissionSDK.HFL;
+using System.Runtime.Serialization;
 
 namespace DotNetMissionSDK.Json
 {
@@ -24,7 +25,8 @@ namespace DotNetMissionSDK.Json
 		PlayerFood,						// [Any/All/CurrentPlayer/Player#] food [comparison] [quantity]
 		PlayerVehicleCount,				// [Any/All/CurrentPlayer/Player#] vehicle count [comparison] [quantity]
 		PlayerUnitsInRegion,			// [Any/All/CurrentPlayer/Player#] has [comparison] [quantity] [Any/Category/UnitType] in region [Anywhere/name]
-		PlayerKitsInRegion,				// [Any/All/CurrentPlayer/Player#] has [comparison] [quantity] [UnitType] kits in region [Anywhere/name]
+		PlayerConvecsWithKitInRegion,	// [Any/All/CurrentPlayer/Player#] has [comparison] [quantity] convecs with a [UnitType] kit in region [Anywhere/name]
+		PlayerTrucksWithCargoInRegion,	// [Any/All/CurrentPlayer/Player#] has [comparison] [quantity] trucks with [TruckCargo] cargo in region [Anywhere/name]
 		PlayerMorale,					// [Any/All/CurrentPlayer/Player#] morale is [comparison] [Terrible/Poor/Fair/Good/Excellent]
 		PlayerResearch,					// [Any/All/CurrentPlayer/Player#] [has/does not have] technology [TopicID]
 		PlayerAvailableWorkers,			// [Any/All/CurrentPlayer/Player#] available workers [comparison] [quantity]
@@ -62,11 +64,12 @@ namespace DotNetMissionSDK.Json
 		PlayerStarshipProgress,			// [Any/All/CurrentPlayer/Player#] starship progress [comparison] [quantity]
 		
 		UnitID=2000,					// [CurrentUnit] is [UnitID]
+		UnitOwnerID,					// [CurrentUnit/UnitID] is owned by [Player#]
 		UnitType,						// [CurrentUnit/UnitID] [is/is not] [UnitType]
 		UnitBusy,						// [CurrentUnit/UnitID] [is/is not] busy
 		UnitEMPed,						// [CurrentUnit/UnitID] [is/is not] EMPed
-		UnitEnabled,					// [CurrentUnit/UnitID] [is/is not] enabled
-		UnitDisabled,					// [CurrentUnit/UnitID] [is/is not] disabled
+		StructureEnabled,				// [CurrentUnit/UnitID] [is/is not] enabled
+		StructureDisabled,				// [CurrentUnit/UnitID] [is/is not] disabled
 		UnitPositionX,					// [CurrentUnit/UnitID] position X [comparison] [value]
 		UnitPositionY,					// [CurrentUnit/UnitID] position Y [comparison] [value]
 		UnitHealth,						// [CurrentUnit/UnitID] health [comparison] [value]
@@ -85,14 +88,15 @@ namespace DotNetMissionSDK.Json
 		StructureWorkers,				// [CurrentUnit/UnitID] [has/does not have] workers
 		StructureScientists,			// [CurrentUnit/UnitID] [has/does not have] scientists
 		StructureInfected,				// [CurrentUnit/UnitID] [is/is not] infected
-		BeaconTruckLoadsSoFar,			// [UnitID] beacon truck loads so far [comparison] [quantity]
-		BeaconSurveyedByPlayer,			// [UnitID] beacon surveyed by [CurrentPlayer/Player#]
 		LabResearchTopic,				// [CurrentUnit/UnitID] lab [is/is not] researching [TopicID]
 		LabScientistCount,				// [CurrentUnit/UnitID] lab scientist count [comparison] [quantity]
 		UnitHasWeapon,					// [CurrentUnit/UnitID] [has/does not have] weapon
 		StructureHasEmptyBay,			// [CurrentUnit/UnitID] [has/does not have] empty bay
 		StructureHasBayWithCargo,		// [CurrentUnit/UnitID] [has/does not have] bay with cargo [map_id]
 		UnitInRegion,					// [CurrentUnit/UnitID] is in [region]
+
+		BeaconTruckLoadsSoFar=3000,		// [UnitID] beacon truck loads so far [comparison] [quantity]
+		BeaconSurveyedByPlayer,			// [UnitID] beacon surveyed by [CurrentPlayer/Player#]
 	}
 
 	[DataContract]
@@ -100,34 +104,139 @@ namespace DotNetMissionSDK.Json
 	{
 		[DataMember(Name = "Type")]					private string m_Type				{ get; set; }
 		[DataMember(Name = "Subject")]				public string subject				{ get; set; } // TriggerPlayerCategory, TriggerUnitCategory, Switch#
-		[DataMember(Name = "Comparison")]			public string m_Comparison			{ get; set; }
+		[DataMember(Name = "Comparison")]			private string m_Comparison			{ get; set; }
 
 		[DataMember(Name = "Value")]				public string value					{ get; set; } // Quantity, Value, TopicID, Colony, Difficulty, Morale, Region, etc.
 		[DataMember(Name = "Value2")]				public string value2				{ get; set; } // Secondary value used by some conditions
+		[DataMember(Name = "Value3")]				public string value3				{ get; set; } // Secondary value used by some conditions
 
 
 		public TriggerConditionType type						{ get { return GetEnum<TriggerConditionType>(m_Type);		} set { m_Type = value.ToString();				} }
 		public TriggerCompare comparison						{ get { return GetEnum<TriggerCompare>(m_Comparison);		} set { m_Comparison = value.ToString();		} }
 
+
 		// Integer subject and values
-		public int GetIntegerSubject()							{ int result; int.TryParse(subject, out result);	return result;		}
+		/*public int GetIntegerSubject()							{ int result; int.TryParse(subject, out result);	return result;		}
 		public int GetIntegerValue()							{ int result; int.TryParse(value, out result);		return result;		}
 		public int GetIntegerValue2()							{ int result; int.TryParse(value2, out result);		return result;		}
+		public int GetIntegerValue3()							{ int result; int.TryParse(value3, out result);		return result;		}*/
 
 		// Parse subject as enum and return as integer
-		public int GetSubjectAsPlayerCategory()					{ return GetEnumOrInt<TriggerPlayerCategory>(subject);					}
+		/*public int GetSubjectAsPlayerCategory()					{ return GetEnumOrInt<TriggerPlayerCategory>(subject);					}
 		public int GetSubjectAsUnitCategory()					{ return GetEnumOrInt<TriggerUnitCategory>(subject);					}
 
 		// Parse value as enum
+		public TriggerPlayerCategory GetValueAsPlayerCategory()	{ return GetEnum<TriggerPlayerCategory>(value);							}
 		public PlayerDifficulty GetValueAsPlayerDifficulty()	{ return GetEnum<PlayerDifficulty>(value);								}
-		public TriggerColonyType GetValueAsPlayerColonyType()	{ return GetEnum<TriggerColonyType>(value);								}
-		public MoraleLevel GetValueAsPlayerMorale()				{ return GetEnum<MoraleLevel>(value);									}
+		public TriggerColonyType GetValueAsColonyType()			{ return GetEnum<TriggerColonyType>(value);								}
+		public MoraleLevel GetValueAsMorale()					{ return GetEnum<MoraleLevel>(value);									}
 		public TruckCargo GetValueAsTruckCargo()				{ return GetEnum<TruckCargo>(value);									}
+		public CommandType GetValueAsCommandType()				{ return GetEnum<CommandType>(value);									}
+		public ActionType GetValueAsActionType()				{ return GetEnum<ActionType>(value);									}
 		public map_id GetValueAsMapID()							{ return GetEnum<map_id>(value);										}
-		public int GetValueAsRegion()							{ return GetEnumOrInt<map_id>(value);									}
+		public int GetValueAsRegion()							{ return GetEnumOrInt<TriggerRegion>(value);							}*/
 
 		// Parse value2 as enum
-		public map_id GetValue2AsMapID()						{ return GetEnum<map_id>(value);										}
+		/*public map_id GetValue2AsMapID()						{ return GetEnum<map_id>(value2);										}
+
+		// Parse value 3 as enum
+		public int GetValue3AsRegion()							{ return GetEnumOrInt<TriggerRegion>(value3);							}*/
+
+
+		public TriggerValueType GetSubjectType()
+		{
+			if ((int)type >= 1000 && (int)type < 2000) return TriggerValueType.PlayerCategory;
+			if ((int)type >= 2000 && (int)type < 3000) return TriggerValueType.UnitCategory;
+			return TriggerValueType.Integer;
+		}
+
+		/*public int GetSubjectAsInt()
+		{
+			switch (GetSubjectType())
+			{
+				case TriggerValueType.PlayerCategory:	return GetSubjectAsPlayerCategory();
+				case TriggerValueType.UnitCategory:	return GetSubjectAsUnitCategory();
+			}
+
+			return GetIntegerSubject();
+		}*/
+
+		public TriggerValueType GetValueType()
+		{
+			switch (type)
+			{
+				case TriggerConditionType.CurrentRegion:				return TriggerValueType.Region;
+				case TriggerConditionType.PlayerDifficulty:				return TriggerValueType.Difficulty;
+				case TriggerConditionType.PlayerColony:					return TriggerValueType.ColonyType;
+				case TriggerConditionType.PlayerMorale:					return TriggerValueType.MoraleLevel;
+				case TriggerConditionType.PlayerHasVehicle:				return TriggerValueType.MapID;
+				case TriggerConditionType.PlayerStarshipModuleDeployed:	return TriggerValueType.MapID;
+				case TriggerConditionType.UnitType:						return TriggerValueType.MapID;
+				case TriggerConditionType.ConvecKitType:				return TriggerValueType.MapID;
+				case TriggerConditionType.TruckCargoType:				return TriggerValueType.TruckCargo;
+				case TriggerConditionType.UnitWeapon:					return TriggerValueType.MapID;
+				case TriggerConditionType.UnitLastCommand:				return TriggerValueType.Command;
+				case TriggerConditionType.UnitCurrentAction:			return TriggerValueType.Action;
+				case TriggerConditionType.SpaceportLaunchpadCargo:		return TriggerValueType.MapID;
+				case TriggerConditionType.BeaconSurveyedByPlayer:		return TriggerValueType.PlayerCategory;
+				case TriggerConditionType.StructureHasBayWithCargo:		return TriggerValueType.MapID;
+				case TriggerConditionType.UnitInRegion:					return TriggerValueType.Region;
+			}
+			
+			return TriggerValueType.Integer;
+		}
+
+		/*public int GetValueAsInt()
+		{
+			switch (GetValueType())
+			{
+				case TriggerValueType.Region:			return GetValueAsRegion();
+				case TriggerValueType.Difficulty:		return (int)GetValueAsPlayerDifficulty();
+				case TriggerValueType.ColonyType:		return (int)GetValueAsColonyType();
+				case TriggerValueType.MoraleLevel:		return (int)GetValueAsMorale();
+				case TriggerValueType.MapID:			return (int)GetValueAsMapID();
+				case TriggerValueType.TruckCargo:		return (int)GetValueAsTruckCargo();
+				case TriggerValueType.Command:			return (int)GetValueAsCommandType();
+				case TriggerValueType.Action:			return (int)GetValueAsActionType();
+				case TriggerValueType.PlayerCategory:	return (int)GetValueAsPlayerCategory();
+			}
+
+			return GetIntegerValue();
+		}*/
+
+		public TriggerValueType GetValue2Type()
+		{
+			switch (type)
+			{
+				case TriggerConditionType.PlayerHasVehicle:					return TriggerValueType.MapID;
+				case TriggerConditionType.PlayerUnitsInRegion:				return TriggerValueType.MapID;
+				case TriggerConditionType.PlayerConvecsWithKitInRegion:		return TriggerValueType.MapID;
+				case TriggerConditionType.PlayerTrucksWithCargoInRegion:	return TriggerValueType.TruckCargo;
+			}
+			
+			return TriggerValueType.Integer;
+		}
+
+		/*public int GetValue2AsInt()
+		{
+			switch (GetValueType())
+			{
+				case TriggerValueType.MapID:			return (int)GetValue2AsMapID();
+			}
+
+			return GetIntegerValue2();
+		}*/
+
+		public TriggerValueType GetValue3Type()
+		{
+			return TriggerValueType.Region;
+		}
+
+		/*public int GetValue3AsInt()
+		{
+			return GetValue3AsRegion();
+		}*/
+
 
 		public TriggerConditionData()
 		{
@@ -141,6 +250,7 @@ namespace DotNetMissionSDK.Json
 
 			value = clone.value;
 			value2 = clone.value2;
+			value3 = clone.value3;
 		}
 
 		private int GetEnumOrInt<T>(string val) where T : struct

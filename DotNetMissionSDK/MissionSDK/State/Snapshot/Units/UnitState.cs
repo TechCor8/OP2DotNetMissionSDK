@@ -17,7 +17,7 @@ namespace DotNetMissionSDK.State.Snapshot.Units
 		public bool isBuilding				{ get; private set; }
 		public bool isVehicle				{ get; private set; }
 		public bool isBusy					{ get; private set; }
-		//public bool isLive					{ get; private set; }
+		public bool isLive					{ get; private set; }
 
 		public LOCATION position			{ get; private set; }
 
@@ -61,7 +61,7 @@ namespace DotNetMissionSDK.State.Snapshot.Units
 			isBuilding		= unit.IsBuilding();
 			isVehicle		= unit.IsVehicle();
 			isBusy			= unit.IsBusy();
-			//isLive			= unit.IsLive();
+			isLive			= unit.IsLive();
 
 			position		= unit.GetPosition();
 

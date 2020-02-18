@@ -41,6 +41,8 @@ namespace DotNetMissionSDK.Json
 			[DataMember(Name = "Units")]			public List<UnitData> units				{ get; set; }
 			[DataMember(Name = "WallTubes")]		public List<WallTubeData> wallTubes		{ get; set; }
 
+			[DataMember(Name = "Triggers")]			public List<TriggerData> triggers		{ get; set; }
+
 			public MoraleLevel moraleLevel			{ get { return GetEnum<MoraleLevel>(m_MoraleLevel);	} set { m_MoraleLevel = value.ToString();	} }
 
 			public ResourceData()
@@ -54,12 +56,14 @@ namespace DotNetMissionSDK.Json
 				completedResearch = new int[0];
 				units = new List<UnitData>();
 				wallTubes = new List<WallTubeData>();
+				triggers = new List<TriggerData>();
 			}
 
 			[OnDeserializing]
 			private void OnDeserializing(StreamingContext context)
 			{
 				wallTubes = new List<WallTubeData>();
+				triggers = new List<TriggerData>();
 			}
 
 			public ResourceData(ResourceData clone)
@@ -82,11 +86,14 @@ namespace DotNetMissionSDK.Json
 
 				units = new List<UnitData>(clone.units.Count);
 				wallTubes = new List<WallTubeData>(clone.wallTubes.Count);
+				triggers = new List<TriggerData>(clone.triggers.Count);
 
 				for (int i=0; i < clone.units.Count; ++i)
 					units.Add(new UnitData(clone.units[i]));
 				foreach (WallTubeData wallTube in clone.wallTubes)
 				wallTubes.Add(new WallTubeData(wallTube));
+				foreach (TriggerData trigger in clone.triggers)
+					triggers.Add(new TriggerData(trigger));
 			}
 
 			public void Concat(ResourceData dataToConcat)
@@ -111,11 +118,14 @@ namespace DotNetMissionSDK.Json
 
 				units.Capacity = units.Count + dataToConcat.units.Count;
 				wallTubes.Capacity = wallTubes.Count + dataToConcat.wallTubes.Count;
+				triggers.Capacity = triggers.Count + dataToConcat.triggers.Count;
 
 				foreach (UnitData unit in dataToConcat.units)
 					units.Add(new UnitData(unit));
 				foreach (WallTubeData wallTube in dataToConcat.wallTubes)
 				wallTubes.Add(new WallTubeData(wallTube));
+				foreach (TriggerData trigger in dataToConcat.triggers)
+					triggers.Add(new TriggerData(trigger));
 			}
 
 			public static ResourceData Concat(ResourceData a, ResourceData b)
