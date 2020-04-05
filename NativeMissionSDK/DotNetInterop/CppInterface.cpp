@@ -66,23 +66,13 @@ namespace DotNetInterop
 		}
 	};
 
-	bool Attach(const char* dllPath, bool useCustomDLL)
+	bool Attach(const char* dllPath, const char* sdkPath)
 	{
 		String^ strDllPath = ToManagedString(dllPath);
-		String^ dotNetPath;
+		String^ dotNetPath = ToManagedString(sdkPath);
 
-		if (useCustomDLL)
-		{
-			// Custom mission DLL based on the native plugin name
-			dotNetPath = Path::Combine(Path::GetDirectoryName(strDllPath), Path::GetFileNameWithoutExtension(strDllPath));
-			dotNetPath += "_DotNet.dll";
-		}
-		else
-		{
-			// Common Interop DLL
-			dotNetPath = Path::Combine(Path::GetDirectoryName(strDllPath), "DotNetMissionSDK.dll");
-		}
-		
+		dotNetPath = Path::Combine(Path::GetDirectoryName(strDllPath), dotNetPath);
+
 		// Load DLL and create mission entry instance
 		if (!DotNetMissionDLL::Load(dotNetPath))
 			return false;

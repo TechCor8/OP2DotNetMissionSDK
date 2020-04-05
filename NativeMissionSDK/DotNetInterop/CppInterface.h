@@ -15,7 +15,7 @@ namespace DotNetInterop
 	// Calls .NET library Attach.
 	// Called when DLL is loaded.
 	// Returns true on success.
-	EXPORT_SPEC bool Attach(const char* dllPath, bool useCustomDLL);
+	EXPORT_SPEC bool Attach(const char* dllPath, const char* sdkPath);
 
 	// Calls .NET library Initialize.
 	// Called when the mission is first loaded.
