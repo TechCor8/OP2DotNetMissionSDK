@@ -13,14 +13,17 @@
 //		 See RequiredExports.h for more details.
 //		 ** Be sure to set these when you build your own level**
 // Required data exports  (Description, Map, TechTree, GameType, NumPlayers)
-ExportLevelDetails("6P, LoS, '<map name>'", /*"newworld.map"*/"on6_01.map", "MULTITEK.TXT", Colony, 6)
+ExportLevelDetails("LevelDescXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+	"MapFileXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+	"TechFileXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+	Colony, 6)
+//ExportLevelDetails("6P, LoS, '<map name>'", /*"newworld.map"*/"on6_01.map", "MULTITEK.TXT", Colony, 6)
 // Alternative style:
 // Required data exports  (Description, Map, TechTree, GameType, NumPlayers, maxTechLevel, bUnitOnlyMission)
 //ExportLevelDetailsEx("6P, LoS, '<map name>'", "on6_01.map", "MULTITEK.TXT", MultiLastOneStanding, 6, 12, false)
 
-// Set to true to have the DotNetInterop call [NativePluginName]_DotNet.dll (for custom C# missions).
-// Set to false to have the DotNetInterop call DotNetMissionSDK.dll (for JSON missions).
-#define USE_CUSTOM_DLL false
+// Set this to the file name of your custom C# DLL, or set it to the common DLL version you wish to use.
+Export const char SdkPath[] = "DotNetMissionSDKXXXXXXXXXXXXXXX";
 
 static bool CLR_INIT = false;
 static char* moduleFileName;
@@ -30,7 +33,7 @@ bool Attach()
 {
 	CLR_INIT = true;
 
-	return DotNetInterop::Attach(moduleFileName, USE_CUSTOM_DLL);
+	return DotNetInterop::Attach(moduleFileName, SdkPath);
 }
 
 Export void __cdecl GetSaveRegions(struct BufferDesc &bufDesc)
