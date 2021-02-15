@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 namespace DotNetMissionSDK.Triggers
 {
 	[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Pack=1)]
-	public class EventSystemData
+	public struct EventSystemData
 	{
 		public int gameMark;
 		public int gameTick;
@@ -31,7 +31,7 @@ namespace DotNetMissionSDK.Triggers
 	}
 
 	[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Pack=1)]
-	public class EventTriggerData
+	public struct EventTriggerData
 	{
 		public bool enabled;                // Whether or not the trigger is enabled
 		public bool isExecuting;			// Is this trigger executing right now?
@@ -45,7 +45,7 @@ namespace DotNetMissionSDK.Triggers
 	}
 
 	[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Pack=1)]
-	public class EventRegionData
+	public struct EventRegionData
 	{
 		public int xMin;
 		public int yMin;

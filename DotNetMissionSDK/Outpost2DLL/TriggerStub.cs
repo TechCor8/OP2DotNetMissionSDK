@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 namespace DotNetMissionSDK.Triggers
 {
 	[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Pack=1)]
-	public class TriggerStubData
+	public struct TriggerStubData
 	{
 		public bool isActive;       // If false, trigger has been released and its index is ready for reuse
 		public bool hasFired;

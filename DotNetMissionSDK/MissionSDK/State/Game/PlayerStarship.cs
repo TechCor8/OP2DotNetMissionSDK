@@ -7,7 +7,7 @@ namespace DotNetMissionSDK.State.Game
 	/// Contains persistent state that is stored in the SaveData object. Used by PlayerStarship class.
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Pack=1)]
-	public class PlayerStarshipSaveData
+	public struct PlayerStarshipSaveData
 	{
 		// Starship module counts
 		public byte EDWARDSatelliteCount;
