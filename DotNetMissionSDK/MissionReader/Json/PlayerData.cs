@@ -7,120 +7,120 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class PlayerData
 	{
-		[DataMember(Name = "ID")]					public int id							{ get; set; }
-		[DataMember(Name = "IsEden")]				public bool isEden						{ get; set; }
-		[DataMember(Name = "IsHuman")]				public bool isHuman						{ get; set; }
-		[DataMember(Name = "BotType")]				public string botType					{ get; set; } = string.Empty;
-		[DataMember(Name = "Color")]				public string color					{ get; set; } = string.Empty;
-		[DataMember(Name = "Allies")]				public int[] allies						{ get; set; }
-		[DataMember(Name = "Resources")]			public ResourceData resources			{ get; set; }
-		[DataMember(Name = "DifficultyResources")]	public List<ResourceData> difficulties	{ get; set; }
+		[DataMember(Name = "ID")]					public int Id							{ get; set; }
+		[DataMember(Name = "IsEden")]				public bool IsEden						{ get; set; }
+		[DataMember(Name = "IsHuman")]				public bool IsHuman						{ get; set; }
+		[DataMember(Name = "BotType")]				public string BotType					{ get; set; } = string.Empty;
+		[DataMember(Name = "Color")]				public string Color						{ get; set; } = string.Empty;
+		[DataMember(Name = "Allies")]				public int[] Allies						{ get; set; }
+		[DataMember(Name = "Resources")]			public ResourceData Resources			{ get; set; }
+		[DataMember(Name = "DifficultyResources")]	public List<ResourceData> Difficulties	{ get; set; }
 
 
 		[DataContract]
 		public class ResourceData
 		{
-			[DataMember(Name = "TechLevel")]		public int techLevel					{ get; set; }
-			[DataMember(Name = "MoraleLevel")]		public string moraleLevel				{ get; set; } = string.Empty;
-			[DataMember(Name = "FreeMorale")]		public bool freeMorale					{ get; set; }
-			[DataMember(Name = "CenterView")]		public DataLocation centerView			{ get; set; }
+			[DataMember(Name = "TechLevel")]		public int TechLevel					{ get; set; }
+			[DataMember(Name = "MoraleLevel")]		public string MoraleLevel				{ get; set; } = string.Empty;
+			[DataMember(Name = "FreeMorale")]		public bool FreeMorale					{ get; set; }
+			[DataMember(Name = "CenterView")]		public DataLocation CenterView			{ get; set; }
 
-			[DataMember(Name = "Kids")]				public int kids							{ get; set; }
-			[DataMember(Name = "Workers")]			public int workers						{ get; set; }
-			[DataMember(Name = "Scientists")]		public int scientists					{ get; set; }
-			[DataMember(Name = "CommonOre")]		public int commonOre					{ get; set; }
-			[DataMember(Name = "RareOre")]			public int rareOre						{ get; set; }
-			[DataMember(Name = "Food")]				public int food							{ get; set; }
-			[DataMember(Name = "SolarSatellites")]	public int solarSatellites				{ get; set; }
+			[DataMember(Name = "Kids")]				public int Kids							{ get; set; }
+			[DataMember(Name = "Workers")]			public int Workers						{ get; set; }
+			[DataMember(Name = "Scientists")]		public int Scientists					{ get; set; }
+			[DataMember(Name = "CommonOre")]		public int CommonOre					{ get; set; }
+			[DataMember(Name = "RareOre")]			public int RareOre						{ get; set; }
+			[DataMember(Name = "Food")]				public int Food							{ get; set; }
+			[DataMember(Name = "SolarSatellites")]	public int SolarSatellites				{ get; set; }
 
-			[DataMember(Name = "CompletedResearch")]public int[] completedResearch			{ get; set; }
+			[DataMember(Name = "CompletedResearch")]public int[] CompletedResearch			{ get; set; }
 
-			[DataMember(Name = "Units")]			public List<UnitData> units				{ get; set; }
-			[DataMember(Name = "WallTubes")]		public List<WallTubeData> wallTubes		{ get; set; }
+			[DataMember(Name = "Units")]			public List<UnitData> Units				{ get; set; }
+			[DataMember(Name = "WallTubes")]		public List<WallTubeData> WallTubes		{ get; set; }
 
-			[DataMember(Name = "Triggers")]			public List<TriggerData> triggers		{ get; set; }
+			[DataMember(Name = "Triggers")]			public List<TriggerData> Triggers		{ get; set; }
 
 			public ResourceData()
 			{
-				moraleLevel = "Good";
-				centerView = new DataLocation();
-				kids = 10;
-				workers = 14;
-				scientists = 8;
-				food = 1000;
-				completedResearch = new int[0];
-				units = new List<UnitData>();
-				wallTubes = new List<WallTubeData>();
-				triggers = new List<TriggerData>();
+				MoraleLevel = "Good";
+				CenterView = new DataLocation();
+				Kids = 10;
+				Workers = 14;
+				Scientists = 8;
+				Food = 1000;
+				CompletedResearch = new int[0];
+				Units = new List<UnitData>();
+				WallTubes = new List<WallTubeData>();
+				Triggers = new List<TriggerData>();
 			}
 
 			[OnDeserializing]
 			private void OnDeserializing(StreamingContext context)
 			{
-				wallTubes = new List<WallTubeData>();
-				triggers = new List<TriggerData>();
+				WallTubes = new List<WallTubeData>();
+				Triggers = new List<TriggerData>();
 			}
 
 			public ResourceData(ResourceData clone)
 			{
-				techLevel = clone.techLevel;
-				moraleLevel = clone.moraleLevel;
-				freeMorale = clone.freeMorale;
-				centerView = clone.centerView;
+				TechLevel = clone.TechLevel;
+				MoraleLevel = clone.MoraleLevel;
+				FreeMorale = clone.FreeMorale;
+				CenterView = clone.CenterView;
 
-				kids = clone.kids;
-				workers = clone.workers;
-				scientists = clone.scientists;
-				commonOre = clone.commonOre;
-				rareOre = clone.rareOre;
-				food = clone.food;
-				solarSatellites = clone.solarSatellites;
+				Kids = clone.Kids;
+				Workers = clone.Workers;
+				Scientists = clone.Scientists;
+				CommonOre = clone.CommonOre;
+				RareOre = clone.RareOre;
+				Food = clone.Food;
+				SolarSatellites = clone.SolarSatellites;
 
-				completedResearch = new int[clone.completedResearch.Length];
-				System.Array.Copy(clone.completedResearch, completedResearch, completedResearch.Length);
+				CompletedResearch = new int[clone.CompletedResearch.Length];
+				System.Array.Copy(clone.CompletedResearch, CompletedResearch, CompletedResearch.Length);
 
-				units = new List<UnitData>(clone.units.Count);
-				wallTubes = new List<WallTubeData>(clone.wallTubes.Count);
-				triggers = new List<TriggerData>(clone.triggers.Count);
+				Units = new List<UnitData>(clone.Units.Count);
+				WallTubes = new List<WallTubeData>(clone.WallTubes.Count);
+				Triggers = new List<TriggerData>(clone.Triggers.Count);
 
-				for (int i=0; i < clone.units.Count; ++i)
-					units.Add(new UnitData(clone.units[i]));
-				foreach (WallTubeData wallTube in clone.wallTubes)
-				wallTubes.Add(new WallTubeData(wallTube));
-				foreach (TriggerData trigger in clone.triggers)
-					triggers.Add(new TriggerData(trigger));
+				for (int i=0; i < clone.Units.Count; ++i)
+					Units.Add(new UnitData(clone.Units[i]));
+				foreach (WallTubeData wallTube in clone.WallTubes)
+				WallTubes.Add(new WallTubeData(wallTube));
+				foreach (TriggerData trigger in clone.Triggers)
+					Triggers.Add(new TriggerData(trigger));
 			}
 
 			public void Concat(ResourceData dataToConcat)
 			{
-				techLevel = dataToConcat.techLevel;
-				moraleLevel = dataToConcat.moraleLevel;
-				freeMorale = dataToConcat.freeMorale;
-				centerView = dataToConcat.centerView;
+				TechLevel = dataToConcat.TechLevel;
+				MoraleLevel = dataToConcat.MoraleLevel;
+				FreeMorale = dataToConcat.FreeMorale;
+				CenterView = dataToConcat.CenterView;
 
-				kids += dataToConcat.kids;
-				workers += dataToConcat.workers;
-				scientists += dataToConcat.scientists;
-				commonOre += dataToConcat.commonOre;
-				rareOre += dataToConcat.rareOre;
-				food += dataToConcat.food;
-				solarSatellites += dataToConcat.solarSatellites;
+				Kids += dataToConcat.Kids;
+				Workers += dataToConcat.Workers;
+				Scientists += dataToConcat.Scientists;
+				CommonOre += dataToConcat.CommonOre;
+				RareOre += dataToConcat.RareOre;
+				Food += dataToConcat.Food;
+				SolarSatellites += dataToConcat.SolarSatellites;
 
-				int[] newArr = new int[completedResearch.Length + dataToConcat.completedResearch.Length];
-				System.Array.Copy(completedResearch, newArr, completedResearch.Length);
-				System.Array.Copy(dataToConcat.completedResearch, 0, newArr, completedResearch.Length, dataToConcat.techLevel);
-				completedResearch = newArr;
+				int[] newArr = new int[CompletedResearch.Length + dataToConcat.CompletedResearch.Length];
+				System.Array.Copy(CompletedResearch, newArr, CompletedResearch.Length);
+				System.Array.Copy(dataToConcat.CompletedResearch, 0, newArr, CompletedResearch.Length, dataToConcat.TechLevel);
+				CompletedResearch = newArr;
 
-				units.Capacity = units.Count + dataToConcat.units.Count;
-				wallTubes.Capacity = wallTubes.Count + dataToConcat.wallTubes.Count;
-				triggers.Capacity = triggers.Count + dataToConcat.triggers.Count;
+				Units.Capacity = Units.Count + dataToConcat.Units.Count;
+				WallTubes.Capacity = WallTubes.Count + dataToConcat.WallTubes.Count;
+				Triggers.Capacity = Triggers.Count + dataToConcat.Triggers.Count;
 
-				foreach (UnitData unit in dataToConcat.units)
-					units.Add(new UnitData(unit));
-				foreach (WallTubeData wallTube in dataToConcat.wallTubes)
-				wallTubes.Add(new WallTubeData(wallTube));
-				foreach (TriggerData trigger in dataToConcat.triggers)
-					triggers.Add(new TriggerData(trigger));
+				foreach (UnitData unit in dataToConcat.Units)
+					Units.Add(new UnitData(unit));
+				foreach (WallTubeData wallTube in dataToConcat.WallTubes)
+				WallTubes.Add(new WallTubeData(wallTube));
+				foreach (TriggerData trigger in dataToConcat.Triggers)
+					Triggers.Add(new TriggerData(trigger));
 			}
 
 			public static ResourceData Concat(ResourceData a, ResourceData b)
@@ -140,15 +140,15 @@ namespace DotNetMissionReader
 
 		public PlayerData(int id)
 		{
-			this.id = id;
-			isEden = id % 2 == 0;
-			isHuman = true;
-			botType = id == 0 ? "None" : "Balanced";
-			color = GetPlayerColor(id);
-			allies = new int[0];
+			this.Id = id;
+			IsEden = id % 2 == 0;
+			IsHuman = true;
+			BotType = id == 0 ? "None" : "Balanced";
+			Color = GetPlayerColor(id);
+			Allies = new int[0];
 
-			resources = new ResourceData();
-			difficulties = new List<ResourceData>();
+			Resources = new ResourceData();
+			Difficulties = new List<ResourceData>();
 		}
 
 		private string GetPlayerColor(int id)
@@ -168,34 +168,34 @@ namespace DotNetMissionReader
 
 		public PlayerData(PlayerData clone)
 		{
-			id = clone.id;
-			isEden = clone.isEden;
-			isHuman = clone.isHuman;
-			botType = clone.botType;
-			color = clone.color;
-			allies = new int[clone.allies.Length];
-			System.Array.Copy(clone.allies, allies, allies.Length);
+			Id = clone.Id;
+			IsEden = clone.IsEden;
+			IsHuman = clone.IsHuman;
+			BotType = clone.BotType;
+			Color = clone.Color;
+			Allies = new int[clone.Allies.Length];
+			System.Array.Copy(clone.Allies, Allies, Allies.Length);
 
-			resources = new ResourceData(clone.resources);
-			difficulties = new List<ResourceData>(clone.difficulties.Count);
+			Resources = new ResourceData(clone.Resources);
+			Difficulties = new List<ResourceData>(clone.Difficulties.Count);
 
-			for (int i=0; i < clone.difficulties.Count; ++i)
-				difficulties.Add(new ResourceData(clone.difficulties[i]));
+			for (int i=0; i < clone.Difficulties.Count; ++i)
+				Difficulties.Add(new ResourceData(clone.Difficulties[i]));
 		}
 
 		public void Concat(PlayerData dataToConcat)
 		{
-			isEden = dataToConcat.isEden;
-			isHuman = dataToConcat.isHuman;
-			botType = dataToConcat.botType;
-			color = dataToConcat.color;
-			allies = new int[dataToConcat.allies.Length];
-			System.Array.Copy(dataToConcat.allies, allies, allies.Length);
+			IsEden = dataToConcat.IsEden;
+			IsHuman = dataToConcat.IsHuman;
+			BotType = dataToConcat.BotType;
+			Color = dataToConcat.Color;
+			Allies = new int[dataToConcat.Allies.Length];
+			System.Array.Copy(dataToConcat.Allies, Allies, Allies.Length);
 
-			resources = ResourceData.Concat(resources, dataToConcat.resources);
+			Resources = ResourceData.Concat(Resources, dataToConcat.Resources);
 
-			for (int i=0; i < dataToConcat.difficulties.Count; ++i)
-				difficulties[i].Concat(dataToConcat.difficulties[i]);
+			for (int i=0; i < dataToConcat.Difficulties.Count; ++i)
+				Difficulties[i].Concat(dataToConcat.Difficulties[i]);
 		}
 	}
 }

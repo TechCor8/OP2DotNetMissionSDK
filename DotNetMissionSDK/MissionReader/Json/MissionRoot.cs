@@ -8,30 +8,30 @@ namespace DotNetMissionReader
 	{
 		public const string SDKVersion = "0"; // May only use dot versioning (e.g. 1.0.0). Dot not required.
 
-		[DataMember(Name = "SDKVersion")]		public string sdkVersion					{ get; set; }
-		[DataMember(Name = "LevelDetails")]		public LevelDetails levelDetails			{ get; set; }
-		[DataMember(Name = "MasterVariant")]	public MissionVariant masterVariant			{ get; set; }
-		[DataMember(Name = "MissionVariants")]	public List<MissionVariant> missionVariants	{ get; set; }
-		[DataMember(Name = "Disasters")]		public DisasterData[] disasters				{ get; set; }
-		[DataMember(Name = "Triggers")]			public OP2TriggerData[] triggers			{ get; set; }
-		[DataMember(Name = "Regions")]			public List<RegionData> regions				{ get; set; }
+		[DataMember(Name = "SDKVersion")]		public string SdkVersion					{ get; set; }
+		[DataMember(Name = "LevelDetails")]		public LevelDetails LevelDetails			{ get; set; }
+		[DataMember(Name = "MasterVariant")]	public MissionVariant MasterVariant			{ get; set; }
+		[DataMember(Name = "MissionVariants")]	public List<MissionVariant> MissionVariants	{ get; set; }
+		[DataMember(Name = "Disasters")]		public DisasterData[] Disasters				{ get; set; }
+		[DataMember(Name = "Triggers")]			public OP2TriggerData[] Triggers			{ get; set; }
+		[DataMember(Name = "Regions")]			public List<RegionData> Regions				{ get; set; }
 
 		public MissionRoot()
 		{
-			sdkVersion = SDKVersion;
-			levelDetails = new LevelDetails();
-			masterVariant = new MissionVariant();
-			missionVariants = new List<MissionVariant>();
-			disasters = new DisasterData[0];
-			triggers = new OP2TriggerData[0];
-			regions = new List<RegionData>();
+			SdkVersion = SDKVersion;
+			LevelDetails = new LevelDetails();
+			MasterVariant = new MissionVariant();
+			MissionVariants = new List<MissionVariant>();
+			Disasters = new DisasterData[0];
+			Triggers = new OP2TriggerData[0];
+			Regions = new List<RegionData>();
 		}
 
 		[OnDeserializing]
 		private void OnDeserializing(StreamingContext context)
 		{
-			sdkVersion = SDKVersion;
-			regions = new List<RegionData>();
+			SdkVersion = SDKVersion;
+			Regions = new List<RegionData>();
 		}
 	}
 }

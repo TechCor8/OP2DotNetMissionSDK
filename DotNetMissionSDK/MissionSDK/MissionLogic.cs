@@ -62,33 +62,33 @@ namespace DotNetMissionSDK
 			List<Unit> createdUnits = new List<Unit>();
 
 			// Startup Flags
-			bool isMultiplayer = (int)root.levelDetails.GetMissionType() <= -4 && (int)root.levelDetails.GetMissionType() >= -8;
+			bool isMultiplayer = (int)root.LevelDetails.GetMissionType() <= -4 && (int)root.LevelDetails.GetMissionType() >= -8;
 			int localDifficulty = TethysGame.GetPlayer(TethysGame.LocalPlayer()).Difficulty();
 
 			// Select mission variant (random)
-			m_SaveData.missionVariantIndex = (byte)TethysGame.GetRandomRange(0, root.missionVariants.Count);
+			m_SaveData.missionVariantIndex = (byte)TethysGame.GetRandomRange(0, root.MissionVariants.Count);
 
 			// Combine master variant with selected variant. The master variant is always used as a base.
 			MissionVariant missionVariant = GetCombinedDifficultyVariant(root);
-			GameData tethysGame = missionVariant.tethysGame;
+			GameData tethysGame = missionVariant.TethysGame;
 
 			// Setup Game
-			TethysGame.SetDaylightEverywhere(tethysGame.daylightEverywhere);
-			TethysGame.SetDaylightMoves(tethysGame.daylightMoves);
-			GameMap.SetInitialLightLevel(tethysGame.initialLightLevel);
+			TethysGame.SetDaylightEverywhere(tethysGame.DaylightEverywhere);
+			TethysGame.SetDaylightMoves(tethysGame.DaylightMoves);
+			GameMap.SetInitialLightLevel(tethysGame.InitialLightLevel);
 
 			// If this is a multiplayer game, use the game-specified light settings
 			if (isMultiplayer && !TethysGame.UsesDayNight())
 				TethysGame.SetDaylightEverywhere(true);
 
-			TethysGame.SetMusicPlayList(tethysGame.musicPlayList.songIDs.Length, tethysGame.musicPlayList.repeatStartIndex, tethysGame.musicPlayList.songIDs);
+			TethysGame.SetMusicPlayList(tethysGame.MusicPlayList.SongIds.Length, tethysGame.MusicPlayList.RepeatStartIndex, tethysGame.MusicPlayList.SongIds);
 
 			// Select Beacons
-			List<GameData.Beacon> beacons = new List<GameData.Beacon>();
-			foreach (var group in new List<GameData.Beacon>(tethysGame.beacons).GroupBy(b => b.id))
+			List<Beacon> beacons = new List<Beacon>();
+			foreach (var group in new List<Beacon>(tethysGame.Beacons).GroupBy(b => b.Id))
 			{
-				List<GameData.Beacon> groupBeacons = group.ToList();
-				if (groupBeacons[0].id <= 0)
+				List<Beacon> groupBeacons = group.ToList();
+				if (groupBeacons[0].Id <= 0)
 					beacons.AddRange(groupBeacons);
 				else
 				{
@@ -99,20 +99,20 @@ namespace DotNetMissionSDK
 			}
 
 			// Create beacons
-			foreach (GameData.Beacon beacon in beacons)
+			foreach (Beacon beacon in beacons)
 			{
-				LOCATION spawnPt = TethysGame.GetMapCoordinates(beacon.position.ToLocation());
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(beacon.Position.ToLocation());
 
 				int stubIndex = TethysGame.CreateBeacon(beacon.GetMapID(), spawnPt.x, spawnPt.y, beacon.GetOreType(), beacon.GetBarYield(), beacon.GetBarVariant());
-				SetUnitID(beacon.id, stubIndex);
+				SetUnitID(beacon.Id, stubIndex);
 			}
 
 			// Select markers
-			List<GameData.Marker> markers = new List<GameData.Marker>();
-			foreach (var group in new List<GameData.Marker>(tethysGame.markers).GroupBy(m => m.id))
+			List<Marker> markers = new List<Marker>();
+			foreach (var group in new List<Marker>(tethysGame.Markers).GroupBy(m => m.Id))
 			{
-				List<GameData.Marker> groupMarkers = group.ToList();
-				if (groupMarkers[0].id <= 0)
+				List<Marker> groupMarkers = group.ToList();
+				if (groupMarkers[0].Id <= 0)
 					markers.AddRange(groupMarkers);
 				else
 				{
@@ -123,20 +123,20 @@ namespace DotNetMissionSDK
 			}
 
 			// Create markers
-			foreach (GameData.Marker marker in markers)
+			foreach (Marker marker in markers)
 			{
-				LOCATION spawnPt = TethysGame.GetMapCoordinates(marker.position.ToLocation());
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(marker.Position.ToLocation());
 
 				Unit unit = TethysGame.PlaceMarker(spawnPt.x, spawnPt.y, marker.GetMarkerType());
-				SetUnitID(marker.id, unit.GetStubIndex());
+				SetUnitID(marker.Id, unit.GetStubIndex());
 			}
 
 			// Select wreckage
-			List<GameData.Wreckage> wreckages = new List<GameData.Wreckage>();
-			foreach (var group in new List<GameData.Wreckage>(tethysGame.wreckage).GroupBy(w => w.id))
+			List<Wreckage> wreckages = new List<Wreckage>();
+			foreach (var group in new List<Wreckage>(tethysGame.Wreckage).GroupBy(w => w.Id))
 			{
-				List<GameData.Wreckage> groupWreckage = group.ToList();
-				if (groupWreckage[0].id <= 0)
+				List<Wreckage> groupWreckage = group.ToList();
+				if (groupWreckage[0].Id <= 0)
 					wreckages.AddRange(groupWreckage);
 				else
 				{
@@ -147,38 +147,38 @@ namespace DotNetMissionSDK
 			}
 
 			// Create wreckage
-			foreach (GameData.Wreckage wreck in tethysGame.wreckage)
+			foreach (Wreckage wreck in tethysGame.Wreckage)
 			{
-				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.position.ToLocation());
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.Position.ToLocation());
 
-				TethysGame.CreateWreck(spawnPt.x, spawnPt.y, wreck.GetTechID(), wreck.isVisible);
+				TethysGame.CreateWreck(spawnPt.x, spawnPt.y, wreck.GetTechID(), wreck.IsVisible);
 			}
 
 			// Setup Players
-			foreach (PlayerData data in missionVariant.players)
+			foreach (PlayerData data in missionVariant.Players)
 			{
-				Player player = TethysGame.GetPlayer(data.id);
-				PlayerData.ResourceData resourceData = data.resources;
+				Player player = TethysGame.GetPlayer(data.Id);
+				PlayerData.ResourceData resourceData = data.Resources;
 				
 				// Process resources
-				player.SetTechLevel(resourceData.techLevel);
+				player.SetTechLevel(resourceData.TechLevel);
 
 				switch ((MoraleLevel)resourceData.GetMoraleLevel())
 				{
-					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.id);	TethysGame.ForceMoraleGreat(data.id);	break;
-					case MoraleLevel.Good:			TethysGame.ForceMoraleGood(data.id);	TethysGame.ForceMoraleGood(data.id);	break;
-					case MoraleLevel.Fair:			TethysGame.ForceMoraleOK(data.id);		TethysGame.ForceMoraleOK(data.id);		break;
-					case MoraleLevel.Poor:			TethysGame.ForceMoralePoor(data.id);	TethysGame.ForceMoralePoor(data.id);	break;
-					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.id);	TethysGame.ForceMoraleRotten(data.id);	break;
+					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.Id);	TethysGame.ForceMoraleGreat(data.Id);	break;
+					case MoraleLevel.Good:			TethysGame.ForceMoraleGood(data.Id);	TethysGame.ForceMoraleGood(data.Id);	break;
+					case MoraleLevel.Fair:			TethysGame.ForceMoraleOK(data.Id);		TethysGame.ForceMoraleOK(data.Id);		break;
+					case MoraleLevel.Poor:			TethysGame.ForceMoralePoor(data.Id);	TethysGame.ForceMoralePoor(data.Id);	break;
+					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.Id);	TethysGame.ForceMoraleRotten(data.Id);	break;
 				}
 
-				if ((TethysGame.UsesMorale() || !isMultiplayer) && resourceData.freeMorale)
-					TethysGame.FreeMoraleLevel(data.id);
+				if ((TethysGame.UsesMorale() || !isMultiplayer) && resourceData.FreeMorale)
+					TethysGame.FreeMoraleLevel(data.Id);
 
 				// Only set player colony type and color if playing single player
-				if (!data.isHuman || !isMultiplayer)
+				if (!data.IsHuman || !isMultiplayer)
 				{
-					if (data.isEden)
+					if (data.IsEden)
 						player.GoEden();
 					else
 						player.GoPlymouth();
@@ -186,37 +186,37 @@ namespace DotNetMissionSDK
 					player.SetColorNumber(data.GetColor());
 				}
 
-				if (data.isHuman)
+				if (data.IsHuman)
 					player.GoHuman();
 				else
 					player.GoAI();
 				
-				foreach (int allyID in data.allies)
+				foreach (int allyID in data.Allies)
 					player.AllyWith(allyID);
 
 				// Set camera position
-				LOCATION centerView = TethysGame.GetMapCoordinates(resourceData.centerView.ToLocation());
+				LOCATION centerView = TethysGame.GetMapCoordinates(resourceData.CenterView.ToLocation());
 				player.CenterViewOn(centerView.x, centerView.y);
 
 				// Set population
-				player.SetKids(resourceData.kids);
-				player.SetWorkers(resourceData.workers);
-				player.SetScientists(resourceData.scientists);
-				player.SetOre(resourceData.commonOre);
-				player.SetRareOre(resourceData.rareOre);
-				player.SetFoodStored(resourceData.food);
-				player.SetSolarSat(resourceData.solarSatellites);
+				player.SetKids(resourceData.Kids);
+				player.SetWorkers(resourceData.Workers);
+				player.SetScientists(resourceData.Scientists);
+				player.SetOre(resourceData.CommonOre);
+				player.SetRareOre(resourceData.RareOre);
+				player.SetFoodStored(resourceData.Food);
+				player.SetSolarSat(resourceData.SolarSatellites);
 
 				// Set completed research
-				foreach (int techID in resourceData.completedResearch)
+				foreach (int techID in resourceData.CompletedResearch)
 					player.MarkResearchComplete(techID);
 
 				// Select units
 				List<UnitData> units = new List<UnitData>();
-				foreach (var group in new List<UnitData>(resourceData.units).GroupBy(u => u.id))
+				foreach (var group in new List<UnitData>(resourceData.Units).GroupBy(u => u.Id))
 				{
 					List<UnitData> groupUnits = group.ToList();
-					if (groupUnits[0].id <= 0)
+					if (groupUnits[0].Id <= 0)
 						units.AddRange(groupUnits);
 					else
 					{
@@ -229,17 +229,17 @@ namespace DotNetMissionSDK
 				// Create units
 				foreach (UnitData unitData in units)
 				{
-					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.position.ToLocation());
+					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.Position.ToLocation());
 
-					Unit unit = unitData.CreateUnit(data.id, spawnPt);
-					SetUnitID(data.id, unit.GetStubIndex());
+					Unit unit = unitData.CreateUnit(data.Id, spawnPt);
+					SetUnitID(data.Id, unit.GetStubIndex());
 					createdUnits.Add(unit);
 				}
 
 				// Create walls and tubes
-				foreach (WallTubeData wallTube in resourceData.wallTubes)
+				foreach (WallTubeData wallTube in resourceData.WallTubes)
 				{
-					LOCATION location = TethysGame.GetMapCoordinates(wallTube.position.ToLocation());
+					LOCATION location = TethysGame.GetMapCoordinates(wallTube.Position.ToLocation());
 					TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.GetTypeID());
 				}
 			}
@@ -247,14 +247,14 @@ namespace DotNetMissionSDK
 			// Setup Autolayout bases
 			BaseGenerator baseGenerator = new BaseGenerator(createdUnits);
 
-			foreach (AutoLayout layout in missionVariant.layouts)
+			foreach (AutoLayout layout in missionVariant.Layouts)
 			{
 				// Select units
 				List<UnitData> units = new List<UnitData>();
-				foreach (var group in new List<UnitData>(layout.units).GroupBy(u => u.id))
+				foreach (var group in new List<UnitData>(layout.Units).GroupBy(u => u.Id))
 				{
 					List<UnitData> groupUnits = group.ToList();
-					if (groupUnits[0].id <= 0)
+					if (groupUnits[0].Id <= 0)
 						units.AddRange(groupUnits);
 					else
 					{
@@ -265,14 +265,14 @@ namespace DotNetMissionSDK
 				}
 
 				// Generate autolayout base
-				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), layout.baseCenterPt.ToLocation(), units.ToArray());
+				baseGenerator.Generate(TethysGame.GetPlayer(layout.PlayerId), layout.BaseCenterPt.ToLocation(), units.ToArray());
 			}
 
 			// Setup Disasters
 			InitializeDisasters();
 
 			// Setup Triggers
-			List<OP2TriggerData> triggers = new List<OP2TriggerData>(root.triggers);
+			List<OP2TriggerData> triggers = new List<OP2TriggerData>(root.Triggers);
 			Dictionary<int, TriggerStub> triggerLookup = new Dictionary<int, TriggerStub>();
 			int previousCount = 0;
 
@@ -295,8 +295,8 @@ namespace DotNetMissionSDK
 
 					// Get parent trigger if there is one
 					TriggerStub parentTrigger = null;
-					if (data.triggerID > 0)
-						triggerLookup.TryGetValue(data.triggerID, out parentTrigger);
+					if (data.TriggerId > 0)
+						triggerLookup.TryGetValue(data.TriggerId, out parentTrigger);
 
 					bool wasProcessed = true;
 
@@ -315,7 +315,7 @@ namespace DotNetMissionSDK
 								break;
 							}
 							
-							trigger = TriggerStub.CreateVictoryCondition(data.id, data.enabled, parentTrigger, data.message);
+							trigger = TriggerStub.CreateVictoryCondition(data.Id, data.Enabled, parentTrigger, data.Message);
 							break;
 
 						case TriggerType.Failure:
@@ -325,51 +325,51 @@ namespace DotNetMissionSDK
 								break;
 							}
 
-							trigger = TriggerStub.CreateFailureCondition(data.id, data.enabled, parentTrigger);
+							trigger = TriggerStub.CreateFailureCondition(data.Id, data.Enabled, parentTrigger);
 							break;
 
 						case TriggerType.OnePlayerLeft:
-							trigger = TriggerStub.CreateOnePlayerLeftTrigger(data.id, data.enabled, data.oneShot);
+							trigger = TriggerStub.CreateOnePlayerLeftTrigger(data.Id, data.Enabled, data.OneShot);
 							break;
 
 						case TriggerType.Evac:
-							trigger = TriggerStub.CreateEvacTrigger(data.id, data.enabled, data.oneShot, data.playerID);
+							trigger = TriggerStub.CreateEvacTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId);
 							break;
 
 						case TriggerType.Midas:
-							trigger = TriggerStub.CreateMidasTrigger(data.id, data.enabled, data.oneShot, data.time);
+							trigger = TriggerStub.CreateMidasTrigger(data.Id, data.Enabled, data.OneShot, data.Time);
 							break;
 
 						case TriggerType.Operational:
-							trigger = TriggerStub.CreateOperationalTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.GetUnitType(), data.count, data.GetCompareType());
+							trigger = TriggerStub.CreateOperationalTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.GetUnitType(), data.Count, data.GetCompareType());
 							break;
 
 						case TriggerType.Research:
-							trigger = TriggerStub.CreateResearchTrigger(data.id, data.enabled, data.oneShot, data.techID, data.playerID);
+							trigger = TriggerStub.CreateResearchTrigger(data.Id, data.Enabled, data.OneShot, data.TechId, data.PlayerId);
 							break;
 
 						case TriggerType.Resource:
-							trigger = TriggerStub.CreateResourceTrigger(data.id, data.enabled, data.oneShot, data.GetResourceType(), data.count, data.playerID, data.GetCompareType());
+							trigger = TriggerStub.CreateResourceTrigger(data.Id, data.Enabled, data.OneShot, data.GetResourceType(), data.Count, data.PlayerId, data.GetCompareType());
 							break;
 
 						case TriggerType.Kit:
-							trigger = TriggerStub.CreateKitTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.GetUnitType(), data.count);
+							trigger = TriggerStub.CreateKitTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.GetUnitType(), data.Count);
 							break;
 
 						case TriggerType.Escape:
-							trigger = TriggerStub.CreateEscapeTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height, data.count, data.GetUnitType(), data.GetCargoType(), data.cargoAmount);
+							trigger = TriggerStub.CreateEscapeTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.X, data.Y, data.Width, data.Height, data.Count, data.GetUnitType(), data.GetCargoType(), data.cargoAmount);
 							break;
 
 						case TriggerType.Count:
-							trigger = TriggerStub.CreateCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.GetUnitType(), data.GetCargoOrWeaponType(), data.count, data.GetCompareType());
+							trigger = TriggerStub.CreateCountTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.GetUnitType(), data.GetCargoOrWeaponType(), data.Count, data.GetCompareType());
 							break;
 
 						case TriggerType.VehicleCount:
-							trigger = TriggerStub.CreateVehicleCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.GetCompareType());
+							trigger = TriggerStub.CreateVehicleCountTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.Count, data.GetCompareType());
 							break;
 
 						case TriggerType.BuildingCount:
-							trigger = TriggerStub.CreateBuildingCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.GetCompareType());
+							trigger = TriggerStub.CreateBuildingCountTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.Count, data.GetCompareType());
 							break;
 
 						case TriggerType.Attacked:
@@ -383,19 +383,19 @@ namespace DotNetMissionSDK
 							break;
 
 						case TriggerType.Time:
-							trigger = TriggerStub.CreateTimeTrigger(data.id, data.enabled, data.oneShot, data.time);
+							trigger = TriggerStub.CreateTimeTrigger(data.Id, data.Enabled, data.OneShot, data.Time);
 							break;
 
 						case TriggerType.TimeRange:
-							trigger = TriggerStub.CreateTimeTrigger(data.id, data.enabled, data.oneShot, data.minTime, data.maxTime);
+							trigger = TriggerStub.CreateTimeTrigger(data.Id, data.Enabled, data.OneShot, data.MinTime, data.MaxTime);
 							break;
 
 						case TriggerType.Point:
-							trigger = TriggerStub.CreatePointTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y);
+							trigger = TriggerStub.CreatePointTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.X, data.Y);
 							break;
 
 						case TriggerType.Rect:
-							trigger = TriggerStub.CreateRectTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height);
+							trigger = TriggerStub.CreateRectTrigger(data.Id, data.Enabled, data.OneShot, data.PlayerId, data.X, data.Y, data.Width, data.Height);
 							break;
 
 						case TriggerType.SpecialTarget:
@@ -412,7 +412,7 @@ namespace DotNetMissionSDK
 					{
 						try
 						{
-							triggerLookup.Add(data.id, trigger);
+							triggerLookup.Add(data.Id, trigger);
 						}
 						catch (ArgumentException e)
 						{
@@ -472,11 +472,11 @@ namespace DotNetMissionSDK
 			m_Disasters.Clear();
 
 			// Setup Disasters
-			if (TethysGame.CanHaveDisasters() || root.levelDetails.GetMissionType() == MissionType.Colony)
+			if (TethysGame.CanHaveDisasters() || root.LevelDetails.GetMissionType() == MissionType.Colony)
 			{
-				foreach (DisasterData disaster in root.disasters)
+				foreach (DisasterData disaster in root.Disasters)
 				{
-					disaster.timeUntilNextDisaster = disaster.startTime;
+					disaster.timeUntilNextDisaster = disaster.StartTime;
 					m_Disasters.Add(disaster);
 				}
 			}
@@ -489,39 +489,39 @@ namespace DotNetMissionSDK
 		{
 			m_TriggerData.Clear();
 
-			foreach (OP2TriggerData data in m_Root.triggers)
-				m_TriggerData.Add(data.id, data);
+			foreach (OP2TriggerData data in m_Root.Triggers)
+				m_TriggerData.Add(data.Id, data);
 		}
 
 		private MissionVariant GetCombinedDifficultyVariant(MissionRoot root)
 		{
 			// Combine master variant with selected variant. The master variant is always used as a base.
-			MissionVariant missionVariant = root.masterVariant;
-			if (root.missionVariants.Count > 0)
-				missionVariant = MissionVariant.Concat(root.masterVariant, root.missionVariants[m_SaveData.missionVariantIndex]);
+			MissionVariant missionVariant = root.MasterVariant;
+			if (root.MissionVariants.Count > 0)
+				missionVariant = MissionVariant.Concat(root.MasterVariant, root.MissionVariants[m_SaveData.missionVariantIndex]);
 
 			// Startup Flags
-			bool isMultiplayer = (int)root.levelDetails.GetMissionType() <= -4 && (int)root.levelDetails.GetMissionType() >= -8;
+			bool isMultiplayer = (int)root.LevelDetails.GetMissionType() <= -4 && (int)root.LevelDetails.GetMissionType() >= -8;
 			int localDifficulty = TethysGame.GetPlayer(TethysGame.LocalPlayer()).Difficulty();
 
 			// Combine master gaia resources with difficulty gaia resources
-			if (!isMultiplayer && localDifficulty < missionVariant.tethysDifficulties.Count)
-				missionVariant.tethysGame = GameData.Concat(missionVariant.tethysGame, missionVariant.tethysDifficulties[localDifficulty]);
+			if (!isMultiplayer && localDifficulty < missionVariant.TethysDifficulties.Count)
+				missionVariant.TethysGame = GameData.Concat(missionVariant.TethysGame, missionVariant.TethysDifficulties[localDifficulty]);
 
-			foreach (PlayerData data in missionVariant.players)
+			foreach (PlayerData data in missionVariant.Players)
 			{
-				Player player = TethysGame.GetPlayer(data.id);
+				Player player = TethysGame.GetPlayer(data.Id);
 
 				// Get difficulty
 				int difficulty = player.Difficulty();
 
 				// If playing single player, all players get assigned the local player's difficulty
-				if (!isMultiplayer && data.id != TethysGame.LocalPlayer())
+				if (!isMultiplayer && data.Id != TethysGame.LocalPlayer())
 					difficulty = localDifficulty;
 
 				// Add difficulty resources
-				if (difficulty < data.difficulties.Count)
-					data.resources = PlayerData.ResourceData.Concat(data.resources, data.difficulties[difficulty]);
+				if (difficulty < data.Difficulties.Count)
+					data.Resources = PlayerData.ResourceData.Concat(data.Resources, data.Difficulties[difficulty]);
 			}
 
 			return missionVariant;
@@ -535,12 +535,12 @@ namespace DotNetMissionSDK
 			MissionVariant missionVariant = GetCombinedDifficultyVariant(m_Root);
 
 			// Initialize bots
-			for (int i=0; i < missionVariant.players.Count; ++i)
+			for (int i=0; i < missionVariant.Players.Count; ++i)
 			{
-				if (missionVariant.players[i].GetBotType() == BotType.None)
+				if (missionVariant.Players[i].GetBotType() == BotType.None)
 					continue;
 
-				m_BotPlayer[i] = new BotPlayer(missionVariant.players[i].GetBotType(), i);
+				m_BotPlayer[i] = new BotPlayer(missionVariant.Players[i].GetBotType(), i);
 				m_BotPlayer[i].Start();
 			}
 
@@ -563,16 +563,16 @@ namespace DotNetMissionSDK
 			}
 
 			// Execute trigger actions
-			foreach (ActionData action in data.actions)
+			foreach (ActionData action in data.Actions)
 				ExecuteAction(action);
 		}
 
 		private void ExecuteAction(ActionData action)
 		{
-			switch (action.type)
+			switch (action.Type)
 			{
 				case "AddMessage":
-					TethysGame.AddMessage(0, 0, action.message, action.playerID, action.soundID);
+					TethysGame.AddMessage(0, 0, action.Message, action.PlayerId, action.SoundId);
 					break;
 			}
 		}
@@ -589,12 +589,12 @@ namespace DotNetMissionSDK
 			foreach (DisasterData disaster in m_Disasters)
 			{
 				// Stop processing disaster if the time period has ended
-				if (currentTime > disaster.endTime)
+				if (currentTime > disaster.EndTime)
 					continue;
 
 				if (currentTime >= disaster.timeUntilNextDisaster)
 				{
-					disaster.timeUntilNextDisaster += TethysGame.GetRandomRange(disaster.minDelay, disaster.maxDelay);
+					disaster.timeUntilNextDisaster += TethysGame.GetRandomRange(disaster.MinDelay, disaster.MaxDelay);
 
 					FireDisaster(disaster);
 				}
@@ -607,19 +607,19 @@ namespace DotNetMissionSDK
 
 		private void FireDisaster(DisasterData disaster)
 		{
-			LOCATION spawnPt = TethysGame.GetMapCoordinates(disaster.srcRect.GetRandomPointInRect());
-			LOCATION destPt = TethysGame.GetMapCoordinates(disaster.destRect.GetRandomPointInRect());
+			LOCATION spawnPt = TethysGame.GetMapCoordinates(disaster.SrcRect.GetRandomPointInRect());
+			LOCATION destPt = TethysGame.GetMapCoordinates(disaster.DestRect.GetRandomPointInRect());
 
-			switch (disaster.type)
+			switch (disaster.Type)
 			{
-				case DisasterType.Meteor:		TethysGame.SetMeteor(spawnPt.x, spawnPt.y, disaster.size);								break;
-				case DisasterType.Earthquake:	TethysGame.SetEarthquake(spawnPt.x, spawnPt.y, disaster.size);							break;
-				case DisasterType.Lightning:	TethysGame.SetLightning(spawnPt.x, spawnPt.y, disaster.duration, destPt.x, destPt.y);	break;
-				case DisasterType.Tornado:		TethysGame.SetTornado(spawnPt.x, spawnPt.y, disaster.duration, destPt.x, destPt.y, 0);	break;
-				case DisasterType.Eruption:		TethysGame.SetEruption(spawnPt.x, spawnPt.y, disaster.duration);						break;
+				case DisasterType.Meteor:		TethysGame.SetMeteor(spawnPt.x, spawnPt.y, disaster.Size);								break;
+				case DisasterType.Earthquake:	TethysGame.SetEarthquake(spawnPt.x, spawnPt.y, disaster.Size);							break;
+				case DisasterType.Lightning:	TethysGame.SetLightning(spawnPt.x, spawnPt.y, disaster.Duration, destPt.x, destPt.y);	break;
+				case DisasterType.Tornado:		TethysGame.SetTornado(spawnPt.x, spawnPt.y, disaster.Duration, destPt.x, destPt.y, 0);	break;
+				case DisasterType.Eruption:		TethysGame.SetEruption(spawnPt.x, spawnPt.y, disaster.Duration);						break;
 				case DisasterType.Blight:
 					GameMap.SetVirusUL(spawnPt.x, spawnPt.y, true);
-					TethysGame.SetMicrobeSpreadSpeed(disaster.duration);
+					TethysGame.SetMicrobeSpreadSpeed(disaster.Duration);
 					break;
 			}
 		}

@@ -87,14 +87,14 @@ namespace DotNetMissionSDK.Triggers
 			InitializeTriggers(combinedVariant);
 
 			// Initialize regions
-			for (int i=0; i < m_MissionRoot.regions.Count; ++i)
+			for (int i=0; i < m_MissionRoot.Regions.Count; ++i)
 			{
-				RegionData regionData = m_MissionRoot.regions[i];
+				RegionData regionData = m_MissionRoot.Regions[i];
 
-				m_EventData.regions[i].xMin = regionData.rect.xMin;
-				m_EventData.regions[i].yMin = regionData.rect.yMin;
-				m_EventData.regions[i].xMax = regionData.rect.xMax;
-				m_EventData.regions[i].yMax = regionData.rect.yMax;
+				m_EventData.regions[i].xMin = regionData.Rect.MinX;
+				m_EventData.regions[i].yMin = regionData.Rect.MinY;
+				m_EventData.regions[i].xMax = regionData.Rect.MaxX;
+				m_EventData.regions[i].yMax = regionData.Rect.MaxY;
 			}
 
 			// Initialize trigger save data
@@ -126,13 +126,13 @@ namespace DotNetMissionSDK.Triggers
 			int triggerIndex = 0;
 
 			// Gaia triggers
-			foreach (TriggerData triggerData in combinedVariant.tethysGame.triggers)
+			foreach (TriggerData triggerData in combinedVariant.TethysGame.Triggers)
 				CreateTrigger(triggerIndex++, triggerData, -1);
 
 			// Player triggers
-			for (int i=0; i < combinedVariant.players.Count; ++i)
+			for (int i=0; i < combinedVariant.Players.Count; ++i)
 			{
-				foreach (TriggerData triggerData in combinedVariant.players[i].resources.triggers)
+				foreach (TriggerData triggerData in combinedVariant.Players[i].Resources.Triggers)
 					CreateTrigger(triggerIndex++, triggerData, i);
 			}
 		}
@@ -141,10 +141,10 @@ namespace DotNetMissionSDK.Triggers
 		{
 			// Get list for trigger event type
 			List<EventTrigger> list;
-			if (!m_Triggers.TryGetValue(triggerData.eventType, out list))
+			if (!m_Triggers.TryGetValue(triggerData.EventType, out list))
 			{
 				list = new List<EventTrigger>();
-				m_Triggers.Add(triggerData.eventType, list);
+				m_Triggers.Add(triggerData.EventType, list);
 			}
 
 			EventTrigger trigger = new EventTrigger(m_EventData, triggerData, m_EventData.triggers[triggerIndex], triggerOwnerID);

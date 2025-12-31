@@ -10,42 +10,42 @@ namespace DotNetMissionReader
 	public class MissionVariant
 	{
 		// The internal name of this variant to aid the mission designer.
-		[DataMember(Name = "Name")]					public string name							{ get; set; } = string.Empty;
+		[DataMember(Name = "Name")]					public string Name							{ get; set; } = string.Empty;
 
-		[DataMember(Name = "TethysGame")]			public GameData tethysGame					{ get; set; }
-		[DataMember(Name = "TethysDifficulties")]	public List<GameData> tethysDifficulties	{ get; set; }
-		[DataMember(Name = "Players")]				public List<PlayerData> players				{ get; set; }
-		[DataMember(Name = "AutoLayouts")]			public List<AutoLayout> layouts				{ get; set; }
+		[DataMember(Name = "TethysGame")]			public GameData TethysGame					{ get; set; }
+		[DataMember(Name = "TethysDifficulties")]	public List<GameData> TethysDifficulties	{ get; set; }
+		[DataMember(Name = "Players")]				public List<PlayerData> Players				{ get; set; }
+		[DataMember(Name = "AutoLayouts")]			public List<AutoLayout> Layouts				{ get; set; }
 
 
 		public MissionVariant()
 		{
-			tethysGame = new GameData();
-			tethysDifficulties = new List<GameData>();
-			players = new List<PlayerData>(2);
-			layouts = new List<AutoLayout>();
+			TethysGame = new GameData();
+			TethysDifficulties = new List<GameData>();
+			Players = new List<PlayerData>(2);
+			Layouts = new List<AutoLayout>();
 
 			for (int i=0; i < 2; ++i)
-				players.Add(new PlayerData(i));
+				Players.Add(new PlayerData(i));
 		}
 
 		public MissionVariant(MissionVariant clone)
 		{
-			name = clone.name;
+			Name = clone.Name;
 
-			tethysGame = new GameData(clone.tethysGame);
-			tethysDifficulties = new List<GameData>(clone.tethysDifficulties.Count);
-			players = new List<PlayerData>(clone.players.Count);
-			layouts = new List<AutoLayout>(clone.layouts.Count);
+			TethysGame = new GameData(clone.TethysGame);
+			TethysDifficulties = new List<GameData>(clone.TethysDifficulties.Count);
+			Players = new List<PlayerData>(clone.Players.Count);
+			Layouts = new List<AutoLayout>(clone.Layouts.Count);
 
-			for (int i=0; i < clone.tethysDifficulties.Count; ++i)
-				tethysDifficulties.Add(new GameData(clone.tethysDifficulties[i]));
+			for (int i=0; i < clone.TethysDifficulties.Count; ++i)
+				TethysDifficulties.Add(new GameData(clone.TethysDifficulties[i]));
 
-			for (int i=0; i < clone.players.Count; ++i)
-				players.Add(new PlayerData(clone.players[i]));
+			for (int i=0; i < clone.Players.Count; ++i)
+				Players.Add(new PlayerData(clone.Players[i]));
 
-			for (int i=0; i < clone.layouts.Count; ++i)
-				layouts.Add(new AutoLayout(clone.layouts[i]));
+			for (int i=0; i < clone.Layouts.Count; ++i)
+				Layouts.Add(new AutoLayout(clone.Layouts[i]));
 		}
 
 		/// <summary>
@@ -58,16 +58,16 @@ namespace DotNetMissionReader
 		public static MissionVariant Concat(MissionVariant a, MissionVariant b)
 		{
 			MissionVariant result = new MissionVariant(a);
-			result.tethysGame.Concat(b.tethysGame);
+			result.TethysGame.Concat(b.TethysGame);
 
-			for (int i=0; i < b.tethysDifficulties.Count; ++i)
-				result.tethysDifficulties[i].Concat(b.tethysDifficulties[i]);
+			for (int i=0; i < b.TethysDifficulties.Count; ++i)
+				result.TethysDifficulties[i].Concat(b.TethysDifficulties[i]);
 
-			for (int i=0; i < b.layouts.Count; ++i)
-				result.layouts.Add(new AutoLayout(b.layouts[i]));
+			for (int i=0; i < b.Layouts.Count; ++i)
+				result.Layouts.Add(new AutoLayout(b.Layouts[i]));
 
-			for (int i=0; i < result.players.Count; ++i)
-				result.players[i].Concat(b.players[i]);
+			for (int i=0; i < result.Players.Count; ++i)
+				result.Players[i].Concat(b.Players[i]);
 
 			return result;
 		}

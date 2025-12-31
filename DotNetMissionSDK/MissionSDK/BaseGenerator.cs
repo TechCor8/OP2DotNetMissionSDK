@@ -106,10 +106,10 @@ namespace DotNetMissionSDK
 			// Generate all structures in order
 			foreach (UnitData data in unitData)
 			{
-				if (data.ignoreLayout)
+				if (data.IgnoreLayout)
 				{
 					// Create unit that ignores layout
-					LOCATION loc = TethysGame.GetMapCoordinates(data.position.ToLocation());
+					LOCATION loc = TethysGame.GetMapCoordinates(data.Position.ToLocation());
 					Unit unit = data.CreateUnit(owner.playerID, loc);
 					CreatedUnitData createdUnitData = new CreatedUnitData(data);
 
@@ -128,7 +128,7 @@ namespace DotNetMissionSDK
 						GenerateTubes(owner, unit, loc, createdUnitData);
 
 						// If structure should have a wall, add it to the spawn list to generate later
-						if (data.createWall)
+						if (data.CreateWall)
 							wallSpawns.Add(MAP_RECT.FromMinMax(spawnArea.xMin-1, spawnArea.yMin-1, spawnArea.xMax+1, spawnArea.yMax+1));
 					}
 				}
@@ -140,7 +140,7 @@ namespace DotNetMissionSDK
 						spawnArea = GenerateUnit(owner, baseCenterPt, data);
 
 						// If structure should have a wall, add it to the spawn list to generate later
-						if (data.createWall)
+						if (data.CreateWall)
 							wallSpawns.Add(MAP_RECT.FromMinMax(spawnArea.xMin-1, spawnArea.yMin-1, spawnArea.xMax+1, spawnArea.yMax+1));
 					}
 					else if (IsVehicle(data.GetTypeID()))
@@ -187,7 +187,7 @@ namespace DotNetMissionSDK
 			LOCATION foundPt;
 			if (!Pathfinder.GetClosestValidTile(GetTilesInRect(spawnArea), GetTileCost, validTileCB, out foundPt))
 			{
-				Console.WriteLine("Failed to place unit: " + data.typeID);
+				Console.WriteLine("Failed to place unit: " + data.TypeID);
 				return spawnArea;
 			}
 
@@ -243,7 +243,7 @@ namespace DotNetMissionSDK
 			// Vehicles must be at least spawnDistance away from spawnArea
 			if (IsVehicle(unitToSpawn.GetTypeID()))
 			{
-				spawnArea.Inflate(unitToSpawn.spawnDistance, unitToSpawn.spawnDistance);
+				spawnArea.Inflate(unitToSpawn.SpawnDistance, unitToSpawn.SpawnDistance);
 
 				// Tile is not valid if extended spawn area contains the tile
 				if (spawnArea.Contains(x,y))
@@ -254,7 +254,7 @@ namespace DotNetMissionSDK
 			MAP_RECT targetSpawnRect = new UnitInfo(unitToSpawn.GetTypeID()).GetRect(new LOCATION(x,y), true);
 
 			// Check if colliding
-			if (IsColliding(targetSpawnRect, unitToSpawn.minDistance, IsStructure(unitToSpawn.GetTypeID()), IsVehicle(unitToSpawn.GetTypeID())))
+			if (IsColliding(targetSpawnRect, unitToSpawn.MinDistance, IsStructure(unitToSpawn.GetTypeID()), IsVehicle(unitToSpawn.GetTypeID())))
 				return false;
 				
 			return true;
@@ -303,7 +303,7 @@ namespace DotNetMissionSDK
 					CreatedUnitData data;
 					int targetMinDistance = 0;
 					if (m_CreatedUnitData.TryGetValue(unit.GetStubIndex(), out data))
-						targetMinDistance = data.unitData.minDistance;
+						targetMinDistance = data.unitData.MinDistance;
 
 					// Inflate by min distance
 					if (minDistance < targetMinDistance)
@@ -328,7 +328,7 @@ namespace DotNetMissionSDK
 		/// <param name="createdUnitData">The source unit's created unit data.</param>
 		private void GenerateTubes(Player owner, Unit sourceUnit, LOCATION sourcePosition, CreatedUnitData createdUnitData)
 		{
-			int maxDistance = createdUnitData.unitData.minDistance;
+			int maxDistance = createdUnitData.unitData.MinDistance;
 			int maxTubes = createdUnitData.unitData.maxTubes;
 
 			// First structure does not generate any tubes.

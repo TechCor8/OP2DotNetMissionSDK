@@ -15,7 +15,7 @@ namespace DotNetMissionSDK
 
 		public static MAP_RECT ToMapRect(this DataRect data)
 		{
-			return MAP_RECT.FromMinMax(data.xMin, data.yMin, data.xMax, data.yMax);
+			return MAP_RECT.FromMinMax(data.MinX, data.MinY, data.MaxX, data.MaxY);
 		}
 	}
 }

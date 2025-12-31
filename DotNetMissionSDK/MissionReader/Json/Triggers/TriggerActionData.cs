@@ -166,22 +166,22 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class TriggerActionData
 	{
-		[DataMember(Name = "Type")]					private string m_Type				{ get; set; } = string.Empty;
-		[DataMember(Name = "Modifier")]				private string m_Modifier			{ get; set; } = string.Empty; // Set, add, subtract
-		[DataMember(Name = "Subject")]				public string subject				{ get; set; } = string.Empty; // TriggerPlayerCategory, TriggerUnitCategory, Switch#
-		[DataMember(Name = "Subject2")]				public string subject2				{ get; set; } = string.Empty; // map_id weapon
-		[DataMember(Name = "SubjectPlayer")]		public string subjectPlayer			{ get; set; } = string.Empty; // TriggerPlayerCategory
-		[DataMember(Name = "SubjectRegion")]		public string subjectRegion			{ get; set; } = string.Empty; // Region
-		[DataMember(Name = "SubjectQuantity")]		public int subjectQuantity			{ get; set; }
+		[DataMember(Name = "Type")]					private string _type				{ get; set; } = string.Empty;
+		[DataMember(Name = "Modifier")]				private string _modifier			{ get; set; } = string.Empty; // Set, add, subtract
+		[DataMember(Name = "Subject")]				public string Subject				{ get; set; } = string.Empty; // TriggerPlayerCategory, TriggerUnitCategory, Switch#
+		[DataMember(Name = "Subject2")]				public string Subject2				{ get; set; } = string.Empty; // map_id weapon
+		[DataMember(Name = "SubjectPlayer")]		public string SubjectPlayer			{ get; set; } = string.Empty; // TriggerPlayerCategory
+		[DataMember(Name = "SubjectRegion")]		public string SubjectRegion			{ get; set; } = string.Empty; // Region
+		[DataMember(Name = "SubjectQuantity")]		public int SubjectQuantity			{ get; set; }
 		
-		[DataMember(Name = "Value")]				public string value					{ get; set; } = string.Empty;
-		[DataMember(Name = "Value2")]				public string value2				{ get; set; } = string.Empty;
-		[DataMember(Name = "Value3")]				public string value3				{ get; set; } = string.Empty;
-		[DataMember(Name = "Value4")]				public string value4				{ get; set; } = string.Empty;
-		[DataMember(Name = "Value5")]				public string value5				{ get; set; } = string.Empty;
+		[DataMember(Name = "Value")]				public string Value					{ get; set; } = string.Empty;
+		[DataMember(Name = "Value2")]				public string Value2				{ get; set; } = string.Empty;
+		[DataMember(Name = "Value3")]				public string Value3				{ get; set; } = string.Empty;
+		[DataMember(Name = "Value4")]				public string Value4				{ get; set; } = string.Empty;
+		[DataMember(Name = "Value5")]				public string Value5				{ get; set; } = string.Empty;
 
-		public TriggerActionType type							{ get { return GetEnum<TriggerActionType>(m_Type);			} set { m_Type = value.ToString();				} }
-		public TriggerModifier modifier							{ get { return GetEnum<TriggerModifier>(m_Modifier);		} set { m_Modifier = value.ToString();			} }
+		public TriggerActionType type							{ get { return GetEnum<TriggerActionType>(_type);		} set { _type = value.ToString();				} }
+		public TriggerModifier modifier							{ get { return GetEnum<TriggerModifier>(_modifier);		} set { _modifier = value.ToString();			} }
 
 
 		// Integer subject and values
@@ -201,8 +201,8 @@ namespace DotNetMissionReader
 		public int GetSubjectAsMarkerType()						{ return GetEnumOrInt<MarkerType>(subject);								}
 		public int GetSubjectAsTruckCargo()						{ return GetEnumOrInt<TruckCargo>(subject);								}*/
 
-		public int GetSubjectPlayer()							{ return GetEnumOrInt<TriggerPlayerCategory>(subjectPlayer);			}
-		public int GetSubjectRegion()							{ return GetEnumOrInt<TriggerRegion>(subjectRegion);					}
+		public int GetSubjectPlayer()							{ return GetEnumOrInt<TriggerPlayerCategory>(SubjectPlayer);			}
+		public int GetSubjectRegion()							{ return GetEnumOrInt<TriggerRegion>(SubjectRegion);					}
 
 		// Parse value as enum
 		/*public TriggerPlayerCategory GetValueAsPlayerCategory()	{ return GetEnum<TriggerPlayerCategory>(value);							}
@@ -380,18 +380,18 @@ namespace DotNetMissionReader
 
 		public TriggerActionData(TriggerActionData clone)
 		{
-			m_Type = clone.m_Type;
-			m_Modifier = clone.m_Modifier;
-			subject = clone.subject;
-			subjectPlayer = clone.subjectPlayer;
-			subjectRegion = clone.subjectRegion;
-			subjectQuantity = clone.subjectQuantity;
+			_type = clone._type;
+			_modifier = clone._modifier;
+			Subject = clone.Subject;
+			SubjectPlayer = clone.SubjectPlayer;
+			SubjectRegion = clone.SubjectRegion;
+			SubjectQuantity = clone.SubjectQuantity;
 
-			value = clone.value;
-			value2 = clone.value2;
-			value3 = clone.value3;
-			value4 = clone.value4;
-			value5 = clone.value5;
+			Value = clone.Value;
+			Value2 = clone.Value2;
+			Value3 = clone.Value3;
+			Value4 = clone.Value4;
+			Value5 = clone.Value5;
 		}
 
 		private int GetEnumOrInt<T>(string val) where T : struct

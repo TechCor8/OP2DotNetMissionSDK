@@ -24,20 +24,20 @@ namespace DotNetMissionSDK.Triggers
 			m_TriggerSaveData = triggerSaveData;
 			
 			// Cache trigger conditions
-			m_TriggerConditions = new EventTriggerCondition[triggerData.conditions.Count];
+			m_TriggerConditions = new EventTriggerCondition[triggerData.Conditions.Count];
 			for (int i=0; i < m_TriggerConditions.Length; ++i)
-				m_TriggerConditions[i] = new EventTriggerCondition(eventData, triggerData.conditions[i], ownerID);
+				m_TriggerConditions[i] = new EventTriggerCondition(eventData, triggerData.Conditions[i], ownerID);
 
 			// Cache trigger actions
-			m_TriggerActions = new EventTriggerAction[triggerData.actions.Count];
+			m_TriggerActions = new EventTriggerAction[triggerData.Actions.Count];
 			for (int i=0; i < m_TriggerActions.Length; ++i)
-				m_TriggerActions[i] = new EventTriggerAction(eventData, triggerData.actions[i], ownerID);
+				m_TriggerActions[i] = new EventTriggerAction(eventData, triggerData.Actions[i], ownerID);
 		}
 
 		public void NewMission()
 		{
 			// Initialize default state
-			m_TriggerSaveData.enabled = m_TriggerData.enabled;
+			m_TriggerSaveData.enabled = m_TriggerData.Enabled;
 			m_TriggerSaveData.isExecuting = false;
 		}
 

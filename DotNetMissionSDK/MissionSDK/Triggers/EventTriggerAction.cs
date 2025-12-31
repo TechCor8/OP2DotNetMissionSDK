@@ -54,17 +54,17 @@ namespace DotNetMissionSDK.Triggers
 
 			type = actionData.type;
 			modifier = actionData.modifier;
-			subject = TriggerValueTypeUtility.GetStringAsInt(actionData.subject, actionData.GetSubjectType());
-			subject2 = TriggerValueTypeUtility.GetStringAsInt(actionData.subject2, actionData.GetSubject2Type());
+			subject = TriggerValueTypeUtility.GetStringAsInt(actionData.Subject, actionData.GetSubjectType());
+			subject2 = TriggerValueTypeUtility.GetStringAsInt(actionData.Subject2, actionData.GetSubject2Type());
 			subjectPlayer = actionData.GetSubjectPlayer();
 			subjectRegion = actionData.GetSubjectRegion();
-			subjectQuantity = actionData.subjectQuantity;
+			subjectQuantity = actionData.SubjectQuantity;
 
-			value = TriggerValueTypeUtility.GetStringAsInt(actionData.value, actionData.GetValueType());
-			value2 = TriggerValueTypeUtility.GetStringAsInt(actionData.value2, actionData.GetValue2Type());
-			value3 = TriggerValueTypeUtility.GetStringAsInt(actionData.value3, actionData.GetValue3Type());
-			value4 = TriggerValueTypeUtility.GetStringAsInt(actionData.value4, actionData.GetValue4Type());
-			value5 = TriggerValueTypeUtility.GetStringAsInt(actionData.value5, actionData.GetValue5Type());
+			value = TriggerValueTypeUtility.GetStringAsInt(actionData.Value, actionData.GetValueType());
+			value2 = TriggerValueTypeUtility.GetStringAsInt(actionData.Value2, actionData.GetValue2Type());
+			value3 = TriggerValueTypeUtility.GetStringAsInt(actionData.Value3, actionData.GetValue3Type());
+			value4 = TriggerValueTypeUtility.GetStringAsInt(actionData.Value4, actionData.GetValue4Type());
+			value5 = TriggerValueTypeUtility.GetStringAsInt(actionData.Value5, actionData.GetValue5Type());
 
 			subjectType = actionData.GetSubjectType();
 		}
@@ -192,7 +192,7 @@ namespace DotNetMissionSDK.Triggers
 
 				case TriggerActionType.SetPlayerName:                               // Set [CurrentPlayer/Player#] name to [value]
 					foreach (PlayerState player in GetPlayer(stateSnapshot, eventPlayer, subjectPlayer))
-						GameState.players[player.playerID].SetPlayerName(m_ActionData.value);
+						GameState.players[player.playerID].SetPlayerName(m_ActionData.Value);
 
 					return EventTriggerActionResult.Complete;
 				
@@ -328,7 +328,7 @@ namespace DotNetMissionSDK.Triggers
 					LOCATION centerPt = GetRegionCenterPt(GetRegionRect(value3));
 
 					foreach (PlayerState player in GetPlayer(stateSnapshot, eventPlayer, subjectPlayer))
-						TethysGame.AddMessage(centerPt.x, centerPt.y, m_ActionData.value, player.playerID, value2);
+						TethysGame.AddMessage(centerPt.x, centerPt.y, m_ActionData.Value, player.playerID, value2);
 
 					return EventTriggerActionResult.Complete;
 				}
@@ -344,7 +344,7 @@ namespace DotNetMissionSDK.Triggers
 						return EventTriggerActionResult.Failure;
 
 					foreach (PlayerState player in GetPlayer(stateSnapshot, eventPlayer, subjectPlayer))
-						TethysGame.AddMessage(unit, m_ActionData.value, player.playerID, value2);
+						TethysGame.AddMessage(unit, m_ActionData.Value, player.playerID, value2);
 
 					return EventTriggerActionResult.Complete;
 				}
@@ -353,7 +353,7 @@ namespace DotNetMissionSDK.Triggers
 					foreach (PlayerState fromPlayer in GetPlayer(stateSnapshot, eventPlayer, value3))
 					{
 						foreach (PlayerState player in GetPlayer(stateSnapshot, eventPlayer, subjectPlayer))
-							TethysGame.AddMessage(fromPlayer.playerID, m_ActionData.value, player.playerID, value2);
+							TethysGame.AddMessage(fromPlayer.playerID, m_ActionData.Value, player.playerID, value2);
 					}
 
 					return EventTriggerActionResult.Complete;
@@ -507,7 +507,7 @@ namespace DotNetMissionSDK.Triggers
 
 				case TriggerActionType.SetMusic:                                    // Set music [ID CSV] repeat to [index]
 				{
-					string[] songs = m_ActionData.value.Split(',');
+					string[] songs = m_ActionData.Value.Split(',');
 					List<int> songIDs = new List<int>(songs.Length);
 					foreach (string song in songs)
 					{

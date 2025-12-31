@@ -31,37 +31,37 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class OP2TriggerData
 	{
-		[DataMember(Name = "ID")]					public int id						{ get; set; }
-		[DataMember(Name = "Type")]					public string triggerType			{ get; set; } = string.Empty;
-		[DataMember(Name = "Enabled")]				public bool enabled					{ get; set; }
-		[DataMember(Name = "OneShot")]				public bool oneShot					{ get; set; }
+		[DataMember(Name = "ID")]					public int Id						{ get; set; }
+		[DataMember(Name = "Type")]					public string TriggerType			{ get; set; } = string.Empty;
+		[DataMember(Name = "Enabled")]				public bool Enabled					{ get; set; }
+		[DataMember(Name = "OneShot")]				public bool OneShot					{ get; set; }
 
-		[DataMember(Name = "Actions")]				public ActionData[] actions			{ get; set; } = Array.Empty<ActionData>();
+		[DataMember(Name = "Actions")]				public ActionData[] Actions			{ get; set; } = Array.Empty<ActionData>();
 
 
-		[DataMember(Name = "TriggerID")]			public int triggerID				{ get; set; }
+		[DataMember(Name = "TriggerID")]			public int TriggerId				{ get; set; }
 
-		[DataMember(Name = "Message")]				public string message				{ get; set; } = string.Empty;
+		[DataMember(Name = "Message")]				public string Message				{ get; set; } = string.Empty;
 
-		[DataMember(Name = "PlayerID")]				public int playerID					{ get; set; }
-		[DataMember(Name = "Count")]				public int count					{ get; set; }
-		[DataMember(Name = "CompareType")]			public string compareType			{ get; set; } = string.Empty;
-		[DataMember(Name = "UnitType")]				public string unitType				{ get; set; } = string.Empty;
+		[DataMember(Name = "PlayerID")]				public int PlayerId					{ get; set; }
+		[DataMember(Name = "Count")]				public int Count					{ get; set; }
+		[DataMember(Name = "CompareType")]			public string CompareType			{ get; set; } = string.Empty;
+		[DataMember(Name = "UnitType")]				public string UnitType				{ get; set; } = string.Empty;
 
-		[DataMember(Name = "Time")]					public int time						{ get; set; }
-		[DataMember(Name = "MinTime")]				public int minTime					{ get; set; }
-		[DataMember(Name = "MaxTime")]				public int maxTime					{ get; set; }
+		[DataMember(Name = "Time")]					public int Time						{ get; set; }
+		[DataMember(Name = "MinTime")]				public int MinTime					{ get; set; }
+		[DataMember(Name = "MaxTime")]				public int MaxTime					{ get; set; }
 
-		[DataMember(Name = "TechID")]				public int techID					{ get; set; }
+		[DataMember(Name = "TechID")]				public int TechId					{ get; set; }
 
-		[DataMember(Name = "X")]					public int x						{ get; set; }
-		[DataMember(Name = "Y")]					public int y						{ get; set; }
-		[DataMember(Name = "Width")]				public int width					{ get; set; }
-		[DataMember(Name = "Height")]				public int height					{ get; set; }
+		[DataMember(Name = "X")]					public int X						{ get; set; }
+		[DataMember(Name = "Y")]					public int Y						{ get; set; }
+		[DataMember(Name = "Width")]				public int Width					{ get; set; }
+		[DataMember(Name = "Height")]				public int Height					{ get; set; }
 
-		[DataMember(Name = "CargoOrWeaponType")]	public string cargoOrWeaponType		{ get; set; } = string.Empty;
-		[DataMember(Name = "ResourceType")]			public string resourceType			{ get; set; } = string.Empty;
-		[DataMember(Name = "CargoType")]			public string cargoType				{ get; set; } = string.Empty;
+		[DataMember(Name = "CargoOrWeaponType")]	public string CargoOrWeaponType		{ get; set; } = string.Empty;
+		[DataMember(Name = "ResourceType")]			public string ResourceType			{ get; set; } = string.Empty;
+		[DataMember(Name = "CargoType")]			public string CargoType				{ get; set; } = string.Empty;
 
 		[DataMember(Name = "CargoAmount")]			public int cargoAmount				{ get; set; }
 

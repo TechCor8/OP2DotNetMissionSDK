@@ -7,35 +7,35 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class TriggerData
 	{
-		[DataMember(Name = "ID")]					public int id									{ get; set; }
-		[DataMember(Name = "Enabled")]				public bool enabled								{ get; set; }
-		[DataMember(Name = "EventType")]			private string m_EventType						{ get; set; } = string.Empty;
-		[DataMember(Name = "Condition")]			public List<TriggerConditionData> conditions	{ get; set; }
-		[DataMember(Name = "Actions")]				public List<TriggerActionData> actions			{ get; set; }
+		[DataMember(Name = "ID")]					public int Id									{ get; set; }
+		[DataMember(Name = "Enabled")]				public bool Enabled								{ get; set; }
+		[DataMember(Name = "EventType")]			private string _eventType						{ get; set; } = string.Empty;
+		[DataMember(Name = "Condition")]			public List<TriggerConditionData> Conditions	{ get; set; }
+		[DataMember(Name = "Actions")]				public List<TriggerActionData> Actions			{ get; set; }
 
-		public TriggerEventType eventType			{ get { return GetEnum<TriggerEventType>(m_EventType);			} set { m_EventType = value.ToString();		} }
+		public TriggerEventType EventType			{ get { return GetEnum<TriggerEventType>(_eventType);			} set { _eventType = value.ToString();		} }
 
 
 		public TriggerData()
 		{
-			enabled = true;
+			Enabled = true;
 
-			conditions = new List<TriggerConditionData>();
-			actions = new List<TriggerActionData>();
+			Conditions = new List<TriggerConditionData>();
+			Actions = new List<TriggerActionData>();
 		}
 
 		public TriggerData(TriggerData clone)
 		{
-			id = clone.id;
-			m_EventType = clone.m_EventType;
+			Id = clone.Id;
+			_eventType = clone._eventType;
 
-			conditions = new List<TriggerConditionData>(clone.conditions.Count);
-			actions = new List<TriggerActionData>(clone.actions.Count);
+			Conditions = new List<TriggerConditionData>(clone.Conditions.Count);
+			Actions = new List<TriggerActionData>(clone.Actions.Count);
 
-			for (int i=0; i < clone.conditions.Count; ++i)
-				conditions.Add(new TriggerConditionData(clone.conditions[i]));
-			for (int i=0; i < clone.actions.Count; ++i)
-				actions.Add(new TriggerActionData(clone.actions[i]));
+			for (int i=0; i < clone.Conditions.Count; ++i)
+				Conditions.Add(new TriggerConditionData(clone.Conditions[i]));
+			for (int i=0; i < clone.Actions.Count; ++i)
+				Actions.Add(new TriggerActionData(clone.Actions[i]));
 		}
 
 		private static T GetEnum<T>(string val) where T : struct

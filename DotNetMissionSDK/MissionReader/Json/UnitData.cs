@@ -9,57 +9,57 @@ namespace DotNetMissionReader
 	public class UnitData
 	{
 		// Standard info
-		[DataMember(Name = "ID")]			public int id						{ get; set; }
-		[DataMember(Name = "TypeID")]		public string typeID				{ get; set; } = string.Empty;
-		[DataMember(Name = "Health")]		public float health					{ get; set; }
-		[DataMember(Name = "Lights")]		public bool lights					{ get; set; }
-		[DataMember(Name = "CargoType")]	public string cargoType				{ get; set; } = string.Empty;
-		[DataMember(Name = "CargoAmount")]	public int cargoAmount				{ get; set; }
-		[DataMember(Name = "Direction")]	public string direction				{ get; set; } = string.Empty;
-		[DataMember(Name = "Position")]		public DataLocation position		{ get; set; }
+		[DataMember(Name = "ID")]			public int Id						{ get; set; }
+		[DataMember(Name = "TypeID")]		public string TypeID				{ get; set; } = string.Empty;
+		[DataMember(Name = "Health")]		public float Health					{ get; set; }
+		[DataMember(Name = "Lights")]		public bool Lights					{ get; set; }
+		[DataMember(Name = "CargoType")]	public string CargoType				{ get; set; } = string.Empty;
+		[DataMember(Name = "CargoAmount")]	public int CargoAmount				{ get; set; }
+		[DataMember(Name = "Direction")]	public string Direction				{ get; set; } = string.Empty;
+		[DataMember(Name = "Position")]		public DataLocation Position		{ get; set; }
 
 		// Used for ore mines
-		[DataMember(Name = "BarYield")]		public string barYield				{ get; set; } = string.Empty;
-		[DataMember(Name = "BarVariant")]	public string barVariant			{ get; set; } = string.Empty;
+		[DataMember(Name = "BarYield")]		public string BarYield				{ get; set; } = string.Empty;
+		[DataMember(Name = "BarVariant")]	public string BarVariant			{ get; set; } = string.Empty;
 
 		// AutoLayout
-		[DataMember(Name = "IgnoreLayout")]	public bool ignoreLayout			{ get; set; }
-		[DataMember(Name = "MinDistance")]	public int minDistance				{ get; set; }
-		[DataMember(Name = "SpawnDistance")]public int spawnDistance			{ get; set; }
-		[DataMember(Name = "CreateWall")]	public bool createWall				{ get; set; }
-		[DataMember(Name = "MaxTubes")]		private int? m_MaxTubes				{ get; set; }
+		[DataMember(Name = "IgnoreLayout")]	public bool IgnoreLayout			{ get; set; }
+		[DataMember(Name = "MinDistance")]	public int MinDistance				{ get; set; }
+		[DataMember(Name = "SpawnDistance")]public int SpawnDistance			{ get; set; }
+		[DataMember(Name = "CreateWall")]	public bool CreateWall				{ get; set; }
+		[DataMember(Name = "MaxTubes")]		private int? _MaxTubes				{ get; set; }
 
 		
 		// AutoLayout
-		public int maxTubes					{ get { return m_MaxTubes != null ? m_MaxTubes.Value : -1; } set { m_MaxTubes = value;			} }
+		public int maxTubes					{ get { return _MaxTubes != null ? _MaxTubes.Value : -1; } set { _MaxTubes = value;			} }
 
 		[OnDeserializing]
 		private void OnDeserializing(StreamingContext context)
 		{
-			health = 1;
-			lights = true;
+			Health = 1;
+			Lights = true;
 		}
 
 		public UnitData() { }
 		public UnitData(UnitData clone)
 		{
-			id = clone.id;
-			typeID = clone.typeID;
-			health = clone.health;
-			lights = clone.lights;
-			cargoType = clone.cargoType;
-			cargoAmount = clone.cargoAmount;
-			direction = clone.direction;
-			position = clone.position;
+			Id = clone.Id;
+			TypeID = clone.TypeID;
+			Health = clone.Health;
+			Lights = clone.Lights;
+			CargoType = clone.CargoType;
+			CargoAmount = clone.CargoAmount;
+			Direction = clone.Direction;
+			Position = clone.Position;
 
-			barYield = clone.barYield;
-			barVariant = clone.barVariant;
+			BarYield = clone.BarYield;
+			BarVariant = clone.BarVariant;
 
-			ignoreLayout = clone.ignoreLayout;
-			minDistance = clone.minDistance;
-			spawnDistance = clone.spawnDistance;
-			createWall = clone.createWall;
-			m_MaxTubes = clone.m_MaxTubes;
+			IgnoreLayout = clone.IgnoreLayout;
+			MinDistance = clone.MinDistance;
+			SpawnDistance = clone.SpawnDistance;
+			CreateWall = clone.CreateWall;
+			_MaxTubes = clone._MaxTubes;
 		}
 	}
 }

@@ -35,13 +35,13 @@ namespace DotNetMissionSDK.Triggers
 			m_EventData = eventData;
 			m_OwnerID = ownerID;
 
-			type = conditionData.type;
-			subject = TriggerValueTypeUtility.GetStringAsInt(conditionData.subject, conditionData.GetSubjectType());
-			comparison = conditionData.comparison;
+			type = conditionData.Type;
+			subject = TriggerValueTypeUtility.GetStringAsInt(conditionData.Subject, conditionData.GetSubjectType());
+			comparison = conditionData.Comparison;
 
-			value = TriggerValueTypeUtility.GetStringAsInt(conditionData.value, conditionData.GetValueType());
-			value2 = TriggerValueTypeUtility.GetStringAsInt(conditionData.value2, conditionData.GetValue2Type());
-			value3 = TriggerValueTypeUtility.GetStringAsInt(conditionData.value3, conditionData.GetValue3Type());
+			value = TriggerValueTypeUtility.GetStringAsInt(conditionData.Value, conditionData.GetValueType());
+			value2 = TriggerValueTypeUtility.GetStringAsInt(conditionData.Value2, conditionData.GetValue2Type());
+			value3 = TriggerValueTypeUtility.GetStringAsInt(conditionData.Value3, conditionData.GetValue3Type());
 
 			subjectType = conditionData.GetSubjectType();
 

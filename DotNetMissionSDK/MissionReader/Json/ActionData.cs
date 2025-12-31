@@ -5,10 +5,10 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class ActionData
 	{
-		[DataMember(Name = "Type")]				public string type			{ get; set; } = string.Empty;
+		[DataMember(Name = "Type")]				public string Type			{ get; set; } = string.Empty;
 
-		[DataMember(Name = "Message")]			public string message		{ get; set; } = string.Empty;
-		[DataMember(Name = "PlayerID")]			public int playerID			{ get; set; }
-		[DataMember(Name = "SoundID")]			public int soundID			{ get; set; }
+		[DataMember(Name = "Message")]			public string Message		{ get; set; } = string.Empty;
+		[DataMember(Name = "PlayerID")]			public int PlayerId			{ get; set; }
+		[DataMember(Name = "SoundID")]			public int SoundId			{ get; set; }
 	}
 }

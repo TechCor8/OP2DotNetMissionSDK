@@ -4,21 +4,21 @@ namespace DotNetMissionSDK
 {
 	public static class UnitDataExtensions
 	{
-		public static map_id GetTypeID(this UnitData unitData) => GetEnum<map_id>(unitData.typeID);
-		public static void SetTypeID(this UnitData unitData, map_id typeId) => unitData.typeID = typeId.ToString();
+		public static map_id GetTypeID(this UnitData unitData) => GetEnum<map_id>(unitData.TypeID);
+		public static void SetTypeID(this UnitData unitData, map_id typeId) => unitData.TypeID = typeId.ToString();
 
-		public static int GetCargoType(this UnitData unitData) => GetCargoType(GetTypeID(unitData), unitData.cargoType);
-		public static void SetCargoType(this UnitData unitData, int cargoType) => unitData.cargoType = GetCargoType(GetTypeID(unitData), cargoType);
+		public static int GetCargoType(this UnitData unitData) => GetCargoType(GetTypeID(unitData), unitData.CargoType);
+		public static void SetCargoType(this UnitData unitData, int cargoType) => unitData.CargoType = GetCargoType(GetTypeID(unitData), cargoType);
 
-		public static UnitDirection GetDirection(this UnitData unitData) => GetEnum<UnitDirection>(unitData.direction);
-		public static void SetDirection(this UnitData unitData, UnitDirection direction) => unitData.direction = direction.ToString();
+		public static UnitDirection GetDirection(this UnitData unitData) => GetEnum<UnitDirection>(unitData.Direction);
+		public static void SetDirection(this UnitData unitData, UnitDirection direction) => unitData.Direction = direction.ToString();
 
 		// Used for ore mines
-		public static Yield GetBarYield(this UnitData unitData) => GetEnum<Yield>(unitData.barYield);
-		public static void SetBarYield(this UnitData unitData, Yield barYield) => unitData.barYield = barYield.ToString();
+		public static Yield GetBarYield(this UnitData unitData) => GetEnum<Yield>(unitData.BarYield);
+		public static void SetBarYield(this UnitData unitData, Yield barYield) => unitData.BarYield = barYield.ToString();
 
-		public static Variant GetBarVariant(this UnitData unitData) => GetEnum<Variant>(unitData.barVariant);
-		public static void SetBarVariant(this UnitData unitData, Variant barVariant) => unitData.barVariant = barVariant.ToString();
+		public static Variant GetBarVariant(this UnitData unitData) => GetEnum<Variant>(unitData.BarVariant);
+		public static void SetBarVariant(this UnitData unitData, Variant barVariant) => unitData.BarVariant = barVariant.ToString();
 
 		/// <summary>
 		/// Creates a unit from UnitData.
@@ -47,12 +47,12 @@ namespace DotNetMissionSDK
 
 				case map_id.CargoTruck:
 					unit = TethysGame.CreateUnit(data.GetTypeID(), pt.x, pt.y, playerID, data.GetCargoType(), data.GetDirection());
-					unit.SetTruckCargo((TruckCargo)data.GetCargoType(), data.cargoAmount);
+					unit.SetTruckCargo((TruckCargo)data.GetCargoType(), data.CargoAmount);
 					break;
 
 				case map_id.ConVec:
 					unit = TethysGame.CreateUnit(data.GetTypeID(), pt.x, pt.y, playerID, data.GetCargoType(), data.GetDirection());
-					unit.SetCargo((map_id)data.GetCargoType(), (map_id)data.cargoAmount);
+					unit.SetCargo((map_id)data.GetCargoType(), (map_id)data.CargoAmount);
 					break;
 
 				default:
@@ -62,11 +62,11 @@ namespace DotNetMissionSDK
 			}
 
 			int hp = unit.GetUnitInfo().GetHitPoints(playerID);
-			int damage = (int)(hp * (1.0f - data.health));
+			int damage = (int)(hp * (1.0f - data.Health));
 			unit.SetDamage(damage);
 
 			if (unit.IsVehicle())
-				unit.DoSetLights(data.lights);
+				unit.DoSetLights(data.Lights);
 
 			return unit;
 		}
@@ -153,18 +153,18 @@ namespace DotNetMissionSDK
 		private static void SetUnitData(UnitData unitData, map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant,
 								bool ignoreLayout, int minDistance, int spawnDistance, bool createWall, int maxTubes)
 		{
-			unitData.typeID = typeID.ToString();
-			unitData.lights = true;
-			unitData.cargoType = GetCargoType(typeID, cargoType);
-			unitData.cargoAmount = cargoAmount;
-			unitData.direction = direction.ToString();
-			unitData.position = position.ToDataLocation();
-			unitData.barYield = barYield.ToString();
-			unitData.barVariant = barVariant.ToString();
-			unitData.ignoreLayout = ignoreLayout;
-			unitData.minDistance = minDistance;
-			unitData.spawnDistance = spawnDistance;
-			unitData.createWall = createWall;
+			unitData.TypeID = typeID.ToString();
+			unitData.Lights = true;
+			unitData.CargoType = GetCargoType(typeID, cargoType);
+			unitData.CargoAmount = cargoAmount;
+			unitData.Direction = direction.ToString();
+			unitData.Position = position.ToDataLocation();
+			unitData.BarYield = barYield.ToString();
+			unitData.BarVariant = barVariant.ToString();
+			unitData.IgnoreLayout = ignoreLayout;
+			unitData.MinDistance = minDistance;
+			unitData.SpawnDistance = spawnDistance;
+			unitData.CreateWall = createWall;
 			unitData.maxTubes = maxTubes;
 		}
 	}

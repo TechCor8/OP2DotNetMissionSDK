@@ -6,20 +6,20 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class AutoLayout
 	{
-		[DataMember(Name = "PlayerID")]			public int playerID					{ get; set; }
-		[DataMember(Name = "BaseCenterPt")]		public DataLocation baseCenterPt	{ get; set; }
+		[DataMember(Name = "PlayerID")]			public int PlayerId					{ get; set; }
+		[DataMember(Name = "BaseCenterPt")]		public DataLocation BaseCenterPt	{ get; set; }
 
-		[DataMember(Name = "Units")]			public UnitData[] units				{ get; set; } = Array.Empty<UnitData>();
+		[DataMember(Name = "Units")]			public UnitData[] Units				{ get; set; } = Array.Empty<UnitData>();
 
 		public AutoLayout() { }
 		public AutoLayout(AutoLayout clone)
 		{
-			playerID = clone.playerID;
-			baseCenterPt = clone.baseCenterPt;
+			PlayerId = clone.PlayerId;
+			BaseCenterPt = clone.BaseCenterPt;
 
-			units = new UnitData[clone.units.Length];
-			for (int i=0; i < units.Length; ++i)
-				units[i] = new UnitData(clone.units[i]);
+			Units = new UnitData[clone.Units.Length];
+			for (int i=0; i < Units.Length; ++i)
+				Units[i] = new UnitData(clone.Units[i]);
 		}
 	}
 }

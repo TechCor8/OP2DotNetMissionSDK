@@ -5,9 +5,9 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class DataRect
 	{
-		[DataMember(Name = "MinX")]		public int xMin			{ get; set; }
-		[DataMember(Name = "MinY")]		public int yMin			{ get; set; }
-		[DataMember(Name = "MaxX")]		public int xMax			{ get; set; }
-		[DataMember(Name = "MaxY")]		public int yMax			{ get; set; }
+		[DataMember(Name = "MinX")]		public int MinX			{ get; set; }
+		[DataMember(Name = "MinY")]		public int MinY			{ get; set; }
+		[DataMember(Name = "MaxX")]		public int MaxX			{ get; set; }
+		[DataMember(Name = "MaxY")]		public int MaxY			{ get; set; }
 	}
 }

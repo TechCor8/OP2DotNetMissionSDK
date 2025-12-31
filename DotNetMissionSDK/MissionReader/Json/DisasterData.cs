@@ -15,20 +15,20 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class DisasterData
 	{
-		[DataMember(Name = "ID")]				public int id				{ get; set; }
-		[DataMember(Name = "Type")]				private string m_Type		{ get; set; } = string.Empty;
-		[DataMember(Name = "SrcRect")]			public DataRect srcRect		{ get; set; } = new DataRect();
-		[DataMember(Name = "DestRect")]			public DataRect destRect	{ get; set; } = new DataRect();
-		[DataMember(Name = "Size")]				public int size				{ get; set; }
-		[DataMember(Name = "Duration")]			public int duration			{ get; set; }
-		[DataMember(Name = "StartTime")]		public int startTime		{ get; set; }
-		[DataMember(Name = "EndTime")]			public int endTime			{ get; set; }
-		[DataMember(Name = "MinDelay")]			public int minDelay			{ get; set; }
-		[DataMember(Name = "MaxDelay")]			public int maxDelay			{ get; set; }
+		[DataMember(Name = "ID")]				public int Id				{ get; set; }
+		[DataMember(Name = "Type")]				private string _Type		{ get; set; } = string.Empty;
+		[DataMember(Name = "SrcRect")]			public DataRect SrcRect		{ get; set; } = new DataRect();
+		[DataMember(Name = "DestRect")]			public DataRect DestRect	{ get; set; } = new DataRect();
+		[DataMember(Name = "Size")]				public int Size				{ get; set; }
+		[DataMember(Name = "Duration")]			public int Duration			{ get; set; }
+		[DataMember(Name = "StartTime")]		public int StartTime		{ get; set; }
+		[DataMember(Name = "EndTime")]			public int EndTime			{ get; set; }
+		[DataMember(Name = "MinDelay")]			public int MinDelay			{ get; set; }
+		[DataMember(Name = "MaxDelay")]			public int MaxDelay			{ get; set; }
 
 		public int timeUntilNextDisaster;
 
-		public DisasterType type				{ get { return GetEnum<DisasterType>(m_Type);		} set { m_Type = value.ToString();			} }
+		public DisasterType Type				{ get { return GetEnum<DisasterType>(_Type);		} set { _Type = value.ToString();			} }
 		
 
 		private static T GetEnum<T>(string val) where T : struct

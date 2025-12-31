@@ -101,17 +101,17 @@ namespace DotNetMissionReader
 	[DataContract]
 	public class TriggerConditionData
 	{
-		[DataMember(Name = "Type")]					private string m_Type				{ get; set; } = string.Empty;
-		[DataMember(Name = "Subject")]				public string subject				{ get; set; } = string.Empty; // TriggerPlayerCategory, TriggerUnitCategory, Switch#
-		[DataMember(Name = "Comparison")]			private string m_Comparison			{ get; set; } = string.Empty;
+		[DataMember(Name = "Type")]					private string _type				{ get; set; } = string.Empty;
+		[DataMember(Name = "Subject")]				public string Subject				{ get; set; } = string.Empty; // TriggerPlayerCategory, TriggerUnitCategory, Switch#
+		[DataMember(Name = "Comparison")]			private string _comparison			{ get; set; } = string.Empty;
 
-		[DataMember(Name = "Value")]				public string value					{ get; set; } = string.Empty; // Quantity, Value, TopicID, Colony, Difficulty, Morale, Region, etc.
-		[DataMember(Name = "Value2")]				public string value2				{ get; set; } = string.Empty; // Secondary value used by some conditions
-		[DataMember(Name = "Value3")]				public string value3				{ get; set; } = string.Empty; // Secondary value used by some conditions
+		[DataMember(Name = "Value")]				public string Value					{ get; set; } = string.Empty; // Quantity, Value, TopicID, Colony, Difficulty, Morale, Region, etc.
+		[DataMember(Name = "Value2")]				public string Value2				{ get; set; } = string.Empty; // Secondary value used by some conditions
+		[DataMember(Name = "Value3")]				public string Value3				{ get; set; } = string.Empty; // Secondary value used by some conditions
 
 
-		public TriggerConditionType type						{ get { return GetEnum<TriggerConditionType>(m_Type);		} set { m_Type = value.ToString();				} }
-		public TriggerCompare comparison						{ get { return GetEnum<TriggerCompare>(m_Comparison);		} set { m_Comparison = value.ToString();		} }
+		public TriggerConditionType Type						{ get { return GetEnum<TriggerConditionType>(_type);		} set { _type = value.ToString();			} }
+		public TriggerCompare Comparison						{ get { return GetEnum<TriggerCompare>(_comparison);		} set { _comparison = value.ToString();		} }
 
 
 		// Integer subject and values
@@ -144,8 +144,8 @@ namespace DotNetMissionReader
 
 		public TriggerValueType GetSubjectType()
 		{
-			if ((int)type >= 1000 && (int)type < 2000) return TriggerValueType.PlayerCategory;
-			if ((int)type >= 2000 && (int)type < 3000) return TriggerValueType.UnitCategory;
+			if ((int)Type >= 1000 && (int)Type < 2000) return TriggerValueType.PlayerCategory;
+			if ((int)Type >= 2000 && (int)Type < 3000) return TriggerValueType.UnitCategory;
 			return TriggerValueType.Integer;
 		}
 
@@ -162,7 +162,7 @@ namespace DotNetMissionReader
 
 		public TriggerValueType GetValueType()
 		{
-			switch (type)
+			switch (Type)
 			{
 				case TriggerConditionType.CurrentRegion:				return TriggerValueType.Region;
 				case TriggerConditionType.PlayerDifficulty:				return TriggerValueType.Difficulty;
@@ -205,7 +205,7 @@ namespace DotNetMissionReader
 
 		public TriggerValueType GetValue2Type()
 		{
-			switch (type)
+			switch (Type)
 			{
 				case TriggerConditionType.PlayerHasVehicle:					return TriggerValueType.MapID;
 				case TriggerConditionType.PlayerUnitsInRegion:				return TriggerValueType.MapID;
@@ -243,13 +243,13 @@ namespace DotNetMissionReader
 
 		public TriggerConditionData(TriggerConditionData clone)
 		{
-			m_Type = clone.m_Type;
-			subject = clone.subject;
-			m_Comparison = clone.m_Comparison;
+			_type = clone._type;
+			Subject = clone.Subject;
+			_comparison = clone._comparison;
 
-			value = clone.value;
-			value2 = clone.value2;
-			value3 = clone.value3;
+			Value = clone.Value;
+			Value2 = clone.Value2;
+			Value3 = clone.Value3;
 		}
 
 		private int GetEnumOrInt<T>(string val) where T : struct
