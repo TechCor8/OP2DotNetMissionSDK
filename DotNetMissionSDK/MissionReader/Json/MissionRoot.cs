@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	[DataContract]
 	public class MissionRoot

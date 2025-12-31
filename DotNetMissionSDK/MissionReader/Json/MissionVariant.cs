@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	/// <summary>
 	/// Represents a mission variant that is randomly selected at start (unless it is a difficulty variant).
@@ -10,7 +10,7 @@ namespace DotNetMissionSDK.Json
 	public class MissionVariant
 	{
 		// The internal name of this variant to aid the mission designer.
-		[DataMember(Name = "Name")]					public string name							{ get; set; }
+		[DataMember(Name = "Name")]					public string name							{ get; set; } = string.Empty;
 
 		[DataMember(Name = "TethysGame")]			public GameData tethysGame					{ get; set; }
 		[DataMember(Name = "TethysDifficulties")]	public List<GameData> tethysDifficulties	{ get; set; }

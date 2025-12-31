@@ -1,5 +1,5 @@
 ﻿
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	/// <summary>
 	/// Non-negative values are used as the PlayerID.
@@ -91,21 +91,21 @@ namespace DotNetMissionSDK.Json
 			{
 				case TriggerValueType.PlayerCategory:		return GetEnumOrInt<TriggerPlayerCategory>(value);
 				case TriggerValueType.UnitCategory:			return GetEnumOrInt<TriggerUnitCategory>(value);
-				case TriggerValueType.Difficulty:			return GetEnumOrInt<PlayerDifficulty>(value);
+				//case TriggerValueType.Difficulty:			return GetEnumOrInt<PlayerDifficulty>(value);
 				case TriggerValueType.ColonyType:			return GetEnumOrInt<TriggerColonyType>(value);
-				case TriggerValueType.MoraleLevel:			return GetEnumOrInt<MoraleLevel>(value);
-				case TriggerValueType.TruckCargo:			return GetEnumOrInt<TruckCargo>(value);
-				case TriggerValueType.Command:				return GetEnumOrInt<HFL.CommandType>(value);
-				case TriggerValueType.Action:				return GetEnumOrInt<HFL.ActionType>(value);
-				case TriggerValueType.MapID:				return GetEnumOrInt<map_id>(value);
-				case TriggerValueType.MarkerType:			return GetEnumOrInt<MarkerType>(value);
-				case TriggerValueType.Direction:			return GetEnumOrInt<UnitDirection>(value);
-				case TriggerValueType.OreType:				return GetEnumOrInt<BeaconType>(value);
-				case TriggerValueType.Yield:				return GetEnumOrInt<Yield>(value);
-				case TriggerValueType.Variant:				return GetEnumOrInt<Variant>(value);
+				//case TriggerValueType.MoraleLevel:			return GetEnumOrInt<MoraleLevel>(value);
+				//case TriggerValueType.TruckCargo:			return GetEnumOrInt<TruckCargo>(value);
+				//case TriggerValueType.Command:				return GetEnumOrInt<HFL.CommandType>(value);
+				//case TriggerValueType.Action:				return GetEnumOrInt<HFL.ActionType>(value);
+				//case TriggerValueType.MapID:				return GetEnumOrInt<map_id>(value);
+				//case TriggerValueType.MarkerType:			return GetEnumOrInt<MarkerType>(value);
+				//case TriggerValueType.Direction:			return GetEnumOrInt<UnitDirection>(value);
+				//case TriggerValueType.OreType:				return GetEnumOrInt<BeaconType>(value);
+				//case TriggerValueType.Yield:				return GetEnumOrInt<Yield>(value);
+				//case TriggerValueType.Variant:				return GetEnumOrInt<Variant>(value);
 				case TriggerValueType.Region:				return GetEnumOrInt<TriggerRegion>(value);
-				case TriggerValueType.Color:				return GetEnumOrInt<PlayerColor>(value);
-				case TriggerValueType.BotType:				return GetEnumOrInt<AI.BotType>(value);
+				//case TriggerValueType.Color:				return GetEnumOrInt<PlayerColor>(value);
+				//case TriggerValueType.BotType:				return GetEnumOrInt<AI.BotType>(value);
 				//case ValueType.String:
 			}
 			

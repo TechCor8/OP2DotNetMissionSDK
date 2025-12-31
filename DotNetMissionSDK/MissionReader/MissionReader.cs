@@ -1,10 +1,14 @@
-﻿using DotNetMissionSDK.Json;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization.Json;
 
 
-namespace DotNetMissionSDK
+namespace DotNetMissionReader
 {
+	// NOTE:
+	// This reader is the same in both DotNetMissionSDK and OP2GameLogic projects.
+	// When making changes, copy the files over to keep them in sync.
+	// Eventually, this should be made into a shared library.
+
 	/// <summary>
 	/// Reads JSON data for mission.
 	/// </summary>

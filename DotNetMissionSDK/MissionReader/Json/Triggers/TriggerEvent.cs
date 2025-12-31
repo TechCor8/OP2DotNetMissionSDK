@@ -1,5 +1,5 @@
 ﻿
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	public enum TriggerEventType
 	{

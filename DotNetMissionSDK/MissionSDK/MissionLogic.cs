@@ -1,11 +1,11 @@
 ﻿using DotNetMissionSDK.AI;
-using DotNetMissionSDK.Json;
 using DotNetMissionSDK.Triggers;
 using DotNetMissionSDK.State;
 using System;
 using System.Collections.Generic;
 using DotNetMissionSDK.State.Snapshot;
 using System.Linq;
+using DotNetMissionReader;
 
 namespace DotNetMissionSDK
 {
@@ -62,7 +62,7 @@ namespace DotNetMissionSDK
 			List<Unit> createdUnits = new List<Unit>();
 
 			// Startup Flags
-			bool isMultiplayer = (int)root.levelDetails.missionType <= -4 && (int)root.levelDetails.missionType >= -8;
+			bool isMultiplayer = (int)root.levelDetails.GetMissionType() <= -4 && (int)root.levelDetails.GetMissionType() >= -8;
 			int localDifficulty = TethysGame.GetPlayer(TethysGame.LocalPlayer()).Difficulty();
 
 			// Select mission variant (random)
@@ -101,9 +101,9 @@ namespace DotNetMissionSDK
 			// Create beacons
 			foreach (GameData.Beacon beacon in beacons)
 			{
-				LOCATION spawnPt = TethysGame.GetMapCoordinates(beacon.position);
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(beacon.position.ToLocation());
 
-				int stubIndex = TethysGame.CreateBeacon(beacon.mapID, spawnPt.x, spawnPt.y, beacon.oreType, beacon.barYield, beacon.barVariant);
+				int stubIndex = TethysGame.CreateBeacon(beacon.GetMapID(), spawnPt.x, spawnPt.y, beacon.GetOreType(), beacon.GetBarYield(), beacon.GetBarVariant());
 				SetUnitID(beacon.id, stubIndex);
 			}
 
@@ -125,9 +125,9 @@ namespace DotNetMissionSDK
 			// Create markers
 			foreach (GameData.Marker marker in markers)
 			{
-				LOCATION spawnPt = TethysGame.GetMapCoordinates(marker.position);
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(marker.position.ToLocation());
 
-				Unit unit = TethysGame.PlaceMarker(spawnPt.x, spawnPt.y, marker.markerType);
+				Unit unit = TethysGame.PlaceMarker(spawnPt.x, spawnPt.y, marker.GetMarkerType());
 				SetUnitID(marker.id, unit.GetStubIndex());
 			}
 
@@ -149,9 +149,9 @@ namespace DotNetMissionSDK
 			// Create wreckage
 			foreach (GameData.Wreckage wreck in tethysGame.wreckage)
 			{
-				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.position);
+				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.position.ToLocation());
 
-				TethysGame.CreateWreck(spawnPt.x, spawnPt.y, wreck.techID, wreck.isVisible);
+				TethysGame.CreateWreck(spawnPt.x, spawnPt.y, wreck.GetTechID(), wreck.isVisible);
 			}
 
 			// Setup Players
@@ -163,7 +163,7 @@ namespace DotNetMissionSDK
 				// Process resources
 				player.SetTechLevel(resourceData.techLevel);
 
-				switch ((MoraleLevel)resourceData.moraleLevel)
+				switch ((MoraleLevel)resourceData.GetMoraleLevel())
 				{
 					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.id);	TethysGame.ForceMoraleGreat(data.id);	break;
 					case MoraleLevel.Good:			TethysGame.ForceMoraleGood(data.id);	TethysGame.ForceMoraleGood(data.id);	break;
@@ -183,7 +183,7 @@ namespace DotNetMissionSDK
 					else
 						player.GoPlymouth();
 
-					player.SetColorNumber(data.color);
+					player.SetColorNumber(data.GetColor());
 				}
 
 				if (data.isHuman)
@@ -195,7 +195,7 @@ namespace DotNetMissionSDK
 					player.AllyWith(allyID);
 
 				// Set camera position
-				LOCATION centerView = TethysGame.GetMapCoordinates(resourceData.centerView);
+				LOCATION centerView = TethysGame.GetMapCoordinates(resourceData.centerView.ToLocation());
 				player.CenterViewOn(centerView.x, centerView.y);
 
 				// Set population
@@ -229,7 +229,7 @@ namespace DotNetMissionSDK
 				// Create units
 				foreach (UnitData unitData in units)
 				{
-					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.position);
+					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.position.ToLocation());
 
 					Unit unit = unitData.CreateUnit(data.id, spawnPt);
 					SetUnitID(data.id, unit.GetStubIndex());
@@ -239,8 +239,8 @@ namespace DotNetMissionSDK
 				// Create walls and tubes
 				foreach (WallTubeData wallTube in resourceData.wallTubes)
 				{
-					LOCATION location = TethysGame.GetMapCoordinates(wallTube.position);
-					TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.typeID);
+					LOCATION location = TethysGame.GetMapCoordinates(wallTube.position.ToLocation());
+					TethysGame.CreateWallOrTube(location.x, location.y, 0, wallTube.GetTypeID());
 				}
 			}
 
@@ -265,7 +265,7 @@ namespace DotNetMissionSDK
 				}
 
 				// Generate autolayout base
-				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), layout.baseCenterPt, units.ToArray());
+				baseGenerator.Generate(TethysGame.GetPlayer(layout.playerID), layout.baseCenterPt.ToLocation(), units.ToArray());
 			}
 
 			// Setup Disasters
@@ -302,7 +302,7 @@ namespace DotNetMissionSDK
 
 					TriggerStub trigger = null;
 
-					switch (data.type)
+					switch (data.GetTriggerType())
 					{
 						case TriggerType.None:
 							Console.WriteLine("Warning: Trigger Type None");
@@ -341,7 +341,7 @@ namespace DotNetMissionSDK
 							break;
 
 						case TriggerType.Operational:
-							trigger = TriggerStub.CreateOperationalTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.unitType, data.count, data.compareType);
+							trigger = TriggerStub.CreateOperationalTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.GetUnitType(), data.count, data.GetCompareType());
 							break;
 
 						case TriggerType.Research:
@@ -349,27 +349,27 @@ namespace DotNetMissionSDK
 							break;
 
 						case TriggerType.Resource:
-							trigger = TriggerStub.CreateResourceTrigger(data.id, data.enabled, data.oneShot, data.resourceType, data.count, data.playerID, data.compareType);
+							trigger = TriggerStub.CreateResourceTrigger(data.id, data.enabled, data.oneShot, data.GetResourceType(), data.count, data.playerID, data.GetCompareType());
 							break;
 
 						case TriggerType.Kit:
-							trigger = TriggerStub.CreateKitTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.unitType, data.count);
+							trigger = TriggerStub.CreateKitTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.GetUnitType(), data.count);
 							break;
 
 						case TriggerType.Escape:
-							trigger = TriggerStub.CreateEscapeTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height, data.count, data.unitType, data.cargoType, data.cargoAmount);
+							trigger = TriggerStub.CreateEscapeTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.x, data.y, data.width, data.height, data.count, data.GetUnitType(), data.GetCargoType(), data.cargoAmount);
 							break;
 
 						case TriggerType.Count:
-							trigger = TriggerStub.CreateCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.unitType, data.cargoOrWeaponType, data.count, data.compareType);
+							trigger = TriggerStub.CreateCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.GetUnitType(), data.GetCargoOrWeaponType(), data.count, data.GetCompareType());
 							break;
 
 						case TriggerType.VehicleCount:
-							trigger = TriggerStub.CreateVehicleCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
+							trigger = TriggerStub.CreateVehicleCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.GetCompareType());
 							break;
 
 						case TriggerType.BuildingCount:
-							trigger = TriggerStub.CreateBuildingCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.compareType);
+							trigger = TriggerStub.CreateBuildingCountTrigger(data.id, data.enabled, data.oneShot, data.playerID, data.count, data.GetCompareType());
 							break;
 
 						case TriggerType.Attacked:
@@ -404,7 +404,7 @@ namespace DotNetMissionSDK
 
 						default:
 							wasProcessed = false;
-							Console.WriteLine("Invalid Trigger Type: " + data.type);
+							Console.WriteLine("Invalid Trigger Type: " + data.GetTriggerType());
 							break;
 					}
 
@@ -472,7 +472,7 @@ namespace DotNetMissionSDK
 			m_Disasters.Clear();
 
 			// Setup Disasters
-			if (TethysGame.CanHaveDisasters() || root.levelDetails.missionType == MissionType.Colony)
+			if (TethysGame.CanHaveDisasters() || root.levelDetails.GetMissionType() == MissionType.Colony)
 			{
 				foreach (DisasterData disaster in root.disasters)
 				{
@@ -501,7 +501,7 @@ namespace DotNetMissionSDK
 				missionVariant = MissionVariant.Concat(root.masterVariant, root.missionVariants[m_SaveData.missionVariantIndex]);
 
 			// Startup Flags
-			bool isMultiplayer = (int)root.levelDetails.missionType <= -4 && (int)root.levelDetails.missionType >= -8;
+			bool isMultiplayer = (int)root.levelDetails.GetMissionType() <= -4 && (int)root.levelDetails.GetMissionType() >= -8;
 			int localDifficulty = TethysGame.GetPlayer(TethysGame.LocalPlayer()).Difficulty();
 
 			// Combine master gaia resources with difficulty gaia resources
@@ -537,10 +537,10 @@ namespace DotNetMissionSDK
 			// Initialize bots
 			for (int i=0; i < missionVariant.players.Count; ++i)
 			{
-				if (missionVariant.players[i].botType == BotType.None)
+				if (missionVariant.players[i].GetBotType() == BotType.None)
 					continue;
 
-				m_BotPlayer[i] = new BotPlayer(missionVariant.players[i].botType, i);
+				m_BotPlayer[i] = new BotPlayer(missionVariant.players[i].GetBotType(), i);
 				m_BotPlayer[i].Start();
 			}
 

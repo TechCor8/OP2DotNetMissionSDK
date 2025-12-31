@@ -1,7 +1,6 @@
-﻿using DotNetMissionSDK.HFL;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	public enum TriggerConditionType
 	{
@@ -102,13 +101,13 @@ namespace DotNetMissionSDK.Json
 	[DataContract]
 	public class TriggerConditionData
 	{
-		[DataMember(Name = "Type")]					private string m_Type				{ get; set; }
-		[DataMember(Name = "Subject")]				public string subject				{ get; set; } // TriggerPlayerCategory, TriggerUnitCategory, Switch#
-		[DataMember(Name = "Comparison")]			private string m_Comparison			{ get; set; }
+		[DataMember(Name = "Type")]					private string m_Type				{ get; set; } = string.Empty;
+		[DataMember(Name = "Subject")]				public string subject				{ get; set; } = string.Empty; // TriggerPlayerCategory, TriggerUnitCategory, Switch#
+		[DataMember(Name = "Comparison")]			private string m_Comparison			{ get; set; } = string.Empty;
 
-		[DataMember(Name = "Value")]				public string value					{ get; set; } // Quantity, Value, TopicID, Colony, Difficulty, Morale, Region, etc.
-		[DataMember(Name = "Value2")]				public string value2				{ get; set; } // Secondary value used by some conditions
-		[DataMember(Name = "Value3")]				public string value3				{ get; set; } // Secondary value used by some conditions
+		[DataMember(Name = "Value")]				public string value					{ get; set; } = string.Empty; // Quantity, Value, TopicID, Colony, Difficulty, Morale, Region, etc.
+		[DataMember(Name = "Value2")]				public string value2				{ get; set; } = string.Empty; // Secondary value used by some conditions
+		[DataMember(Name = "Value3")]				public string value3				{ get; set; } = string.Empty; // Secondary value used by some conditions
 
 
 		public TriggerConditionType type						{ get { return GetEnum<TriggerConditionType>(m_Type);		} set { m_Type = value.ToString();				} }

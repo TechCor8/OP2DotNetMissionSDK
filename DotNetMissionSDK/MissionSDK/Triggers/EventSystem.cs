@@ -1,5 +1,5 @@
-﻿using DotNetMissionSDK.AI;
-using DotNetMissionSDK.Json;
+﻿using DotNetMissionReader;
+using DotNetMissionSDK.AI;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
 using System.Collections.Generic;

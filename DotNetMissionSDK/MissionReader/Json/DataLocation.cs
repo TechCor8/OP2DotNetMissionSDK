@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	[DataContract]
 	public struct DataLocation
@@ -9,20 +9,10 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "Y")]		public int y			{ get; set; }
 
 
-		public DataLocation(LOCATION location)
+		public DataLocation(int x, int y)
 		{
-			x = location.x;
-			y = location.y;
-		}
-
-		public static implicit operator LOCATION(DataLocation data)
-		{
-			return new LOCATION(data.x, data.y);
-		}
-
-		public static implicit operator DataLocation(LOCATION data)
-		{
-			return new DataLocation(data);
+			this.x = x;
+			this.y = y;
 		}
 	}
 }

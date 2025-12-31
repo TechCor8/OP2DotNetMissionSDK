@@ -1,10 +1,10 @@
-﻿using DotNetMissionSDK.Json;
-using DotNetMissionSDK.Pathfinding;
+﻿using DotNetMissionSDK.Pathfinding;
 using DotNetMissionSDK.HFL;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DotNetMissionSDK.Async;
+using DotNetMissionReader;
 
 namespace DotNetMissionSDK
 {
@@ -109,7 +109,7 @@ namespace DotNetMissionSDK
 				if (data.ignoreLayout)
 				{
 					// Create unit that ignores layout
-					LOCATION loc = TethysGame.GetMapCoordinates(data.position);
+					LOCATION loc = TethysGame.GetMapCoordinates(data.position.ToLocation());
 					Unit unit = data.CreateUnit(owner.playerID, loc);
 					CreatedUnitData createdUnitData = new CreatedUnitData(data);
 
@@ -121,9 +121,9 @@ namespace DotNetMissionSDK
 					m_GeneratedUnits.Add(unit);
 
 					// Store spawn area for units that spawn after this structure
-					if (IsStructure(data.typeID))
+					if (IsStructure(data.GetTypeID()))
 					{
-						spawnArea = new UnitInfo(data.typeID).GetRect(loc);
+						spawnArea = new UnitInfo(data.GetTypeID()).GetRect(loc);
 
 						GenerateTubes(owner, unit, loc, createdUnitData);
 
@@ -134,7 +134,7 @@ namespace DotNetMissionSDK
 				}
 				else
 				{
-					if (IsStructure(data.typeID))
+					if (IsStructure(data.GetTypeID()))
 					{
 						// Create structure with auto-layout
 						spawnArea = GenerateUnit(owner, baseCenterPt, data);
@@ -143,7 +143,7 @@ namespace DotNetMissionSDK
 						if (data.createWall)
 							wallSpawns.Add(MAP_RECT.FromMinMax(spawnArea.xMin-1, spawnArea.yMin-1, spawnArea.xMax+1, spawnArea.yMax+1));
 					}
-					else if (IsVehicle(data.typeID))
+					else if (IsVehicle(data.GetTypeID()))
 					{
 						// Save vehicle for later
 						vehicleSpawns.Add(new VehicleSpawnArea(data, spawnArea));
@@ -204,7 +204,7 @@ namespace DotNetMissionSDK
 			GenerateTubes(owner, unit, foundPt, createdUnitData);
 
 			// Return spawn rect for found point
-			return new UnitInfo(data.typeID).GetRect(foundPt);
+			return new UnitInfo(data.GetTypeID()).GetRect(foundPt);
 		}
 
 		private LOCATION[] GetTilesInRect(MAP_RECT rect)
@@ -241,7 +241,7 @@ namespace DotNetMissionSDK
 		private bool IsValidTile(int x, int y, MAP_RECT spawnArea, UnitData unitToSpawn)
 		{
 			// Vehicles must be at least spawnDistance away from spawnArea
-			if (IsVehicle(unitToSpawn.typeID))
+			if (IsVehicle(unitToSpawn.GetTypeID()))
 			{
 				spawnArea.Inflate(unitToSpawn.spawnDistance, unitToSpawn.spawnDistance);
 
@@ -251,10 +251,10 @@ namespace DotNetMissionSDK
 			}
 
 			// Get spawn rect
-			MAP_RECT targetSpawnRect = new UnitInfo(unitToSpawn.typeID).GetRect(new LOCATION(x,y), true);
+			MAP_RECT targetSpawnRect = new UnitInfo(unitToSpawn.GetTypeID()).GetRect(new LOCATION(x,y), true);
 
 			// Check if colliding
-			if (IsColliding(targetSpawnRect, unitToSpawn.minDistance, IsStructure(unitToSpawn.typeID), IsVehicle(unitToSpawn.typeID)))
+			if (IsColliding(targetSpawnRect, unitToSpawn.minDistance, IsStructure(unitToSpawn.GetTypeID()), IsVehicle(unitToSpawn.GetTypeID())))
 				return false;
 				
 			return true;

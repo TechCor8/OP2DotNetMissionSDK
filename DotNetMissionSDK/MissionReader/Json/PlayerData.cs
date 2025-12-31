@@ -1,8 +1,8 @@
-﻿using DotNetMissionSDK.AI;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	[DataContract]
 	public class PlayerData
@@ -10,21 +10,18 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "ID")]					public int id							{ get; set; }
 		[DataMember(Name = "IsEden")]				public bool isEden						{ get; set; }
 		[DataMember(Name = "IsHuman")]				public bool isHuman						{ get; set; }
-		[DataMember(Name = "BotType")]				private string m_BotType				{ get; set; }
-		[DataMember(Name = "Color")]				private string m_Color					{ get; set; }
+		[DataMember(Name = "BotType")]				public string botType					{ get; set; } = string.Empty;
+		[DataMember(Name = "Color")]				public string color					{ get; set; } = string.Empty;
 		[DataMember(Name = "Allies")]				public int[] allies						{ get; set; }
 		[DataMember(Name = "Resources")]			public ResourceData resources			{ get; set; }
 		[DataMember(Name = "DifficultyResources")]	public List<ResourceData> difficulties	{ get; set; }
-
-		public BotType botType					{ get { return GetEnum<BotType>(m_BotType);			} set { m_BotType = value.ToString();		} }
-		public PlayerColor color				{ get { return GetEnum<PlayerColor>(m_Color);		} set { m_Color = value.ToString();			} }
 
 
 		[DataContract]
 		public class ResourceData
 		{
 			[DataMember(Name = "TechLevel")]		public int techLevel					{ get; set; }
-			[DataMember(Name = "MoraleLevel")]		private string m_MoraleLevel			{ get; set; }
+			[DataMember(Name = "MoraleLevel")]		public string moraleLevel				{ get; set; } = string.Empty;
 			[DataMember(Name = "FreeMorale")]		public bool freeMorale					{ get; set; }
 			[DataMember(Name = "CenterView")]		public DataLocation centerView			{ get; set; }
 
@@ -43,12 +40,10 @@ namespace DotNetMissionSDK.Json
 
 			[DataMember(Name = "Triggers")]			public List<TriggerData> triggers		{ get; set; }
 
-			public MoraleLevel moraleLevel			{ get { return GetEnum<MoraleLevel>(m_MoraleLevel);	} set { m_MoraleLevel = value.ToString();	} }
-
 			public ResourceData()
 			{
-				moraleLevel = MoraleLevel.Good;
-				centerView = new DataLocation(new LOCATION(0,0));
+				moraleLevel = "Good";
+				centerView = new DataLocation();
 				kids = 10;
 				workers = 14;
 				scientists = 8;
@@ -69,7 +64,7 @@ namespace DotNetMissionSDK.Json
 			public ResourceData(ResourceData clone)
 			{
 				techLevel = clone.techLevel;
-				m_MoraleLevel = clone.m_MoraleLevel;
+				moraleLevel = clone.moraleLevel;
 				freeMorale = clone.freeMorale;
 				centerView = clone.centerView;
 
@@ -99,7 +94,7 @@ namespace DotNetMissionSDK.Json
 			public void Concat(ResourceData dataToConcat)
 			{
 				techLevel = dataToConcat.techLevel;
-				m_MoraleLevel = dataToConcat.m_MoraleLevel;
+				moraleLevel = dataToConcat.moraleLevel;
 				freeMorale = dataToConcat.freeMorale;
 				centerView = dataToConcat.centerView;
 
@@ -148,12 +143,27 @@ namespace DotNetMissionSDK.Json
 			this.id = id;
 			isEden = id % 2 == 0;
 			isHuman = true;
-			botType = id == 0 ? BotType.None : BotType.Balanced;
-			color = (PlayerColor)id;
+			botType = id == 0 ? "None" : "Balanced";
+			color = GetPlayerColor(id);
 			allies = new int[0];
 
 			resources = new ResourceData();
 			difficulties = new List<ResourceData>();
+		}
+
+		private string GetPlayerColor(int id)
+		{
+			switch (id)
+			{
+				case 0: return "Blue";
+				case 1: return "Red";
+				case 2: return "Green";
+				case 3: return "Yellow";
+				case 4: return "Cyan";
+				case 5: return "Magenta";
+				case 6: return "Black";
+				default: return "Clear";
+			}
 		}
 
 		public PlayerData(PlayerData clone)
@@ -161,8 +171,8 @@ namespace DotNetMissionSDK.Json
 			id = clone.id;
 			isEden = clone.isEden;
 			isHuman = clone.isHuman;
-			m_BotType = clone.m_BotType;
-			m_Color = clone.m_Color;
+			botType = clone.botType;
+			color = clone.color;
 			allies = new int[clone.allies.Length];
 			System.Array.Copy(clone.allies, allies, allies.Length);
 

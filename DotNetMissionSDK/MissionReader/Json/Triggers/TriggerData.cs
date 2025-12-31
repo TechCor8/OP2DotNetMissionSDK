@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	// Save Data: Index, Enabled, ActionIndex (currently executing)
 	[DataContract]
@@ -9,7 +9,7 @@ namespace DotNetMissionSDK.Json
 	{
 		[DataMember(Name = "ID")]					public int id									{ get; set; }
 		[DataMember(Name = "Enabled")]				public bool enabled								{ get; set; }
-		[DataMember(Name = "EventType")]			private string m_EventType						{ get; set; }
+		[DataMember(Name = "EventType")]			private string m_EventType						{ get; set; } = string.Empty;
 		[DataMember(Name = "Condition")]			public List<TriggerConditionData> conditions	{ get; set; }
 		[DataMember(Name = "Actions")]				public List<TriggerActionData> actions			{ get; set; }
 

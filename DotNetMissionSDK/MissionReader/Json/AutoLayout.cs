@@ -1,6 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	[DataContract]
 	public class AutoLayout
@@ -8,7 +9,7 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "PlayerID")]			public int playerID					{ get; set; }
 		[DataMember(Name = "BaseCenterPt")]		public DataLocation baseCenterPt	{ get; set; }
 
-		[DataMember(Name = "Units")]			public UnitData[] units				{ get; set; }
+		[DataMember(Name = "Units")]			public UnitData[] units				{ get; set; } = Array.Empty<UnitData>();
 
 		public AutoLayout() { }
 		public AutoLayout(AutoLayout clone)

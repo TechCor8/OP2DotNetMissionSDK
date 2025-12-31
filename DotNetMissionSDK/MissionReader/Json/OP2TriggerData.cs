@@ -1,6 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	public enum TriggerType
 	{
@@ -31,21 +32,21 @@ namespace DotNetMissionSDK.Json
 	public class OP2TriggerData
 	{
 		[DataMember(Name = "ID")]					public int id						{ get; set; }
-		[DataMember(Name = "Type")]					private string m_Type				{ get; set; }
+		[DataMember(Name = "Type")]					public string triggerType			{ get; set; } = string.Empty;
 		[DataMember(Name = "Enabled")]				public bool enabled					{ get; set; }
 		[DataMember(Name = "OneShot")]				public bool oneShot					{ get; set; }
 
-		[DataMember(Name = "Actions")]				public ActionData[] actions			{ get; set; }
+		[DataMember(Name = "Actions")]				public ActionData[] actions			{ get; set; } = Array.Empty<ActionData>();
 
 
 		[DataMember(Name = "TriggerID")]			public int triggerID				{ get; set; }
 
-		[DataMember(Name = "Message")]				public string message				{ get; set; }
+		[DataMember(Name = "Message")]				public string message				{ get; set; } = string.Empty;
 
 		[DataMember(Name = "PlayerID")]				public int playerID					{ get; set; }
 		[DataMember(Name = "Count")]				public int count					{ get; set; }
-		[DataMember(Name = "CompareType")]			private string m_CompareType		{ get; set; }
-		[DataMember(Name = "UnitType")]				private string m_UnitType			{ get; set; }
+		[DataMember(Name = "CompareType")]			public string compareType			{ get; set; } = string.Empty;
+		[DataMember(Name = "UnitType")]				public string unitType				{ get; set; } = string.Empty;
 
 		[DataMember(Name = "Time")]					public int time						{ get; set; }
 		[DataMember(Name = "MinTime")]				public int minTime					{ get; set; }
@@ -58,19 +59,12 @@ namespace DotNetMissionSDK.Json
 		[DataMember(Name = "Width")]				public int width					{ get; set; }
 		[DataMember(Name = "Height")]				public int height					{ get; set; }
 
-		[DataMember(Name = "CargoOrWeaponType")]	private string m_CargoOrWeaponType	{ get; set; }
-		[DataMember(Name = "ResourceType")]			private string m_ResourceType		{ get; set; }
-		[DataMember(Name = "CargoType")]			private string m_CargoType			{ get; set; }
+		[DataMember(Name = "CargoOrWeaponType")]	public string cargoOrWeaponType		{ get; set; } = string.Empty;
+		[DataMember(Name = "ResourceType")]			public string resourceType			{ get; set; } = string.Empty;
+		[DataMember(Name = "CargoType")]			public string cargoType				{ get; set; } = string.Empty;
 
 		[DataMember(Name = "CargoAmount")]			public int cargoAmount				{ get; set; }
 
-
-		public TriggerType type						{ get { return GetEnum<TriggerType>(m_Type);				} set { m_Type = value.ToString();				} }
-		public CompareMode compareType				{ get { return GetEnum<CompareMode>(m_CompareType);			} set { m_CompareType = value.ToString();		} }
-		public map_id unitType						{ get { return GetEnum<map_id>(m_UnitType);					} set { m_UnitType = value.ToString();			} }
-		public map_id cargoOrWeaponType				{ get { return GetEnum<map_id>(m_CargoOrWeaponType);		} set { m_CargoOrWeaponType = value.ToString();	} }
-		public TriggerResource resourceType			{ get { return GetEnum<TriggerResource>(m_ResourceType);	} set { m_ResourceType = value.ToString();		} }
-		public TruckCargo cargoType					{ get { return GetEnum<TruckCargo>(m_CargoType);			} set { m_CargoType = value.ToString();			} }
 
 		private T GetEnum<T>(string val) where T : struct
 		{

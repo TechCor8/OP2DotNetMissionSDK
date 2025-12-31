@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	public enum DisasterType
 	{
@@ -16,9 +16,9 @@ namespace DotNetMissionSDK.Json
 	public class DisasterData
 	{
 		[DataMember(Name = "ID")]				public int id				{ get; set; }
-		[DataMember(Name = "Type")]				private string m_Type		{ get; set; }
-		[DataMember(Name = "SrcRect")]			public DataRect srcRect		{ get; set; }
-		[DataMember(Name = "DestRect")]			public DataRect destRect	{ get; set; }
+		[DataMember(Name = "Type")]				private string m_Type		{ get; set; } = string.Empty;
+		[DataMember(Name = "SrcRect")]			public DataRect srcRect		{ get; set; } = new DataRect();
+		[DataMember(Name = "DestRect")]			public DataRect destRect	{ get; set; } = new DataRect();
 		[DataMember(Name = "Size")]				public int size				{ get; set; }
 		[DataMember(Name = "Duration")]			public int duration			{ get; set; }
 		[DataMember(Name = "StartTime")]		public int startTime		{ get; set; }

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace DotNetMissionSDK.Json
+namespace DotNetMissionReader
 {
 	public enum TriggerActionType
 	{
@@ -166,19 +166,19 @@ namespace DotNetMissionSDK.Json
 	[DataContract]
 	public class TriggerActionData
 	{
-		[DataMember(Name = "Type")]					private string m_Type				{ get; set; }
-		[DataMember(Name = "Modifier")]				private string m_Modifier			{ get; set; } // Set, add, subtract
-		[DataMember(Name = "Subject")]				public string subject				{ get; set; } // TriggerPlayerCategory, TriggerUnitCategory, Switch#
-		[DataMember(Name = "Subject2")]				public string subject2				{ get; set; } // map_id weapon
-		[DataMember(Name = "SubjectPlayer")]		public string subjectPlayer			{ get; set; } // TriggerPlayerCategory
-		[DataMember(Name = "SubjectRegion")]		public string subjectRegion			{ get; set; } // Region
+		[DataMember(Name = "Type")]					private string m_Type				{ get; set; } = string.Empty;
+		[DataMember(Name = "Modifier")]				private string m_Modifier			{ get; set; } = string.Empty; // Set, add, subtract
+		[DataMember(Name = "Subject")]				public string subject				{ get; set; } = string.Empty; // TriggerPlayerCategory, TriggerUnitCategory, Switch#
+		[DataMember(Name = "Subject2")]				public string subject2				{ get; set; } = string.Empty; // map_id weapon
+		[DataMember(Name = "SubjectPlayer")]		public string subjectPlayer			{ get; set; } = string.Empty; // TriggerPlayerCategory
+		[DataMember(Name = "SubjectRegion")]		public string subjectRegion			{ get; set; } = string.Empty; // Region
 		[DataMember(Name = "SubjectQuantity")]		public int subjectQuantity			{ get; set; }
 		
-		[DataMember(Name = "Value")]				public string value					{ get; set; }
-		[DataMember(Name = "Value2")]				public string value2				{ get; set; }
-		[DataMember(Name = "Value3")]				public string value3				{ get; set; }
-		[DataMember(Name = "Value4")]				public string value4				{ get; set; }
-		[DataMember(Name = "Value5")]				public string value5				{ get; set; }
+		[DataMember(Name = "Value")]				public string value					{ get; set; } = string.Empty;
+		[DataMember(Name = "Value2")]				public string value2				{ get; set; } = string.Empty;
+		[DataMember(Name = "Value3")]				public string value3				{ get; set; } = string.Empty;
+		[DataMember(Name = "Value4")]				public string value4				{ get; set; } = string.Empty;
+		[DataMember(Name = "Value5")]				public string value5				{ get; set; } = string.Empty;
 
 		public TriggerActionType type							{ get { return GetEnum<TriggerActionType>(m_Type);			} set { m_Type = value.ToString();				} }
 		public TriggerModifier modifier							{ get { return GetEnum<TriggerModifier>(m_Modifier);		} set { m_Modifier = value.ToString();			} }
