@@ -1,4 +1,5 @@
 ﻿using DotNetMissionSDK.Async;
+using DotNetMissionSDK.Pathfinding;
 using DotNetMissionSDK.State;
 using DotNetMissionSDK.State.Snapshot;
 using DotNetMissionSDK.State.Snapshot.Units;
@@ -50,8 +51,10 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 
 		protected int m_OwnerID;
 		private UnitSlot[] m_UnitSlots = new UnitSlot[0];
+
+		private MAP_RECT m_FormationArea;
 		
-		public ThreatZone threatZone	{ get; set;			}
+		public CombatZone combatZone	{ get; set;			}
 
 		/// <summary>
 		/// The vehicle group's type represented as an enum.
@@ -74,10 +77,10 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		}
 
 
-		public VehicleGroup(int ownerID, ThreatZone zone)
+		public VehicleGroup(int ownerID, CombatZone zone)
 		{
 			m_OwnerID = ownerID;
-			threatZone = zone;
+			combatZone = zone;
 
 			m_UnitSlots = GetUnitSlots(zone.strengthDesired);
 		}
@@ -187,11 +190,13 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		{
 			ThreadAssert.MainThreadRequired();
 
-			bool goToThreatZone = false;
+			m_FormationArea = GetFormationArea();
 
-			// If any unit is in threat zone, or all units are in staging area, send everyone to threat zone
-			// Otherwise, send all units to staging area
-			goToThreatZone = IsAnyUnitInThreatZone() || AreAllUnitsInStagingArea();
+			bool goToCombatZone = false;
+
+			// If any unit is in threat zone, or all units are in formation, send everyone to combat zone
+			// Otherwise, send all units to the formation area
+			goToCombatZone = IsAnyUnitInCombatZone() || AreAllUnitsInFormation();
 
 			// Move units
 			foreach (UnitSlot slot in m_UnitSlots)
@@ -207,32 +212,36 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 					continue;
 				}
 
-				if (goToThreatZone)
+				if (goToCombatZone)
 				{
 					// Attack closest priority target
-					if (threatZone.priorityTargets.Length > 0)
+					if (combatZone.priorityTargets.Length > 0)
 					{
-						UnitState target = threatZone.GetClosestPriorityTarget(unit.GetPosition());
+						UnitState target = combatZone.GetClosestPriorityTarget(unit.GetPosition());
 						Unit targetUnit = GameState.GetUnit(target.unitID);
 						if (targetUnit != null)
 							unit.DoAttack(targetUnit);
 					}
-					else if (!unit.isSearchingOrHasPath || !threatZone.bounds.Contains(unit.destination))
+					else if (!unit.isSearchingOrHasPath || !combatZone.bounds.Contains(unit.destination))
 					{
 						// Otherwise, move to random location in zone
-						LOCATION targetPosition = threatZone.bounds.GetRandomPointInRect();
+						LOCATION targetPosition = combatZone.bounds.GetRandomPointInRect();
 						unit.DoMoveWithPathfinder(stateSnapshot, targetPosition);
 					}
 				}
-				else if (!threatZone.IsInStagingArea(unit.GetPosition()) && (!unit.isSearchingOrHasPath || !threatZone.IsInStagingArea(unit.destination)))
+				else if (!IsInFormation(unit.GetPosition()) && (!unit.isSearchingOrHasPath || !IsInFormation(unit.destination)))
 				{
-					// Head to staging area
-					threatZone.SendUnitToStagingArea(stateSnapshot, unit);
+					// Head to formation area
+					LOCATION targetPosition = m_FormationArea.GetRandomPointInRect();
+					int unitStrength = unit.GetUnitInfo().GetWeaponStrength();
+					stateSnapshot.Retain();
+					unit.DoMoveWithPathfinder((x,y) => GetTileFormationCost(x,y, unitStrength, stateSnapshot), IsInFormation, (path) => stateSnapshot.Release());
+					//unit.DoMoveWithPathfinder(stateSnapshot, targetPosition);
 				}
 			}
 		}
 
-		private bool IsAnyUnitInThreatZone()
+		private bool IsAnyUnitInCombatZone()
 		{
 			foreach (UnitSlot slot in m_UnitSlots)
 			{
@@ -244,14 +253,14 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 				if (unit == null)
 					continue;
 
-				if (threatZone.Contains(unit.GetPosition()))
+				if (combatZone.Contains(unit.GetPosition()))
 					return true;
 			}
 
 			return false;
 		}
 
-		private bool AreAllUnitsInStagingArea()
+		private bool AreAllUnitsInFormation()
 		{
 			foreach (UnitSlot slot in m_UnitSlots)
 			{
@@ -263,11 +272,87 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 				if (unit == null)
 					continue;
 
-				if (!threatZone.IsInStagingArea(unit.GetPosition()))
+				if (!IsInFormation(unit.GetPosition()))
 					return false;
 			}
 
 			return true;
+		}
+
+		private bool IsInFormation(LOCATION position)
+		{
+			return m_FormationArea.Contains(position);
+		}
+
+		private bool IsInFormation(int x, int y)
+		{
+			return m_FormationArea.Contains(x, y);
+		}
+
+		// The formation area is a moving area that represents where the units should group to be in formation.
+		private MAP_RECT GetFormationArea()
+		{
+			ThreadAssert.MainThreadRequired();
+
+			LOCATION avgLocation = new LOCATION();
+			int unitCount = 0;
+
+			foreach (UnitSlot slot in m_UnitSlots)
+			{
+				if (slot.unitInSlot == -1)
+					continue;
+
+				Vehicle unit = GameState.GetUnit(slot.unitInSlot) as Vehicle;
+
+				if (unit == null)
+					continue;
+
+				avgLocation += unit.GetPosition();
+				++unitCount;
+			}
+
+			if (unitCount == 0)
+			{
+				// No units. No formation area.
+				return new MAP_RECT();
+			}
+
+			avgLocation /= unitCount;
+
+			MAP_RECT area = new MAP_RECT(avgLocation, new LOCATION(0,0));
+			area.Inflate(5);
+
+			area.ClipToMap();
+
+			return area;
+		}
+
+		private int GetTileFormationCost(int x, int y, int unitStrength, StateSnapshot state)
+		{
+			PlayerState owner = state.players[m_OwnerID];
+
+			if (!state.tileMap.IsTilePassable(x,y))
+				return Pathfinder.Impassable;
+
+			// Buildings and units are impassable
+			if (state.unitMap.GetUnitOnTile(new LOCATION(x,y)) != null)
+				return Pathfinder.Impassable;
+
+			// Get tile movement speed cost
+			int moveCost = state.tileMap.GetTileMovementCost(x,y);
+
+			// Get enemy strength at tile
+			int enemyStrength = 0;
+			foreach (int enemyID in owner.enemyPlayerIDs)
+				enemyStrength += state.strengthMap.GetPlayerStrength(enemyID, x,y);
+
+			// If tile has enemy strength greater than our own, avoid it.
+			if (enemyStrength > unitStrength)
+				return Pathfinder.Impassable;
+			else if (enemyStrength > 0)
+				moveCost += 4; // Try to navigate around enemy, but go ahead and engage if no choice.
+
+			return moveCost;
 		}
 
 

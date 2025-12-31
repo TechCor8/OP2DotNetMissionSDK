@@ -10,7 +10,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		public override VehicleGroupType groupType		{ get { return VehicleGroupType.Assault;		}	}
 
 
-		public AssaultGroup(int ownerID, ThreatZone zone) : base(ownerID, zone)
+		public AssaultGroup(int ownerID, CombatZone zone) : base(ownerID, zone)
 		{
 		}
 

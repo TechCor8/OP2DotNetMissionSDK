@@ -9,7 +9,7 @@ namespace DotNetMissionSDK.AI.Combat.Groups
 		public override VehicleGroupType groupType		{ get { return VehicleGroupType.Capture;		}	}
 
 
-		public CaptureGroup(int ownerID, ThreatZone zone) : base(ownerID, zone)
+		public CaptureGroup(int ownerID, CombatZone zone) : base(ownerID, zone)
 		{
 		}
 

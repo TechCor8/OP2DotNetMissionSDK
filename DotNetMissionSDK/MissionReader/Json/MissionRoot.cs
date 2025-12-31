@@ -6,7 +6,7 @@ namespace DotNetMissionSDK.Json
 	[DataContract]
 	public class MissionRoot
 	{
-		private const string SDKVersion = "0"; // May only use dot versioning (e.g. 1.0.0). Dot not required.
+		public const string SDKVersion = "0"; // May only use dot versioning (e.g. 1.0.0). Dot not required.
 
 		[DataMember(Name = "SDKVersion")]		public string sdkVersion					{ get; set; }
 		[DataMember(Name = "LevelDetails")]		public LevelDetails levelDetails			{ get; set; }

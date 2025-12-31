@@ -13,16 +13,15 @@ namespace DotNetMissionSDK.AI.Managers
 	/// </summary>
 	public class CombatManager
 	{
-		private List<ThreatZone> m_DefenseZones = new List<ThreatZone>();		// Proximity, Defense, Mining
-		private List<ThreatZone> m_EnemyBaseZones = new List<ThreatZone>();		// Enemy bases
-		private List<ThreatZone> m_VulnerableZones = new List<ThreatZone>();	// Vulnerable Structure, Vulnerable Vehicle
-
+		private List<CombatZone> m_CombatZones = new List<CombatZone>();
 		private List<VehicleGroup> m_CombatGroups = new List<VehicleGroup>();
 
 		private bool m_IsProcessing;
 
+		private const int m_CombatZoneSize = 8;
+
 		// Debugging
-		private List<Unit> m_DebugMarkers = new List<Unit>();
+		//private List<Unit> m_DebugMarkers = new List<Unit>();
 
 		public BotPlayer botPlayer							{ get; private set; }
 		public int ownerID									{ get; private set; }
@@ -50,20 +49,20 @@ namespace DotNetMissionSDK.AI.Managers
 
 			AsyncPump.Run(() =>
 			{
-				m_DefenseZones.Clear();
-				m_EnemyBaseZones.Clear();
-				m_VulnerableZones.Clear();
+				m_CombatZones.Clear();
 
 				List<VehicleGroup> combatGroups = new List<VehicleGroup>(combatGroupCapacity);
 
-				// Create threat zones
+				// Create combat zones
 				CreateProximityZones(stateSnapshot, combatGroups);
 				CreateDefenseZones(stateSnapshot, combatGroups);
 				CreateVulnerableStructureZones(stateSnapshot, combatGroups);
 				CreateVulnerableVehicleZones(stateSnapshot, combatGroups);
 				CreateEnemyBaseZones(stateSnapshot, combatGroups);
-				//CreateDefenseZones(stateSnapshot, combatGroups);
 				CreateMiningZones(stateSnapshot, combatGroups);
+
+				// Sort combat groups by zone importance
+				combatGroups.Sort((a,b) => b.combatZone.importance.CompareTo(a.combatZone.importance));
 
 				PopulateCombatGroups(owner, combatGroups);
 
@@ -78,16 +77,16 @@ namespace DotNetMissionSDK.AI.Managers
 				// Update debug markers
 				if (ownerID == TethysGame.LocalPlayer())
 				{
-					foreach (Unit unit in m_DebugMarkers)
-						unit.DoDeath();
+					//foreach (Unit unit in m_DebugMarkers)
+					//	unit.DoDeath();
 
-					m_DebugMarkers.Clear();
+					//m_DebugMarkers.Clear();
 
 					for (int i=0; i < m_CombatGroups.Count; ++i)
 					{
-						LOCATION position = m_CombatGroups[i].threatZone.bounds.position;
-						position += m_CombatGroups[i].threatZone.bounds.size / 2;
-						m_DebugMarkers.Add(TethysGame.PlaceMarker(position.x, position.y, MarkerType.Circle));
+						LOCATION position = m_CombatGroups[i].combatZone.bounds.position;
+						position += m_CombatGroups[i].combatZone.bounds.size / 2;
+						//m_DebugMarkers.Add(TethysGame.PlaceMarker(position.x, position.y, MarkerType.Circle));
 					}
 				}
 
@@ -107,14 +106,14 @@ namespace DotNetMissionSDK.AI.Managers
 			unassignedUnits.AddRange(owner.units.spiders);
 			unassignedUnits.AddRange(owner.units.scorpions);
 
-			// Units already in an active threat zone must be assigned to that zone
+			// Units already in an active combat zone must be assigned to that zone
 			for (int i=0; i < unassignedUnits.Count; ++i)
 			{
 				VehicleState unit = unassignedUnits[i];
 
 				foreach (VehicleGroup group in combatGroups)
 				{
-					if (group.threatZone.threatLevel != ThreatLevel.None && group.threatZone.Contains(unit.position))
+					if (group.combatZone.threatLevel != ThreatLevel.None && group.combatZone.Contains(unit.position))
 					{
 						if (group.AssignUnit(unit))
 						{
@@ -173,7 +172,7 @@ namespace DotNetMissionSDK.AI.Managers
 		// PopulateCombatGroup - Units to populate must be able to reach zone without engaging in combat
 
 		/// <summary>
-		/// Creates threat zones for enemy combat units in close proximity to allied civilian units.
+		/// Creates combat zones for enemy combat units in close proximity to allied civilian units.
 		/// </summary>
 		private void CreateProximityZones(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups)
 		{
@@ -221,20 +220,20 @@ namespace DotNetMissionSDK.AI.Managers
 
 			// Create zone around unit
 			MAP_RECT area = new MAP_RECT(unit.position, new LOCATION(0,0));
-			area.Inflate(8);
+			area.Inflate(m_CombatZoneSize);
 
-			if (DoesOverlapZone(area, m_DefenseZones))
+			if (DoesOverlapZone(area, m_CombatZones))
 				return;
 
 			List<UnitState> enemiesInArea = stateSnapshot.unitMap.GetUnitsInArea(area);
 			enemiesInArea.RemoveAll((UnitState tileUnit) => owner.allyPlayerIDs.Contains(tileUnit.ownerID));
 
 			if (enemiesInArea.Count > 0)
-				m_DefenseZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault));
+				m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault));
 		}
 
 		/// <summary>
-		/// Creates threat zones for vulnerable enemy structures.
+		/// Creates combat zones for vulnerable enemy structures.
 		/// </summary>
 		private void CreateVulnerableStructureZones(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups)
 		{
@@ -251,9 +250,9 @@ namespace DotNetMissionSDK.AI.Managers
 						continue;
 
 					MAP_RECT area = new MAP_RECT(unit.position, new LOCATION(0,0));
-					area.Inflate(8);
+					area.Inflate(m_CombatZoneSize);
 
-					if (DoesOverlapZone(area, m_VulnerableZones))
+					if (DoesOverlapZone(area, m_CombatZones))
 						continue;
 
 					List<UnitState> enemiesInArea = stateSnapshot.unitMap.GetUnitsInArea(area);
@@ -270,15 +269,15 @@ namespace DotNetMissionSDK.AI.Managers
 					
 					// Create zone, prioritizing bombers if they are available
 					if (owner.HasTechnologyByIndex(starflareInfo.researchTopic))
-						m_VulnerableZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 1, VehicleGroupType.Bomber));
+						m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 1, VehicleGroupType.Bomber));
 					else
-						m_VulnerableZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass));
+						m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass));
 				}
 			}
 		}
 
 		/// <summary>
-		/// Creates threat zones for vulnerable enemy vehicles.
+		/// Creates combat zones for vulnerable enemy vehicles.
 		/// </summary>
 		private void CreateVulnerableVehicleZones(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups)
 		{
@@ -295,9 +294,9 @@ namespace DotNetMissionSDK.AI.Managers
 						continue;
 
 					MAP_RECT area = new MAP_RECT(unit.position, new LOCATION(0,0));
-					area.Inflate(8);
+					area.Inflate(m_CombatZoneSize);
 
-					if (DoesOverlapZone(area, m_VulnerableZones))
+					if (DoesOverlapZone(area, m_CombatZones))
 						continue;
 
 					List<UnitState> enemiesInArea = stateSnapshot.unitMap.GetUnitsInArea(area);
@@ -314,15 +313,15 @@ namespace DotNetMissionSDK.AI.Managers
 					
 					// Create zone, prioritizing capture groups if they are available
 					if (!owner.isEden && owner.HasTechnologyByIndex(spiderInfo.researchTopic))
-						m_VulnerableZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 1, VehicleGroupType.Capture));
+						m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 1, VehicleGroupType.Capture));
 					else
-						m_VulnerableZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass));
+						m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 4, VehicleGroupType.Harass));
 				}
 			}
 		}
 
 		/// <summary>
-		/// Create threat zones for enemy bases.
+		/// Create combat zones for enemy bases.
 		/// </summary>
 		private void CreateEnemyBaseZones(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups)
 		{
@@ -335,21 +334,21 @@ namespace DotNetMissionSDK.AI.Managers
 				foreach (StructureState unit in enemy.units.GetStructures())
 				{
 					MAP_RECT area = new MAP_RECT(unit.position, new LOCATION(0,0));
-					area.Inflate(8);
+					area.Inflate(m_CombatZoneSize);
 
-					if (DoesOverlapZone(area, m_EnemyBaseZones))
+					if (DoesOverlapZone(area, m_CombatZones))
 						continue;
 
 					List<UnitState> enemiesInArea = stateSnapshot.unitMap.GetUnitsInArea(area);
 					enemiesInArea.RemoveAll((UnitState tileUnit) => owner.allyPlayerIDs.Contains(tileUnit.ownerID));
 
-					m_EnemyBaseZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault));
+					m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, enemiesInArea.ToArray(), 5, VehicleGroupType.Assault));
 				}
 			}
 		}
 
 		/// <summary>
-		/// Create threat zones for own base units.
+		/// Create combat zones for own base units.
 		/// </summary>
 		private void CreateDefenseZones(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups)
 		{
@@ -358,12 +357,12 @@ namespace DotNetMissionSDK.AI.Managers
 			foreach (UnitState unit in owner.units.GetStructures())
 			{
 				MAP_RECT area = new MAP_RECT(unit.position, new LOCATION(0,0));
-				area.Inflate(8);
+				area.Inflate(m_CombatZoneSize);
 
-				if (DoesOverlapZone(area, m_DefenseZones))
+				if (DoesOverlapZone(area, m_CombatZones))
 					continue;
 
-				m_DefenseZones.Add(CreateZone(stateSnapshot, combatGroups, area, new UnitState[0], 3, VehicleGroupType.Assault));
+				m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, new UnitState[0], 3, VehicleGroupType.Assault));
 			}
 
 			foreach (UnitState unit in owner.units.GetVehicles())
@@ -373,17 +372,17 @@ namespace DotNetMissionSDK.AI.Managers
 					continue;
 
 				MAP_RECT area = new MAP_RECT(unit.position, new LOCATION(0,0));
-				area.Inflate(8);
+				area.Inflate(m_CombatZoneSize);
 
-				if (DoesOverlapZone(area, m_DefenseZones))
+				if (DoesOverlapZone(area, m_CombatZones))
 					continue;
 
-				m_DefenseZones.Add(CreateZone(stateSnapshot, combatGroups, area, new UnitState[0], 4, VehicleGroupType.Assault));
+				m_CombatZones.Add(CreateZone(stateSnapshot, combatGroups, area, new UnitState[0], 4, VehicleGroupType.Assault));
 			}
 		}
 
 		/// <summary>
-		/// Create threat zones for empty mining sites.
+		/// Create combat zones for empty mining sites.
 		/// </summary>
 		private void CreateMiningZones(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups)
 		{
@@ -392,9 +391,9 @@ namespace DotNetMissionSDK.AI.Managers
 			// TODO: Implement
 		}
 
-		private bool DoesOverlapZone(MAP_RECT area, IEnumerable<ThreatZone> zones)
+		private bool DoesOverlapZone(MAP_RECT area, IEnumerable<CombatZone> zones)
 		{
-			foreach (ThreatZone zone in zones)
+			foreach (CombatZone zone in zones)
 			{
 				if (zone.bounds.DoesRectIntersect(area))
 					return true;
@@ -403,9 +402,9 @@ namespace DotNetMissionSDK.AI.Managers
 			return false;
 		}
 
-		private ThreatZone CreateZone(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups, MAP_RECT area, UnitState[] enemiesInArea, int additionalStrengthDesired, VehicleGroupType groupType)
+		private CombatZone CreateZone(StateSnapshot stateSnapshot, List<VehicleGroup> combatGroups, MAP_RECT area, UnitState[] enemiesInArea, int additionalStrengthDesired, VehicleGroupType groupType)
 		{
-			ThreatZone zone = new ThreatZone(stateSnapshot, ownerID, area, enemiesInArea, additionalStrengthDesired);
+			CombatZone zone = new CombatZone(stateSnapshot, ownerID, area, enemiesInArea, additionalStrengthDesired);
 			
 			VehicleGroup zoneGroup = null;
 

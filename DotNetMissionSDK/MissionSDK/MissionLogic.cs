@@ -165,11 +165,11 @@ namespace DotNetMissionSDK
 
 				switch ((MoraleLevel)resourceData.moraleLevel)
 				{
-					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.id);		break;
-					case MoraleLevel.Good:			TethysGame.ForceMoraleGood(data.id);		break;
-					case MoraleLevel.Fair:			TethysGame.ForceMoraleOK(data.id);			break;
-					case MoraleLevel.Poor:			TethysGame.ForceMoralePoor(data.id);		break;
-					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.id);		break;
+					case MoraleLevel.Excellent:		TethysGame.ForceMoraleGreat(data.id);	TethysGame.ForceMoraleGreat(data.id);	break;
+					case MoraleLevel.Good:			TethysGame.ForceMoraleGood(data.id);	TethysGame.ForceMoraleGood(data.id);	break;
+					case MoraleLevel.Fair:			TethysGame.ForceMoraleOK(data.id);		TethysGame.ForceMoraleOK(data.id);		break;
+					case MoraleLevel.Poor:			TethysGame.ForceMoralePoor(data.id);	TethysGame.ForceMoralePoor(data.id);	break;
+					case MoraleLevel.Terrible:		TethysGame.ForceMoraleRotten(data.id);	TethysGame.ForceMoraleRotten(data.id);	break;
 				}
 
 				if ((TethysGame.UsesMorale() || !isMultiplayer) && resourceData.freeMorale)

@@ -292,6 +292,14 @@ namespace DotNetMissionSDK
 				);
 		}
 
+		/// <summary>
+		/// Gets the diagonal distance from a point to the closest point in the rect.
+		/// </summary>
+		public int GetDiagonalDistance(LOCATION otherPt)
+		{
+			return GetClosestPointInRect(otherPt).GetDiagonalDistance(otherPt);
+		}
+
 		public LOCATION[] GetPoints()
 		{
 			LOCATION[] points = new LOCATION[width*height];
