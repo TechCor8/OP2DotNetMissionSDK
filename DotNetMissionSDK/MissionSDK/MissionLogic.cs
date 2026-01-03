@@ -84,10 +84,10 @@ namespace DotNetMissionSDK
 			TethysGame.SetMusicPlayList(tethysGame.MusicPlayList.SongIds.Length, tethysGame.MusicPlayList.RepeatStartIndex, tethysGame.MusicPlayList.SongIds);
 
 			// Select Beacons
-			List<Beacon> beacons = new List<Beacon>();
-			foreach (var group in new List<Beacon>(tethysGame.Beacons).GroupBy(b => b.Id))
+			List<BeaconData> beacons = new List<BeaconData>();
+			foreach (var group in new List<BeaconData>(tethysGame.Beacons).GroupBy(b => b.Id))
 			{
-				List<Beacon> groupBeacons = group.ToList();
+				List<BeaconData> groupBeacons = group.ToList();
 				if (groupBeacons[0].Id <= 0)
 					beacons.AddRange(groupBeacons);
 				else
@@ -99,7 +99,7 @@ namespace DotNetMissionSDK
 			}
 
 			// Create beacons
-			foreach (Beacon beacon in beacons)
+			foreach (BeaconData beacon in beacons)
 			{
 				LOCATION spawnPt = TethysGame.GetMapCoordinates(beacon.Position.ToLocation());
 
@@ -108,10 +108,10 @@ namespace DotNetMissionSDK
 			}
 
 			// Select markers
-			List<Marker> markers = new List<Marker>();
-			foreach (var group in new List<Marker>(tethysGame.Markers).GroupBy(m => m.Id))
+			List<MarkerData> markers = new List<MarkerData>();
+			foreach (var group in new List<MarkerData>(tethysGame.Markers).GroupBy(m => m.Id))
 			{
-				List<Marker> groupMarkers = group.ToList();
+				List<MarkerData> groupMarkers = group.ToList();
 				if (groupMarkers[0].Id <= 0)
 					markers.AddRange(groupMarkers);
 				else
@@ -123,7 +123,7 @@ namespace DotNetMissionSDK
 			}
 
 			// Create markers
-			foreach (Marker marker in markers)
+			foreach (MarkerData marker in markers)
 			{
 				LOCATION spawnPt = TethysGame.GetMapCoordinates(marker.Position.ToLocation());
 
@@ -132,10 +132,10 @@ namespace DotNetMissionSDK
 			}
 
 			// Select wreckage
-			List<Wreckage> wreckages = new List<Wreckage>();
-			foreach (var group in new List<Wreckage>(tethysGame.Wreckage).GroupBy(w => w.Id))
+			List<WreckageData> wreckages = new List<WreckageData>();
+			foreach (var group in new List<WreckageData>(tethysGame.Wreckage).GroupBy(w => w.Id))
 			{
-				List<Wreckage> groupWreckage = group.ToList();
+				List<WreckageData> groupWreckage = group.ToList();
 				if (groupWreckage[0].Id <= 0)
 					wreckages.AddRange(groupWreckage);
 				else
@@ -147,7 +147,7 @@ namespace DotNetMissionSDK
 			}
 
 			// Create wreckage
-			foreach (Wreckage wreck in tethysGame.Wreckage)
+			foreach (WreckageData wreck in tethysGame.Wreckage)
 			{
 				LOCATION spawnPt = TethysGame.GetMapCoordinates(wreck.Position.ToLocation());
 
@@ -232,7 +232,7 @@ namespace DotNetMissionSDK
 					LOCATION spawnPt = TethysGame.GetMapCoordinates(unitData.Position.ToLocation());
 
 					Unit unit = unitData.CreateUnit(data.Id, spawnPt);
-					SetUnitID(data.Id, unit.GetStubIndex());
+					SetUnitID(unitData.Id, unit.GetStubIndex());
 					createdUnits.Add(unit);
 				}
 

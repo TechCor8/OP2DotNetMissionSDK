@@ -187,7 +187,7 @@ namespace DotNetMissionSDK
 			LOCATION foundPt;
 			if (!Pathfinder.GetClosestValidTile(GetTilesInRect(spawnArea), GetTileCost, validTileCB, out foundPt))
 			{
-				Console.WriteLine("Failed to place unit: " + data.TypeID);
+				Console.WriteLine("Failed to place unit: " + data.TypeId);
 				return spawnArea;
 			}
 

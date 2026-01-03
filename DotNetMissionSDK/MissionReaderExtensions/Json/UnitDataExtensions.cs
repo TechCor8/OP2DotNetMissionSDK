@@ -4,8 +4,8 @@ namespace DotNetMissionSDK
 {
 	public static class UnitDataExtensions
 	{
-		public static map_id GetTypeID(this UnitData unitData) => GetEnum<map_id>(unitData.TypeID);
-		public static void SetTypeID(this UnitData unitData, map_id typeId) => unitData.TypeID = typeId.ToString();
+		public static map_id GetTypeID(this UnitData unitData) => GetEnum<map_id>(unitData.TypeId);
+		public static void SetTypeID(this UnitData unitData, map_id typeId) => unitData.TypeId = typeId.ToString();
 
 		public static int GetCargoType(this UnitData unitData) => GetCargoType(GetTypeID(unitData), unitData.CargoType);
 		public static void SetCargoType(this UnitData unitData, int cargoType) => unitData.CargoType = GetCargoType(GetTypeID(unitData), cargoType);
@@ -153,7 +153,7 @@ namespace DotNetMissionSDK
 		private static void SetUnitData(UnitData unitData, map_id typeID, int cargoType, int cargoAmount, UnitDirection direction, LOCATION position, Yield barYield, Variant barVariant,
 								bool ignoreLayout, int minDistance, int spawnDistance, bool createWall, int maxTubes)
 		{
-			unitData.TypeID = typeID.ToString();
+			unitData.TypeId = typeID.ToString();
 			unitData.Lights = true;
 			unitData.CargoType = GetCargoType(typeID, cargoType);
 			unitData.CargoAmount = cargoAmount;

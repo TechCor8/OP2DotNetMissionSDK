@@ -10,7 +10,7 @@ namespace DotNetMissionReader
 	{
 		// Standard info
 		[DataMember(Name = "ID")]			public int Id						{ get; set; }
-		[DataMember(Name = "TypeID")]		public string TypeID				{ get; set; } = string.Empty;
+		[DataMember(Name = "TypeID")]		public string TypeId				{ get; set; } = string.Empty;
 		[DataMember(Name = "Health")]		public float Health					{ get; set; }
 		[DataMember(Name = "Lights")]		public bool Lights					{ get; set; }
 		[DataMember(Name = "CargoType")]	public string CargoType				{ get; set; } = string.Empty;
@@ -44,7 +44,7 @@ namespace DotNetMissionReader
 		public UnitData(UnitData clone)
 		{
 			Id = clone.Id;
-			TypeID = clone.TypeID;
+			TypeId = clone.TypeId;
 			Health = clone.Health;
 			Lights = clone.Lights;
 			CargoType = clone.CargoType;

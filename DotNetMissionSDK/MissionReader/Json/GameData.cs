@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace DotNetMissionReader
@@ -12,9 +13,9 @@ namespace DotNetMissionReader
 		[DataMember(Name = "InitialLightLevel")]		public int InitialLightLevel			{ get; set; }
 
 		[DataMember(Name = "MusicPlayList")]			public MusicPlayList MusicPlayList		{ get; set; }
-		[DataMember(Name = "Beacons")]					public List<Beacon> Beacons				{ get; set; }
-		[DataMember(Name = "Markers")]					public List<Marker> Markers				{ get; set; }
-		[DataMember(Name = "Wreckage")]					public List<Wreckage> Wreckage			{ get; set; }
+		[DataMember(Name = "Beacons")]					public List<BeaconData> Beacons				{ get; set; }
+		[DataMember(Name = "Markers")]					public List<MarkerData> Markers				{ get; set; }
+		[DataMember(Name = "Wreckage")]					public List<WreckageData> Wreckage			{ get; set; }
 
 		[DataMember(Name = "Triggers")]					public List<TriggerData> Triggers		{ get; set; }
 
@@ -31,9 +32,9 @@ namespace DotNetMissionReader
 			DaylightMoves = true;
 			MusicPlayList = new MusicPlayList();
 			MusicPlayList.SongIds = new int[] { 0 };
-			Beacons = new List<Beacon>();
-			Markers = new List<Marker>();
-			Wreckage = new List<Wreckage>();
+			Beacons = new List<BeaconData>();
+			Markers = new List<MarkerData>();
+			Wreckage = new List<WreckageData>();
 			Triggers = new List<TriggerData>();
 		}
 
@@ -50,17 +51,17 @@ namespace DotNetMissionReader
 			InitialLightLevel = clone.InitialLightLevel;
 
 			MusicPlayList = new MusicPlayList(clone.MusicPlayList);
-			Beacons = new List<Beacon>(clone.Beacons.Count);
-			Markers = new List<Marker>(clone.Markers.Count);
-			Wreckage = new List<Wreckage>(clone.Wreckage.Count);
+			Beacons = new List<BeaconData>(clone.Beacons.Count);
+			Markers = new List<MarkerData>(clone.Markers.Count);
+			Wreckage = new List<WreckageData>(clone.Wreckage.Count);
 			Triggers = new List<TriggerData>(clone.Triggers.Count);
 
-			foreach (Beacon beacon in clone.Beacons)
-				Beacons.Add(new Beacon(beacon));
-			foreach (Marker marker in clone.Markers)
-				Markers.Add(new Marker(marker));
-			foreach (Wreckage wreck in clone.Wreckage)
-				Wreckage.Add(new Wreckage(wreck));
+			foreach (BeaconData beacon in clone.Beacons)
+				Beacons.Add(new BeaconData(beacon));
+			foreach (MarkerData marker in clone.Markers)
+				Markers.Add(new MarkerData(marker));
+			foreach (WreckageData wreck in clone.Wreckage)
+				Wreckage.Add(new WreckageData(wreck));
 			foreach (TriggerData trigger in clone.Triggers)
 				Triggers.Add(new TriggerData(trigger));
 		}
@@ -78,12 +79,12 @@ namespace DotNetMissionReader
 			Wreckage.Capacity = Wreckage.Count + dataToConcat.Wreckage.Count;
 			Triggers.Capacity = Triggers.Count + dataToConcat.Triggers.Count;
 
-			foreach (Beacon beacon in dataToConcat.Beacons)
-				Beacons.Add(new Beacon(beacon));
-			foreach (Marker marker in dataToConcat.Markers)
-				Markers.Add(new Marker(marker));
-			foreach (Wreckage wreck in dataToConcat.Wreckage)
-				Wreckage.Add(new Wreckage(wreck));
+			foreach (BeaconData beacon in dataToConcat.Beacons)
+				Beacons.Add(new BeaconData(beacon));
+			foreach (MarkerData marker in dataToConcat.Markers)
+				Markers.Add(new MarkerData(marker));
+			foreach (WreckageData wreck in dataToConcat.Wreckage)
+				Wreckage.Add(new WreckageData(wreck));
 			foreach (TriggerData trigger in dataToConcat.Triggers)
 				Triggers.Add(new TriggerData(trigger));
 		}
@@ -101,7 +102,7 @@ namespace DotNetMissionReader
 	public class MusicPlayList
 	{
 		[DataMember(Name = "RepeatStartIndex")]		public int RepeatStartIndex				{ get; set; }
-		[DataMember(Name = "SongIDs")]				public int[] SongIds					{ get; set; }
+		[DataMember(Name = "SongIDs")]				public int[] SongIds					{ get; set; } = Array.Empty<int>();
 
 		public MusicPlayList() { }
 		public MusicPlayList(MusicPlayList clone)
@@ -113,18 +114,18 @@ namespace DotNetMissionReader
 	}
 
 	[DataContract]
-	public class Beacon
+	public class BeaconData
 	{
 		[DataMember(Name = "ID")]					public int Id							{ get; set; }
-		[DataMember(Name = "MapID")]				public string MapId						{ get; set; }
-		[DataMember(Name = "OreType")]				public string OreType					{ get; set; }
-		[DataMember(Name = "BarYield")]				public string BarYield					{ get; set; }
-		[DataMember(Name = "BarVariant")]			public string BarVariant				{ get; set; }
+		[DataMember(Name = "MapID")]				public string MapId						{ get; set; } = string.Empty;
+		[DataMember(Name = "OreType")]				public string OreType					{ get; set; } = string.Empty;
+		[DataMember(Name = "BarYield")]				public string BarYield					{ get; set; } = string.Empty;
+		[DataMember(Name = "BarVariant")]			public string BarVariant				{ get; set; } = string.Empty;
 		[DataMember(Name = "Position")]				public DataLocation Position			{ get; set; }
 
 			
-		public Beacon() { }
-		public Beacon(Beacon clone)
+		public BeaconData() { }
+		public BeaconData(BeaconData clone)
 		{
 			Id = clone.Id;
 			MapId = clone.MapId;
@@ -136,15 +137,15 @@ namespace DotNetMissionReader
 	}
 
 	[DataContract]
-	public class Marker
+	public class MarkerData
 	{
 		[DataMember(Name = "ID")]					public int Id							{ get; set; }
-		[DataMember(Name = "MarkerType")]			public string MarkerType				{ get; set; }
+		[DataMember(Name = "MarkerType")]			public string MarkerType				{ get; set; } = string.Empty;
 		[DataMember(Name = "Position")]				public DataLocation Position			{ get; set; }
 
 
-		public Marker() { }
-		public Marker(Marker clone)
+		public MarkerData() { }
+		public MarkerData(MarkerData clone)
 		{
 			Id = clone.Id;
 			MarkerType = clone.MarkerType;
@@ -153,15 +154,15 @@ namespace DotNetMissionReader
 	}
 
 	[DataContract]
-	public class Wreckage
+	public class WreckageData
 	{
 		[DataMember(Name = "ID")]					public int Id							{ get; set; }
-		[DataMember(Name = "TechID")]				public string TechId					{ get; set; }
+		[DataMember(Name = "TechID")]				public string TechId					{ get; set; } = string.Empty;
 		[DataMember(Name = "IsVisible")]			public bool IsVisible					{ get; set; }
 		[DataMember(Name = "Position")]				public DataLocation Position			{ get; set; }
 
-		public Wreckage() { }
-		public Wreckage(Wreckage clone)
+		public WreckageData() { }
+		public WreckageData(WreckageData clone)
 		{
 			Id = clone.Id;
 			TechId = clone.TechId;
